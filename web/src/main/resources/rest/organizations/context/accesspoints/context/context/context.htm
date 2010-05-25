@@ -1,0 +1,83 @@
+<!--
+
+
+    Copyright 2009 Streamsource AB
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>${request.resourceRef.remainingPart}</title>
+    <link rel="stylesheet" type="text/css" href="/streamflow/streamflow/v1/static/rest.css" />
+</head>
+
+<body>
+
+<h1>${request.resourceRef.remainingPart}</h1>
+
+#if ($result.queries)
+<div class="block">
+    <h2>Queries</h2>
+    <ul>
+        #foreach($query in $result.queries)
+        #set($desc = $api.method($query))
+        <li>
+            <a href="$query">$query</a>
+            #if($desc)
+            <p>$desc</p>
+            #end
+        </li>
+        #end
+    </ul>
+</div>
+#end
+
+#if($result.commands)
+<div class="block">
+    <h2>Commands</h2>
+    <ul>
+        #foreach($command in $result.commands)
+        #set($desc = $api.method($command))
+        <li>
+            <a href="$command">$command</a>
+            #if($desc)
+            <p>$desc</p>
+            #end
+        </li>
+        #end
+    </ul>
+</div>
+#end
+
+#if($result.contexts)
+<div class="block">
+    <h2>Sub-contexts</h2>
+    <ul>
+        #foreach($context in $result.contexts)
+        #set($desc = $api.method($context))
+        <li>
+            <a href="$context">$context</a>
+            #if($desc)
+            <p>$desc</p>
+            #end
+        </li>
+        #end
+    </ul>
+</div>
+#end
+
+</body>
+
+</html>
