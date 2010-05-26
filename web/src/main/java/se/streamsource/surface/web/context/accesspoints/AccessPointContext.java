@@ -17,7 +17,12 @@
 
 package se.streamsource.surface.web.context.accesspoints;
 
+import org.qi4j.api.injection.scope.Uses;
 import org.qi4j.api.mixin.Mixins;
+import se.streamsource.dci.api.Context;
+import se.streamsource.dci.api.IndexInteraction;
+import se.streamsource.dci.value.LinksValue;
+import se.streamsource.surface.web.context.IndexInteractionLinksValue;
 import se.streamsource.surface.web.context.accesspoints.endusers.EndUsersContext;
 import se.streamsource.dci.api.Interactions;
 import se.streamsource.dci.api.InteractionsMixin;
@@ -28,7 +33,7 @@ import se.streamsource.dci.restlet.client.CommandQueryClient;
  */
 @Mixins(AccessPointContext.Mixin.class)
 public interface AccessPointContext
-   extends Interactions
+   extends Interactions, IndexInteraction<LinksValue>
 {
    @SubContext
    EndUsersContext endusers();
@@ -41,6 +46,22 @@ public interface AccessPointContext
       {
          context.set( context.get( CommandQueryClient.class ).getSubClient( "endusers" ));
          return subContext( EndUsersContext.class );
+      }
+
+      public LinksValue index()
+      {
+         CommandQueryClient client = context.get( CommandQueryClient.class );
+
+         CommandQueryClient subClient = client.getSubClient( "accesspoints" );
+
+         try
+         {
+            return subClient.query( "index", LinksValue.class );
+         } catch (Throwable e)
+         {
+            e.printStackTrace();
+         }
+         return null;
       }
    }
 

@@ -23,12 +23,14 @@ jQuery(document).ready(function()
      'li':{
       'link<-links':{
        'a':'link.text',
-       'a@dir':'link.id',
+       'a@accesskey':'link.id'
       }
      }
     };
 
-    var baseUrl = "surface/accesspoints/"
+    var baseUrl = "surface/accespoints/"
+    errorHandler = function(XMLHttpRequest, textStatus, errorThrown) { alert(errorThrown ); }
+
 
 	$('#to_another_div').live('click', function() {
 		$('#app').load('components.html #organizations_div', function () {
@@ -38,16 +40,22 @@ jQuery(document).ready(function()
 				success: function(data) {
 					$('ul').render(data, directive );
 				},
-                error: function(XMLHttpRequest, textStatus, errorThrown) {
-                    alert(errorThrown );
-                }
+                error: errorHandler
 			});
 		});
 	});
 
-    $('#to_organization_div').live('click', function(data) {
-        $('#app').load('components.html #organization_div', function() {
-          alert(data)
+    $('#to_organization_div').live('click', function() {
+        baseUrl += $(this).attr('accesskey') + '/';
+        $('#app').load('components.html #organization_div', function(event) {
+            $.ajax({
+				url: baseUrl+'index.json',
+				success: function(data) {
+					$('ul').render(data, directive );
+				},
+                error: errorHandler 
+                }
+			});
         });
 
     });
