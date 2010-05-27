@@ -28,7 +28,7 @@ jQuery(document).ready(function()
      }
     };
 
-    var baseUrl = "surface/accespoints/"
+    var baseUrl = "surface/accesspoints/"
     errorHandler = function(XMLHttpRequest, textStatus, errorThrown) { alert(errorThrown ); }
 
 
@@ -54,7 +54,6 @@ jQuery(document).ready(function()
 					$('ul').render(data, directive );
 				},
                 error: errorHandler 
-                }
 			});
         });
 
