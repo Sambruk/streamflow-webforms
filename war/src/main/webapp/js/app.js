@@ -47,11 +47,24 @@ jQuery(document).ready(function()
 
     $('#to_organization_div').live('click', function() {
         baseUrl += $(this).attr('accesskey') + '/';
-        $('#app').load('components.html #organization_div', function(event) {
+        $('#app').load('components.html #organization_div', function() {
             $.ajax({
 				url: baseUrl+'index.json',
 				success: function(data) {
-					$('ul').render(data, directive );
+					$('#accesspoint_name').text( data.string );
+
+					$.ajax( {
+					    url: baseUrl + 'endusers/viewenduser',
+                        success: function(data) {
+                           $('#enduser_description').show().text( data );
+                           $('#login_enduser').hide();
+                        },
+                        error: function(XMLHttpRequest, textStatus, errorThrown) {
+                           $('#to_enduser_inbox').hide();
+                           $('#login_enduser').show();
+                        }
+                    });
+
 				},
                 error: errorHandler 
 			});

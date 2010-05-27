@@ -61,8 +61,7 @@ public interface RootContext
          filter.setNext( (Restlet) client );
 
          CommandQueryClient cqc = obf.newObjectBuilder( CommandQueryClient.class ).use( filter, streamflowReference, new NullResponseHandler() ).newInstance();
-         //context.set( cqc.getSubClient( "surface" ).getSubClient( "accesspoints" ) );
-         context.set( cqc.getSubClient( "surface" ).getSubClient( "organizations" ) );
+         context.set( cqc.getSubClient( "surface" ).getSubClient( "accesspoints" ) );
 
          return subContext( AccessPointsContext.class );
       }
