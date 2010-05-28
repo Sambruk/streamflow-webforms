@@ -74,7 +74,8 @@ public class CookieResponseHandler
 
                   CookieSetting cookieSetting = new CookieSetting( EndUsersContext.COOKIE_NAME, userId );
                   // one day
-                  cookieSetting.setMaxAge( 60 * 60 * 24 );
+                  //cookieSetting.setMaxAge( 60 * 60 * 24 );
+                  cookieSetting.setMaxAge( 60 );
                   this.response.getCookieSettings().add( cookieSetting );
                }
 

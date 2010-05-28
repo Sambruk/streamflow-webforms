@@ -26,6 +26,7 @@ import org.restlet.data.Status;
 import org.restlet.representation.EmptyRepresentation;
 import org.restlet.resource.ResourceException;
 import org.restlet.util.Series;
+import se.streamsource.streamflow.resource.roles.EntityReferenceDTO;
 import se.streamsource.surface.web.rest.CookieResponseHandler;
 import se.streamsource.dci.api.ContextNotFoundException;
 import se.streamsource.dci.api.Interactions;
@@ -42,10 +43,14 @@ public interface EndUsersContext
 {
    public static final String COOKIE_NAME = "ANONYMOUS_USER";
 
-
+   // Commands
    void selectenduser( Response response ) throws ResourceException;
 
+
+   // Queries
    LinkValue viewenduser( Response response ) throws ResourceException;
+
+   EntityReferenceDTO userreference( Response response) throws ResourceException;
 
    abstract class Mixin
          extends InteractionsMixin
@@ -62,7 +67,6 @@ public interface EndUsersContext
          // for now only user the anonymous end users
          Series<Cookie> cookies = response.getRequest().getCookies();
 
-         EntityReference user = null;
          Cookie cookie = findCookie( cookies );
          if ( cookie == null )
          {
@@ -90,8 +94,19 @@ public interface EndUsersContext
          return null;
       }
 
-
+      //This one will re-direct
       public LinkValue viewenduser( Response response ) throws ResourceException
+      {
+         EntityReferenceDTO dto = userreference( response );
+
+         ValueBuilder<LinkValue> builder = module.valueBuilderFactory().newValueBuilder( LinkValue.class );
+         builder.prototype().id().set( dto.entity().get().identity() );
+         builder.prototype().href().set( dto.entity().get().identity()+"/" );
+         builder.prototype().text().set( "ANONYMOUS" );
+         return builder.newInstance();
+      }
+
+      public EntityReferenceDTO userreference( Response response) throws ResourceException
       {
          Series<Cookie> cookies = response.getRequest().getCookies();
 
@@ -102,13 +117,11 @@ public interface EndUsersContext
             throw new ResourceException( Status.CLIENT_ERROR_UNAUTHORIZED );
          }
 
-         ValueBuilder<LinkValue> builder = module.valueBuilderFactory().newValueBuilder( LinkValue.class );
-         EntityReference entityReference = EntityReference.parseEntityReference( cookie.getValue() );
-         builder.prototype().id().set( entityReference.identity() );
-         builder.prototype().href().set( entityReference.identity()+"/" );
-         builder.prototype().text().set( "ANONYMOUS" );
+         ValueBuilder<EntityReferenceDTO> builder = module.valueBuilderFactory().newValueBuilder( EntityReferenceDTO.class );
+         builder.prototype().entity().set( EntityReference.parseEntityReference( cookie.getValue() ) );
          return builder.newInstance();
       }
+
    }
 
 }

@@ -28,7 +28,7 @@ jQuery(document).ready(function()
      }
     };
 
-    var baseUrl = "surface/accesspoints/"
+    var contextUrl = "surface/accesspoints/"
     errorHandler = function(XMLHttpRequest, textStatus, errorThrown) { alert(errorThrown ); }
 
 
@@ -36,7 +36,7 @@ jQuery(document).ready(function()
 		$('#app').load('components.html #organizations_div', function () {
 
 			$.ajax({
-				url: baseUrl+'index.json',
+				url: contextUrl+'index.json',
 				success: function(data) {
 					$('ul').render(data, directive );
 				},
@@ -46,22 +46,24 @@ jQuery(document).ready(function()
 	});
 
     $('#to_organization_div').live('click', function() {
-        baseUrl += $(this).attr('accesskey') + '/';
+        contextUrl += $(this).attr('accesskey') + '/';
         $('#app').load('components.html #organization_div', function() {
             $.ajax({
-				url: baseUrl+'index.json',
+				url: contextUrl+'index.json',
 				success: function(data) {
 					$('#accesspoint_name').text( data.string );
 
+                    contextUrl += 'endusers/';
 					$.ajax( {
-					    url: baseUrl + 'endusers/viewenduser',
+					    url: contextUrl + 'userreference.json',
                         success: function(data) {
-                           $('#enduser_description').show().text( data );
+                           contextUrl += data.entity + '/';
                            $('#login_enduser').hide();
+                           $('#to_enduser_inbox').show();
                         },
                         error: function(XMLHttpRequest, textStatus, errorThrown) {
-                           $('#to_enduser_inbox').hide();
                            $('#login_enduser').show();
+                           $('#to_enduser_inbox').hide();
                         }
                     });
 
@@ -70,6 +72,79 @@ jQuery(document).ready(function()
 			});
         });
 
+    });
+
+    updateInbox = function(url) {
+        $.ajax({
+            url: url + 'index.json',
+            success: function(data) {
+                if (data.links.size == 0)
+                {
+                    $('ul').hide();
+                } else
+                {
+                    $('li').remove();
+                    $('ul').append('<li><a href="#" id="to_case_div" accesskey=""></a></li>');
+                    $('ul').show().render(data, directive );
+                }
+            },
+            error: errorHandler
+        });
+    };
+
+    $('#login_enduser_operation').live('click', function() {
+        $('#app').load('components.html #enduser_inbox_div', function() {
+            $.ajax({
+                    url: contextUrl + 'selectenduser.json',
+                    type: 'POST',
+                    success: function(data, textStatus, XMLHttpRequest) {
+                        $.ajax({
+                            url: contextUrl + 'userreference.json',
+                            success: function(data) {
+                                contextUrl += data.entity + '/';
+                                updateInbox(contextUrl);
+                            },
+                            error: errorHandler
+                        });
+                    },
+                    error: errorHandler
+            });
+        });
+    });
+
+    $('#to_viewenduser_div').live('click', function() {
+        $('#app').load('components.html #enduser_inbox_div', function() {
+            updateInbox(contextUrl);
+        });
+    });
+
+    $('#create_case').live('click', function() {
+        var caseName = $('#casename').attr('value');
+
+        if ( caseName.length > 0)
+        {
+            $.ajax({
+                url: contextUrl + 'createcase.json',
+                data: 'string='+ $('#casename').attr('value'),
+                type: 'POST',
+                success: function() {
+                    updateInbox(contextUrl);
+                },
+                error: errorHandler
+            });
+        };
+    });
+
+    $('#to_case_div').live('click', function() {
+        contextUrl += $(this).attr('accesskey') + '/';
+        $('#app').load('components.html #case_div', function() {
+            $.ajax({
+                url: contextUrl + 'index.json',
+                success: function(data) {
+                    $('#case_description').text(data.description);
+                }
+            });
+        });
     });
 
 	$('#to_start').live('click', function() {
