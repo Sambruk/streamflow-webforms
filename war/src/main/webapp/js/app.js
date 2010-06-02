@@ -1,4 +1,4 @@
-/*
+/**
  *
  * Copyright 2009 Streamsource AB
  *
@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 
 jQuery(document).ready(function()
 {
@@ -31,12 +32,16 @@ jQuery(document).ready(function()
     var contextUrl = "surface/accesspoints/"
     errorHandler = function(XMLHttpRequest, textStatus, errorThrown) { alert(errorThrown ); }
 
+    var url = function(ref, operation) {
+        return ref.toString() + operation;
+    };
+
 
 	$('#to_another_div').live('click', function() {
 		$('#app').load('components.html #organizations_div', function () {
 
 			$.ajax({
-				url: contextUrl+'index.json',
+				url: contextUrl + 'index.json',
 				success: function(data) {
 					$('ul').render(data, directive );
 				},
@@ -92,6 +97,8 @@ jQuery(document).ready(function()
         });
     };
 
+    var userInboxUrl
+
     $('#login_enduser_operation').live('click', function() {
         $('#app').load('components.html #enduser_inbox_div', function() {
             $.ajax({
@@ -102,6 +109,7 @@ jQuery(document).ready(function()
                             url: contextUrl + 'userreference.json',
                             success: function(data) {
                                 contextUrl += data.entity + '/';
+                                userInboxUrl = contextUrl;
                                 updateInbox(contextUrl);
                             },
                             error: errorHandler
@@ -125,10 +133,11 @@ jQuery(document).ready(function()
         {
             $.ajax({
                 url: contextUrl + 'createcase.json',
-                data: 'string='+ $('#casename').attr('value'),
+                data: 'string='+ caseName,
                 type: 'POST',
                 success: function() {
                     updateInbox(contextUrl);
+                    $('#casename').removeAttr('value');
                 },
                 error: errorHandler
             });
@@ -146,6 +155,28 @@ jQuery(document).ready(function()
             });
         });
     });
+
+    $('#back_to_index').live('click', function() {
+        contextUrl = userInboxUrl;
+        $('#app').load('components.html #enduser_inbox_div', function() {
+            updateInbox(contextUrl);
+        });
+    });
+
+    $('#send_case').live('click', function() {
+        $.ajax({
+            url: contextUrl + "sendtofunction.json",
+            type: 'POST',
+            success: function(data) {
+                contextUrl = userInboxUrl;
+                $('#app').load('components.html #enduser_inbox_div', function() {
+                    updateInbox(contextUrl);
+                });
+            },
+            error: errorHandler
+        });
+    });
+
 
 	$('#to_start').live('click', function() {
 		$('#app').load("components.html #start");
