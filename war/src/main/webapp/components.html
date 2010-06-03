@@ -45,8 +45,8 @@
     <a href="#" id="create_case">Create case</a>
     <input type="text" id="casename" value=""/>
 
-    <ul>
-        <li><a href="#" id="to_case_div" accesskey=""></a></li>
+    <ul id="case_list">
+        <li id="case_element"><a href="#" id="to_case_div" accesskey=""></a></li>
     </ul>
 </div>
 
@@ -55,26 +55,26 @@
     <h1 id="case_description"></h1>
 
     <div id="submittedforms_div">
-        <table id="submittedforms_table">
-            <thead>
-                <tr><th>Submitted Forms</th></tr>
-            </thead>
-            <tbody>
-                <tr id="submittedforms_table_empty"><td>No submitted forms</td></tr>
-            </tbody>
-        </table>
+        Submitted Forms
+        <ul id="submitted_forms_list">
+            <li id="submitted_form"><a href="#" id="view_submitted_form" accesskey=""></a></li>
+        </ul>
     </div>
 
     <div id="formdrafts_div">
-        <table id="formdrafts_table">
-            <thead>
-                <tr><th>Form Drafts</th></tr>
-            </thead>
-            <tbody>
-                <tr id="formdrafts_table_empty"><td>No form drafts</td></tr>
-            </tbody>
-        </table>
+        Form Drafts
+        <ul id="form_drafts_list">
+            <li id="form_draft"><a href="#" id="edit_form_draft" accesskey=""></a></li>
+        </ul>
     </div>
+
+    <div id="requiredforms_div">
+        Required Forms
+        <ul id="required_forms_list">
+            <li id="required_form"><a href="#" id="create_form_draft" accesskey=""></a></li>
+        </ul>
+    </div>
+
 
     <a href="#" id="back_to_index">To inbox</a> <a href="#" id="send_case">Send</a>
 </div>

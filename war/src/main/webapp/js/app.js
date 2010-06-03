@@ -29,11 +29,33 @@ jQuery(document).ready(function()
      }
     };
 
-    var contextUrl = "surface/accesspoints/"
-    errorHandler = function(XMLHttpRequest, textStatus, errorThrown) { alert(errorThrown ); }
+    var contextUrl = "surface/accesspoints/";
+    var userInboxUrl;
+    errorHandler = function(XMLHttpRequest, textStatus, errorThrown) { alert(errorThrown ); };
 
-    var url = function(ref, operation) {
-        return ref.toString() + operation;
+    updateList = function(url, list_id, element_id) {
+
+        $.ajax({
+            url: url + 'index.json',
+            success: function(data) {
+                if (data.links.length == 0)
+                {
+                    $('ul#'+list_id ).hide();
+                } else
+                {
+                    $('ul#'+list_id+' > li:gt(0)').remove();
+                    $('ul#'+list_id ).show().render(data, directive );
+                }
+            },
+            error: errorHandler
+        });
+    };
+
+    toInbox = function(userInboxUrl) {
+        contextUrl = userInboxUrl;
+        $('#app').load('components.html #enduser_inbox_div', function() {
+            updateList(contextUrl, 'case_list', 'case_element');
+        });
     };
 
 
@@ -50,6 +72,7 @@ jQuery(document).ready(function()
 		});
 	});
 
+
     $('#to_organization_div').live('click', function() {
         contextUrl += $(this).attr('accesskey') + '/';
         $('#app').load('components.html #organization_div', function() {
@@ -63,6 +86,7 @@ jQuery(document).ready(function()
 					    url: contextUrl + 'userreference.json',
                         success: function(data) {
                            contextUrl += data.entity + '/';
+                           userInboxUrl = contextUrl;
                            $('#login_enduser').hide();
                            $('#to_enduser_inbox').show();
                         },
@@ -79,26 +103,6 @@ jQuery(document).ready(function()
 
     });
 
-    updateInbox = function(url) {
-        $.ajax({
-            url: url + 'index.json',
-            success: function(data) {
-                if (data.links.size == 0)
-                {
-                    $('ul').hide();
-                } else
-                {
-                    $('li').remove();
-                    $('ul').append('<li><a href="#" id="to_case_div" accesskey=""></a></li>');
-                    $('ul').show().render(data, directive );
-                }
-            },
-            error: errorHandler
-        });
-    };
-
-    var userInboxUrl
-
     $('#login_enduser_operation').live('click', function() {
         $('#app').load('components.html #enduser_inbox_div', function() {
             $.ajax({
@@ -110,7 +114,7 @@ jQuery(document).ready(function()
                             success: function(data) {
                                 contextUrl += data.entity + '/';
                                 userInboxUrl = contextUrl;
-                                updateInbox(contextUrl);
+                                updateList(contextUrl, 'case_list', 'case_element');
                             },
                             error: errorHandler
                         });
@@ -122,7 +126,7 @@ jQuery(document).ready(function()
 
     $('#to_viewenduser_div').live('click', function() {
         $('#app').load('components.html #enduser_inbox_div', function() {
-            updateInbox(contextUrl);
+            updateList(contextUrl, 'case_list', 'case_element');
         });
     });
 
@@ -136,7 +140,7 @@ jQuery(document).ready(function()
                 data: 'string='+ caseName,
                 type: 'POST',
                 success: function() {
-                    updateInbox(contextUrl);
+                    updateList(contextUrl, 'case_list', 'case_element');
                     $('#casename').removeAttr('value');
                 },
                 error: errorHandler
@@ -153,14 +157,14 @@ jQuery(document).ready(function()
                     $('#case_description').text(data.description);
                 }
             });
+            //updateList(contextUrl + 'submittedforms/', 'submitted_forms_list', 'submitted_form');
+            updateList(contextUrl + 'formdrafts/',     'form_drafts_list', 'form_draft');
+            updateList(contextUrl + 'requiredforms/',  'required_forms_list', 'required_form');
         });
     });
 
     $('#back_to_index').live('click', function() {
-        contextUrl = userInboxUrl;
-        $('#app').load('components.html #enduser_inbox_div', function() {
-            updateInbox(contextUrl);
-        });
+        toInbox( userInboxUrl );
     });
 
     $('#send_case').live('click', function() {
@@ -168,15 +172,23 @@ jQuery(document).ready(function()
             url: contextUrl + "sendtofunction.json",
             type: 'POST',
             success: function(data) {
-                contextUrl = userInboxUrl;
-                $('#app').load('components.html #enduser_inbox_div', function() {
-                    updateInbox(contextUrl);
-                });
+                toInbox(userInboxUrl );
             },
             error: errorHandler
         });
     });
 
+    $('#create_form_draft').live('click', function() {
+        var entity = $(this).attr('accesskey');
+        $.ajax({
+            url: contextUrl + 'requiredforms/createformdraft.json',
+            type: 'POST',
+            data: 'entity=' + entity,
+            success: function(data) {
+                updateList(contextUrl + 'formdrafts/',     'form_drafts_list', 'form_draft');
+            }
+        });
+    });
 
 	$('#to_start').live('click', function() {
 		$('#app').load("components.html #start");

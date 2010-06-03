@@ -24,6 +24,7 @@ import se.streamsource.dci.api.Interactions;
 import se.streamsource.dci.api.InteractionsMixin;
 import se.streamsource.dci.api.SubContexts;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
+import se.streamsource.dci.value.LinksValue;
 import se.streamsource.dci.value.StringValue;
 import se.streamsource.dci.value.TitledLinksValue;
 
@@ -31,7 +32,7 @@ import se.streamsource.dci.value.TitledLinksValue;
  */
 @Mixins(EndUserContext.Mixin.class)
 public interface EndUserContext
-      extends SubContexts<CaseContext>, Interactions, IndexInteraction<TitledLinksValue>
+      extends SubContexts<CaseContext>, Interactions, IndexInteraction<LinksValue>
 {
    // commands
    void createcase( StringValue desctiption );
@@ -59,13 +60,13 @@ public interface EndUserContext
          return subContext( CaseContext.class );
       }
 
-      public TitledLinksValue index()
+      public LinksValue index()
       {
          CommandQueryClient client = context.get( CommandQueryClient.class );
 
          try
          {
-            return client.query( "index", TitledLinksValue.class );
+            return client.query( "index", LinksValue.class );
          } catch (Throwable e)
          {
             e.printStackTrace();
