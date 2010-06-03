@@ -20,6 +20,11 @@ jQuery(document).ready(function()
 {
 	$('#app').load("components.html #start");
 
+    $('#to_start').live('click', function() {
+        $('#app').load("components.html #start");
+    });
+
+
     var directive = {
      'li':{
       'link<-links':{
@@ -190,7 +195,29 @@ jQuery(document).ready(function()
         });
     });
 
-	$('#to_start').live('click', function() {
-		$('#app').load("components.html #start");
-	});
+    $('#edit_form_draft').live('click', function() {
+        var entity = $(this).attr('accesskey');
+        $('#app').load('components.html #form_filling_div', function() {
+            $.ajax({
+                url: contextUrl + 'formdrafts/' + entity + '/index.json',
+                success: function(data) {
+                    $('#form_page').text(data.title);
+                    appendTableRow(data.fields);
+                }
+            });
+        });
+    });
+
+    appendTableRow = function(fields) {
+        for (idx in fields) {
+            field = fields[idx];
+            id = field.field.field;
+            name = field.field.description;
+            value = field.value;
+            $('#form_table_body').append('<tr><td>'+name+'</td><td id="'+id+'">'+value+'</td></tr>');
+            //$('#form_field_name').text(field.field.description);
+            //$('#form_field_value').text(field.value);
+        }
+
+    };
 })
