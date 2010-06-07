@@ -21,6 +21,7 @@ import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.value.ValueBuilder;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
+import se.streamsource.streamflow.resource.roles.IntegerDTO;
 import se.streamsource.surface.web.context.accesspoints.endusers.formdrafts.summary.SummaryContext;
 import se.streamsource.dci.api.IndexInteraction;
 import se.streamsource.dci.api.Interactions;
@@ -42,7 +43,11 @@ public interface FormDraftContext
 
    void next( Representation rep);
 
+   void nextpage( IntegerDTO page );
+
    void previous( Representation rep );
+
+   void previouspage( IntegerDTO page );
 
    void updatefield( FieldDTO field );
 
@@ -56,9 +61,7 @@ public interface FormDraftContext
 
          try
          {
-            PageSubmissionValue value = client.query( "index", PageSubmissionValue.class );
-            context.set( value );
-            return value;
+            return client.query( "index", PageSubmissionValue.class );
          } catch (Throwable e)
          {
             e.printStackTrace();
@@ -70,6 +73,32 @@ public interface FormDraftContext
       {
          context.set( context.get( CommandQueryClient.class ).getSubClient( "summary" ));
          return subContext( SummaryContext.class );
+      }
+
+      public void nextpage(IntegerDTO page)
+      {
+         CommandQueryClient client = context.get( CommandQueryClient.class );
+
+         try
+         {
+            client.postCommand( "nextpage", page);
+         } catch (ResourceException e)
+         {
+            e.printStackTrace();
+         }
+      }
+
+      public void previouspage(IntegerDTO page)
+      {
+         CommandQueryClient client = context.get( CommandQueryClient.class );
+
+         try
+         {
+            client.postCommand( "previouspage", page);
+         } catch (ResourceException e)
+         {
+            e.printStackTrace();
+         }
       }
 
       public void next( Representation rep)
@@ -100,27 +129,14 @@ public interface FormDraftContext
 
       public void updatefield( FieldDTO field )
       {
-         PageSubmissionValue value = context.get( PageSubmissionValue.class );
-         ValueBuilder<FieldSubmissionValue> builder = null;
+         CommandQueryClient client = context.get( CommandQueryClient.class );
 
-         for (FieldSubmissionValue fieldSubmissionValue : value.fields().get())
+         try
          {
-            if ( fieldSubmissionValue.field().get().field().get().identity().equals( field.field().get() ) )
-            {
-               builder = module.valueBuilderFactory().newValueBuilder( FieldSubmissionValue.class ).withPrototype( fieldSubmissionValue );
-               builder.prototype().value().set( field.value().get() );
-
-               CommandQueryClient client = context.get( CommandQueryClient.class );
-
-               try
-               {
-                  client.postCommand( "updatefield", builder.newInstance() );
-               } catch (ResourceException e)
-               {
-                  e.printStackTrace();
-               }
-
-            }
+            client.postCommand( "updatefield", field );
+         } catch (ResourceException e)
+         {
+            e.printStackTrace();
          }
       }
 

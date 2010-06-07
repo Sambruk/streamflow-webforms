@@ -41,7 +41,7 @@
 
 <div id="enduser_inbox_div">
 
-    <h2>User home</h2>
+    <h2>Drafts box</h2>
     <a href="#" id="create_case">Create case</a>
     <input type="text" id="casename" value=""/>
 
@@ -52,12 +52,11 @@
 
 
 <div id="case_div">
-    <h1 id="case_description"></h1>
+    <h2 id="case_description"></h2>
 
     <div id="submittedforms_div">
         Submitted Forms
         <ul id="submitted_forms_list">
-            <li id="submitted_form"><a href="#" id="view_submitted_form" accesskey=""></a></li>
         </ul>
     </div>
 
@@ -76,10 +75,12 @@
     </div>
 
 
-    <a href="#" id="back_to_index">To inbox</a> <a href="#" id="send_case">Send</a>
+    <a href="#" id="back_to_index">To drafts box</a> <a href="#" id="send_case">Send</a>
 </div>
 
 <div id="form_filling_div">
+    <a href="#" id="back_to_case_div">Back to case</a>
+
     <table>
         <thead>
             <th id="form_page"></th>
@@ -89,5 +90,16 @@
     </table>
 
     <a href="#" id="form_page_previous">Previous</a> <a href="#" id="form_page_next">Next</a>
-    <a href="#" id="form_page_discard">Discard</a> <a href="#" id="form_page_summary">Summary</a>
+    <a href="#" id="form_page_discard">Discard</a> <a href="#" id="form_summary">Summary</a>
+</div>
+
+<div id="form_summary_div">
+    <a href="#" id="back_back_to_case_div">Back to case</a>    
+    <h2 id="form_description"></h2>
+
+    <ul id="form_page_summary">
+
+    </ul>
+
+    <a href="#" id="form_submit">Submit</a>
 </div>

@@ -37,7 +37,7 @@ public interface SummaryContext
 {
    void submit();
 
-   void gotopage( Representation rep );
+   void gotopage( IntegerDTO page );
 
    abstract class Mixin
       extends InteractionsMixin
@@ -70,21 +70,13 @@ public interface SummaryContext
          }
       }
 
-      public void gotopage( Representation rep )
+      public void gotopage( IntegerDTO page )
       {
-         Form form = new Form( rep );
-
          CommandQueryClient client = context.get( CommandQueryClient.class );
-
-         ValueBuilder<IntegerDTO> builder = module.valueBuilderFactory().newValueBuilder( IntegerDTO.class );
-         for (String key : form.getValuesMap().keySet())
-         {
-            builder.prototype().integer().set( Integer.parseInt( form.getValues( key ) ) );
-         }
 
          try
          {
-            client.postCommand( "gotopage", builder.newInstance() );
+            client.postCommand( "gotopage", page );
          } catch (ResourceException e)
          {
             e.printStackTrace();
