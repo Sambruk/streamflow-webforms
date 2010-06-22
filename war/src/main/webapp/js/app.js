@@ -247,12 +247,51 @@ jQuery(document).ready(function()
             name = field.field.description;
             value = field.value;
             if (value == null) value = "";
-            $('#form_table_body').append('<tr><td>'+name+'</td><td><input type="text" onChange="javascript:fieldChanged(id);" onblur="javascript:updateField(id);" id="'+id+'" value="'+value+'"/></td></tr>');
+
+            fieldType = field.field.fieldValue._type;
+            switch (fieldType)
+            {             
+                case "se.streamsource.streamflow.domain.form.SelectionFieldValue":
+                    selectionType = "";
+                    if (field.field.fieldValue.multiple)
+                    {
+                        selectionType = "checkbox";
+                    } else
+                    {
+                        selectionType = "radio";
+                    }
+                    values = field.field.fieldValue.values;
+                    tableRow = '<tr><td>'+name+'</td><td><fieldset id="'+id+'">';
+                    for (valueIdx in values)
+                    {
+                        var selectionValue = values[valueIdx];
+                        var checked = "";
+                        if (value.indexOf(selectionValue)>-1) checked = "checked";
+                        tableRow += '<input name="'+selectionValue+'" id="'+selectionValue+'" type="'+selectionType+'" onChange="javascript:selectChanged(parent.id);" '+checked+'/><label for="'+selectionValue+'">'+selectionValue+'</label>';
+                    }
+                    $('#form_table_body').append(tableRow + '</fieldset></td></tr>');
+                    break;
+                default:
+                    $('#form_table_body').append('<tr><td>'+name+'</td><td><input type="text" onChange="javascript:fieldChanged(id);" onblur="javascript:updateField(id);" id="'+id+'" value="'+value+'"/></td></tr>');
+            }
         }
+    };
+
+    selectChanged = function(fieldId) {
+        fieldValue = $('#'+fieldId+ ' input:checked').map(function() {return this.name}).get().join(', ');
+        updateFieldValue(fieldId, fieldValue);
     };
 
     fieldChanged = function(fieldId) {
         form_fields_changed[fieldId] = true;
+    };
+
+    updateFieldValue = function(fieldId, fieldValue) {
+        $.ajax({
+            url: contextUrl + 'updatefield.json',
+            data: 'field='+fieldId+'&value='+fieldValue,
+            type: 'POST'
+        });
     };
 
     updateField = function(fieldId) {
