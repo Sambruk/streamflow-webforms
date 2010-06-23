@@ -267,9 +267,19 @@ jQuery(document).ready(function()
                         var selectionValue = values[valueIdx];
                         var checked = "";
                         if (value.indexOf(selectionValue)>-1) checked = "checked";
-                        tableRow += '<input name="'+selectionValue+'" id="'+selectionValue+'" type="'+selectionType+'" onChange="javascript:selectChanged(parent.id);" '+checked+'/><label for="'+selectionValue+'">'+selectionValue+'</label>';
+                        tableRow += '<input name="'+id+'" id="'+selectionValue+'" type="'+selectionType+'" onChange="javascript:selectChanged(parent.id);" '+checked+'/><label for="'+selectionValue+'">'+selectionValue+'</label>';
                     }
                     $('#form_table_body').append(tableRow + '</fieldset></td></tr>');
+                    break;
+                case "se.streamsource.streamflow.domain.form.TextFieldValue":
+                    var rows = field.field.fieldValue.rows;
+                    var width = field.field.fieldValue.width;
+                    if (rows == null) {
+                        $('#form_table_body').append('<tr><td>'+name+'</td><td><input type="text" size="'+width+'" onChange="javascript:fieldChanged(id);" onblur="javascript:updateField(id);" id="'+id+'" value="'+value+'"/></td></tr>');
+                    } else {
+                        rows -= 1;
+                        $('#form_table_body').append('<tr><td>'+name+'</td><td><textarea cols="'+width+'" rows="'+rows+'" type="text" onChange="javascript:fieldChanged(id);" onblur="javascript:updateField(id);" id="'+id+'">'+value+'</textarea></td></tr>');
+                    }
                     break;
                 default:
                     $('#form_table_body').append('<tr><td>'+name+'</td><td><input type="text" onChange="javascript:fieldChanged(id);" onblur="javascript:updateField(id);" id="'+id+'" value="'+value+'"/></td></tr>');
@@ -278,7 +288,7 @@ jQuery(document).ready(function()
     };
 
     selectChanged = function(fieldId) {
-        fieldValue = $('#'+fieldId+ ' input:checked').map(function() {return this.name}).get().join(', ');
+        fieldValue = $('#'+fieldId+ ' input:checked').map(function() {return this.id}).get().join(', ');
         updateFieldValue(fieldId, fieldValue);
     };
 
