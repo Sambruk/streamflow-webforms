@@ -281,10 +281,19 @@ jQuery(document).ready(function()
                         $('#form_table_body').append('<tr><td>'+name+'</td><td><textarea cols="'+width+'" rows="'+rows+'" type="text" onChange="javascript:fieldChanged(id);" onblur="javascript:updateField(id);" id="'+id+'">'+value+'</textarea></td></tr>');
                     }
                     break;
+                case "se.streamsource.streamflow.domain.form.DateFieldValue":
+                    $('#form_table_body').append('<tr><td><label for="'+id+'">'+name+'</label></td><td><input onChange="javascript:updateDate(id, this.value);" type="text" name="'+id+'" id="'+id+'" value="'+value+'"/></td></tr>');
+                    $('#'+id).datepicker();
+                    break;
                 default:
                     $('#form_table_body').append('<tr><td>'+name+'</td><td><input type="text" onChange="javascript:fieldChanged(id);" onblur="javascript:updateField(id);" id="'+id+'" value="'+value+'"/></td></tr>');
             }
         }
+    };
+
+    updateDate = function(fieldId, dateValue) {
+        var date = new Date(dateValue);
+        updateFieldValue(fieldId, date.format("UTC:yyyy-mm-dd'T'HH:MM:ss.0000'Z'"));
     };
 
     selectChanged = function(fieldId) {
