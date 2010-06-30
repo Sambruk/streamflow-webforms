@@ -27,7 +27,6 @@ import org.restlet.Restlet;
 import se.streamsource.surface.web.ClientEventSourceService;
 import se.streamsource.surface.web.context.accesspoints.AccessPointContext;
 import se.streamsource.surface.web.context.accesspoints.AccessPointsContext;
-import se.streamsource.surface.web.context.accesspoints.endusers.CaseContext;
 import se.streamsource.surface.web.context.accesspoints.endusers.EndUserContext;
 import se.streamsource.surface.web.context.accesspoints.endusers.EndUsersContext;
 import se.streamsource.surface.web.context.accesspoints.endusers.formdrafts.FormDraftContext;
@@ -127,7 +126,6 @@ public class ContextsAssembler
 
             AccessPointContext.class,
             AccessPointsContext.class,
-            CaseContext.class,
             EndUsersContext.class,
             EndUserContext.class,
             OrganizationContext.class,

@@ -18,61 +18,38 @@
 package se.streamsource.surface.web.context.accesspoints.endusers;
 
 import org.qi4j.api.mixin.Mixins;
+import org.qi4j.api.value.ValueBuilder;
 import se.streamsource.dci.api.ContextNotFoundException;
 import se.streamsource.dci.api.IndexInteraction;
 import se.streamsource.dci.api.Interactions;
 import se.streamsource.dci.api.InteractionsMixin;
+import se.streamsource.dci.api.SubContext;
 import se.streamsource.dci.api.SubContexts;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
+import se.streamsource.dci.value.LinkValue;
 import se.streamsource.dci.value.LinksValue;
 import se.streamsource.dci.value.StringValue;
 import se.streamsource.dci.value.TitledLinksValue;
+import se.streamsource.streamflow.resource.roles.EntityReferenceDTO;
+import se.streamsource.surface.web.context.accesspoints.endusers.formdrafts.FormDraftsContext;
 
 /**
  */
 @Mixins(EndUserContext.Mixin.class)
 public interface EndUserContext
-      extends SubContexts<CaseContext>, Interactions, IndexInteraction<LinksValue>
+      extends Interactions
 {
-   // commands
-   void createcase( StringValue desctiption );
+   @SubContext
+   FormDraftsContext forms();
 
    abstract class Mixin
          extends InteractionsMixin
          implements EndUserContext
    {
-      public void createcase( StringValue desctiption )
+      public FormDraftsContext forms()
       {
-         CommandQueryClient client = context.get( CommandQueryClient.class );
-
-         try
-         {
-            client.postCommand( "createcase", desctiption );
-         } catch (Throwable e)
-         {
-            e.printStackTrace();
-         }
-      }
-
-      public CaseContext context( String id ) throws ContextNotFoundException
-      {
-         context.set( context.get( CommandQueryClient.class ).getSubClient( id ));
-         return subContext( CaseContext.class );
-      }
-
-      public LinksValue index()
-      {
-         CommandQueryClient client = context.get( CommandQueryClient.class );
-
-         try
-         {
-            return client.query( "index", LinksValue.class );
-         } catch (Throwable e)
-         {
-            e.printStackTrace();
-         }
-         return null;
+         context.set( context.get( CommandQueryClient.class ).getSubClient( "forms" ));
+         return subContext( FormDraftsContext.class );
       }
    }
-
 }

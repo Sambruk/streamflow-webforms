@@ -18,12 +18,44 @@
 
 jQuery(document).ready(function()
 {
-	$('#app').load("components.html #start");
+    errorHandler = function(XMLHttpRequest, textStatus, errorThrown) { alert(errorThrown ); };
+    var accesspoint = window.top.location.search.substring(1).split('=')[1];
+	// if accesspoint is set go directly to login
+	// otherwise list all accesspoints
 
-    $('#to_start').live('click', function() {
-        $('#app').load("components.html #start");
-    });
+	var contextUrl = "surface/accesspoints/";
+	if ( accesspoint == null )
+	{
+	    $('#app').load('components.html #access_points_div', function () {
+			$.ajax({
+				url: contextUrl + 'index.json',
+				success: function(data) {
+					for (idx in data.links)
+					{
+					    var link = data.links[idx];
+					    $('ul').append('<li><a href="?ap='+link.id+'">'+link.text+'</a></li>');
+					}
+				},
+                error: errorHandler
+			});
+		});
+	} else
+	{
+	    contextUrl += accesspoint + '/endusers/';
+	    // load either login page or go to form edit view
 
+        $.ajax({
+            url: contextUrl + 'userreference.json',
+            success: function(data) {
+               contextUrl += data.entity + '/';
+               setupFormUrl();
+               loadFormEditDiv();
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+               $('#app').load('components.html #login_div');
+            }
+        });
+	};
 
     var directive = {
      'li':{
@@ -33,12 +65,6 @@ jQuery(document).ready(function()
       }
      }
     };
-
-    var contextUrl = "surface/accesspoints/";
-    var userInboxUrl;
-    var caseUrl;
-    var formEditUrl;
-    errorHandler = function(XMLHttpRequest, textStatus, errorThrown) { alert(errorThrown ); };
 
     updateList = function(url, list_id, element_id) {
 
@@ -58,165 +84,41 @@ jQuery(document).ready(function()
         });
     };
 
-    toInbox = function(userInboxUrl) {
-        contextUrl = userInboxUrl;
-        $('#app').load('components.html #enduser_inbox_div', function() {
-            updateList(contextUrl, 'case_list', 'case_element');
-        });
-    };
-
-
-	$('#to_another_div').live('click', function() {
-		$('#app').load('components.html #organizations_div', function () {
-
-			$.ajax({
-				url: contextUrl + 'index.json',
-				success: function(data) {
-					$('ul').render(data, directive );
-				},
-                error: errorHandler
-			});
-		});
-	});
-
-
-    $('#to_organization_div').live('click', function() {
-        contextUrl += $(this).attr('accesskey') + '/';
-        $('#app').load('components.html #organization_div', function() {
-            $.ajax({
-				url: contextUrl+'index.json',
-				success: function(data) {
-					$('#accesspoint_name').text( data.string );
-
-                    contextUrl += 'endusers/';
-					$.ajax( {
-					    url: contextUrl + 'userreference.json',
-                        success: function(data) {
-                           contextUrl += data.entity + '/';
-                           userInboxUrl = contextUrl;
-                           $('#login_enduser').hide();
-                           $('#to_enduser_inbox').show();
-                        },
-                        error: function(XMLHttpRequest, textStatus, errorThrown) {
-                           $('#login_enduser').show();
-                           $('#to_enduser_inbox').hide();
-                        }
-                    });
-
-				},
-                error: errorHandler 
-			});
-        });
-
-    });
-
-    $('#login_enduser_operation').live('click', function() {
-        $('#app').load('components.html #enduser_inbox_div', function() {
-            $.ajax({
-                    url: contextUrl + 'selectenduser.json',
-                    type: 'POST',
-                    success: function(data, textStatus, XMLHttpRequest) {
-                        $.ajax({
-                            url: contextUrl + 'userreference.json',
-                            success: function(data) {
-                                contextUrl += data.entity + '/';
-                                userInboxUrl = contextUrl;
-                                updateList(contextUrl, 'case_list', 'case_element');
-                            },
-                            error: errorHandler
-                        });
+    login = function() {
+        $.ajax({
+            url: contextUrl + 'selectenduser.json',
+            async: false,
+            type: 'POST',
+            success: function(data, textStatus, XMLHttpRequest) {
+                $.ajax({
+                    url: contextUrl + 'userreference.json',
+                    async: false,
+                    success: function(data) {
+                        contextUrl += data.entity + '/';
                     },
                     error: errorHandler
-            });
-        });
-    });
-
-    $('#to_viewenduser_div').live('click', function() {
-        $('#app').load('components.html #enduser_inbox_div', function() {
-            updateList(contextUrl, 'case_list', 'case_element');
-        });
-    });
-
-    $('#create_case').live('click', function() {
-        var caseName = $('#casename').attr('value');
-
-        if ( caseName.length > 0)
-        {
-            $.ajax({
-                url: contextUrl + 'createcase.json',
-                data: 'string='+ caseName,
-                type: 'POST',
-                success: function() {
-                    updateList(contextUrl, 'case_list', 'case_element');
-                    $('#casename').removeAttr('value');
-                },
-                error: errorHandler
-            });
-        };
-    });
-
-    loadCaseView = function() {
-        $('#app').load('components.html #case_div', function() {
-            $.ajax({
-                url: contextUrl + 'index.json',
-                success: function(data) {
-                    $('#case_description').text(data.description);
-                }
-            });
-            //updateList(contextUrl + 'submittedforms/', 'submitted_forms_list' );
-            $.ajax({
-                url: contextUrl + 'submittedforms/index.json',
-                success: function(data) {
-                    if (data.forms.length == 0)
-                    {
-                        $('ul#submitted_forms_list').hide();
-                    } else
-                    {
-                        $('li#submitted_form').remove();
-                        for (idx in data.forms) {
-                            form = data.forms[idx];
-                            $('ul#submitted_forms_list').append('<li id="submitted_form">'+form.form+' submitted by '+form.submitter+' ('+form.submissionDate+')'+'</li>');
-                        };
-                        $('ul#submitted_forms_list').show();
-                    }
-                }
-            });
-            updateList(contextUrl + 'formdrafts/',     'form_drafts_list', 'form_draft');
-            updateList(contextUrl + 'requiredforms/',  'required_forms_list', 'required_form');
-        });
-    };
-
-    $('#to_case_div').live('click', function() {
-        contextUrl += $(this).attr('accesskey') + '/';
-        caseUrl = contextUrl;
-        loadCaseView();
-    });
-
-    $('#back_to_index').live('click', function() {
-        toInbox( userInboxUrl );
-    });
-
-    $('#send_case').live('click', function() {
-        $.ajax({
-            url: contextUrl + "sendtofunction.json",
-            type: 'POST',
-            success: function(data) {
-                toInbox(userInboxUrl );
+                });
             },
             error: errorHandler
         });
-    });
+    };
 
-    $('#create_form_draft').live('click', function() {
-        var entity = $(this).attr('accesskey');
+    setupFormUrl = function() {
+        contextUrl += 'forms/'
         $.ajax({
-            url: contextUrl + 'requiredforms/createformdraft.json',
-            type: 'POST',
-            data: 'entity=' + entity,
+            url: contextUrl + 'index.json',
+            async: false,
             success: function(data) {
-                updateList(contextUrl + 'formdrafts/',     'form_drafts_list', 'form_draft');
-            }
+                contextUrl += data.links[0].href;
+            },
+            error : errorHandler
         });
+    };
+
+    $('#login_enduser_operation').live('click', function() {
+        login();
+        setupFormUrl();
+        loadFormEditDiv();
     });
 
     var form_fields_changed = {};
@@ -233,12 +135,6 @@ jQuery(document).ready(function()
             });
         });
     };
-
-    $('#edit_form_draft').live('click', function() {
-        contextUrl += 'formdrafts/' + $(this).attr('accesskey') + '/';
-        formEditUrl = contextUrl;
-        loadFormEditDiv();
-    });
 
     appendTableRow = function(fields) {
         for (idx in fields) {
@@ -329,23 +225,12 @@ jQuery(document).ready(function()
         }
     };
 
-    $('#back_to_case_div').live('click', function() {
-        contextUrl = caseUrl;
-        loadCaseView();
-    });
-
-    $('#back_back_to_case_div').live('click', function() {
-        contextUrl = caseUrl;
-        loadCaseView();
-    });
-
     $('#form_page_previous').live('click', function() {
         $.ajax({
             url: contextUrl + 'previouspage.json',
             type: 'POST',
             data: 'integer=0',
             success: function(data) {
-                contextUrl = formEditUrl;
                 loadFormEditDiv();
             },
             error: errorHandler
@@ -358,7 +243,6 @@ jQuery(document).ready(function()
             type: 'POST',
             data: 'integer=0',
             success: function(data) {
-                contextUrl = formEditUrl;
                 loadFormEditDiv();
             },
             error: errorHandler
@@ -366,7 +250,7 @@ jQuery(document).ready(function()
     });
 
     $('#form_page_discard').live('click', function() {
-        // todo
+        // todo goto form summary and write "form discarded"
     });
 
     $('#form_summary').live('click', function() {
@@ -397,7 +281,6 @@ jQuery(document).ready(function()
             data: "integer=" + page,
             type: 'POST',
             success: function(data) {
-                contextUrl = formEditUrl;
                 loadFormEditDiv();
             },
             error: errorHandler
@@ -409,8 +292,7 @@ jQuery(document).ready(function()
             url: contextUrl + 'summary/submit.json',
             type: 'POST',
             success: function() {
-                contextUrl = caseUrl;
-                loadCaseView();
+                $('#app').load("components.html #thank_you_div");               
             },
             error: function() {
                 // todo show errors and stay on page
