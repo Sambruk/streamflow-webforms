@@ -19,6 +19,8 @@ package se.streamsource.surface.web.context.accesspoints.endusers;
 
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.value.ValueBuilder;
+import org.restlet.Response;
+import org.restlet.representation.EmptyRepresentation;
 import se.streamsource.dci.api.ContextNotFoundException;
 import se.streamsource.dci.api.IndexInteraction;
 import se.streamsource.dci.api.Interactions;
@@ -31,7 +33,9 @@ import se.streamsource.dci.value.LinksValue;
 import se.streamsource.dci.value.StringValue;
 import se.streamsource.dci.value.TitledLinksValue;
 import se.streamsource.streamflow.resource.roles.EntityReferenceDTO;
+import se.streamsource.surface.web.context.IndexInteractionLinksValue;
 import se.streamsource.surface.web.context.accesspoints.endusers.formdrafts.FormDraftsContext;
+import se.streamsource.surface.web.rest.ProxyResponseHandler;
 
 /**
  */
@@ -39,17 +43,11 @@ import se.streamsource.surface.web.context.accesspoints.endusers.formdrafts.Form
 public interface EndUserContext
       extends Interactions
 {
-   @SubContext
-   FormDraftsContext forms();
 
    abstract class Mixin
          extends InteractionsMixin
          implements EndUserContext
    {
-      public FormDraftsContext forms()
-      {
-         context.set( context.get( CommandQueryClient.class ).getSubClient( "forms" ));
-         return subContext( FormDraftsContext.class );
-      }
+
    }
 }

@@ -18,6 +18,10 @@
 package se.streamsource.surface.web.context.accesspoints;
 
 import org.qi4j.api.mixin.Mixins;
+import org.qi4j.api.value.ValueBuilder;
+import se.streamsource.dci.value.LinkValue;
+import se.streamsource.dci.value.LinksValue;
+import se.streamsource.streamflow.infrastructure.application.LinksBuilder;
 import se.streamsource.surface.web.context.IndexInteractionLinksValue;
 import se.streamsource.dci.api.ContextNotFoundException;
 import se.streamsource.dci.api.Interactions;
@@ -29,13 +33,40 @@ import se.streamsource.dci.restlet.client.CommandQueryClient;
  */
 @Mixins(AccessPointsContext.Mixin.class)
 public interface AccessPointsContext
-      extends SubContexts<AccessPointContext>, Interactions, IndexInteractionLinksValue
+      extends SubContexts<AccessPointContext>, Interactions
 {
+
+   LinksValue surfacelinks();
 
    abstract class Mixin
          extends InteractionsMixin
          implements AccessPointsContext
    {
+      public LinksValue surfacelinks()
+      {
+         CommandQueryClient client = context.get( CommandQueryClient.class );
+
+         try
+         {
+            LinksValue linksValue = client.query( "index", LinksValue.class );
+            LinksBuilder builder = new LinksBuilder( module.valueBuilderFactory() );
+            ValueBuilder<LinkValue> linkBuilder = module.valueBuilderFactory().newValueBuilder( LinkValue.class );
+
+            for (LinkValue linkValue : linksValue.links().get())
+            {
+               linkBuilder.withPrototype( linkValue );
+               linkBuilder.prototype().href().set( "../../../?ap="+linkValue.id().get() );
+               builder.addLink( linkBuilder.newInstance() );
+            }
+
+            return builder.newLinks();
+         } catch (Throwable e)
+         {
+            e.printStackTrace();
+         }
+         return null;
+      }
+
       public AccessPointContext context( String id ) throws ContextNotFoundException
       {
          context.set( context.get( CommandQueryClient.class ).getSubClient( id ));

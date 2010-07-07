@@ -48,12 +48,11 @@ public class SurfaceMain
       SLF4JBridgeHandler.install();
 
       component = new Component();
-      component.getServers().add( Protocol.HTTP, 8080 );
+      component.getServers().add( Protocol.HTTP, 8282 );
       component.getClients().add( Protocol.CLAP );
       component.getClients().add( Protocol.FILE );
       SurfaceRestApplication application = new SurfaceRestApplication( component.getContext().createChildContext() );
       component.getDefaultHost().attach( "/surface", application );
-      component.getInternalRouter().attach( "app", application );
       component.start();
    }
 

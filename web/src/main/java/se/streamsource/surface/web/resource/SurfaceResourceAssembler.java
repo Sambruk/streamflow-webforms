@@ -22,11 +22,14 @@ import org.qi4j.bootstrap.Assembler;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.spi.service.importer.NewObjectImporter;
+import org.restlet.Client;
+import org.restlet.Restlet;
 import se.streamsource.surface.web.ClientEventSourceService;
 import se.streamsource.surface.web.rest.CookieResponseHandler;
 import se.streamsource.dci.restlet.client.ResponseHandler;
 import se.streamsource.dci.restlet.server.DCIAssembler;
 import se.streamsource.dci.restlet.server.DefaultResponseWriterFactory;
+import se.streamsource.surface.web.rest.ProxyRestlet;
 
 /**
  */
@@ -42,7 +45,8 @@ public class SurfaceResourceAssembler
 
       // Resources
       module.addObjects(
-            SurfaceRootContextFactory.class
+            SurfaceRootContextFactory.class,
+            ProxyRestlet.class
       );
 
       module.addServices( ClientEventSourceService.class ).visibleIn( Visibility.application );
@@ -51,5 +55,6 @@ public class SurfaceResourceAssembler
 
       module.addObjects( CookieResponseHandler.class ).visibleIn( Visibility.application );
 
+      module.importServices( Client.class ).visibleIn( Visibility.application );
    }
 }

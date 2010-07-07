@@ -63,12 +63,13 @@ import se.streamsource.streamflow.domain.form.TextFieldValue;
 import se.streamsource.streamflow.infrastructure.event.DomainEvent;
 import se.streamsource.streamflow.infrastructure.event.TransactionEvents;
 import se.streamsource.streamflow.resource.caze.FieldDTO;
-import se.streamsource.streamflow.resource.caze.ProxyUserCaseDTO;
+import se.streamsource.streamflow.resource.caze.EndUserCaseDTO;
 import se.streamsource.streamflow.resource.caze.SubmittedFormListDTO;
 import se.streamsource.streamflow.resource.caze.SubmittedFormsListDTO;
 import se.streamsource.streamflow.resource.roles.EntityReferenceDTO;
 import se.streamsource.streamflow.resource.roles.IntegerDTO;
 import se.streamsource.streamflow.resource.user.NewProxyUserCommand;
+import se.streamsource.surface.web.rest.ProxyResponseHandler;
 
 /**
  */
@@ -81,7 +82,7 @@ public class ContextsAssembler
             importedBy( NewObjectImporter.class ).
             visibleIn( Visibility.application );
       module.addObjects( InteractionConstraintsService.class,
-            CommandQueryClient.class, CookieResponseHandler.class );
+            CommandQueryClient.class, CookieResponseHandler.class, ProxyResponseHandler.class );
       module.addValues( TransactionEvents.class, DomainEvent.class ).visibleIn( Visibility.application );
 
       module.addServices( ClientEventSourceService.class ).visibleIn( Visibility.application );
@@ -93,7 +94,7 @@ public class ContextsAssembler
             StringValue.class,
             TitledLinksValue.class,
             NewProxyUserCommand.class,
-            ProxyUserCaseDTO.class,
+            EndUserCaseDTO.class,
             SubmittedFormsListDTO.class,
             SubmittedFormListDTO.class,
             PageSubmissionValue.class,

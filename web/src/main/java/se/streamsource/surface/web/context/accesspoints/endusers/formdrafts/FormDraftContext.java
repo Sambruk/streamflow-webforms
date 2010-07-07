@@ -51,6 +51,8 @@ public interface FormDraftContext
 
    void updatefield( FieldDTO field );
 
+   void discard( IntegerDTO dummy );
+
    abstract class Mixin
       extends InteractionsMixin
       implements FormDraftContext
@@ -140,13 +142,13 @@ public interface FormDraftContext
          }
       }
 
-      public void gotopage( Representation rep )
+      public void discard( IntegerDTO dummy )
       {
          CommandQueryClient client = context.get( CommandQueryClient.class );
 
          try
          {
-            client.postCommand( "gotopage", rep );
+            client.postCommand( "discard", dummy );
          } catch (ResourceException e)
          {
             e.printStackTrace();

@@ -29,9 +29,12 @@ import org.restlet.Application;
 import org.restlet.Client;
 import org.restlet.Context;
 import org.restlet.Restlet;
+import org.restlet.Uniform;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.data.MediaType;
 import org.restlet.data.Protocol;
+import org.restlet.routing.Router;
+import org.restlet.routing.Template;
 import org.restlet.security.Authenticator;
 import org.restlet.security.ChallengeAuthenticator;
 import org.restlet.security.Verifier;
@@ -50,12 +53,6 @@ public class SurfaceRestApplication
    ObjectBuilderFactory factory;
    @Structure
    UnitOfWorkFactory unitOfWorkFactory;
-
-   @Optional
-   @Service
-   Verifier verifier;
-
-   //Enroler enroler = new DefaultEnroler();
 
    @Structure
    ApplicationSPI app;
@@ -89,14 +86,14 @@ public class SurfaceRestApplication
    @Override
    public Restlet createInboundRoot()
    {
-      //getContext().setVerifier( verifier );
+      Router router = new Router();
 
       Restlet cqr = factory.newObjectBuilder( CommandQueryRestlet.class ).use( getContext() ).newInstance();
+      ProxyRestlet proxyRestlet = factory.newObject( ProxyRestlet.class );
+      router.attach( "/proxy", proxyRestlet, Template.MODE_STARTS_WITH );
+      router.attach( "/surface", cqr, Template.MODE_STARTS_WITH );
 
-      Authenticator auth = new ChallengeAuthenticator( getContext(), ChallengeScheme.HTTP_BASIC, "StreamFlow" );
-      auth.setNext( cqr );
-
-      return new org.qi4j.rest.ExtensionMediaTypeFilter( getContext(), cqr);
+      return new org.qi4j.rest.ExtensionMediaTypeFilter( getContext(), router );
    }
 
 

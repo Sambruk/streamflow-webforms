@@ -26,6 +26,7 @@ import se.streamsource.dci.api.IndexInteraction;
 import se.streamsource.dci.api.Interactions;
 import se.streamsource.dci.api.InteractionsMixin;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
+import se.streamsource.dci.value.StringValue;
 import se.streamsource.streamflow.domain.form.FormSubmissionValue;
 import se.streamsource.streamflow.resource.roles.IntegerDTO;
 
@@ -35,7 +36,9 @@ import se.streamsource.streamflow.resource.roles.IntegerDTO;
 public interface SummaryContext
    extends Interactions, IndexInteraction<FormSubmissionValue>
 {
-   void submit();
+   void submit( StringValue dummy );
+
+   void submitandsend( StringValue dummy );
 
    void gotopage( IntegerDTO page );
 
@@ -57,13 +60,26 @@ public interface SummaryContext
          return null;
       }
 
-      public void submit()
+      public void submit( StringValue dummy )
       {
          CommandQueryClient client = context.get( CommandQueryClient.class );
 
          try
          {
             client.postCommand( "submit" );
+         } catch (Throwable e)
+         {
+            e.printStackTrace();
+         }
+      }
+
+      public void submitandsend( StringValue dummy )
+      {
+         CommandQueryClient client = context.get( CommandQueryClient.class );
+
+         try
+         {
+            client.postCommand( "submitandsend" );
          } catch (Throwable e)
          {
             e.printStackTrace();
