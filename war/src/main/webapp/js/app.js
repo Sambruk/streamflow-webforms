@@ -257,7 +257,7 @@ jQuery(document).ready(function()
 
    $('#form_submit').live('click', function() {
         $.ajax({
-            url: proxyContextUrl + 'summary/submit.json',
+            url: proxyContextUrl + 'summary/submitandsend.json',
             type: 'POST',
             success: function() {
                 var node = $('#thank_you_div').clone();
