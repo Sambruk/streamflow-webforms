@@ -20,3 +20,20 @@
 text-align:center;
 color:red;
 }
+
+div.formfield div { display: inline-block }
+
+p.headline { font-weight: bold }
+
+fieldset {
+    display:inline;
+    padding:0;
+}
+
+div.fieldname {
+    width: 150px;
+}
+
+div.formfield {
+    margin: 10px 0;
+}

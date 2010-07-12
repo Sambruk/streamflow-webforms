@@ -23,13 +23,14 @@ jQuery(document).ready(function()
     function try_login() {
         $.ajax({
             url: contextUrl + 'userreference.json',
+            async: false,
             success: function(data) {
                proxyContextUrl += data.entity + '/';
                setupFormUrl();
                loadFormEditDiv();
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-               $('#app').load('components.html #login_div');
+               $('#app').empty().append( $('#login_div').clone() );
             }
         });
     };
@@ -52,11 +53,6 @@ jQuery(document).ready(function()
             error: errorHandler
         });
     };
-
-    function getParameter( event ) {
-        ev = event.parameters.split( ':' )[1].substring(1);
-        return ev.substring( 0, ev.length -2 );
-    }
 
     function setupFormUrl() {
         $.ajax({
@@ -84,14 +80,13 @@ jQuery(document).ready(function()
 
     function loadFormEditDiv() {
         form_fields_changed = {};
-        $('#app').load('components.html #form_filling_div', function() {
-            $.ajax({
-                url: proxyContextUrl + 'index.json',
-                success: function(data) {
-                    $('#form_page').text(data.title);
-                    appendTableRow(data.fields);
-                }
-            });
+        $('#app').empty().append( $('#form_filling_div').clone() );
+        $.ajax({
+            url: proxyContextUrl + 'index.json',
+            success: function(data) {
+                $('#form_page').text(data.title);
+                insertRows( data.fields, 1 );
+            }
         });
     };
 
@@ -101,7 +96,7 @@ jQuery(document).ready(function()
     };
 
     selectChanged = function(fieldId) {
-        fieldValue = $('#'+fieldId+ ' input:checked').map(function() {return this.id}).get().join(', ');
+        fieldValue = $('#'+fieldId+ ' input:checked').map(function() {return this.name}).get().join(', ');
         updateFieldValue(fieldId, fieldValue);
     };
 
@@ -110,82 +105,86 @@ jQuery(document).ready(function()
     };
 
     updateFieldValue = function(fieldId, fieldValue) {
+        var image = $('#'+fieldId).find('img');
+        image.show();
         $.ajax({
             url: proxyContextUrl + 'updatefield.json',
             async: false,
             data: 'field='+fieldId+'&value='+fieldValue,
             type: 'POST'
         });
+        image.hide();
     };
 
     updateField = function(fieldId) {
         if ( form_fields_changed[fieldId] )
         {
-            value = $('#'+fieldId).attr('value');
-            $.ajax({
-                url: proxyContextUrl + 'updatefield.json',
-                async: false,
-                data: 'field='+fieldId+'&value='+value,
-                type: 'POST',
-                success: function(data) {
-                    // ignore for now, but should check for validation errors
-                },
-                error: errorHandler
-            });
+            value = $('#'+fieldId).find('input').attr('value');
+            updateFieldValue(fieldId, value);
         }
     };
 
-    function appendTableRow(fields) {
-        for (idx in fields) {
-            field = fields[idx];
-            id = field.field.field;
-            name = field.field.description;
-            value = field.value;
-            if (value == null) value = "";
-
-            fieldType = field.field.fieldValue._type;
-            switch (fieldType)
-            {
-                case "se.streamsource.streamflow.domain.form.SelectionFieldValue":
-                    selectionType = "";
-                    if (field.field.fieldValue.multiple)
-                    {
-                        selectionType = "checkbox";
-                    } else
-                    {
-                        selectionType = "radio";
-                    }
-                    values = field.field.fieldValue.values;
-                    tableRow = '<tr><td>'+name+'</td><td><fieldset id="'+id+'">';
-                    for (valueIdx in values)
-                    {
-                        var selectionValue = values[valueIdx];
-                        var checked = "";
-                        if (value.indexOf(selectionValue)>-1) checked = "checked";
-                        tableRow += '<input name="'+id+'" id="'+selectionValue+'" type="'+selectionType+'" onChange="javascript:selectChanged(name);" '+checked+'/><label for="'+selectionValue+'">'+selectionValue+'</label>';
-                    }
-                    $('#form_table_body').append(tableRow + '</fieldset></td></tr>');
-                    // <td id="processing"><img src="images/Processing.gif"/></td>
-                    break;
-                case "se.streamsource.streamflow.domain.form.TextFieldValue":
-                    var rows = field.field.fieldValue.rows;
-                    var width = field.field.fieldValue.width;
-                    if (rows == null) {
-                        $('#form_table_body').append('<tr><td>'+name+'</td><td><input type="text" size="'+width+'" onChange="javascript:fieldChanged(id);" onblur="javascript:updateField(id);" id="'+id+'" value="'+value+'"/></td></tr>');
-                    } else {
-                        rows -= 1;
-                        $('#form_table_body').append('<tr><td>'+name+'</td><td><textarea cols="'+width+'" rows="'+rows+'" type="text" onChange="javascript:fieldChanged(id);" onblur="javascript:updateField(id);" id="'+id+'">'+value+'</textarea></td></tr>');
-                    }
-                    break;
-                case "se.streamsource.streamflow.domain.form.DateFieldValue":
-                    $('#form_table_body').append('<tr><td><label for="'+id+'">'+name+'</label></td><td><input onChange="javascript:updateDate(id, this.value);" type="text" name="'+id+'" id="'+id+'" value="'+value+'"/></td></tr>');
-                    $('#'+id).datepicker();
-                    break;
-                default:
-                    // unknown type ignore
-            }
+    updateTextAreaField = function(fieldId) {
+        if ( form_fields_changed[fieldId] )
+        {
+            value = $('#'+fieldId).find('textarea').attr('value');
+            updateFieldValue(fieldId, value);
         }
-    };
+    }
+
+    function insertRows( fields, fieldCount) {
+        if (fields.length == 0) return;
+        var field = fields[0];
+        var id = field.field.field;
+        var name = field.field.description;
+        var value = (field.value == null ? "" : field.value);
+        var fieldType = field.field.fieldValue._type;
+        var list = fieldType.split('.');
+        var field_type = list[ list.length - 1 ];
+        $('#form_table_body').append( $('#FormField').clone().attr('id', id) );
+        $('#'+id).find('div').filter('.fieldname').text(name);
+        $('#'+id).find('img').hide();
+        switch (field_type) {
+            case "TextFieldValue":
+                var rows = field.field.fieldValue.rows;
+                var width = field.field.fieldValue.width;
+                if (rows == null || rows < 2 ) {
+                    $('#'+id).find('div').filter('.fieldvalue').append( $('#textfield'+field_type).clone().attr({
+                        id: id,
+                        size: width,
+                        value: value
+                    }) );
+                } else {
+                    $('#'+id).find('div').filter('.fieldvalue').append( $('#textarea'+field_type).clone().attr({
+                        id: id,
+                        cols: width,
+                        rows: rows-1
+                    }).append(value) );
+                }
+                break;
+            case "SelectionFieldValue":
+                $('#'+id).find('div').filter('.fieldvalue').append( $('#'+field_type).clone() );
+                var selectionType = (field.field.fieldValue.multiple ? "checkbox" : "radio" );
+                var values = field.field.fieldValue.values;
+                for (valueIdx in values)
+                {
+                    var selectionValue = values[valueIdx];
+                    var node = $('#'+selectionType + "SelectionFieldValue").clone().attr({id: id, name:selectionValue });
+                    if  ( value.indexOf(selectionValue)>-1 )
+                    {
+                        node.attr('checked', 'checked');
+                    }
+                    $('#'+id).find('#'+field_type).append(node).append(selectionValue);
+                };
+                break;
+            case "DateFieldValue":
+                $('#'+id).find('div').filter('.fieldvalue').append( $('#'+field_type).clone().attr({value: value, name:id, id: 'datefield'+fieldCount}).datepicker() );
+                break;
+            default:
+                // ignore
+            };
+        insertRows( fields.slice(1), fieldCount+1 );
+    }
 
     function changePage(command, page) {
         $.ajax({
@@ -205,16 +204,18 @@ jQuery(document).ready(function()
 	var proxyContextUrl = "surface/proxy/accesspoints/"
 	var contextUrl = "surface/surface/accesspoints/";
     var form_fields_changed = {};
-	if ( accesspoint == null || accesspoint.length < 1 )
-	{
-        $('#app').empty();
-        $('#app').append('<font color="red">Error: No access point specified</font>');
-	} else
-	{
-	    contextUrl += accesspoint + '/endusers/';
-	    proxyContextUrl += accesspoint + '/endusers/';
-        try_login();
-	};
+	$('#app').empty();
+	$('#components').hide().load('components.html', function() {
+        if ( accesspoint == null || accesspoint.length < 1 )
+        {
+            $('#app').append('<font color="red">Error: No access point specified</font>');
+        } else
+        {
+            contextUrl += accesspoint + '/endusers/';
+            proxyContextUrl += accesspoint + '/endusers/';
+            try_login();
+        };
+	});
 
     $('#login_enduser_operation').live('click', function() {
         login();
@@ -234,23 +235,23 @@ jQuery(document).ready(function()
     });
 
     $('#form_summary').live('click', function() {
-        $('#app').load('components.html #form_summary_div', function() {
-            $.ajax({
-                url: proxyContextUrl + 'summary/index.json',
-                success: function(data) {
-                    $('#form_description').text(data.description);
+        $('#app').empty().append( $('#form_summary_div').clone() );
+        $.ajax({
+            url: proxyContextUrl + 'summary/index.json',
+            success: function(data) {
+                $('#form_description').text(data.description);
 
-                    for (idx in data.pages) {
-                        page = data.pages[idx];
-                        $('#form_page_summary').append('<li><a href="#" id="goto_form_page" accesskey="'+idx+'">'+page.title+'</a></li>');
-                        for (field_idx in page.fields) {
-                            field = page.fields[field_idx];
-                            $('#form_page_summary').append('<li><b>'+field.field.description+':</b> '+field.value+'</li>');
-                        }
+                for (idx in data.pages) {
+                    page = data.pages[idx];
+                    var page_ref = $('#goto_form_page').clone().attr('accesskey', idx).text(page.title);
+                    $('#form_page_summary').append( page_ref );
+                    for (field_idx in page.fields) {
+                        field = page.fields[field_idx];
+                        $('#form_page_summary').append('<li><b>'+field.field.description+':</b> '+field.value+'</li>');
                     }
-                },
-                error: errorHandler
-            });
+                }
+            },
+            error: errorHandler
         });
    });
 
@@ -259,9 +260,9 @@ jQuery(document).ready(function()
             url: proxyContextUrl + 'summary/submit.json',
             type: 'POST',
             success: function() {
-                $('#app').load("components.html #thank_you_div", function(){
-                    $('#end_message').text("Form submitted. Thank you!");
-                });
+                var node = $('#thank_you_div').clone();
+                node.find('#end_message').text("Form submitted. Thank you!");
+                $('#app').empty().append( node );
             },
             error: function() {
                 // todo show errors and stay on page

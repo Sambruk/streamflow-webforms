@@ -25,13 +25,8 @@
 </div>
 
 <div id="form_filling_div">
-    <table>
-        <thead>
-            <th id="form_page"></th>
-        </thead>
-        <tbody id="form_table_body">
-        </tbody>
-    </table>
+    <p id="form_page" class="headline"></p>
+    <p id="form_table_body"></p>
 
     <a href="#" id="form_page_previous">Previous</a> <a href="#" id="form_page_next">Next</a>
     <a href="#" id="form_page_discard">Discard</a> <a href="#" id="form_summary">Summary</a>
@@ -53,3 +48,21 @@
 <div id="thank_you_div">
     <p id="end_message"></p>  
 </div>
+
+
+<div id="FormField" class="formfield">
+    <div class="fieldname"></div>
+    <div class="fieldvalue"></div>
+    <div class="fieldwaiting">
+        <img src="images/waiting.gif" alt="waiting"/>
+    </div>
+</div>
+
+<fieldset id="SelectionFieldValue"></fieldset>
+<input id="textfieldTextFieldValue" type="text" size="" onChange="javascript:fieldChanged(id);" onblur="javascript:updateField(id);" value=""/>
+<textarea id="textareaTextFieldValue" cols="" rows="" onChange="javascript:fieldChanged(id);" onblur="javascript:updateTextAreaField(id);"></textarea>
+<input id="DateFieldValue" onChange="javascript:updateDate(this.name, this.value);" type="text" value=""/>
+<input id="checkboxSelectionFieldValue" type="checkbox" onChange="javascript:selectChanged(id);" />
+<input id="radioSelectionFieldValue" type="radio" onChange="javascript:selectChanged(id);" />
+
+<a id="goto_form_page" href="#" accesskey=""></a>
