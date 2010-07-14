@@ -49,7 +49,6 @@ public class SurfaceRootContextFactory
 
       String url = bundle.getString( "streamflow.url" );
       streamflowReference = new Reference( url );
-      streamflowReference.addSegment( "streamflow" ).addSegment( "v1" ).addSegment( "" );
 
       String proxyusername = bundle.getString( "streamflow.proxyuser.username" );
       String proxypassword = bundle.getString( "streamflow.proxyuser.password" );

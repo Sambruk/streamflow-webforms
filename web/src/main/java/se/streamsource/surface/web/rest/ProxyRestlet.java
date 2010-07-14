@@ -48,7 +48,7 @@ public class ProxyRestlet
       ResourceBundle bundle = ResourceBundle.getBundle( SurfaceRootContextFactory.class.getName() );
 
       String url = bundle.getString( "streamflow.url" );
-      Reference streamflowReference = new Reference( url + "/streamflow/v1/surface" + remaining );
+      Reference streamflowReference = new Reference( url + "/surface" + remaining );
 
       String proxyusername = bundle.getString( "streamflow.proxyuser.username" );
       String proxypassword = bundle.getString( "streamflow.proxyuser.password" );

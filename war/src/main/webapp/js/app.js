@@ -177,6 +177,11 @@ jQuery(document).ready(function()
                     $('#'+id).find('#'+field_type).append(node).append(selectionValue);
                 };
                 break;
+            case "CommentFieldValue":
+                var comment = $('#'+field_type).clone();
+                comment.text( field.field.note );
+                $('#'+id).find('div').filter('.fieldvalue').append( comment );                            
+                break;
             case "DateFieldValue":
                 $('#'+id).find('div').filter('.fieldvalue').append( $('#'+field_type).clone().attr({value: value, name:id, id: 'datefield'+fieldCount}).datepicker() );
                 break;
