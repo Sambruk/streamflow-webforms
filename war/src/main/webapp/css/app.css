@@ -39,11 +39,15 @@ div.formfield {
 }
 
 div.commentfield {
-    background: #fffbc9;
+    background: #ffffcc;
     padding: 10px;
     margin: 0 0 12px 0;
-    font-style:italic;
     border: 1px solid #f8e5be;
     -moz-border-radius: 12px;
     -webkit-border-radius: 12px;
+}
+
+div.commentfield pre {
+    font-size: small;
+    font-family:'comic sans ms'
 }

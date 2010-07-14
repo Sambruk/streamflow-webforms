@@ -96,7 +96,7 @@ jQuery(document).ready(function()
     };
 
     selectChanged = function(fieldId) {
-        fieldValue = $('#'+fieldId+ ' input:checked').map(function() {return this.name}).get().join(', ');
+        fieldValue = $('#'+fieldId+ ' input:checked').map(function() {return $('#label'+this.id).text() }).get().join(', ');
         updateFieldValue(fieldId, fieldValue);
     };
 
@@ -169,17 +169,19 @@ jQuery(document).ready(function()
                 for (valueIdx in values)
                 {
                     var selectionValue = values[valueIdx];
-                    var node = $('#'+selectionType + "SelectionFieldValue").clone().attr({id: id, name:selectionValue });
+                    var selectionId = field_type + fieldCount + '' + valueIdx;
+                    var node = $('#'+selectionType + field_type).clone().attr({id: selectionId, name: id });
                     if  ( value.indexOf(selectionValue)>-1 )
                     {
                         node.attr('checked', 'checked');
                     }
-                    $('#'+id).find('#'+field_type).append(node).append(selectionValue);
+                    var label = $('#label').clone().attr({'for': selectionId, id: 'label'+selectionId }).text(selectionValue);
+                    $('#'+id).find('#'+field_type).append(node).append(label);
                 };
                 break;
             case "CommentFieldValue":
                 var comment = $('#'+field_type).clone();
-                comment.text( field.field.note );
+                comment.append( '<pre>'+field.field.note+'</pre>' );
                 $('#'+id).find('div').filter('.fieldvalue').append( comment );                            
                 break;
             case "DateFieldValue":
