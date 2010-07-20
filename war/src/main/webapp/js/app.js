@@ -101,6 +101,10 @@ jQuery(document).ready(function()
         updateFieldValue(fieldId, fieldValue);
     };
 
+    updateComboSelect = function(fieldId) {
+        alert(fieldId);
+    };
+
     fieldChanged = function(fieldId) {
         form_fields_changed[fieldId] = true;
     };
@@ -165,7 +169,21 @@ jQuery(document).ready(function()
                 $('#'+id).find('div').filter('.fieldvalue').append( fieldSet );
                 break;
             case "ComboBoxFieldValue":
-                $('#'+id).find('div').filter('.fieldvalue').append( 'type <i>'+field_type+'</i> not implemented yet');
+                var comboBox = $('#'+field_type).clone().attr({name: id, id: "ComboBox"+id});
+                var values = field.field.fieldValue.values;
+                comboBox.append( $('<option />') );
+                for (valueIdx in values)
+                {
+                    var selectionValue = values[valueIdx];
+                    var selectionId = field_type + fieldCount + '' + valueIdx;
+                    var node = $('<option />').attr({value: selectionValue}).text(selectionValue);
+                    if  ( value.indexOf(selectionValue)>-1 )
+                    {
+                        node.attr('selected', 'selected');
+                    }
+                    comboBox.append( node );
+                };
+                $('#'+id).find('div').filter('.fieldvalue').append( comboBox );
                 break;
             case "CommentFieldValue":
                 var comment = $('#'+field_type).clone();
