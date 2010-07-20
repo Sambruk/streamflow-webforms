@@ -97,6 +97,7 @@ jQuery(document).ready(function()
 
     selectChanged = function(fieldId) {
         fieldValue = $('#'+fieldId+ ' input:checked').map(function() {return $('#label'+this.id).text() }).get().join(', ');
+        
         updateFieldValue(fieldId, fieldValue);
     };
 
@@ -145,47 +146,75 @@ jQuery(document).ready(function()
         $('#'+id).find('div').filter('.fieldname').text(name);
         $('#'+id).find('img').hide();
         switch (field_type) {
-            case "TextFieldValue":
-                var rows = field.field.fieldValue.rows;
-                var width = field.field.fieldValue.width;
-                if (rows == null || rows < 2 ) {
-                    $('#'+id).find('div').filter('.fieldvalue').append( $('#textfield'+field_type).clone().attr({
-                        id: id,
-                        size: width,
-                        value: value
-                    }) );
-                } else {
-                    $('#'+id).find('div').filter('.fieldvalue').append( $('#textarea'+field_type).clone().attr({
-                        id: id,
-                        cols: width,
-                        rows: rows-1
-                    }).append(value) );
-                }
-                break;
-            case "SelectionFieldValue":
-                $('#'+id).find('div').filter('.fieldvalue').append( $('#'+field_type).clone() );
-                var selectionType = (field.field.fieldValue.multiple ? "checkbox" : "radio" );
+            case "CheckboxesFieldValue":
+                var fieldSet = $('#FieldSet').clone().attr('id', 'FieldSet'+id);
                 var values = field.field.fieldValue.values;
                 for (valueIdx in values)
                 {
                     var selectionValue = values[valueIdx];
                     var selectionId = field_type + fieldCount + '' + valueIdx;
-                    var node = $('#'+selectionType + field_type).clone().attr({id: selectionId, name: id });
+                    var node = $('#'+field_type).clone().attr({id: selectionId, name: id });
                     if  ( value.indexOf(selectionValue)>-1 )
                     {
                         node.attr('checked', 'checked');
                     }
                     var label = $('#label').clone().attr({'for': selectionId, id: 'label'+selectionId }).text(selectionValue);
+                    fieldSet.append( node ).append( label );
                     $('#'+id).find('#'+field_type).append(node).append(label);
                 };
+                $('#'+id).find('div').filter('.fieldvalue').append( fieldSet );
+                break;
+            case "ComboBoxFieldValue":
+                $('#'+id).find('div').filter('.fieldvalue').append( 'type <i>'+field_type+'</i> not implemented yet');
                 break;
             case "CommentFieldValue":
                 var comment = $('#'+field_type).clone();
                 comment.append( '<pre>'+field.field.note+'</pre>' );
-                $('#'+id).find('div').filter('.fieldvalue').append( comment );                            
+                $('#'+id).find('div').filter('.fieldvalue').append( comment );
                 break;
             case "DateFieldValue":
                 $('#'+id).find('div').filter('.fieldvalue').append( $('#'+field_type).clone().attr({value: value, name:id, id: 'datefield'+fieldCount}).datepicker() );
+                break;
+            case "ListBoxFieldValue":
+                $('#'+id).find('div').filter('.fieldvalue').append( 'type <i>'+field_type+'</i> not implemented yet');
+                break;
+            case "NumberFieldValue":
+                $('#'+id).find('div').filter('.fieldvalue').append( 'type <i>'+field_type+'</i> not implemented yet');
+                break;
+            case "OptionButtonsFieldValue":
+                var fieldSet = $('#FieldSet').clone().attr('id', 'FieldSet'+id);
+                var values = field.field.fieldValue.values;
+                for (valueIdx in values)
+                {
+                    var selectionValue = values[valueIdx];
+                    var selectionId = field_type + fieldCount + '' + valueIdx;
+                    var node = $('#'+field_type).clone().attr({id: selectionId, name: id });
+                    if  ( value.indexOf(selectionValue)>-1 )
+                    {
+                        node.attr('checked', 'checked');
+                    }
+                    var label = $('#label').clone().attr({'for': selectionId, id: 'label'+selectionId }).text(selectionValue);
+                    fieldSet.append( node ).append( label );
+                    $('#'+id).find('#'+field_type).append(node).append(label);
+                };
+                $('#'+id).find('div').filter('.fieldvalue').append( fieldSet );
+                break;
+            case "TextAreaFieldValue":
+                var cols = field.field.fieldValue.cols;
+                var rows = field.field.fieldValue.rows;
+                $('#'+id).find('div').filter('.fieldvalue').append( $('#'+field_type).clone().attr({
+                    id: id,
+                    cols: cols,
+                    rows: rows-1
+                }).append(value) );
+                break;
+            case "TextFieldValue":
+                var width = field.field.fieldValue.width;
+                $('#'+id).find('div').filter('.fieldvalue').append( $('#'+field_type).clone().attr({
+                    id: id,
+                    size: width,
+                    value: value
+                }) );
                 break;
             default:
                 // ignore
