@@ -30,8 +30,8 @@
     </modules>
 
     <scm>
-        <connection>scm:svn:https://source.waygroup.se/svn/streamsource/access/branches/1.0</connection>
-        <developerConnection>scm:svn:https://source.waygroup.se/svn/streamsource/access/branches/1.0</developerConnection>
+        <connection>scm:svn:https://source.waygroup.se/svn/streamsource/surface/branches/1.0</connection>
+        <developerConnection>scm:svn:https://source.waygroup.se/svn/streamsource/surface/branches/1.0</developerConnection>
     </scm>
 
     <distributionManagement>
@@ -508,4 +508,35 @@
             -->
         </dependencies>
     </dependencyManagement>
+
+    <profiles>
+        <profile>
+            <id>glassfish-remote</id>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>wagon-maven-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>upload-streamflow</id>
+                                    <phase>install</phase>
+                                    <goals>
+                                        <goal>upload-single</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                            <configuration>
+                                <fromFile>target/${project.build.finalName}.war</fromFile>
+                                <serverId>deploy.streamflow</serverId>
+                                <url>scp://${deploy.server}${deploy.server.domain}/autodeploy/</url>
+                                <toFile>${project.build.finalName}.war</toFile>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+    </profiles>
 </project>

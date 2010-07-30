@@ -12,6 +12,10 @@
     <packaging>war</packaging>
     <name>StreamSource Surface war</name>
     <description>StreamSource Surface WAR packaging</description>
+    <properties>
+        <deploy.dir>${glassfish.domain}/autodeploy</deploy.dir>
+    </properties>
+    
     <build>
         <plugins>
             <!-- Resources -->
@@ -66,7 +70,7 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <version>2.0</version>
             </plugin>
-            <plugin>
+            <!-- <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>
                 <configuration>
@@ -108,6 +112,14 @@
                         <argument>root@${deploy.server}</argument>
                         <argument>sh deploy.sh</argument>
                     </arguments>
+                </configuration>
+            </plugin> -->
+             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>wagon-maven-plugin</artifactId>
+                <configuration>
+                    <fromFile>target/${project.build.finalName}.war</fromFile>
+                    <toFile>${project.build.finalName}.war</toFile>
                 </configuration>
             </plugin>
         </plugins>
