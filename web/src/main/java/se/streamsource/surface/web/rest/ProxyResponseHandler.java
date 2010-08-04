@@ -17,23 +17,12 @@
 
 package se.streamsource.surface.web.rest;
 
-import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.injection.scope.Uses;
-import org.qi4j.api.value.ValueBuilderFactory;
 import org.restlet.Response;
-import org.restlet.data.CookieSetting;
 import org.restlet.data.Method;
-import org.restlet.representation.EmptyRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 import se.streamsource.dci.restlet.client.ResponseHandler;
-import se.streamsource.streamflow.infrastructure.event.DomainEvent;
-import se.streamsource.streamflow.infrastructure.event.TransactionEvents;
-import se.streamsource.streamflow.infrastructure.json.JSONObject;
-import se.streamsource.streamflow.infrastructure.json.JSONTokener;
-import se.streamsource.surface.web.context.accesspoints.endusers.EndUsersContext;
-
-import java.util.List;
 
 /**
  */
