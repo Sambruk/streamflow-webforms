@@ -1,106 +1,93 @@
-/**
- *
- * Copyright 2009 Streamsource AB
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 /* line 7, ../src/ie.scss */
 .bp {
   text-align: center;
 }
-/* line 48, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
+/* line 48, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
 * html .bp legend {
   margin: 0px -8px 16px 0;
   padding: 0;
 }
-/* line 52, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
+/* line 52, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
 html > .bp p code {
   *white-space: normal;
 }
-/* line 67, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
+/* line 67, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
 .bp .container {
   text-align: left;
 }
-/* line 69, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
+/* line 69, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
 .bp sup {
   vertical-align: text-top;
 }
-/* line 71, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
+/* line 71, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
 .bp sub {
   vertical-align: text-bottom;
 }
-/* line 73, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
+/* line 73, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
 .bp hr {
   margin: -8px auto 11px;
 }
-/* line 75, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
+/* line 75, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
 .bp img {
   -ms-interpolation-mode: bicubic;
 }
-/* line 77, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
+/* line 77, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
 .bp fieldset {
   padding-top: 0;
 }
-/* line 79, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
+/* line 79, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
 .bp textarea {
   overflow: auto;
 }
-/* line 82, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
+/* line 82, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
 .bp input.text {
   margin: 0.5em 0;
   background-color: white;
   border: 1px solid #bbbbbb;
 }
-/* line 86, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
+/* line 86, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
 .bp input.text:focus {
   border: 1px solid #666666;
 }
-/* line 88, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
+/* line 88, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
 .bp input.title {
   margin: 0.5em 0;
   background-color: white;
   border: 1px solid #bbbbbb;
 }
-/* line 92, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
+/* line 92, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
 .bp input.title:focus {
   border: 1px solid #666666;
 }
-/* line 94, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
+/* line 94, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
 .bp input.checkbox {
   position: relative;
   top: 0.25em;
 }
-/* line 97, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
+/* line 97, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
 .bp input.radio {
   position: relative;
   top: 0.25em;
 }
-/* line 100, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
+/* line 100, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
 .bp input.button {
   position: relative;
   top: 0.25em;
 }
-/* line 103, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
+/* line 103, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
 .bp textarea {
   margin: 0.5em 0;
 }
-/* line 105, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
+/* line 105, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
 .bp select {
   margin: 0.5em 0;
 }
-/* line 107, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
+/* line 107, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_ie.scss */
 .bp button {
   position: relative;
   top: 0.25em;
+}
+/* line 16, ../src/ie.scss */
+.bp a.button {
+  display: inline-block;
 }

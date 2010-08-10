@@ -1,22 +1,5 @@
-/**
- *
- * Copyright 2009 Streamsource AB
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 /* line 18, ../src/buttons.scss */
-a.button {
+.bp a.button {
   display: -moz-inline-box;
   -moz-box-orient: vertical;
   display: inline-block;
@@ -37,8 +20,8 @@ a.button {
   border-color: #eeeeee #dedede #dedede #eeeeee;
   color: #565656;
 }
-/* line 78, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
-a.button img {
+/* line 78, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
+.bp a.button img {
   margin: 0 3px -3px 0 !important;
   padding: 0;
   border: none;
@@ -46,21 +29,15 @@ a.button img {
   height: 16px;
   float: none;
 }
-/* line 65, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
-a.button:hover {
-  background-color: #dff4ff;
-  border-color: #d2f1ff #c2e1ef #c2e1ef #d2f1ff;
-  color: #336699;
-}
-/* line 49, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
-a.button:active {
+/* line 49, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
+.bp a.button:active {
   background-color: #6299c5;
   border-color: #72a9d5 #6299c5 #6299c5 #72a9d5;
   color: white;
 }
 
 /* line 31, ../src/buttons.scss */
-button {
+.bp button {
   display: inline;
   float: left;
   display: block;
@@ -80,8 +57,8 @@ button {
   border-color: #eeeeee #dedede #dedede #eeeeee;
   color: #565656;
 }
-/* line 78, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
-button img {
+/* line 78, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
+.bp button img {
   margin: 0 3px -3px 0 !important;
   padding: 0;
   border: none;
@@ -89,57 +66,57 @@ button img {
   height: 16px;
   float: none;
 }
-/* line 98, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
-button[type] {
+/* line 98, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
+.bp button[type] {
   padding: 4px 10px 4px 7px;
   line-height: 17px;
 }
-/* line 101, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
-*:first-child + html button[type] {
+/* line 101, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
+*:first-child + html .bp button[type] {
   padding: 4px 10px 3px 7px;
 }
-/* line 65, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
-button:hover {
+/* line 65, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
+.bp button:hover {
   background-color: #dff4ff;
   border-color: #d2f1ff #c2e1ef #c2e1ef #d2f1ff;
   color: #336699;
 }
-/* line 49, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
-button:active {
+/* line 49, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
+.bp button:active {
   background-color: #6299c5;
   border-color: #72a9d5 #6299c5 #6299c5 #72a9d5;
   color: white;
 }
 
 /* line 39, ../src/buttons.scss */
-a.positive, button.positive {
+.bp a.positive, .bp button.positive {
   color: #529214;
 }
-/* line 65, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
-a.positive:hover, button.positive:hover {
+/* line 65, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
+.bp a.positive:hover, .bp button.positive:hover {
   background-color: #e6efc2;
   border-color: #d6e890 #c6d880 #c6d880 #d6e890;
   color: #529214;
 }
-/* line 49, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
-a.positive:active, button.positive:active {
+/* line 49, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
+.bp a.positive:active, .bp button.positive:active {
   background-color: #529214;
   border-color: #62a224 #529214 #529214 #62a224;
   color: white;
 }
 
 /* line 44, ../src/buttons.scss */
-a.negative, button.negative {
+.bp a.negative, .bp button.negative {
   color: #d12f19;
 }
-/* line 65, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
-a.negative:hover, button.negative:hover {
+/* line 65, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
+.bp a.negative:hover, .bp button.negative:hover {
   background-color: #fbe3e4;
   border-color: #ffd2d4 #fbc2c4 #fbc2c4 #ffd2d4;
   color: #d12f19;
 }
-/* line 49, ../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
-a.negative:active, button.negative:active {
+/* line 49, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
+.bp a.negative:active, .bp button.negative:active {
   background-color: #d12f19;
   border-color: #e13f29 #d12f19 #d12f19 #e13f29;
   color: white;
