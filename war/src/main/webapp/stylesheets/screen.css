@@ -1,61 +1,61 @@
 /* line 18, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_form.scss */
-.bp label {
+div.bp #app label {
   font-weight: bold;
 }
 /* line 19, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_form.scss */
-.bp fieldset {
+div.bp #app fieldset {
   padding: 1.4em;
   margin: 0 0 1.5em 0;
 }
 /* line 20, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_form.scss */
-.bp legend {
+div.bp #app legend {
   font-weight: bold;
   font-size: 1.2em;
 }
 /* line 25, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_form.scss */
-.bp input.text, .bp input.title, .bp input[type=text], .bp input[type=password] {
+div.bp #app input.text, div.bp #app input.title, div.bp #app input[type=text], div.bp #app input[type=password] {
   margin: 0.5em 0;
   background-color: white;
   padding: 5px;
 }
 /* line 26, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_form.scss */
-.bp input.title {
+div.bp #app input.title {
   font-size: 1.5em;
 }
 /* line 30, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_form.scss */
-.bp input[type=checkbox], .bp input.checkbox, .bp input[type=radio], .bp input.radio {
+div.bp #app input[type=checkbox], div.bp #app input.checkbox, div.bp #app input[type=radio], div.bp #app input.radio {
   position: relative;
   top: 0.25em;
 }
 /* line 32, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_form.scss */
-.bp textarea {
+div.bp #app textarea {
   margin: 0.5em 0;
   padding: 5px;
 }
 /* line 33, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_form.scss */
-.bp select {
+div.bp #app select {
   margin: 0.5em 0;
 }
 /* line 57, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_form.scss */
-.bp fieldset {
+div.bp #app fieldset {
   border: 1px solid #cccccc;
 }
 /* line 60, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_form.scss */
-.bp input.text, .bp input.title, .bp input[type=text], .bp input[type=password],
-.bp textarea, .bp select {
+div.bp #app input.text, div.bp #app input.title, div.bp #app input[type=text], div.bp #app input[type=password],
+div.bp #app textarea, div.bp #app select {
   border: 1px solid #bbbbbb;
 }
 /* line 62, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_form.scss */
-.bp input.text:focus, .bp input.title:focus, .bp input[type=text]:focus, .bp input[type=password]:focus,
-.bp textarea:focus, .bp select:focus {
+div.bp #app input.text:focus, div.bp #app input.title:focus, div.bp #app input[type=text]:focus, div.bp #app input[type=password]:focus,
+div.bp #app textarea:focus, div.bp #app select:focus {
   border: 1px solid #666666;
 }
 /* line 46, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_form.scss */
-.bp input.text, .bp input.title, .bp input[type=text], .bp input[type=password] {
+div.bp #app input.text, div.bp #app input.title, div.bp #app input[type=text], div.bp #app input[type=password] {
   width: 300px;
 }
 /* line 48, ../../../../../../../../../Program Files/IronRuby 1.0v4/lib/ironruby/gems/1.8/gems/compass-0.10.2/frameworks/blueprint/stylesheets/blueprint/_form.scss */
-.bp textarea {
+div.bp #app textarea {
   width: 390px;
   height: 250px;
 }
