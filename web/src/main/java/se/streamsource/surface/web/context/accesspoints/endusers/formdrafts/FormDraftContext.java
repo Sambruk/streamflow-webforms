@@ -41,11 +41,7 @@ public interface FormDraftContext
    @SubContext
    SummaryContext summary();
 
-   void next( Representation rep);
-
    void nextpage( IntegerDTO page );
-
-   void previous( Representation rep );
 
    void previouspage( IntegerDTO page );
 
@@ -97,32 +93,6 @@ public interface FormDraftContext
          try
          {
             client.postCommand( "previouspage", page);
-         } catch (ResourceException e)
-         {
-            e.printStackTrace();
-         }
-      }
-
-      public void next( Representation rep)
-      {
-         CommandQueryClient client = context.get( CommandQueryClient.class );
-
-         try
-         {
-            client.postCommand( "next", rep );
-         } catch (ResourceException e)
-         {
-            e.printStackTrace();
-         }
-      }
-
-      public void previous( Representation rep)
-      {
-         CommandQueryClient client = context.get( CommandQueryClient.class );
-
-         try
-         {
-            client.postCommand( "previous", rep );
          } catch (ResourceException e)
          {
             e.printStackTrace();

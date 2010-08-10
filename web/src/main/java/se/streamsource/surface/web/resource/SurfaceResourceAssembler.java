@@ -24,12 +24,15 @@ import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.spi.service.importer.NewObjectImporter;
 import org.restlet.Client;
 import org.restlet.Restlet;
+import se.streamsource.dci.restlet.server.CommandResult;
 import se.streamsource.surface.web.ClientEventSourceService;
 import se.streamsource.surface.web.rest.CookieResponseHandler;
 import se.streamsource.dci.restlet.client.ResponseHandler;
 import se.streamsource.dci.restlet.server.DCIAssembler;
 import se.streamsource.dci.restlet.server.DefaultResponseWriterFactory;
 import se.streamsource.surface.web.rest.ProxyRestlet;
+
+import static org.qi4j.bootstrap.ImportedServiceDeclaration.NEW_OBJECT;
 
 /**
  */
@@ -41,6 +44,7 @@ public class SurfaceResourceAssembler
      module.addObjects( DefaultResponseWriterFactory.class, EventsCommandResult.class );
       new DCIAssembler().assemble( module );
 
+      module.importServices( CommandResult.class).importedBy( NEW_OBJECT );
       module.importServices( SurfaceRootContextFactory.class ).importedBy( NewObjectImporter.class );
 
       // Resources

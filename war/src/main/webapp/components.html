@@ -20,16 +20,28 @@
 <!-- Components goes here-->
 <div id="login_div">
     <div id="login_enduser">
-        <a href="#" id="login_enduser_operation">Sign in</a>
+        <a class="button" href="#" id="login_enduser_operation">
+            <img src="images/buttons/door_in.png" alt=""/>Sign in
+        </a>
     </div>
 </div>
 
 <div id="form_filling_div">
-    <p id="form_page" class="headline"></p>
+    <ul id="form_pages"></ul>
     <p id="form_table_body"></p>
 
-    <a href="#" id="form_page_previous">Previous</a> <a href="#" id="form_page_next">Next</a>
-    <a href="#" id="form_page_discard">Discard</a> <a href="#" id="form_summary">Summary</a>
+    <a href="#" id="form_page_previous" class="button">
+       <img src="images/buttons/arrow_left.png" alt=""/> Previous
+    </a>
+    <a href="#" id="form_page_next" class="button">
+       <img src="images/buttons/arrow_right.png" alt=""/>  Next
+    </a>
+    <a href="#" id="form_page_discard" class="button">
+        <img src="images/buttons/cross.png" alt=""/> Discard
+    </a>
+    <a href="#" id="form_summary" class="button">
+        <img src="images/buttons/sum.png" alt=""/> Summary
+    </a>
 </div>
 
 <div id="form_summary_div">
@@ -40,13 +52,15 @@
     </ul>
 
     <div id="form_submission_status">
-        <a href="#" id="form_submit">Submit</a>
+        <a href="#" id="form_submit" class="button positive">
+            <img src="images/buttons/tick.png" alt=""/> Submit
+        </a>
     </div>
 </div>
 
 
 <div id="thank_you_div">
-    <p id="end_message"></p>  
+    <span id="end_message"></span>  
 </div>
 
 
@@ -56,6 +70,7 @@
     <div class="fieldwaiting">
         <img src="images/waiting.gif" alt="waiting"/>
     </div>
+    <div class="fielddescription"></div>
 </div>
 
 <fieldset id="FieldSet"></fieldset>

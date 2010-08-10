@@ -18,7 +18,7 @@
 
 jQuery(document).ready(function()
 {
-    function errorHandler(XMLHttpRequest, textStatus, errorThrown) { alert(errorThrown ); };
+    function errorHandler(XMLHttpRequest, textStatus, errorThrown) { alert('Error: '+ errorThrown ); };
 
     function try_login() {
         $.ajax({
@@ -66,11 +66,11 @@ jQuery(document).ready(function()
                     event = data.events[idx];
                     if ( event.name == "createdCase")
                     {
-                        ev = event.parameters.split( ':' )[1].substring(1);
-                        proxyContextUrl += ev.substring( 0, ev.length -2 );
+                        proxyContextUrl += JSON.parse(event.parameters)['param1'];
                     } else if ( event.name == "changedFormSubmission" )
                     {
                         proxyContextUrl += '/formdrafts/' + event.entity + '/';
+                        formPages = JSON.parse(JSON.parse(event.parameters)['param1'])['pages'];
                     }
                 }
             },
@@ -79,16 +79,27 @@ jQuery(document).ready(function()
     };
 
     function loadFormEditDiv() {
-        form_fields_changed = {};
+        formFieldsChanged = {};
         $('#app').empty().append( $('#form_filling_div').clone() );
         $.ajax({
             url: proxyContextUrl + 'index.json',
             success: function(data) {
-                $('#form_page').text(data.title);
+                insertPages( data );
                 insertRows( data.fields, 1 );
             }
         });
     };
+
+    function insertPages( data ) {
+        for ( idx in formPages ) {
+            if ( data.page == formPages[idx].page )
+            {
+                $('#form_pages').append( $('<li />').attr({class: "selected"}).text(formPages[idx].title ) );
+            } else {
+                $('#form_pages').append( $('<li />').text(formPages[idx].title ) );
+            }
+        }
+    }
 
     updateDate = function(fieldId, dateValue) {
         var date = new Date(dateValue);
@@ -106,7 +117,7 @@ jQuery(document).ready(function()
     };
 
     fieldChanged = function(fieldId) {
-        form_fields_changed[fieldId] = true;
+        formFieldsChanged[fieldId] = true;
     };
 
     updateFieldValue = function(fieldId, fieldValue) {
@@ -122,7 +133,7 @@ jQuery(document).ready(function()
     };
 
     updateField = function(fieldId) {
-        if ( form_fields_changed[fieldId] )
+        if ( formFieldsChanged[fieldId] )
         {
             value = $('#'+fieldId).find('input').attr('value');
             updateFieldValue(fieldId, value);
@@ -130,7 +141,7 @@ jQuery(document).ready(function()
     };
 
     updateTextAreaField = function(fieldId) {
-        if ( form_fields_changed[fieldId] )
+        if ( formFieldsChanged[fieldId] )
         {
             value = $('#'+fieldId).find('textarea').attr('value');
             updateFieldValue(fieldId, value);
@@ -257,7 +268,8 @@ jQuery(document).ready(function()
 	// otherwise list all accesspoints
 	var proxyContextUrl = "surface/proxy/accesspoints/"
 	var contextUrl = "surface/surface/accesspoints/";
-    var form_fields_changed = {};
+	var formPages;
+    var formFieldsChanged = {};
 	$('#app').empty();
 	$('#components').hide().load('components.html', function() {
         if ( accesspoint == null || accesspoint.length < 1 )
