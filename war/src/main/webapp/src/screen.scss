@@ -1,6 +1,7 @@
 
 // This import applies a global reset to any page that imports this stylesheet.
-@import "blueprint/reset";
+//@import "blueprint/reset";
+@import "blueprint/reset/utilities";
 
 // To configure blueprint, edit the partials/base.sass file.
 @import "partials/base";
@@ -14,14 +15,16 @@
 @import "partials/page";
 @import "partials/form";
 @import "partials/two_col";
-
-
+@import "compass/utilities/lists/horizontal-list";
+@import "compass/utilities/lists/bullets";
 
 $main_color: #003358; // #ccf;
 $page_background_color: #f0f0f0;
 $fieldset_background: lighten($page_background_color, 0%); //#220;
 
 div.bp {
+@include blueprint-nested-reset;
+@include blueprint-typography(true);
 @include fancy-type;
 width: 600px;
 margin: 20px;
@@ -39,6 +42,28 @@ fieldset {
 background-color: $fieldset_background;
 }
 
+.fieldvalue, .fieldwaiting  {
+  display:-moz-inline-box;
+  display:inline-block;
+  zoom:1;
+  *display:inline;
+
+}
+#form_filling_div > ul {
+@include horizontal-list;
+margin-top: 23px;
+margin-bottom: 23px;
+li {
+color: $main_color;
+font-size: 1.2em;
+}
+a { text-decoration: none; }
+li.selected {
+font-weight: bold;
+text-decoration: underline;
+}
+}
+
 .commentField pre {
 margin: 3px 0px;
 }
@@ -53,3 +78,20 @@ display: block;
 }
 }
 
+.ui-datepicker {
+font-size: 62.5%;
+}
+
+.bp .copy {
+display: block;
+margin-top: 23px;
+}
+
+#form_page_summary {
+ul {
+@include no-bullets;
+}
+li {
+padding: 4px;
+}
+}
