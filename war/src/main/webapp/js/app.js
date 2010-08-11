@@ -91,12 +91,17 @@ jQuery(document).ready(function()
     };
 
     function insertPages( data ) {
+        var lastIdx = formPages.length - 1;
         for ( idx in formPages ) {
             if ( data.page == formPages[idx].page )
             {
                 $('#form_pages').append( $('<li />').attr({class: "selected"}).text(formPages[idx].title ) );
             } else {
                 $('#form_pages').append( $('<li />').text(formPages[idx].title ) );
+            }
+            if ( idx < lastIdx )
+            {
+                $('#form_pages').append( $('<li />').text('>>') );
             }
         }
     }
@@ -153,13 +158,21 @@ jQuery(document).ready(function()
         var field = fields[0];
         var id = field.field.field;
         var name = field.field.description;
+        var desc = field.field.note;
         var value = (field.value == null ? "" : field.value);
         var fieldType = field.field.fieldValue._type;
         var list = fieldType.split('.');
         var field_type = list[ list.length - 1 ];
         $('#form_table_body').append( $('#FormField').clone().attr('id', id) );
-        $('#'+id).find('div').filter('.fieldname').text(name);
-        $('#'+id).find('img').hide();
+        if ( desc != "" )
+        {
+            $('#'+id).find('div.fieldname > img').aToolTip({
+		    		clickIt: true,
+		    		tipContent: desc
+            });
+            $('#'+id).find('div.fieldname > img').show();
+        }
+        $('#'+id).find('div.fieldname > label').text(name);
         switch (field_type) {
             case "CheckboxesFieldValue":
                 var fieldSet = $('#FieldSet').clone().attr('id', 'FieldSet'+id);
@@ -174,7 +187,7 @@ jQuery(document).ready(function()
                         node.attr('checked', 'checked');
                     }
                     var label = $('#label').clone().attr({'for': selectionId, id: 'label'+selectionId }).text(selectionValue);
-                    fieldSet.append( node ).append( label );
+                    fieldSet.append( $('<div />').append( node ).append( label ) );
                     $('#'+id).find('#'+field_type).append(node).append(label);
                 };
                 $('#'+id).find('div').filter('.fieldvalue').append( fieldSet );
@@ -223,7 +236,7 @@ jQuery(document).ready(function()
                         node.attr('checked', 'checked');
                     }
                     var label = $('#label').clone().attr({'for': selectionId, id: 'label'+selectionId }).text(selectionValue);
-                    fieldSet.append( node ).append( label );
+                    fieldSet.append( $('<div />').append( node ).append( label ) );
                     $('#'+id).find('#'+field_type).append(node).append(label);
                 };
                 $('#'+id).find('div').filter('.fieldvalue').append( fieldSet );
@@ -308,13 +321,15 @@ jQuery(document).ready(function()
                 $('#form_description').text(data.description);
 
                 for (idx in data.pages) {
-                    page = data.pages[idx];
+                    var pageDiv = $('#form_page_summary').clone().attr('id', 'page'+idx);
+                    var page = data.pages[idx];
                     var page_ref = $('#goto_form_page').clone().attr('accesskey', idx).text(page.title);
-                    $('#form_page_summary').append( page_ref );
+                    pageDiv.find('h3').append( page_ref );
                     for (field_idx in page.fields) {
                         field = page.fields[field_idx];
-                        $('#form_page_summary').append('<li><b>'+field.field.description+':</b> '+field.value+'</li>');
+                        pageDiv.find('ul').append('<li><b>'+field.field.description+':</b> '+field.value+'</li>');
                     }
+                    $('#form_pages_summary').append( pageDiv );
                 }
             },
             error: errorHandler
@@ -325,7 +340,7 @@ jQuery(document).ready(function()
         $.ajax({
             url: proxyContextUrl + 'summary/submitandsend.json',
             type: 'POST',
-            success: function() {
+            success: function( ) {
                 var node = $('#thank_you_div').clone();
                 node.find('#end_message').text("Form submitted. Thank you!");
                 $('#app').empty().append( node );
