@@ -164,7 +164,7 @@ jQuery(document).ready(function()
         var list = fieldType.split('.');
         var field_type = list[ list.length - 1 ];
         $('#form_table_body').append( $('#FormField').clone().attr('id', id) );
-        if ( desc != "" )
+        if ( desc != "" && field_type != "CommentFieldValue")
         {
             $('#'+id).find('div.fieldname > img').aToolTip({
 		    		clickIt: true,
@@ -327,7 +327,12 @@ jQuery(document).ready(function()
                     pageDiv.find('h3').append( page_ref );
                     for (field_idx in page.fields) {
                         field = page.fields[field_idx];
-                        pageDiv.find('ul').append('<li><b>'+field.field.description+':</b> '+field.value+'</li>');
+                        var list = field.field.fieldValue._type.split('.');
+                        var field_type = list[ list.length - 1 ];
+                        if ( field_type != "CommentFieldValue")
+                        {
+                            pageDiv.find('ul').append('<li><b>'+field.field.description+':</b> '+field.value+'</li>');
+                        }
                     }
                     $('#form_pages_summary').append( pageDiv );
                 }
