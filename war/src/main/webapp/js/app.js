@@ -126,7 +126,7 @@ jQuery(document).ready(function()
     };
 
     updateFieldValue = function(fieldId, fieldValue) {
-        var image = $('#'+fieldId).find('img');
+        var image = $('#'+fieldId).find('.fieldwaiting > img');
         image.show();
         $.ajax({
             url: proxyContextUrl + 'updatefield.json',
@@ -281,6 +281,7 @@ jQuery(document).ready(function()
 	// otherwise list all accesspoints
 	var proxyContextUrl = "surface/proxy/accesspoints/"
 	var contextUrl = "surface/surface/accesspoints/";
+    var missingFields = "";
 	var formPages;
     var formFieldsChanged = {};
 	$('#app').empty();
@@ -314,6 +315,7 @@ jQuery(document).ready(function()
     });
 
     $('#form_summary').live('click', function() {
+        missingFields = "";
         $('#app').empty().append( $('#form_summary_div').clone() );
         $.ajax({
             url: proxyContextUrl + 'summary/index.json',
@@ -326,15 +328,34 @@ jQuery(document).ready(function()
                     var page_ref = $('#goto_form_page').clone().attr('accesskey', idx).text(page.title);
                     pageDiv.find('h3').append( page_ref );
                     for (field_idx in page.fields) {
-                        field = page.fields[field_idx];
+                        var field = page.fields[field_idx];
+                        var value = (field.value == null ? "" : field.value);
                         var list = field.field.fieldValue._type.split('.');
                         var field_type = list[ list.length - 1 ];
                         if ( field_type != "CommentFieldValue")
                         {
-                            pageDiv.find('ul').append('<li><b>'+field.field.description+':</b> '+field.value+'</li>');
+                            var ul = pageDiv.find('ul');
+                            var li = $('#field_summary').clone().attr('id', field.field );
+                            li.find('b').text(field.field.description+':');
+                            if ( !field.field.mandatory || value != "" )
+                            {
+                                li.find('#missing').hide();
+                            } else
+                            {
+                                missingFields += "Missing value for field '"+field.field.description+"' <br>";
+                            }
+                            li.append( value );
+                            ul.append( li );
                         }
                     }
                     $('#form_pages_summary').append( pageDiv );
+                }
+                if ( missingFields != "" )
+                {
+                    missingFields  += "<br> Cannot submit form";
+                    $('#form_submit').aToolTip({
+                        tipContent: missingFields
+                    });
                 }
             },
             error: errorHandler
@@ -342,17 +363,20 @@ jQuery(document).ready(function()
    });
 
    $('#form_submit').live('click', function() {
-        $.ajax({
-            url: proxyContextUrl + 'summary/submitandsend.json',
-            type: 'POST',
-            success: function( ) {
-                var node = $('#thank_you_div').clone();
-                node.find('#end_message').text("Form submitted. Thank you!");
-                $('#app').empty().append( node );
-            },
-            error: function() {
-                // todo show errors and stay on page
-            }
-        });
+        if ( missingFields == "" )
+        {
+            $.ajax({
+                url: proxyContextUrl + 'summary/submitandsend.json',
+                type: 'POST',
+                success: function( ) {
+                    var node = $('#thank_you_div').clone();
+                    node.find('#end_message').text("Form submitted. Thank you!");
+                    $('#app').empty().append( node );
+                },
+                error: function() {
+                    // todo show errors and stay on page
+                }
+            });
+        }
    });
 })
