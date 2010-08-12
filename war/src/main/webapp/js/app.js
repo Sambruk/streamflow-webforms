@@ -153,6 +153,34 @@ jQuery(document).ready(function()
         }
     }
 
+    updateInteger = function(fieldId) {
+        if ( formFieldsChanged[fieldId] )
+        {
+            var textfield = $('#'+fieldId).find('input');
+            var newValue = parseInt(textfield.attr('value'));
+            if ( isNaN(newValue) ) {
+                textfield.attr('value', '');
+            } else {
+                textfield.attr('value', newValue);
+                updateFieldValue( fieldId, newValue);
+            }
+        }
+    }
+
+    updateDouble = function(fieldId) {
+        if ( formFieldsChanged[fieldId] )
+        {
+            var textfield = $('#'+fieldId).find('input');
+            var newValue = Number(textfield.attr('value'));
+            if ( isNaN(newValue) ) {
+                textfield.attr('value', '');
+            } else {
+                textfield.attr('value', newValue);
+                updateFieldValue( fieldId, newValue);
+            }
+        }
+    }
+
     function insertRows( fields, fieldCount) {
         if (fields.length == 0) return;
         var field = fields[0];
@@ -221,7 +249,13 @@ jQuery(document).ready(function()
                 $('#'+id).find('div').filter('.fieldvalue').append( 'type <i>'+field_type+'</i> not implemented yet');
                 break;
             case "NumberFieldValue":
-                $('#'+id).find('div').filter('.fieldvalue').append( 'type <i>'+field_type+'</i> not implemented yet');
+                if ( field.field.fieldValue.integer )
+                {
+                    $('#'+id).find('div').filter('.fieldvalue').append( $('#'+field_type).clone().attr({id: id, value:value, onblur:"javascript:updateInteger(id);"}) );
+                } else
+                {
+                    $('#'+id).find('div').filter('.fieldvalue').append( $('#'+field_type).clone().attr({id: id, value:value, onblur:"javascript:updateDouble(id);"}) );
+                }
                 break;
             case "OptionButtonsFieldValue":
                 var fieldSet = $('#FieldSet').clone().attr('id', 'FieldSet'+id);

@@ -56,11 +56,6 @@ public class ProxyRestlet
 
       request.setResourceRef( streamflowReference );
 
-      try {
-
-         client.handle( request, response );
-      } catch( Exception e) {
-         e.printStackTrace(  );
-      }
+      client.handle( request, response );
    }
 }
