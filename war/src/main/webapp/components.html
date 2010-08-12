@@ -68,7 +68,7 @@
 </div>
 
 <div id="FormField" class="formfield">
-    <div class="fieldname"><label></label>&nbsp;<img src="images/unknown.png" alt="note" style="display: none"/></div>
+    <div class="fieldname"><label></label><font id="mandatory" color="red">*</font>&nbsp;<img src="images/unknown.png" alt="note" style="display: none"/></div>
     <div class="fieldvalue"></div>
     <div class="fieldwaiting">
         <img src="images/waiting.gif" alt="waiting" style="display: none;"/>
@@ -87,7 +87,7 @@
 <div id="CommentFieldValue" class="commentfield"></div>
 
 <a id="goto_form_page" href="#" accesskey=""></a>
-<li id="field_summary"><b></b><font id="missing" color="red">*</font></li>
+<li id="field_summary"><b></b><font id="mandatory" color="red">*</font>:</li>
 
 <select id="ComboBoxFieldValue" onchange="javascript:updateFieldValue(name, value);">
 </select>

@@ -201,6 +201,10 @@ jQuery(document).ready(function()
             $('#'+id).find('div.fieldname > img').show();
         }
         $('#'+id).find('div.fieldname > label').text(name);
+        if ( !field.field.mandatory )
+        {
+            $('#'+id).find('#mandatory').hide();                    
+        }
         switch (field_type) {
             case "CheckboxesFieldValue":
                 var fieldSet = $('#FieldSet').clone().attr('id', 'FieldSet'+id);
@@ -370,10 +374,10 @@ jQuery(document).ready(function()
                         {
                             var ul = pageDiv.find('ul');
                             var li = $('#field_summary').clone().attr('id', field.field );
-                            li.find('b').text(field.field.description+':');
-                            if ( !field.field.mandatory || value != "" )
+                            li.find('b').text(field.field.description);
+                            if ( !field.field.mandatory )
                             {
-                                li.find('#missing').hide();
+                                li.find('#mandatory').hide();
                             } else
                             {
                                 missingFields += "Missing value for field '"+field.field.description+"' <br>";
