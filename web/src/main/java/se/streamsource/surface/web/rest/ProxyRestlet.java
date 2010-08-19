@@ -25,9 +25,21 @@ import org.restlet.Restlet;
 import org.restlet.Uniform;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
+import org.restlet.data.ClientInfo;
+import org.restlet.data.MediaType;
+import org.restlet.data.Preference;
 import org.restlet.data.Reference;
+import org.restlet.data.Status;
+import org.restlet.engine.io.BioUtils;
+import org.restlet.representation.InputRepresentation;
+import org.restlet.representation.Representation;
+import org.restlet.resource.ClientResource;
+import org.restlet.resource.ResourceException;
 import se.streamsource.surface.web.resource.SurfaceRootContextFactory;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.Collections;
 import java.util.ResourceBundle;
 
 /**
@@ -42,6 +54,7 @@ public class ProxyRestlet
    public void handle( Request request, Response response )
    {
       super.handle( request, response );
+
       Reference ref = request.getResourceRef();
       String remaining = ref.getRemainingPart();
 
@@ -52,10 +65,30 @@ public class ProxyRestlet
 
       String proxyusername = bundle.getString( "streamflow.proxyuser.username" );
       String proxypassword = bundle.getString( "streamflow.proxyuser.password" );
-      request.setChallengeResponse( new ChallengeResponse( ChallengeScheme.HTTP_BASIC, proxyusername, proxypassword ) );
 
-      request.setResourceRef( streamflowReference );
+      ClientResource client = new ClientResource( streamflowReference );
+      client.setClientInfo( request.getClientInfo() );
+      client.setNext( this.client );
+      client.setChallengeResponse( new ChallengeResponse( ChallengeScheme.HTTP_BASIC, proxyusername, proxypassword ) );
+      client.setMethod( request.getMethod() );
+      client.getRequest().setEntity( request.getEntity() );
 
-      client.handle( request, response );
+      try
+      {
+         Representation representation = client.handle();
+         // just a test but should be changed
+         ByteArrayOutputStream bout = new ByteArrayOutputStream( );
+         BioUtils.copy( representation.getStream(), bout);
+         response.setEntity( new InputRepresentation(new ByteArrayInputStream(bout.toByteArray()), representation.getMediaType(), bout.size()) );
+      } catch ( ResourceException re )
+      {
+         response.setStatus( re.getStatus(), re.getCause(), re.getMessage() );
+      } catch ( Exception ex )
+      {
+         response.setStatus( Status.SERVER_ERROR_INTERNAL, ex, ex.getMessage() );
+      } finally
+      {
+         request.getEntity().release();
+      }
    }
 }

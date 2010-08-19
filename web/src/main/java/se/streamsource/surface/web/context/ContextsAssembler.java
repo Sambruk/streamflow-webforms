@@ -69,7 +69,6 @@ import se.streamsource.streamflow.resource.caze.SubmittedFormsListDTO;
 import se.streamsource.streamflow.resource.roles.EntityReferenceDTO;
 import se.streamsource.streamflow.resource.roles.IntegerDTO;
 import se.streamsource.streamflow.resource.user.NewProxyUserCommand;
-import se.streamsource.surface.web.rest.ProxyResponseHandler;
 
 /**
  */
@@ -82,7 +81,7 @@ public class ContextsAssembler
             importedBy( NewObjectImporter.class ).
             visibleIn( Visibility.application );
       module.addObjects( InteractionConstraintsService.class,
-            CommandQueryClient.class, CookieResponseHandler.class, ProxyResponseHandler.class );
+            CommandQueryClient.class, CookieResponseHandler.class);
       module.addValues( TransactionEvents.class, DomainEvent.class ).visibleIn( Visibility.application );
 
       module.addServices( ClientEventSourceService.class ).visibleIn( Visibility.application );

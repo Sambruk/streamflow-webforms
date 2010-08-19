@@ -85,6 +85,22 @@
 <input id="OptionButtonsFieldValue" type="radio" onChange="javascript:selectChanged(name);" />
 <label id="label"></label>
 <div id="CommentFieldValue" class="commentfield"></div>
+<table id="ListBoxFieldValue">
+    <tr>
+        <td>
+            <select id="possiblevalues" multiple="multiple" style="height:200px;width:100px;">
+            </select><br/>
+        </td>
+        <td>
+            <button onclick="javascript:selectItem(name);" type="button">&nbsp;>>&nbsp;</button>
+            <button onclick="javascript:deselectItem(name);" type="button">&nbsp;<<&nbsp;</button>
+        </td>
+        <td>
+            <select id="selectedvalues" multiple="multiple" style="height:200px;width:100px;">
+            </select><br/>
+        </td>
+    </tr>
+</table>
 
 <a id="goto_form_page" href="#" accesskey=""></a>
 <li id="field_summary"><b></b><font id="mandatory" color="red">*</font>:</li>

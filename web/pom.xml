@@ -56,38 +56,7 @@
             <groupId>org.qi4j.library</groupId>
             <artifactId>qi4j-lib-constraints</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>org.qi4j.extension</groupId>
-            <artifactId>qi4j-entitystore-jdbm</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.qi4j.extension</groupId>
-            <artifactId>qi4j-migration</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.qi4j.extension</groupId>
-            <artifactId>qi4j-entitystore-preferences</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.qi4j.extension</groupId>
-            <artifactId>qi4j-reindexer</artifactId>
-        </dependency>
-
         <!-- REST -->
-        <dependency>
-            <groupId>org.qi4j.library</groupId>
-            <artifactId>qi4j-lib-rdf</artifactId>
-            <version>${version.qi4j-lib}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.qi4j.extension</groupId>
-            <artifactId>qi4j-entitystore-rest</artifactId>
-            <version>${version.qi4j-ext}</version>
-        </dependency>
         <dependency>
             <groupId>org.restlet.jee</groupId>
             <artifactId>org.restlet</artifactId>
@@ -132,12 +101,6 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jbehave</groupId>
-            <artifactId>jbehave-core</artifactId>
-            <version>2.4</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

@@ -18,24 +18,8 @@
 package se.streamsource.surface.web.context.accesspoints.endusers;
 
 import org.qi4j.api.mixin.Mixins;
-import org.qi4j.api.value.ValueBuilder;
-import org.restlet.Response;
-import org.restlet.representation.EmptyRepresentation;
-import se.streamsource.dci.api.ContextNotFoundException;
-import se.streamsource.dci.api.IndexInteraction;
 import se.streamsource.dci.api.Interactions;
 import se.streamsource.dci.api.InteractionsMixin;
-import se.streamsource.dci.api.SubContext;
-import se.streamsource.dci.api.SubContexts;
-import se.streamsource.dci.restlet.client.CommandQueryClient;
-import se.streamsource.dci.value.LinkValue;
-import se.streamsource.dci.value.LinksValue;
-import se.streamsource.dci.value.StringValue;
-import se.streamsource.dci.value.TitledLinksValue;
-import se.streamsource.streamflow.resource.roles.EntityReferenceDTO;
-import se.streamsource.surface.web.context.IndexInteractionLinksValue;
-import se.streamsource.surface.web.context.accesspoints.endusers.formdrafts.FormDraftsContext;
-import se.streamsource.surface.web.rest.ProxyResponseHandler;
 
 /**
  */

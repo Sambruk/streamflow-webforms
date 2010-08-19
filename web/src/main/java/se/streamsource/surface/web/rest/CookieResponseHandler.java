@@ -84,6 +84,7 @@ public class CookieResponseHandler
          {
             throw new RuntimeException( "Could not process events", e );
          }
+         response.release();
       }
    }
 }

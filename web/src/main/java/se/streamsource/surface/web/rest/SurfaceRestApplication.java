@@ -17,8 +17,6 @@
 
 package se.streamsource.surface.web.rest;
 
-import org.qi4j.api.common.Optional;
-import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.injection.scope.Uses;
 import org.qi4j.api.object.ObjectBuilderFactory;
@@ -29,17 +27,13 @@ import org.restlet.Application;
 import org.restlet.Client;
 import org.restlet.Context;
 import org.restlet.Restlet;
-import org.restlet.Uniform;
-import org.restlet.data.ChallengeScheme;
 import org.restlet.data.MediaType;
 import org.restlet.data.Protocol;
 import org.restlet.routing.Router;
 import org.restlet.routing.Template;
-import org.restlet.security.Authenticator;
-import org.restlet.security.ChallengeAuthenticator;
-import org.restlet.security.Verifier;
-import se.streamsource.surface.web.SurfaceWebAssembler;
 import se.streamsource.dci.restlet.server.CommandQueryRestlet;
+import se.streamsource.dci.restlet.server.ExtensionMediaTypeFilter;
+import se.streamsource.surface.web.SurfaceWebAssembler;
 
 import java.util.logging.Logger;
 
@@ -93,7 +87,7 @@ public class SurfaceRestApplication
       router.attach( "/proxy", proxyRestlet, Template.MODE_STARTS_WITH );
       router.attach( "/surface", cqr, Template.MODE_STARTS_WITH );
 
-      return new org.qi4j.rest.ExtensionMediaTypeFilter( getContext(), router );
+      return new ExtensionMediaTypeFilter( getContext(), router );
    }
 
 

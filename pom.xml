@@ -13,7 +13,7 @@
         <version.qi4j-lib>1.2-SNAPSHOT</version.qi4j-lib>
         <version.qi4j-ext>1.2-SNAPSHOT</version.qi4j-ext>
         <version.qi4j-tools>1.0</version.qi4j-tools>
-        <version.restlet>2.0-RC3</version.restlet>
+        <version.restlet>2.0.0</version.restlet>
         <version.streamflow>1.1-SNAPSHOT</version.streamflow>
     </properties>
 
@@ -408,11 +408,6 @@
                 <version>${version.qi4j-ext}</version>
             </dependency>
             <dependency>
-                <groupId>org.qi4j.library</groupId>
-                <artifactId>qi4j-lib-rdf</artifactId>
-                <version>${version.qi4j-lib}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.restlet.jee</groupId>
                 <artifactId>org.restlet</artifactId>
                 <version>${version.restlet}</version>
@@ -421,44 +416,6 @@
                 <groupId>org.restlet.jee</groupId>
                 <artifactId>org.restlet.ext.xml</artifactId>
                 <version>${version.restlet}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.qi4j.extension</groupId>
-                <artifactId>qi4j-entitystore-jdbm</artifactId>
-                <version>${version.qi4j-ext}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.qi4j.extension</groupId>
-                <artifactId>qi4j-entitystore-preferences</artifactId>
-                <version>${version.qi4j-ext}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.qi4j.extension</groupId>
-                <artifactId>qi4j-migration</artifactId>
-                <version>${version.qi4j-ext}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.qi4j.extension</groupId>
-                <artifactId>qi4j-reindexer</artifactId>
-                <version>${version.qi4j-ext}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.qi4j.swing</groupId>
-                <artifactId>qi4j-swing-envisage</artifactId>
-                <version>${version.qi4j-tools}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.easymock</groupId>
-                <artifactId>easymock</artifactId>
-                <version>2.3</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.4</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>commons-logging</groupId>
@@ -471,24 +428,7 @@
                 <artifactId>log4j</artifactId>
                 <version>1.2.14</version>
             </dependency>
-            <dependency>
-                <groupId>org.osgi</groupId>
-                <artifactId>org.osgi.core</artifactId>
-                <version>4.0.0</version>
-            </dependency>
             <!-- Test -->
-            <dependency>
-                <groupId>org.jmock</groupId>
-                <artifactId>jmock</artifactId>
-                <version>2.5.1</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.easymock</groupId>
-                <artifactId>easymock</artifactId>
-                <version>2.3</version>
-                <scope>test</scope>
-            </dependency>
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
@@ -500,12 +440,6 @@
                 <artifactId>servlet-api</artifactId>
                 <version>2.5</version>
             </dependency>
-            <!--
-
-                        <groupId>org.osgi</groupId>
-                        <artifactId>osgi_R4_core</artifactId>
-                        <version>1.0</version>
-            -->
         </dependencies>
     </dependencyManagement>
 

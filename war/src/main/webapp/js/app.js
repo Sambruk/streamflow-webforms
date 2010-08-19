@@ -250,7 +250,49 @@ jQuery(document).ready(function()
                 $('#'+id).find('div').filter('.fieldvalue').append( $('#'+field_type).clone().attr({value: value, name:id, id: 'datefield'+fieldCount}).datepicker() );
                 break;
             case "ListBoxFieldValue":
-                $('#'+id).find('div').filter('.fieldvalue').append( 'type <i>'+field_type+'</i> not implemented yet');
+                var listIndex = ((fieldCount+1)*2 +1);
+                var listbox = $('#'+field_type).clone().attr({id:id});
+                var possible = listbox.find('#possiblevalues').attr({id: 'box'+listIndex });
+                var selected = listbox.find('#selectedvalues').attr({id: 'box'+(listIndex+1)});
+
+                listbox.find('button').attr({name: 'to'+(listIndex+1)});
+                listbox.find('#move_right').attr({id: 'to'+listIndex});
+
+                var values = field.field.fieldValue.values;
+                for (valueIdx in values)
+                {
+                    var selectionValue = values[valueIdx];
+                    var selectionId = field_type + fieldCount + '' + valueIdx;
+                    var node = $('<option />').attr({value: selectionValue}).text(selectionValue);
+                    possible.append( node );
+                };
+                //$.configureBoxes();
+                /*
+                <table>
+                    <tr>
+                        <td>
+                            <select id="box1View" multiple="multiple" style="height:500px;width:300px;">
+                                <option value="501649">2008-2009 "Mini" Baja</option>
+                                <option value="501497">AAPA - Asian American Psychological Association</option>
+                                <option value="501053">Academy of Film Geeks</option>
+                                <option value="500004">Aikido Club</option>
+                                <option value="500336">Akanke</option>
+                            </select><br/>
+
+                        </td>
+                        <td>
+                            <button id="to2" type="button">&nbsp;>&nbsp;</button>
+                            <button id="to1" type="button">&nbsp;<&nbsp;</button>
+                        </td>
+                        <td>
+                            <select id="box2View" multiple="multiple" style="height:500px;width:300px;">
+                            </select><br/>
+                        </td>
+                    </tr>
+                </table>
+                */
+
+                $('#'+id).find('div').filter('.fieldvalue').append( listbox );
                 break;
             case "NumberFieldValue":
                 if ( field.field.fieldValue.integer )

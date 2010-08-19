@@ -109,6 +109,7 @@ public interface EndUsersContext
       public EntityReferenceDTO userreference( Response response) throws ResourceException
       {
          Series<Cookie> cookies = response.getRequest().getCookies();
+         response.release();
 
          Cookie cookie = findCookie( cookies );
 

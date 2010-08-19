@@ -20,8 +20,6 @@ package se.streamsource.surface.web.rest;
 import org.qi4j.bootstrap.Assembler;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.library.rdf.entity.EntityStateSerializer;
-import org.qi4j.library.rdf.entity.EntityTypeSerializer;
 import se.streamsource.dci.restlet.server.ResourceFinder;
 
 /**
@@ -32,8 +30,6 @@ public class SurfaceRestAssembler
    public void assemble( ModuleAssembly module ) throws AssemblyException
    {
       module.addObjects( SurfaceRestApplication.class,
-            ResourceFinder.class,
-            EntityStateSerializer.class,
-            EntityTypeSerializer.class );
+            ResourceFinder.class);
    }
 }
