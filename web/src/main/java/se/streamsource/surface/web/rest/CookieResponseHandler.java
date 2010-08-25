@@ -33,6 +33,7 @@ import se.streamsource.dci.restlet.client.ResponseHandler;
 import se.streamsource.streamflow.infrastructure.event.DomainEvent;
 import se.streamsource.streamflow.infrastructure.event.TransactionEvents;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -83,6 +84,13 @@ public class CookieResponseHandler
          } catch (Exception e)
          {
             throw new RuntimeException( "Could not process events", e );
+         }
+         try
+         {
+            response.getEntity().exhaust();
+         } catch (IOException e)
+         {
+            //e.printStackTrace();
          }
          response.release();
       }

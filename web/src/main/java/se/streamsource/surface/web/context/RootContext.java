@@ -22,9 +22,11 @@ import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.injection.scope.Uses;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.object.ObjectBuilderFactory;
+import org.restlet.Response;
 import org.restlet.Restlet;
 import org.restlet.Uniform;
 import org.restlet.data.Reference;
+import org.restlet.resource.ResourceException;
 import org.restlet.routing.Filter;
 import se.streamsource.surface.web.context.accesspoints.AccessPointsContext;
 import se.streamsource.dci.api.Interactions;
@@ -32,6 +34,8 @@ import se.streamsource.dci.api.InteractionsMixin;
 import se.streamsource.dci.api.SubContext;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.dci.restlet.client.NullResponseHandler;
+
+import java.io.IOException;
 
 @Mixins(RootContext.Mixin.class)
 public interface RootContext
@@ -60,7 +64,20 @@ public interface RootContext
       {
          filter.setNext( (Restlet) client );
 
-         CommandQueryClient cqc = obf.newObjectBuilder( CommandQueryClient.class ).use( filter, streamflowReference, new NullResponseHandler() ).newInstance();
+         CommandQueryClient cqc = obf.newObjectBuilder( CommandQueryClient.class ).use( filter, streamflowReference, new NullResponseHandler() {
+            @Override
+            public void handleResponse( Response response ) throws ResourceException
+            {
+               try
+               {
+                  response.getEntity().exhaust();
+               } catch (IOException e)
+               {
+                  //e.printStackTrace();
+               }
+               super.handleResponse( response );
+            }
+         } ).newInstance();
          context.set( cqc.getSubClient( "surface" ).getSubClient( "accesspoints" ) );
 
          return subContext( AccessPointsContext.class );

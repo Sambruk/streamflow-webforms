@@ -39,6 +39,7 @@ import se.streamsource.surface.web.resource.SurfaceRootContextFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.ResourceBundle;
 
@@ -77,8 +78,11 @@ public class ProxyRestlet
       {
          Representation representation = client.handle();
          // just a test but should be changed
+         //response.setEntity( representation );
          ByteArrayOutputStream bout = new ByteArrayOutputStream( );
          BioUtils.copy( representation.getStream(), bout);
+         representation.exhaust();
+         representation.release();
          response.setEntity( new InputRepresentation(new ByteArrayInputStream(bout.toByteArray()), representation.getMediaType(), bout.size()) );
       } catch ( ResourceException re )
       {
