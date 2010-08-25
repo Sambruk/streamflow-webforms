@@ -24,28 +24,9 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.spi.service.importer.NewObjectImporter;
 import org.restlet.Restlet;
-import se.streamsource.surface.web.ClientEventSourceService;
-import se.streamsource.surface.web.context.accesspoints.AccessPointContext;
-import se.streamsource.surface.web.context.accesspoints.AccessPointsContext;
-import se.streamsource.surface.web.context.accesspoints.endusers.EndUserContext;
-import se.streamsource.surface.web.context.accesspoints.endusers.EndUsersContext;
-import se.streamsource.surface.web.context.accesspoints.endusers.formdrafts.FormDraftContext;
-import se.streamsource.surface.web.context.accesspoints.endusers.formdrafts.FormDraftsContext;
-import se.streamsource.surface.web.context.accesspoints.endusers.formdrafts.summary.SummaryContext;
-import se.streamsource.surface.web.context.accesspoints.endusers.submittedforms.SubmittedFormsContext;
-import se.streamsource.surface.web.context.OrganizationContext;
-import se.streamsource.surface.web.context.OrganizationsContext;
-import se.streamsource.surface.web.context.accesspoints.ProxyUserContext;
-import se.streamsource.surface.web.context.projects.CaseTypesContext;
-import se.streamsource.surface.web.context.projects.LabelsContext;
-import se.streamsource.surface.web.context.projects.ProjectsContext;
-import se.streamsource.surface.web.context.proxyusers.ProxyUsersContext;
-import se.streamsource.surface.web.context.accesspoints.endusers.requiredforms.RequiredFormsContext;
-import se.streamsource.surface.web.rest.CookieResponseHandler;
 import se.streamsource.dci.api.InteractionConstraintsService;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.dci.restlet.client.NullResponseHandler;
-import se.streamsource.dci.value.IndexValue;
 import se.streamsource.dci.value.LinkValue;
 import se.streamsource.dci.value.LinksValue;
 import se.streamsource.dci.value.StringValue;
@@ -62,13 +43,29 @@ import se.streamsource.streamflow.domain.form.SelectionFieldValue;
 import se.streamsource.streamflow.domain.form.TextFieldValue;
 import se.streamsource.streamflow.infrastructure.event.DomainEvent;
 import se.streamsource.streamflow.infrastructure.event.TransactionEvents;
-import se.streamsource.streamflow.resource.caze.FieldDTO;
 import se.streamsource.streamflow.resource.caze.EndUserCaseDTO;
+import se.streamsource.streamflow.resource.caze.FieldDTO;
 import se.streamsource.streamflow.resource.caze.SubmittedFormListDTO;
 import se.streamsource.streamflow.resource.caze.SubmittedFormsListDTO;
 import se.streamsource.streamflow.resource.roles.EntityReferenceDTO;
 import se.streamsource.streamflow.resource.roles.IntegerDTO;
 import se.streamsource.streamflow.resource.user.NewProxyUserCommand;
+import se.streamsource.surface.web.ClientEventSourceService;
+import se.streamsource.surface.web.context.accesspoints.AccessPointContext;
+import se.streamsource.surface.web.context.accesspoints.AccessPointsContext;
+import se.streamsource.surface.web.context.accesspoints.ProxyUserContext;
+import se.streamsource.surface.web.context.accesspoints.endusers.EndUserContext;
+import se.streamsource.surface.web.context.accesspoints.endusers.EndUsersContext;
+import se.streamsource.surface.web.context.accesspoints.endusers.formdrafts.FormDraftContext;
+import se.streamsource.surface.web.context.accesspoints.endusers.formdrafts.FormDraftsContext;
+import se.streamsource.surface.web.context.accesspoints.endusers.formdrafts.summary.SummaryContext;
+import se.streamsource.surface.web.context.accesspoints.endusers.requiredforms.RequiredFormsContext;
+import se.streamsource.surface.web.context.accesspoints.endusers.submittedforms.SubmittedFormsContext;
+import se.streamsource.surface.web.context.projects.CaseTypesContext;
+import se.streamsource.surface.web.context.projects.LabelsContext;
+import se.streamsource.surface.web.context.projects.ProjectsContext;
+import se.streamsource.surface.web.context.proxyusers.ProxyUsersContext;
+import se.streamsource.surface.web.rest.CookieResponseHandler;
 
 /**
  */
@@ -87,7 +84,6 @@ public class ContextsAssembler
       module.addServices( ClientEventSourceService.class ).visibleIn( Visibility.application );
 
       module.addValues(
-            IndexValue.class,
             LinksValue.class,
             LinkValue.class,
             StringValue.class,

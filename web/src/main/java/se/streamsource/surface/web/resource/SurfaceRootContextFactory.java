@@ -25,16 +25,17 @@ import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.data.Reference;
 import org.restlet.routing.Filter;
+import se.streamsource.dci.api.RoleMap;
+import se.streamsource.dci.restlet.server.RootContextFactory;
 import se.streamsource.surface.web.context.RootContext;
 import se.streamsource.dci.api.Context;
-import se.streamsource.dci.restlet.server.RootInteractionsFactory;
 
 import java.util.ResourceBundle;
 
 /**
  */
 public class SurfaceRootContextFactory
-   implements RootInteractionsFactory
+   implements RootContextFactory
 {
    @Structure
    TransientBuilderFactory tbf;
@@ -56,10 +57,10 @@ public class SurfaceRootContextFactory
       filter = new AuthenticationFilter( challengeResponse );
    }
 
-   public Object getRoot( Context context )
+   public Object getRoot( RoleMap roleMap )
    {
       return tbf.newTransientBuilder( RootContext.class ).
-            use( context, filter, streamflowReference ).newInstance();
+            use( roleMap, filter, streamflowReference ).newInstance();
    }
 
    class AuthenticationFilter extends Filter
@@ -78,5 +79,4 @@ public class SurfaceRootContextFactory
          return super.beforeHandle( request, response );
       }
    }
-
 }

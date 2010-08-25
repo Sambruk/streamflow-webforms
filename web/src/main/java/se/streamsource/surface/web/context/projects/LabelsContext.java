@@ -18,9 +18,9 @@
 package se.streamsource.surface.web.context.projects;
 
 import org.qi4j.api.mixin.Mixins;
-import se.streamsource.dci.api.IndexInteraction;
-import se.streamsource.dci.api.Interactions;
-import se.streamsource.dci.api.InteractionsMixin;
+import se.streamsource.dci.api.Context;
+import se.streamsource.dci.api.ContextMixin;
+import se.streamsource.dci.api.IndexContext;
 import se.streamsource.dci.api.SubContexts;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.dci.value.StringValue;
@@ -30,24 +30,24 @@ import se.streamsource.dci.value.TitledLinksValue;
  */
 @Mixins(LabelsContext.Mixin.class)
 public interface LabelsContext
-      extends SubContexts<LabelsContext>, IndexInteraction<TitledLinksValue>, Interactions
+      extends SubContexts<LabelsContext>, IndexContext<TitledLinksValue>, Context
 {
    void createaccesspoint( StringValue name );
 
    abstract class Mixin
-         extends InteractionsMixin
+         extends ContextMixin
          implements LabelsContext
    {
       public LabelsContext context( String id )
       {
-         context.set( context.get( CommandQueryClient.class ).getSubClient( id ));
+         roleMap.set( roleMap.get( CommandQueryClient.class ).getSubClient( id ));
          return subContext( LabelsContext.class );
       }
 
 
       public void createaccesspoint( StringValue name )
       {
-         CommandQueryClient client = context.get( CommandQueryClient.class );
+         CommandQueryClient client = roleMap.get( CommandQueryClient.class );
 
          try
          {
@@ -60,7 +60,7 @@ public interface LabelsContext
 
       public TitledLinksValue index()
       {
-         CommandQueryClient client = context.get( CommandQueryClient.class );
+         CommandQueryClient client = roleMap.get( CommandQueryClient.class );
 
          try
          {

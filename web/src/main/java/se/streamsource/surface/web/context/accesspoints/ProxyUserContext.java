@@ -18,9 +18,9 @@
 package se.streamsource.surface.web.context.accesspoints;
 
 import org.qi4j.api.mixin.Mixins;
+import se.streamsource.dci.api.Context;
+import se.streamsource.dci.api.ContextMixin;
 import se.streamsource.surface.web.context.accesspoints.endusers.EndUsersContext;
-import se.streamsource.dci.api.Interactions;
-import se.streamsource.dci.api.InteractionsMixin;
 import se.streamsource.dci.api.SubContext;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 
@@ -28,18 +28,18 @@ import se.streamsource.dci.restlet.client.CommandQueryClient;
  */
 @Mixins(ProxyUserContext.Mixin.class)
 public interface ProxyUserContext
-      extends Interactions
+      extends Context
 {
    @SubContext
    EndUsersContext endusers();
 
    abstract class Mixin
-         extends InteractionsMixin
+         extends ContextMixin
          implements ProxyUserContext
    {
       public EndUsersContext endusers()
       {
-         context.set( context.get( CommandQueryClient.class ).getSubClient( "endusers" ));
+         roleMap.set( roleMap.get( CommandQueryClient.class ).getSubClient( "endusers" ));
          return subContext( EndUsersContext.class );
       }
    }

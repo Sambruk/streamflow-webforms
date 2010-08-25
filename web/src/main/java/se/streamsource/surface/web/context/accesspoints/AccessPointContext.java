@@ -18,9 +18,8 @@
 package se.streamsource.surface.web.context.accesspoints;
 
 import org.qi4j.api.mixin.Mixins;
-import se.streamsource.dci.api.IndexInteraction;
-import se.streamsource.dci.api.Interactions;
-import se.streamsource.dci.api.InteractionsMixin;
+import se.streamsource.dci.api.Context;
+import se.streamsource.dci.api.ContextMixin;
 import se.streamsource.dci.api.SubContext;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.dci.value.StringValue;
@@ -30,18 +29,18 @@ import se.streamsource.surface.web.context.accesspoints.endusers.EndUsersContext
  */
 @Mixins(AccessPointContext.Mixin.class)
 public interface AccessPointContext
-   extends Interactions
+   extends Context
 {
    @SubContext
    EndUsersContext endusers();
 
    abstract class Mixin
-         extends InteractionsMixin
+         extends ContextMixin
          implements AccessPointContext
    {
       public EndUsersContext endusers()
       {
-         context.set( context.get( CommandQueryClient.class ).getSubClient( "endusers" ));
+         roleMap.set( roleMap.get( CommandQueryClient.class ).getSubClient( "endusers" ));
          return subContext( EndUsersContext.class );
       }
    }

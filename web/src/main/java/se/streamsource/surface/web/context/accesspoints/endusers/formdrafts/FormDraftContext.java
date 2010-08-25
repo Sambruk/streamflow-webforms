@@ -21,11 +21,11 @@ import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.value.ValueBuilder;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
+import se.streamsource.dci.api.Context;
+import se.streamsource.dci.api.ContextMixin;
+import se.streamsource.dci.api.IndexContext;
 import se.streamsource.streamflow.resource.roles.IntegerDTO;
 import se.streamsource.surface.web.context.accesspoints.endusers.formdrafts.summary.SummaryContext;
-import se.streamsource.dci.api.IndexInteraction;
-import se.streamsource.dci.api.Interactions;
-import se.streamsource.dci.api.InteractionsMixin;
 import se.streamsource.dci.api.SubContext;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.streamflow.domain.form.FieldSubmissionValue;
@@ -36,7 +36,7 @@ import se.streamsource.streamflow.resource.caze.FieldDTO;
  */
 @Mixins(FormDraftContext.Mixin.class)
 public interface FormDraftContext
-   extends IndexInteraction<PageSubmissionValue>, Interactions
+   extends IndexContext<PageSubmissionValue>, Context
 {
    @SubContext
    SummaryContext summary();
@@ -50,12 +50,12 @@ public interface FormDraftContext
    void discard( IntegerDTO dummy );
 
    abstract class Mixin
-      extends InteractionsMixin
+      extends ContextMixin
       implements FormDraftContext
    {
       public PageSubmissionValue index()
       {
-         CommandQueryClient client = context.get( CommandQueryClient.class );
+         CommandQueryClient client = roleMap.get( CommandQueryClient.class );
 
          try
          {
@@ -69,13 +69,13 @@ public interface FormDraftContext
 
       public SummaryContext summary( )
       {
-         context.set( context.get( CommandQueryClient.class ).getSubClient( "summary" ));
+         roleMap.set( roleMap.get( CommandQueryClient.class ).getSubClient( "summary" ));
          return subContext( SummaryContext.class );
       }
 
       public void nextpage(IntegerDTO page)
       {
-         CommandQueryClient client = context.get( CommandQueryClient.class );
+         CommandQueryClient client = roleMap.get( CommandQueryClient.class );
 
          try
          {
@@ -88,7 +88,7 @@ public interface FormDraftContext
 
       public void previouspage(IntegerDTO page)
       {
-         CommandQueryClient client = context.get( CommandQueryClient.class );
+         CommandQueryClient client = roleMap.get( CommandQueryClient.class );
 
          try
          {
@@ -101,7 +101,7 @@ public interface FormDraftContext
 
       public void updatefield( FieldDTO field )
       {
-         CommandQueryClient client = context.get( CommandQueryClient.class );
+         CommandQueryClient client = roleMap.get( CommandQueryClient.class );
 
          try
          {
@@ -114,7 +114,7 @@ public interface FormDraftContext
 
       public void discard( IntegerDTO dummy )
       {
-         CommandQueryClient client = context.get( CommandQueryClient.class );
+         CommandQueryClient client = roleMap.get( CommandQueryClient.class );
 
          try
          {

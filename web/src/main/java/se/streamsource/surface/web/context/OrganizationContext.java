@@ -18,10 +18,10 @@
 package se.streamsource.surface.web.context;
 
 import org.qi4j.api.mixin.Mixins;
+import se.streamsource.dci.api.Context;
+import se.streamsource.dci.api.ContextMixin;
+import se.streamsource.dci.api.IndexContext;
 import se.streamsource.surface.web.context.accesspoints.AccessPointsContext;
-import se.streamsource.dci.api.IndexInteraction;
-import se.streamsource.dci.api.Interactions;
-import se.streamsource.dci.api.InteractionsMixin;
 import se.streamsource.dci.api.SubContext;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.dci.value.StringValue;
@@ -30,7 +30,7 @@ import se.streamsource.dci.value.StringValue;
  */
 @Mixins(OrganizationContext.Mixin.class)
 public interface OrganizationContext
-      extends Interactions, IndexInteraction<StringValue>
+      extends Context, IndexContext<StringValue>
 {
 
    //@SubContext
@@ -43,7 +43,7 @@ public interface OrganizationContext
    //ProxyUsersContext proxyusers();
 
    abstract class Mixin
-         extends InteractionsMixin
+         extends ContextMixin
          implements OrganizationContext
    {
       /*public ProjectsContext projects()
@@ -54,7 +54,7 @@ public interface OrganizationContext
 
       public AccessPointsContext accesspoints()
       {
-         context.set( context.get( CommandQueryClient.class ).getSubClient( "accesspoints" ));
+         roleMap.set( roleMap.get( CommandQueryClient.class ).getSubClient( "accesspoints" ));
          return subContext( AccessPointsContext.class );
       }
 
@@ -66,7 +66,7 @@ public interface OrganizationContext
 
       public StringValue index()
       {
-         CommandQueryClient client = context.get( CommandQueryClient.class );
+         CommandQueryClient client = roleMap.get( CommandQueryClient.class );
 
          try
          {

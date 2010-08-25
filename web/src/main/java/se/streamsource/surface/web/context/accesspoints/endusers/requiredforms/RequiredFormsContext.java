@@ -18,9 +18,9 @@
 package se.streamsource.surface.web.context.accesspoints.endusers.requiredforms;
 
 import org.qi4j.api.mixin.Mixins;
+import se.streamsource.dci.api.Context;
+import se.streamsource.dci.api.ContextMixin;
 import se.streamsource.surface.web.context.IndexInteractionLinksValue;
-import se.streamsource.dci.api.Interactions;
-import se.streamsource.dci.api.InteractionsMixin;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.streamflow.resource.roles.EntityReferenceDTO;
 
@@ -28,18 +28,18 @@ import se.streamsource.streamflow.resource.roles.EntityReferenceDTO;
  */
 @Mixins(RequiredFormsContext.Mixin.class)
 public interface RequiredFormsContext
-   extends Interactions, IndexInteractionLinksValue
+   extends Context, IndexInteractionLinksValue
 {
    // commands
    void createformdraft( EntityReferenceDTO form );
 
    abstract class Mixin
-      extends InteractionsMixin
+      extends ContextMixin
       implements RequiredFormsContext
    {
       public void createformdraft( EntityReferenceDTO formReference )
       {
-         CommandQueryClient client = context.get( CommandQueryClient.class );
+         CommandQueryClient client = roleMap.get( CommandQueryClient.class );
 
          try
          {

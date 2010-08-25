@@ -18,9 +18,9 @@
 package se.streamsource.surface.web.context.accesspoints.endusers.formdrafts;
 
 import org.qi4j.api.mixin.Mixins;
+import se.streamsource.dci.api.Context;
+import se.streamsource.dci.api.ContextMixin;
 import se.streamsource.surface.web.context.IndexInteractionLinksValue;
-import se.streamsource.dci.api.Interactions;
-import se.streamsource.dci.api.InteractionsMixin;
 import se.streamsource.dci.api.SubContexts;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 
@@ -28,18 +28,18 @@ import se.streamsource.dci.restlet.client.CommandQueryClient;
  */
 @Mixins(FormDraftsContext.Mixin.class)
 public interface FormDraftsContext
-   extends Interactions, IndexInteractionLinksValue, SubContexts<FormDraftContext>
+   extends Context, IndexInteractionLinksValue, SubContexts<FormDraftContext>
 {
 
    FormDraftContext context( String id );
 
    abstract class Mixin
-      extends InteractionsMixin
+      extends ContextMixin
       implements FormDraftsContext
    {
       public FormDraftContext context( String id )
       {
-         context.set( context.get( CommandQueryClient.class ).getSubClient( id ));
+         roleMap.set( roleMap.get( CommandQueryClient.class ).getSubClient( id ));
          return subContext( FormDraftContext.class );
       }
    }

@@ -181,6 +181,16 @@ jQuery(document).ready(function()
         }
     }
 
+    selectItem = function(id, name) {
+        var key = name.substring(2);
+        //$('#box17 > option:selected');$('#box'+key).
+    }
+
+    deselectItem = function(id, name) {
+        var key = name.substring(2);
+
+    }
+
     function insertRows( fields, fieldCount) {
         if (fields.length == 0) return;
         var field = fields[0];
@@ -255,11 +265,11 @@ jQuery(document).ready(function()
                 var possible = listbox.find('#possiblevalues').attr({id: 'box'+listIndex });
                 var selected = listbox.find('#selectedvalues').attr({id: 'box'+(listIndex+1)});
 
-                listbox.find('button').attr({name: 'to'+(listIndex+1)});
-                listbox.find('#move_right').attr({id: 'to'+listIndex});
+                var leftButton = listbox.find('#move_left').attr({id: id, name: 'to'+listIndex});
+                var rightButton = listbox.find('#move_right').attr({id: id, name: 'to'+(listIndex+1)});
 
                 var values = field.field.fieldValue.values;
-                for (valueIdx in values)
+                for ( valueIdx in values )
                 {
                     var selectionValue = values[valueIdx];
                     var selectionId = field_type + fieldCount + '' + valueIdx;
@@ -422,7 +432,10 @@ jQuery(document).ready(function()
                                 li.find('#mandatory').hide();
                             } else
                             {
-                                missingFields += "Missing value for field '"+field.field.description+"' <br>";
+                                if ( value == "" )
+                                {
+                                    missingFields += "Missing value for field '"+field.field.description+"' <br>";
+                                }
                             }
                             li.append( value );
                             ul.append( li );

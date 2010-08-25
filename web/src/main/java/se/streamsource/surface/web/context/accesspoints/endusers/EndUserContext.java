@@ -18,18 +18,18 @@
 package se.streamsource.surface.web.context.accesspoints.endusers;
 
 import org.qi4j.api.mixin.Mixins;
-import se.streamsource.dci.api.Interactions;
-import se.streamsource.dci.api.InteractionsMixin;
+import se.streamsource.dci.api.Context;
+import se.streamsource.dci.api.ContextMixin;
 
 /**
  */
 @Mixins(EndUserContext.Mixin.class)
 public interface EndUserContext
-      extends Interactions
+      extends Context
 {
 
    abstract class Mixin
-         extends InteractionsMixin
+         extends ContextMixin
          implements EndUserContext
    {
 

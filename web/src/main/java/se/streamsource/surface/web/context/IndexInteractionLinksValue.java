@@ -20,7 +20,8 @@ package se.streamsource.surface.web.context;
 import org.qi4j.api.injection.scope.Uses;
 import org.qi4j.api.mixin.Mixins;
 import se.streamsource.dci.api.Context;
-import se.streamsource.dci.api.IndexInteraction;
+import se.streamsource.dci.api.IndexContext;
+import se.streamsource.dci.api.RoleMap;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.dci.value.LinksValue;
 
@@ -28,18 +29,18 @@ import se.streamsource.dci.value.LinksValue;
  */
 @Mixins( IndexInteractionLinksValue.Mixin.class )
 public interface IndexInteractionLinksValue
-   extends IndexInteraction<LinksValue>
+   extends IndexContext<LinksValue>
 {
 
    abstract class Mixin
          implements IndexInteractionLinksValue
    {
       @Uses
-      Context context;
+      RoleMap roleMap;
 
       public LinksValue index()
       {
-         CommandQueryClient client = context.get( CommandQueryClient.class );
+         CommandQueryClient client = roleMap.get( CommandQueryClient.class );
 
          try
          {

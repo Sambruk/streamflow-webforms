@@ -19,9 +19,9 @@ package se.streamsource.surface.web.context.accesspoints.endusers.submittedforms
 
 import org.qi4j.api.mixin.Mixins;
 import org.restlet.resource.ResourceException;
-import se.streamsource.dci.api.IndexInteraction;
-import se.streamsource.dci.api.Interactions;
-import se.streamsource.dci.api.InteractionsMixin;
+import se.streamsource.dci.api.Context;
+import se.streamsource.dci.api.ContextMixin;
+import se.streamsource.dci.api.IndexContext;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.streamflow.resource.caze.SubmittedFormsListDTO;
 
@@ -29,16 +29,16 @@ import se.streamsource.streamflow.resource.caze.SubmittedFormsListDTO;
  */
 @Mixins(SubmittedFormsContext.Mixin.class)
 public interface SubmittedFormsContext
-   extends Interactions, IndexInteraction<SubmittedFormsListDTO>
+   extends Context, IndexContext<SubmittedFormsListDTO>
 {
 
    abstract class Mixin
-      extends InteractionsMixin
+      extends ContextMixin
       implements SubmittedFormsContext
    {
       public SubmittedFormsListDTO index()
       {
-         CommandQueryClient client = context.get( CommandQueryClient.class );
+         CommandQueryClient client = roleMap.get( CommandQueryClient.class );
 
          try
          {

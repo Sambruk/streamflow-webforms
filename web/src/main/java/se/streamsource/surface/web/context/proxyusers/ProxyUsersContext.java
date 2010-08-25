@@ -19,9 +19,9 @@ package se.streamsource.surface.web.context.proxyusers;
 
 import org.qi4j.api.mixin.Mixins;
 import org.restlet.resource.ResourceException;
+import se.streamsource.dci.api.Context;
+import se.streamsource.dci.api.ContextMixin;
 import se.streamsource.surface.web.context.accesspoints.ProxyUserContext;
-import se.streamsource.dci.api.Interactions;
-import se.streamsource.dci.api.InteractionsMixin;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.streamflow.resource.user.NewProxyUserCommand;
 
@@ -29,24 +29,24 @@ import se.streamsource.streamflow.resource.user.NewProxyUserCommand;
  */
 @Mixins(ProxyUsersContext.Mixin.class)
 public interface ProxyUsersContext
-      extends Interactions
+      extends Context
 {
    // commands
    void createproxyuser( NewProxyUserCommand newProxyUserCommand );
 
    abstract class Mixin
-         extends InteractionsMixin
+         extends ContextMixin
          implements ProxyUsersContext
    {
       public ProxyUserContext context( String id )
       {
-         context.set( context.get( CommandQueryClient.class ).getSubClient( id ));
+         roleMap.set( roleMap.get( CommandQueryClient.class ).getSubClient( id ));
          return subContext( ProxyUserContext.class );
       }
 
       public void createproxyuser( NewProxyUserCommand newProxyUserCommand )
       {
-         CommandQueryClient client = context.get( CommandQueryClient.class );
+         CommandQueryClient client = roleMap.get( CommandQueryClient.class );
 
          try
          {

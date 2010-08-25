@@ -28,9 +28,9 @@ import org.restlet.Uniform;
 import org.restlet.data.Reference;
 import org.restlet.resource.ResourceException;
 import org.restlet.routing.Filter;
+import se.streamsource.dci.api.Context;
+import se.streamsource.dci.api.ContextMixin;
 import se.streamsource.surface.web.context.accesspoints.AccessPointsContext;
-import se.streamsource.dci.api.Interactions;
-import se.streamsource.dci.api.InteractionsMixin;
 import se.streamsource.dci.api.SubContext;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.dci.restlet.client.NullResponseHandler;
@@ -39,13 +39,13 @@ import java.io.IOException;
 
 @Mixins(RootContext.Mixin.class)
 public interface RootContext
-   extends Interactions
+   extends Context
 {
    @SubContext
    AccessPointsContext accesspoints();
 
    abstract class Mixin
-      extends InteractionsMixin
+      extends ContextMixin
       implements RootContext
    {
       @Uses
@@ -78,7 +78,7 @@ public interface RootContext
                super.handleResponse( response );
             }
          } ).newInstance();
-         context.set( cqc.getSubClient( "surface" ).getSubClient( "accesspoints" ) );
+         roleMap.set( cqc.getSubClient( "surface" ).getSubClient( "accesspoints" ) );
 
          return subContext( AccessPointsContext.class );
       }

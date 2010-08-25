@@ -18,9 +18,9 @@
 package se.streamsource.surface.web.context.projects;
 
 import org.qi4j.api.mixin.Mixins;
-import se.streamsource.dci.api.IndexInteraction;
-import se.streamsource.dci.api.Interactions;
-import se.streamsource.dci.api.InteractionsMixin;
+import se.streamsource.dci.api.Context;
+import se.streamsource.dci.api.ContextMixin;
+import se.streamsource.dci.api.IndexContext;
 import se.streamsource.dci.api.SubContexts;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.dci.value.TitledLinksValue;
@@ -29,21 +29,21 @@ import se.streamsource.dci.value.TitledLinksValue;
  */
 @Mixins(CaseTypesContext.Mixin.class)
 public interface CaseTypesContext
-      extends SubContexts<LabelsContext>, IndexInteraction<TitledLinksValue>, Interactions
+      extends SubContexts<LabelsContext>, IndexContext<TitledLinksValue>, Context
 {
    abstract class Mixin
-         extends InteractionsMixin
+         extends ContextMixin
          implements CaseTypesContext
    {
       public LabelsContext context( String id )
       {
-         context.set( context.get( CommandQueryClient.class ).getSubClient( id ));
+         roleMap.set( roleMap.get( CommandQueryClient.class ).getSubClient( id ));
          return subContext( LabelsContext.class );
       }
 
       public TitledLinksValue index()
       {
-         CommandQueryClient client = context.get( CommandQueryClient.class );
+         CommandQueryClient client = roleMap.get( CommandQueryClient.class );
 
          try
          {

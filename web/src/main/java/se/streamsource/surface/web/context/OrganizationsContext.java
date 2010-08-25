@@ -18,9 +18,9 @@
 package se.streamsource.surface.web.context;
 
 import org.qi4j.api.mixin.Mixins;
+import se.streamsource.dci.api.Context;
+import se.streamsource.dci.api.ContextMixin;
 import se.streamsource.surface.web.context.IndexInteractionLinksValue;
-import se.streamsource.dci.api.Interactions;
-import se.streamsource.dci.api.InteractionsMixin;
 import se.streamsource.dci.api.SubContexts;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 
@@ -28,17 +28,17 @@ import se.streamsource.dci.restlet.client.CommandQueryClient;
  */
 @Mixins(OrganizationsContext.Mixin.class)
 public interface OrganizationsContext
-      extends SubContexts<OrganizationContext>, Interactions, IndexInteractionLinksValue
+      extends SubContexts<OrganizationContext>, Context, IndexInteractionLinksValue
 {
    abstract class Mixin
-         extends InteractionsMixin
+         extends ContextMixin
          implements
          OrganizationsContext
    {
 
       public OrganizationContext context( String id )
       {
-         context.set( context.get( CommandQueryClient.class ).getSubClient( id ));
+         roleMap.set( roleMap.get( CommandQueryClient.class ).getSubClient( id ));
          return subContext( OrganizationContext.class );
       }
    }

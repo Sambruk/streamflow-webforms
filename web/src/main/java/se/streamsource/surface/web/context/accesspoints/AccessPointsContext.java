@@ -19,13 +19,13 @@ package se.streamsource.surface.web.context.accesspoints;
 
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.value.ValueBuilder;
+import se.streamsource.dci.api.Context;
+import se.streamsource.dci.api.ContextMixin;
 import se.streamsource.dci.value.LinkValue;
 import se.streamsource.dci.value.LinksValue;
 import se.streamsource.streamflow.infrastructure.application.LinksBuilder;
 import se.streamsource.surface.web.context.IndexInteractionLinksValue;
 import se.streamsource.dci.api.ContextNotFoundException;
-import se.streamsource.dci.api.Interactions;
-import se.streamsource.dci.api.InteractionsMixin;
 import se.streamsource.dci.api.SubContexts;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 
@@ -33,18 +33,18 @@ import se.streamsource.dci.restlet.client.CommandQueryClient;
  */
 @Mixins(AccessPointsContext.Mixin.class)
 public interface AccessPointsContext
-      extends SubContexts<AccessPointContext>, Interactions
+      extends SubContexts<AccessPointContext>, Context
 {
 
    LinksValue surfacelinks();
 
    abstract class Mixin
-         extends InteractionsMixin
+         extends ContextMixin
          implements AccessPointsContext
    {
       public LinksValue surfacelinks()
       {
-         CommandQueryClient client = context.get( CommandQueryClient.class );
+         CommandQueryClient client = roleMap.get( CommandQueryClient.class );
 
          try
          {
@@ -69,7 +69,7 @@ public interface AccessPointsContext
 
       public AccessPointContext context( String id ) throws ContextNotFoundException
       {
-         context.set( context.get( CommandQueryClient.class ).getSubClient( id ));
+         roleMap.set( roleMap.get( CommandQueryClient.class ).getSubClient( id ));
          return subContext( AccessPointContext.class );
       }
    }

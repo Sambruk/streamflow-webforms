@@ -26,11 +26,11 @@ import org.restlet.data.Status;
 import org.restlet.representation.EmptyRepresentation;
 import org.restlet.resource.ResourceException;
 import org.restlet.util.Series;
+import se.streamsource.dci.api.Context;
+import se.streamsource.dci.api.ContextMixin;
 import se.streamsource.streamflow.resource.roles.EntityReferenceDTO;
 import se.streamsource.surface.web.rest.CookieResponseHandler;
 import se.streamsource.dci.api.ContextNotFoundException;
-import se.streamsource.dci.api.Interactions;
-import se.streamsource.dci.api.InteractionsMixin;
 import se.streamsource.dci.api.SubContexts;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.dci.value.LinkValue;
@@ -39,7 +39,7 @@ import se.streamsource.dci.value.LinkValue;
  */
 @Mixins(EndUsersContext.Mixin.class)
 public interface EndUsersContext
-      extends SubContexts<EndUserContext>, Interactions
+      extends SubContexts<EndUserContext>, Context
 {
    public static final String COOKIE_NAME = "ANONYMOUS_USER";
 
@@ -53,12 +53,12 @@ public interface EndUsersContext
    EntityReferenceDTO userreference( Response response) throws ResourceException;
 
    abstract class Mixin
-         extends InteractionsMixin
+         extends ContextMixin
          implements EndUsersContext
    {
       public EndUserContext context( String id ) throws ContextNotFoundException
       {
-         context.set( context.get( CommandQueryClient.class ).getSubClient( id ));
+         roleMap.set( roleMap.get( CommandQueryClient.class ).getSubClient( id ));
          return subContext( EndUserContext.class );
       }
 
@@ -72,7 +72,7 @@ public interface EndUsersContext
          {
             try
             {
-               CommandQueryClient client = context.get( CommandQueryClient.class );
+               CommandQueryClient client = roleMap.get( CommandQueryClient.class );
                CookieResponseHandler responseHandler = module.objectBuilderFactory().newObjectBuilder( CookieResponseHandler.class ).use( response ).newInstance();
                client.postCommand( "createenduser", new EmptyRepresentation(), responseHandler );
             } catch (Throwable e)

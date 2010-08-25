@@ -19,12 +19,12 @@ package se.streamsource.surface.web.context.accesspoints.endusers;
 
 import org.qi4j.api.mixin.Mixins;
 import org.restlet.resource.ResourceException;
+import se.streamsource.dci.api.Context;
+import se.streamsource.dci.api.ContextMixin;
+import se.streamsource.dci.api.IndexContext;
 import se.streamsource.surface.web.context.accesspoints.endusers.formdrafts.FormDraftsContext;
 import se.streamsource.surface.web.context.accesspoints.endusers.requiredforms.RequiredFormsContext;
 import se.streamsource.surface.web.context.accesspoints.endusers.submittedforms.SubmittedFormsContext;
-import se.streamsource.dci.api.IndexInteraction;
-import se.streamsource.dci.api.Interactions;
-import se.streamsource.dci.api.InteractionsMixin;
 import se.streamsource.dci.api.SubContext;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.dci.value.StringValue;
@@ -34,7 +34,7 @@ import se.streamsource.streamflow.resource.caze.EndUserCaseDTO;
  */
 @Mixins(CaseContext.Mixin.class)
 public interface CaseContext
-      extends Interactions, IndexInteraction<EndUserCaseDTO>
+      extends Context, IndexContext<EndUserCaseDTO>
 {
    // commands
    void sendtofunction( StringValue dummy );
@@ -49,12 +49,12 @@ public interface CaseContext
    FormDraftsContext formdrafts();
 
    abstract class Mixin
-         extends InteractionsMixin
+         extends ContextMixin
          implements CaseContext
    {
       public EndUserCaseDTO index()
       {
-         CommandQueryClient client = context.get( CommandQueryClient.class );
+         CommandQueryClient client = roleMap.get( CommandQueryClient.class );
 
          try
          {
@@ -68,7 +68,7 @@ public interface CaseContext
 
       public void changedescription( StringValue newDescription )
       {
-         CommandQueryClient client = context.get( CommandQueryClient.class );
+         CommandQueryClient client = roleMap.get( CommandQueryClient.class );
 
          try
          {
@@ -81,7 +81,7 @@ public interface CaseContext
 
       public void sendtofunction( StringValue dummy )
       {
-         CommandQueryClient client = context.get( CommandQueryClient.class );
+         CommandQueryClient client = roleMap.get( CommandQueryClient.class );
 
          try
          {
@@ -95,19 +95,19 @@ public interface CaseContext
 
       public SubmittedFormsContext submittedforms()
       {
-         context.set( context.get( CommandQueryClient.class ).getSubClient( "submittedforms" ));
+         roleMap.set( roleMap.get( CommandQueryClient.class ).getSubClient( "submittedforms" ));
          return subContext( SubmittedFormsContext.class );
       }
 
       public RequiredFormsContext requiredforms()
       {
-         context.set( context.get( CommandQueryClient.class ).getSubClient( "requiredforms" ));
+         roleMap.set( roleMap.get( CommandQueryClient.class ).getSubClient( "requiredforms" ));
          return subContext( RequiredFormsContext.class );
       }
 
       public FormDraftsContext formdrafts()
       {
-         context.set( context.get( CommandQueryClient.class ).getSubClient( "formdrafts" ));
+         roleMap.set( roleMap.get( CommandQueryClient.class ).getSubClient( "formdrafts" ));
          return subContext( FormDraftsContext.class );
       }
 

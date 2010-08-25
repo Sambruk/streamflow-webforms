@@ -22,9 +22,9 @@ import org.qi4j.api.value.ValueBuilder;
 import org.restlet.data.Form;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
-import se.streamsource.dci.api.IndexInteraction;
-import se.streamsource.dci.api.Interactions;
-import se.streamsource.dci.api.InteractionsMixin;
+import se.streamsource.dci.api.Context;
+import se.streamsource.dci.api.ContextMixin;
+import se.streamsource.dci.api.IndexContext;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.dci.value.StringValue;
 import se.streamsource.streamflow.domain.form.FormSubmissionValue;
@@ -34,7 +34,7 @@ import se.streamsource.streamflow.resource.roles.IntegerDTO;
  */
 @Mixins(SummaryContext.Mixin.class)
 public interface SummaryContext
-   extends Interactions, IndexInteraction<FormSubmissionValue>
+   extends Context, IndexContext<FormSubmissionValue>
 {
    void submit( StringValue dummy );
 
@@ -43,12 +43,12 @@ public interface SummaryContext
    void gotopage( IntegerDTO page );
 
    abstract class Mixin
-      extends InteractionsMixin
+      extends ContextMixin
       implements SummaryContext
    {
       public FormSubmissionValue index()
       {
-         CommandQueryClient client = context.get( CommandQueryClient.class );
+         CommandQueryClient client = roleMap.get( CommandQueryClient.class );
 
          try
          {
@@ -62,7 +62,7 @@ public interface SummaryContext
 
       public void submit( StringValue dummy )
       {
-         CommandQueryClient client = context.get( CommandQueryClient.class );
+         CommandQueryClient client = roleMap.get( CommandQueryClient.class );
 
          try
          {
@@ -75,7 +75,7 @@ public interface SummaryContext
 
       public void submitandsend( StringValue dummy )
       {
-         CommandQueryClient client = context.get( CommandQueryClient.class );
+         CommandQueryClient client = roleMap.get( CommandQueryClient.class );
 
          try
          {
@@ -88,7 +88,7 @@ public interface SummaryContext
 
       public void gotopage( IntegerDTO page )
       {
-         CommandQueryClient client = context.get( CommandQueryClient.class );
+         CommandQueryClient client = roleMap.get( CommandQueryClient.class );
 
          try
          {
