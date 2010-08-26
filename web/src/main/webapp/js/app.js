@@ -132,7 +132,10 @@ jQuery(document).ready(function()
             url: proxyContextUrl + 'updatefield.json',
             async: false,
             data: 'field='+fieldId+'&value='+fieldValue,
-            type: 'POST'
+            type: 'POST',
+            success: function(data) {
+                
+            }
         });
         image.hide();
     };
@@ -181,14 +184,38 @@ jQuery(document).ready(function()
         }
     }
 
-    selectItem = function(id, name) {
+    selectItem = function( id, name, multiple ) {
         var key = name.substring(2);
-        //$('#box17 > option:selected');$('#box'+key).
+        var toBox = 'box'+key;
+        var fromBox = 'box'+(parseInt(key)-1);
+        var elements = $('#'+fromBox+' > option:selected');
+        var box = $('#'+toBox);
+
+        if ( !multiple )
+        {
+            $('#'+fromBox).append( $('#'+toBox+' option') );
+            if ( elements.size()>1 )
+            {
+                elements = [ elements[0] ];
+            }
+        }
+        box.append( elements );
+
+        var newValue = $('#'+toBox+' > option').map( function() { return this.value }).get().join(', ');
+
+        updateFieldValue( id, newValue );
     }
 
-    deselectItem = function(id, name) {
+    deselectItem = function( id, name, multiple ) {
         var key = name.substring(2);
+        var toBox = 'box' + key;
+        var fromBox = 'box' + (parseInt(key)+1);
+        var elements = $('#'+fromBox+' > option:selected');
 
+        $('#'+toBox).append( elements );
+        var newValue = $('#'+fromBox+' > option').map( function() { return this.value }).get().join(', ');
+
+        updateFieldValue( id, newValue );
     }
 
     function insertRows( fields, fieldCount) {
@@ -265,43 +292,22 @@ jQuery(document).ready(function()
                 var possible = listbox.find('#possiblevalues').attr({id: 'box'+listIndex });
                 var selected = listbox.find('#selectedvalues').attr({id: 'box'+(listIndex+1)});
 
-                var leftButton = listbox.find('#move_left').attr({id: id, name: 'to'+listIndex});
-                var rightButton = listbox.find('#move_right').attr({id: id, name: 'to'+(listIndex+1)});
+                var leftButton = listbox.find('#move_left').attr({id: id, name: 'to'+listIndex, onclick: 'javascript:deselectItem(id, name, '+field.field.fieldValue.multiple+');' });
+                var rightButton = listbox.find('#move_right').attr({id: id, name: 'to'+(listIndex+1), onclick: 'javascript:selectItem(id, name, '+field.field.fieldValue.multiple+');' });
 
                 var values = field.field.fieldValue.values;
                 for ( valueIdx in values )
                 {
                     var selectionValue = values[valueIdx];
-                    var selectionId = field_type + fieldCount + '' + valueIdx;
-                    var node = $('<option />').attr({value: selectionValue}).text(selectionValue);
-                    possible.append( node );
+                    var node = $('<option />').text(selectionValue);
+                    if  ( value.indexOf(selectionValue)>-1 )
+                    {
+                        selected.append(node);
+                    } else
+                    {
+                        possible.append( node );
+                    }
                 };
-                //$.configureBoxes();
-                /*
-                <table>
-                    <tr>
-                        <td>
-                            <select id="box1View" multiple="multiple" style="height:500px;width:300px;">
-                                <option value="501649">2008-2009 "Mini" Baja</option>
-                                <option value="501497">AAPA - Asian American Psychological Association</option>
-                                <option value="501053">Academy of Film Geeks</option>
-                                <option value="500004">Aikido Club</option>
-                                <option value="500336">Akanke</option>
-                            </select><br/>
-
-                        </td>
-                        <td>
-                            <button id="to2" type="button">&nbsp;>&nbsp;</button>
-                            <button id="to1" type="button">&nbsp;<&nbsp;</button>
-                        </td>
-                        <td>
-                            <select id="box2View" multiple="multiple" style="height:500px;width:300px;">
-                            </select><br/>
-                        </td>
-                    </tr>
-                </table>
-                */
-
                 $('#'+id).find('div').filter('.fieldvalue').append( listbox );
                 break;
             case "NumberFieldValue":
