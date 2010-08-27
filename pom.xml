@@ -306,13 +306,13 @@
                                 <subproduct>Surface</subproduct>
                                 <company>${project.organization.name}</company>
                             </properties>
-                            <runOnlyAtExecutionRoot>false</runOnlyAtExecutionRoot>
+                            <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
                             <resourceBundles>
-                                <resourceBundle>se.streamsource.streamflow:streamflow-jar-resource-bundle:1.0
+                                <resourceBundle>se.streamsource.streamflow:streamflow-jar-resource-bundle:1.1
                                 </resourceBundle>
                             </resourceBundles>
                             <supplementalModelArtifacts>
-                                <supplementalModelArtifact>se.streamsource.streamflow:dependency-resource-supplement:1.0
+                                <supplementalModelArtifact>se.streamsource.streamflow:dependency-resource-supplement:1.1
                                 </supplementalModelArtifact>
                             </supplementalModelArtifacts>
                             <supplementalModels>
@@ -420,12 +420,12 @@
             <dependency>
                 <groupId>commons-logging</groupId>
                 <artifactId>commons-logging</artifactId>
-                <version>1.1</version>
+                <version>1.1.1</version>
             </dependency>
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
-                <version>1.2.14</version>
+                <version>1.2.15</version>
             </dependency>
             <!-- Test -->
             <dependency>
