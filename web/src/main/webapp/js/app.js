@@ -389,7 +389,10 @@ jQuery(document).ready(function()
         {
             contextUrl += accesspoint + '/endusers/';
             proxyContextUrl += accesspoint + '/endusers/';
-            try_login();
+            //try_login();
+            login();
+            setupFormUrl();
+            loadFormEditDiv();
         };
 	});
 
