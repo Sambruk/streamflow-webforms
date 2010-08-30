@@ -66,11 +66,11 @@ jQuery(document).ready(function()
                     var event = data.events[idx];
                     if ( event.name == "createdCase")
                     {
-                        proxyContextUrl += JSON.parse(event.parameters)['param1'];
+                        proxyContextUrl += $.parseJSON(event.parameters)['param1'];
                     } else if ( event.name == "changedFormSubmission" )
                     {
                         proxyContextUrl += '/formdrafts/' + event.entity + '/';
-                        formPages = JSON.parse(JSON.parse(event.parameters)['param1'])['pages'];
+                        formPages = $.parseJSON($.parseJSON(event.parameters)['param1'])['pages'];
                     }
                 }
             },
@@ -95,7 +95,7 @@ jQuery(document).ready(function()
         for ( idx in formPages ) {
             if ( data.page == formPages[idx].page )
             {
-                $('#form_pages').append( $('<li />').attr({'class': "selected"}).text(formPages[idx].title ) );
+                $('#form_pages').append( $('<li />').attr({"class": "selected"}).text(formPages[idx].title ) );
             } else {
                 $('#form_pages').append( $('<li />').text(formPages[idx].title ) );
             }
