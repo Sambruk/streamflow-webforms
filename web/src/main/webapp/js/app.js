@@ -364,6 +364,7 @@ jQuery(document).ready(function()
         $.ajax({
             url: proxyContextUrl + command,
             type: 'POST',
+            async: false,
             data: 'integer='+page,
             success: function(data) {
                 loadFormEditDiv();
