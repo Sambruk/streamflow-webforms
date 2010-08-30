@@ -95,7 +95,7 @@ jQuery(document).ready(function()
         for ( idx in formPages ) {
             if ( data.page == formPages[idx].page )
             {
-                $('#form_pages').append( $('<li />').attr({class: "selected"}).text(formPages[idx].title ) );
+                $('#form_pages').append( $('<li />').attr({'class': "selected"}).text(formPages[idx].title ) );
             } else {
                 $('#form_pages').append( $('<li />').text(formPages[idx].title ) );
             }
