@@ -63,7 +63,7 @@ jQuery(document).ready(function()
                 // get case id and formsubmision id and contruct url
                 for ( idx in data.events )
                 {
-                    event = data.events[idx];
+                    var event = data.events[idx];
                     if ( event.name == "createdCase")
                     {
                         proxyContextUrl += JSON.parse(event.parameters)['param1'];
@@ -112,7 +112,7 @@ jQuery(document).ready(function()
     };
 
     selectChanged = function(fieldId) {
-        fieldValue = $('#'+fieldId+ ' input:checked').map(function() {return $('#label'+this.id).text() }).get().join(', ');
+        var fieldValue = $('#'+fieldId+ ' input:checked').map(function() {return $('#label'+this.id).text() }).get().join(', ');
         
         updateFieldValue(fieldId, fieldValue);
     };
@@ -143,7 +143,7 @@ jQuery(document).ready(function()
     updateField = function(fieldId) {
         if ( formFieldsChanged[fieldId] )
         {
-            value = $('#'+fieldId).find('input').attr('value');
+            var value = $('#'+fieldId).find('input').attr('value');
             updateFieldValue(fieldId, value);
         }
     };
@@ -151,7 +151,7 @@ jQuery(document).ready(function()
     updateTextAreaField = function(fieldId) {
         if ( formFieldsChanged[fieldId] )
         {
-            value = $('#'+fieldId).find('textarea').attr('value');
+            var value = $('#'+fieldId).find('textarea').attr('value');
             updateFieldValue(fieldId, value);
         }
     }
