@@ -54,13 +54,7 @@ import se.streamsource.surface.web.ClientEventSourceService;
 import se.streamsource.surface.web.context.accesspoints.AccessPointContext;
 import se.streamsource.surface.web.context.accesspoints.AccessPointsContext;
 import se.streamsource.surface.web.context.accesspoints.ProxyUserContext;
-import se.streamsource.surface.web.context.accesspoints.endusers.EndUserContext;
 import se.streamsource.surface.web.context.accesspoints.endusers.EndUsersContext;
-import se.streamsource.surface.web.context.accesspoints.endusers.formdrafts.FormDraftContext;
-import se.streamsource.surface.web.context.accesspoints.endusers.formdrafts.FormDraftsContext;
-import se.streamsource.surface.web.context.accesspoints.endusers.formdrafts.summary.SummaryContext;
-import se.streamsource.surface.web.context.accesspoints.endusers.requiredforms.RequiredFormsContext;
-import se.streamsource.surface.web.context.accesspoints.endusers.submittedforms.SubmittedFormsContext;
 import se.streamsource.surface.web.context.projects.CaseTypesContext;
 import se.streamsource.surface.web.context.projects.LabelsContext;
 import se.streamsource.surface.web.context.projects.ProjectsContext;
@@ -114,16 +108,9 @@ public class ContextsAssembler
             RootContext.class).visibleIn( Visibility.application);
 
       module.addTransients(
-            FormDraftContext.class,
-            FormDraftsContext.class,
-            SummaryContext.class,
-            RequiredFormsContext.class,
-            SubmittedFormsContext.class,
-
             AccessPointContext.class,
             AccessPointsContext.class,
             EndUsersContext.class,
-            EndUserContext.class,
             OrganizationContext.class,
             OrganizationsContext.class,
             ProxyUserContext.class,

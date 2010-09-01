@@ -39,7 +39,7 @@ import se.streamsource.dci.value.LinkValue;
  */
 @Mixins(EndUsersContext.Mixin.class)
 public interface EndUsersContext
-      extends SubContexts<EndUserContext>, Context
+      extends Context
 {
    public static final String COOKIE_NAME = "ANONYMOUS_USER";
 
@@ -56,12 +56,6 @@ public interface EndUsersContext
          extends ContextMixin
          implements EndUsersContext
    {
-      public EndUserContext context( String id ) throws ContextNotFoundException
-      {
-         roleMap.set( roleMap.get( CommandQueryClient.class ).getSubClient( id ));
-         return subContext( EndUserContext.class );
-      }
-
       public void selectenduser( Response response ) throws ResourceException
       {
          // for now only user the anonymous end users
