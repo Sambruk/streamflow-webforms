@@ -83,7 +83,7 @@ jQuery(document).ready(function()
     };
 
     updateFieldValue = function(fieldId, fieldValue) {
-        var image = $('#'+fieldId).find('.fieldwaiting > img');
+        var image = $('#'+fieldId+' .fieldwaiting > img');
         image.show();
         $.ajax({
             url: proxyContextUrl + 'updatefield.json',
@@ -222,9 +222,9 @@ jQuery(document).ready(function()
             if ( updatedValue != enteredValue )
             {
                 textfield.attr('value', enteredValue);
-                alert('Invalid integer: '+enteredValue );
-                textfield.focus();
-                textfield.select();
+                setTimeout(function(){textfield.focus(); textfield.select()}, 10);
+                fieldChanged(fieldId);
+                alert('You must enter a valid integer');
             }
         }
     }
@@ -240,9 +240,9 @@ jQuery(document).ready(function()
             if ( updatedValue != enteredValue )
             {
                 textfield.attr('value', enteredValue);
-                alert('Invalid real: '+enteredValue );
-                textfield.focus();
-                textfield.select();
+                setTimeout(function(){textfield.focus(); textfield.select()}, 10);
+                fieldChanged(fieldId);
+                alert('You must enter a valid float');
             }
         }
     }
@@ -413,8 +413,8 @@ jQuery(document).ready(function()
                 var possible = listbox.find('#possiblevalues').attr({id: 'box'+listIndex });
                 var selected = listbox.find('#selectedvalues').attr({id: 'box'+(listIndex+1)});
 
-                var leftButton = listbox.find('#move_left').attr({id: id, name: 'to'+listIndex, onclick: 'javascript:deselectItem(id, name);' });
-                var rightButton = listbox.find('#move_right').attr({id: id, name: 'to'+(listIndex+1), onclick: 'javascript:selectItem(id, name);' });
+                var leftButton = listbox.find('#move_left').attr({id: id, name: 'to'+listIndex});
+                var rightButton = listbox.find('#move_right').attr({id: id, name: 'to'+(listIndex+1)});
 
                 var values = field.field.fieldValue.values;
                 for ( valueIdx in values )
@@ -434,10 +434,10 @@ jQuery(document).ready(function()
             case "NumberFieldValue":
                 if ( field.field.fieldValue.integer )
                 {
-                    $('#'+id).find('div').filter('.fieldvalue').append( $('#'+fieldType).clone().attr({id: 'numberField'+id, value:value, onblur:"javascript:updateInteger(name);", name:id}) );
+                    $('#'+id).find('div').filter('.fieldvalue').append( $('#'+fieldType).clone().attr({id: 'numberField'+id, value:value, "onBlur":"javascript:updateInteger(name);", name:id}) );
                 } else
                 {
-                    $('#'+id).find('div').filter('.fieldvalue').append( $('#'+fieldType).clone().attr({id: 'numberField'+id, value:value, onblur:"javascript:updateDouble(name);return false;", name:id}) );
+                    $('#'+id).find('div').filter('.fieldvalue').append( $('#'+fieldType).clone().attr({id: 'numberField'+id, value:value, "onBlur":"javascript:updateDouble(name);", name:id}) );
                 }
                 break;
             case "OptionButtonsFieldValue":
