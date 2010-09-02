@@ -29,8 +29,11 @@ jQuery(document).ready(function()
             url: contextUrl + 'userreference.json',
             async: false,
             success: function(data) {
-               proxyContextUrl += data.entity + '/';
-               setupFormUrl();
+                proxyContextUrl += data.entity + '/';
+                if ( !queryCaseForm() )
+                {
+                    createCaseWithForm();           
+                }
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                $('#app').empty().append( $('#login_div').clone() );
@@ -46,6 +49,7 @@ jQuery(document).ready(function()
             success: function(data, textStatus, XMLHttpRequest) {
                 $.ajax({
                     url: contextUrl + 'userreference.json',
+                    cache: false,
                     async: false,
                     success: function(data) {
                         proxyContextUrl += data.entity + '/';
@@ -57,7 +61,37 @@ jQuery(document).ready(function()
         });
     };
 
-    function setupFormUrl() {
+    function queryCaseForm() {
+        var result = false;
+        $.ajax({
+            url: proxyContextUrl + 'findcasewithform.json',
+            async: false,
+            cache: false,
+            type: 'GET',
+            success: function(data) {
+                if ( data.caze != null && data.caze != "" && data.form != null && data.form != "" )
+                {
+                    proxyContextUrl += data.caze + '/formdrafts/' + data.form + '/';
+                    $.ajax({
+                        url: proxyContextUrl + 'index.json',
+                        async: false,
+                        cache: false,
+                        type: 'GET',
+                        success: function( data ) {
+                            formSubmissionValue = data;
+                            refreshPageComponents();
+                            result = true;
+                        }
+                    });
+                }
+            },
+            error: errorHandler
+        });
+        return result;
+    }
+
+
+    function createCaseWithForm() {
         $.ajax({
             url: proxyContextUrl + 'createcasewithform.json',
             async: false,
@@ -529,7 +563,10 @@ jQuery(document).ready(function()
             proxyContextUrl += accesspoint + '/endusers/';
             //try_login();
             login();
-            setupFormUrl();
+            if ( !queryCaseForm() )
+            {
+                createCaseWithForm();
+            }
         };
 	});
 
@@ -538,7 +575,10 @@ jQuery(document).ready(function()
      */
     $('#login_enduser_operation').live('click', function() {
         login();
-        setupFormUrl();
+        if ( !queryCaseForm() )
+        {
+            createCaseWithForm();
+        }
     });
 
     $('#form_page_previous').live('click', function() { changePage('previouspage.json', parseInt(formSubmissionValue['currentPage'])-1) });
