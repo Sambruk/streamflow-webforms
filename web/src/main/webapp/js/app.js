@@ -164,6 +164,20 @@ jQuery(document).ready(function()
         });
     }
 
+    function discard()
+    {
+        $.ajax({
+            url: proxyContextUrl + 'discard.json',
+            type: 'POST',
+            data: 'integer=0',
+            success: function() {
+                var node = $('#thank_you_div').clone();
+                node.find('#end_message').text("Form discarded. Thank you!");
+                $('#app').empty().append( node );
+            },
+            error: errorHandler
+        });
+    }
 
     /**
      * Functions that manipulates the DOM
@@ -588,7 +602,7 @@ jQuery(document).ready(function()
     $('#goto_form_page').live('click', function() { changePageAlwaysRefresh('summary/gotopage.json', $(this).attr('accesskey')) });
 
     $('#form_page_discard').live('click', function() {
-        // todo goto form summary and write "form discarded"
+        discard();
     });
 
     $('#form_summary').live('click', function() {
