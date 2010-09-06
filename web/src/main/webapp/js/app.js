@@ -155,7 +155,7 @@ jQuery(document).ready(function()
             type: 'POST',
             success: function( ) {
                 var node = $('#thank_you_div').clone();
-                node.find('#end_message').text("Form submitted. Thank you!");
+                node.find('#end_message').text(texts.formSubmittedThankYou);
                 $('#app').empty().append( node );
             },
             error: function() {

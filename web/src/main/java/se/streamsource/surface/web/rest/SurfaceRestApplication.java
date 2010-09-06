@@ -86,6 +86,9 @@ public class SurfaceRestApplication
       ProxyRestlet proxyRestlet = factory.newObject( ProxyRestlet.class );
       router.attach( "/proxy", proxyRestlet, Template.MODE_STARTS_WITH );
       router.attach( "/surface", cqr, Template.MODE_STARTS_WITH );
+      router.attach("/texts", new TextsRestlet());
+
+      getTunnelService().setLanguageParameter("locale");
 
       return new ExtensionMediaTypeFilter( getContext(), router );
    }
