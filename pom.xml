@@ -275,6 +275,7 @@
                         <exclude>**/docbkx/**</exclude>
                         <exclude>**/javadoc/**</exclude>
                         <exclude>**/site/**</exclude>
+                        <exclude>**/webapp/js/date.format.js</exclude>
                     </excludes>
                     <mapping>
                         <tcl>SCRIPT_STYLE</tcl>

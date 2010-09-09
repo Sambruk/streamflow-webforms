@@ -338,6 +338,14 @@ jQuery(document).ready(function()
         updateFieldValue( id, newValue );
     }
 
+    formatUTCStringToIsoString = function( value){
+      var d = value.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2}):(\d{2}(?:\.\d+)?)(Z|(([+-])(\d{2}):(\d{2})))$/i);
+      if (!d) throw "ISODate, convert: Illegal format";
+      var dateValue = new Date(
+         Date.UTC(d[1],d[2]-1,d[3],d[4],d[5],d[6]|0,(d[6]*1000-((d[6]|0)*1000))|0,d[7]) +
+         (d[7].toUpperCase() ==="Z" ? 0 : (d[10]*3600 + d[11]*60) * (d[9]==="-" ? 1000 : -1000)));
+      return dateFormat(dateValue,"isoDate");
+    }
 
     /**
      * Functions for updating form field components
@@ -470,7 +478,7 @@ jQuery(document).ready(function()
                 $('#'+id).find('div').filter('.fieldvalue').append( comment );
                 break;
             case "DateFieldValue":
-                $('#'+id).find('div').filter('.fieldvalue').append( $('#'+fieldType).clone().attr({value: value, name:id, id: 'datefield'+fieldCount}).datepicker() );
+                $('#'+id).find('div').filter('.fieldvalue').append( $('#'+fieldType).clone().attr({value: formatUTCStringToIsoString(value), name:id, id: 'datefield'+fieldCount}).datepicker() );
                 break;
             case "ListBoxFieldValue":
                 var listIndex = ((fieldCount+1)*2 +1);
@@ -651,7 +659,13 @@ jQuery(document).ready(function()
                             missingFields += "Missing value for field '"+field.field.description+"' <br>";
                         }
                     }
-                    li.append( value );
+                    if (fieldType == "DateFieldValue")
+                    {
+                        li.append(formatUTCStringToIsoString(value));
+                    } else
+                    {
+                        li.append( value );
+                    }
                     ul.append( li );
                 }
             }
