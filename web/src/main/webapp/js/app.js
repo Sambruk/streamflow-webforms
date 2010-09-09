@@ -118,7 +118,7 @@ jQuery(document).ready(function()
 
     updateFieldValue = function(fieldId, fieldValue) {
         var image = $('#'+fieldId+' .fieldwaiting > img');
-        image.show();
+        image.show();              
         $.ajax({
             url: proxyContextUrl + 'updatefield.json',
             async: false,
@@ -200,9 +200,26 @@ jQuery(document).ready(function()
         {
             formFieldsChanged = {};
             $('#app').empty().append( $('#form_filling_div').clone() );
+
             var currentPage = formSubmissionValue['currentPage'];
             var pages = formSubmissionValue['pages'];
             var page = pages[ currentPage ];
+
+            if (currentPage == 0)
+            {
+                $('#form_page_previous_disabled').clone().appendTo('#form_buttons_div');
+            } else {
+                $('#form_page_previous').clone().appendTo('#form_buttons_div');
+            }
+            if (currentPage == pages.length -1)
+            {
+                $('#form_page_next_disabled').clone().appendTo('#form_buttons_div');
+            } else {
+                $('#form_page_next').clone().appendTo('#form_buttons_div');
+            }
+            $('#form_page_discard').clone().appendTo('#form_buttons_div');
+            $('#form_summary').clone().appendTo('#form_buttons_div');
+
             insertPageOverview( pages, currentPage );
             insertRows( page.fields, 1 );
         }

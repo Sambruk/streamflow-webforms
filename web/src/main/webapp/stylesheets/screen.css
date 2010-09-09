@@ -122,6 +122,34 @@ body.two-col #content {
   overflow-x: hidden;
 }
 
+/* Test */
+.bp .disabledbutton {
+  display: inline-block;
+  -moz-box-orient: vertical;
+  vertical-align: middle;
+  margin: 0.7em 0.5em 0.7em 0;
+  border-width: 1px;
+  border-style: solid;
+  font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+  font-size: 100%;
+  line-height: 130%;
+  font-weight: bold;
+  text-decoration: none;
+  padding: 5px 10px 5px 7px;
+  background-color: #f5f5f5;
+  border-color: #eeeeee #dedede #dedede #eeeeee;
+  color: #c9c7c7;;
+}
+
+.bp .disabledbutton img {
+  margin: 0 3px -3px 0 !important;
+  padding: 0;
+  border: none;
+  width: 16px;
+  height: 16px;
+  float: none;
+}
+
 /* line 18, ../src/partials/_buttons.scss */
 .bp a.button {
   display: -moz-inline-box;
