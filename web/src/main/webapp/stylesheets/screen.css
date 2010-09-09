@@ -649,8 +649,9 @@ fieldset {
 }
 
 /* line 68, ../src/screen.scss */
-.commentField pre {
+div.commentfield pre {
   margin: 3px 0px;
+  white-space: pre-wrap;
 }
 
 /* line 72, ../src/screen.scss */
