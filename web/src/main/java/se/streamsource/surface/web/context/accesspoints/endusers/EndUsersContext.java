@@ -28,12 +28,10 @@ import org.restlet.resource.ResourceException;
 import org.restlet.util.Series;
 import se.streamsource.dci.api.Context;
 import se.streamsource.dci.api.ContextMixin;
-import se.streamsource.streamflow.resource.roles.EntityReferenceDTO;
-import se.streamsource.surface.web.rest.CookieResponseHandler;
-import se.streamsource.dci.api.ContextNotFoundException;
-import se.streamsource.dci.api.SubContexts;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.dci.value.LinkValue;
+import se.streamsource.streamflow.resource.roles.EntityReferenceDTO;
+import se.streamsource.surface.web.rest.CookieResponseHandler;
 
 /**
  */
@@ -46,10 +44,9 @@ public interface EndUsersContext
    // Commands
    void selectenduser( Response response ) throws ResourceException;
 
-
    // Queries
    LinkValue viewenduser( Response response ) throws ResourceException;
-
+   
    EntityReferenceDTO userreference( Response response) throws ResourceException;
 
    abstract class Mixin
@@ -116,7 +113,6 @@ public interface EndUsersContext
          builder.prototype().entity().set( EntityReference.parseEntityReference( cookie.getValue() ) );
          return builder.newInstance();
       }
-
    }
 
 }

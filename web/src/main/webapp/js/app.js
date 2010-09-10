@@ -133,7 +133,7 @@ jQuery(document).ready(function()
                 {
                     updateComponent( page.fields[ idx ] );
                 }
-            }
+            } // todo add error handling!
         });
         image.hide();
     };
@@ -169,10 +169,9 @@ jQuery(document).ready(function()
         $.ajax({
             url: proxyContextUrl + 'discard.json',
             type: 'POST',
-            data: 'integer=0',
             success: function() {
                 var node = $('#thank_you_div').clone();
-                node.find('#end_message').text("Form discarded. Thank you!");
+                node.find('#end_message').text( texts.formdiscarded );
                 $('#app').empty().append( node );
             },
             error: errorHandler
@@ -199,7 +198,9 @@ jQuery(document).ready(function()
         if ( formSubmissionValue != null )
         {
             formFieldsChanged = {};
-            $('#app').empty().append( $('#form_filling_div').clone() );
+            var formFillingDiv = $('#form_filling_div').clone().attr({'id':'inserted_form_filling_div'});
+            formFillingDiv.find('#form_description').text(formSubmissionValue.description);
+            $('#app').empty().append( formFillingDiv );
 
             var currentPage = formSubmissionValue['currentPage'];
             var pages = formSubmissionValue['pages'];
@@ -289,7 +290,7 @@ jQuery(document).ready(function()
                 textfield.attr('value', enteredValue);
                 setTimeout(function(){textfield.focus(); textfield.select()}, 10);
                 fieldChanged(fieldId);
-                alert('You must enter a valid integer');
+                alert( texts.invalidinteger );
             }
         }
     }
@@ -307,7 +308,7 @@ jQuery(document).ready(function()
                 textfield.attr('value', enteredValue);
                 setTimeout(function(){textfield.focus(); textfield.select()}, 10);
                 fieldChanged(fieldId);
-                alert('You must enter a valid float');
+                alert( texts.invalidfloat );
             }
         }
     }
@@ -586,6 +587,36 @@ jQuery(document).ready(function()
         refreshPageComponents();
     }
 
+    function translateComponents()
+    {
+        var nodes = $('#components').contents();
+
+        var translateProperties = $('[title=translate]');
+        translateProperties.map( function( idx, element ) {
+            element.textContent = texts[ element.textContent ];
+        });
+    }
+
+    function translate( nodes )
+    {
+        /*nodes.map ( function(idx, element) {
+            if ( element.nodeType == 3 )
+            {
+                // text
+                if ( element.textContent[0] == '$')
+                {
+                    element.textContent = texts[ element.textContent ];
+                }
+            } else if ( element.nodeType == 8 )
+            {
+                //comment
+            } else
+            {
+                translate( element.childNodes );
+            }
+        });*/
+    }
+
 
     /**
      * Main
@@ -598,6 +629,8 @@ jQuery(document).ready(function()
     var formFieldsChanged = {};
 	$('#app').empty();
 	$('#components').hide().load('components.html', function() {
+        //translate( $('#components').contents() );
+        translateComponents();
         if ( accesspoint == null || accesspoint.length < 1 )
         {
             $('#app').append('<font color="red">Error: No access point specified</font>');
@@ -637,8 +670,9 @@ jQuery(document).ready(function()
 
     $('#form_summary').live('click', function() {
         missingFields = "";
-        $('#app').empty().append( $('#form_summary_div').clone() );
-        $('#form_description').text(formSubmissionValue.description);
+        var summaryDiv = $('#form_summary_div').clone().attr({'id':'inserted_form_summary_div'});
+        summaryDiv.find('#form_description').text(formSubmissionValue.description);
+        $('#app').empty().append( summaryDiv );
 
         for (idx in formSubmissionValue.pages) {
             var pageDiv = $('#form_page_summary').clone().attr('id', 'page'+idx);
@@ -661,7 +695,7 @@ jQuery(document).ready(function()
                     {
                         if ( value == "" )
                         {
-                            missingFields += "Missing value for field '"+field.field.description+"' <br>";
+                            missingFields += texts.missingfield + " '"+field.field.description+"' <br>";
                         }
                     }
                     if (fieldType == "DateFieldValue")
@@ -678,7 +712,6 @@ jQuery(document).ready(function()
         }
         if ( missingFields != "" )
         {
-            missingFields  += "<br> Cannot submit form";
             $('#form_submit').aToolTip({
                 tipContent: missingFields
             });
