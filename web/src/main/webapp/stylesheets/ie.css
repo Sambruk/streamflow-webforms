@@ -108,3 +108,8 @@ html > .bp p code {
 .bp a.button {
   display: inline-block;
 }
+
+.disabledbutton { 
+  position: relative;
+  top: -15px;
+}
