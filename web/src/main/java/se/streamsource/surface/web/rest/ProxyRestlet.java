@@ -92,7 +92,7 @@ public class ProxyRestlet
          response.setStatus( Status.SERVER_ERROR_INTERNAL, ex, ex.getMessage() );
       } finally
       {
-         request.getEntity().release();
+         request.release();
       }
    }
 }
