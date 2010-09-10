@@ -123,7 +123,7 @@ body.two-col #content {
 }
 
 /* Test */
-.bp .disabledbutton {
+#form_buttons_div .disabledbutton {
   display: inline-block;
   -moz-box-orient: vertical;
   vertical-align: middle;
@@ -141,13 +141,13 @@ body.two-col #content {
   color: #c9c7c7;;
 }
 
-.bp .disabledbutton img {
+#form_buttons_div .disabledbutton img {
   margin: 0 3px -3px 0 !important;
   padding: 0;
   border: none;
   width: 16px;
   height: 16px;
-  float: none;
+  float: none;re
 }
 
 /* line 18, ../src/partials/_buttons.scss */
