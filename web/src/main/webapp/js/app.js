@@ -611,7 +611,7 @@ jQuery(document).ready(function()
                 for ( idx in words )
                 {
                     var word = words[ idx ];
-                    if ( word.length > 0 && word[0]=='$' )
+                    if ( word.length > 0 && word.charAt(0)=='$' )
                     {
                         words[ idx ] = texts[ word.substring(1).trim() ];
                     }
