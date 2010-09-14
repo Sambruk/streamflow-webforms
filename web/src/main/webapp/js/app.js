@@ -127,7 +127,6 @@ jQuery(document).ready(function()
             url: proxyContextUrl + 'updatefield.json',
             async: false,
             data: fieldDTO,
-            //contentType: 'application/x-www-form-urlencoded; charset=utf-8', 
             type: 'PUT',
             success: function(data) {
                 updateFormSubmissionValue( data );
@@ -595,34 +594,30 @@ jQuery(document).ready(function()
         refreshPageComponents();
     }
 
-    function translateComponents()
+    function translate( )
     {
-        var nodes = $('#components').contents();
-
-        var translateProperties = $('[title=translate]');
-        translateProperties.map( function( idx, element ) {
-            element.textContent = texts[ element.textContent ];
-        });
-    }
-
-    function translate( nodes )
-    {
-        /*nodes.map ( function(idx, element) {
-            if ( element.nodeType == 3 )
-            {
-                // text
-                if ( element.textContent[0] == '$')
+        $('*', 'body')
+            .andSelf()
+            .contents()
+            .filter(function(){
+                return this.nodeType === 3;
+            })
+            .filter(function(){
+                // Only match when contains '$' anywhere in the text
+                return this.nodeValue.indexOf( '$' ) != -1;
+            })
+            .each(function(){
+                var words = this.nodeValue.split(' ');
+                for ( idx in words )
                 {
-                    element.textContent = texts[ element.textContent ];
+                    var word = words[ idx ];
+                    if ( word.length > 0 && word[0]=='$' )
+                    {
+                        words[ idx ] = texts[ word.substring(1).trim() ];
+                    }
                 }
-            } else if ( element.nodeType == 8 )
-            {
-                //comment
-            } else
-            {
-                translate( element.childNodes );
-            }
-        });*/
+                this.nodeValue = words.join(' ');
+            });
     }
 
 
@@ -637,8 +632,7 @@ jQuery(document).ready(function()
     var formFieldsChanged = {};
 	$('#app').empty();
 	$('#components').hide().load('components.html', function() {
-        //translate( $('#components').contents() );
-        translateComponents();
+        translate( );
         if ( accesspoint == null || accesspoint.length < 1 )
         {
             $('#app').append('<font color="red">Error: No access point specified</font>');
