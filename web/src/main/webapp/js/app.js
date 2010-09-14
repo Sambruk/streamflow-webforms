@@ -119,10 +119,15 @@ jQuery(document).ready(function()
     updateFieldValue = function(fieldId, fieldValue) {
         var image = $('#'+fieldId+' .fieldwaiting > img');
         image.show();              
+        var fieldDTO = {
+            field: fieldId,
+            value: fieldValue
+        };
         $.ajax({
             url: proxyContextUrl + 'updatefield.json',
             async: false,
-            data: 'field='+fieldId+'&value='+fieldValue,
+            data: fieldDTO,
+            //contentType: 'application/x-www-form-urlencoded; charset=utf-8', 
             type: 'PUT',
             success: function(data) {
                 updateFormSubmissionValue( data );
@@ -140,10 +145,13 @@ jQuery(document).ready(function()
 
     function updatePage( command, page )
     {
+        var integerDTO = {
+            "integer": page
+        };
         $.ajax({
             url: proxyContextUrl + command,
             type: 'PUT',
-            data: 'integer='+page,
+            data: integerDTO,
             error: errorHandler
         });
     }
