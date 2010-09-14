@@ -613,7 +613,7 @@ jQuery(document).ready(function()
                     var word = words[ idx ];
                     if ( word.length > 0 && word.charAt(0)=='$' )
                     {
-                        words[ idx ] = texts[ word.substring(1).trim() ];
+                        words[ idx ] = texts[ $.trim( word.substring(1) ) ];
                     }
                 }
                 this.nodeValue = words.join(' ');
