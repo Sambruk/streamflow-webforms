@@ -48,6 +48,8 @@ import java.util.ResourceBundle;
 public interface ProxyService
    extends ServiceComposite, Activatable, Configuration, Uniform
 {
+   
+
    class Mixin
       implements Activatable, Uniform
    {

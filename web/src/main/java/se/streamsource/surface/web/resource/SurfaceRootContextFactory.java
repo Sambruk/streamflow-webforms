@@ -18,7 +18,10 @@
 package se.streamsource.surface.web.resource;
 
 import org.qi4j.api.composite.TransientBuilderFactory;
+import org.qi4j.api.configuration.Configuration;
+import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Structure;
+import org.qi4j.api.injection.scope.This;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.ChallengeResponse;
@@ -29,6 +32,8 @@ import se.streamsource.dci.api.RoleMap;
 import se.streamsource.dci.restlet.server.RootContextFactory;
 import se.streamsource.surface.web.context.RootContext;
 import se.streamsource.dci.api.Context;
+import se.streamsource.surface.web.proxy.ProxyConfiguration;
+import se.streamsource.surface.web.proxy.ProxyService;
 
 import java.util.ResourceBundle;
 
@@ -44,15 +49,14 @@ public class SurfaceRootContextFactory
 
    private Reference streamflowReference;
 
-   public SurfaceRootContextFactory()
+   public SurfaceRootContextFactory( @Service ProxyService proxyService )
    {
-      ResourceBundle bundle = ResourceBundle.getBundle( SurfaceRootContextFactory.class.getName() );
-
-      String url = bundle.getString( "streamflow.url" );
+      ProxyConfiguration config = (ProxyConfiguration) proxyService.configuration();
+      String url = config.server().get() + "streamflow";
       streamflowReference = new Reference( url );
 
-      String proxyusername = bundle.getString( "streamflow.proxyuser.username" );
-      String proxypassword = bundle.getString( "streamflow.proxyuser.password" );
+      String proxyusername = config.username().get();
+      String proxypassword = config.password().get();
       ChallengeResponse challengeResponse = new ChallengeResponse( ChallengeScheme.HTTP_BASIC, proxyusername, proxypassword );
       filter = new AuthenticationFilter( challengeResponse );
    }
