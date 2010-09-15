@@ -439,7 +439,7 @@ jQuery(document).ready(function()
         if ( desc != "" && fieldType != "CommentFieldValue")
         {
             $('#'+id).find('div.fieldname > img').aToolTip({
-		    		clickIt: true,
+		    		fixed: true,
 		    		tipContent: desc
             });
             $('#'+id).find('div.fieldname > img').show();

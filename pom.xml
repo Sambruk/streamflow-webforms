@@ -276,6 +276,7 @@
                         <exclude>**/javadoc/**</exclude>
                         <exclude>**/site/**</exclude>
                         <exclude>**/webapp/js/date.format.js</exclude>
+                        <exclude>**/webapp/js/atooltip.min.jquery.js</exclude>
                     </excludes>
                     <mapping>
                         <tcl>SCRIPT_STYLE</tcl>
