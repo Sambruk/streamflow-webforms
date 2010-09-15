@@ -329,7 +329,7 @@ jQuery(document).ready(function()
 
         box.append( elements );
 
-        var newValue = $.map( $('#'+toBox+' > option'), function( elm ) { return elm.value } ).join(', ');
+        var newValue = $.map( $('#'+toBox+' > option'), function( elm ) { return elm.text } ).join(', ');
 
         updateFieldValue( id, newValue );
     }
@@ -341,7 +341,7 @@ jQuery(document).ready(function()
         var elements = $('#'+fromBox+' > option:selected');
 
         $('#'+toBox).append( elements );
-        var newValue = $.map ( $('#'+fromBox+' > option'), function( elm ) { return elm.value }).join(', ');
+        var newValue = $.map ( $('#'+fromBox+' > option'), function( elm ) { return elm.text }).join(', ');
 
         updateFieldValue( id, newValue );
     }
