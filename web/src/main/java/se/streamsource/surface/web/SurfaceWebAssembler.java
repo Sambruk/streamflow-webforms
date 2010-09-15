@@ -17,15 +17,28 @@
 
 package se.streamsource.surface.web;
 
+import org.qi4j.api.common.Visibility;
+import org.qi4j.api.structure.Application;
 import org.qi4j.bootstrap.ApplicationAssembler;
 import org.qi4j.bootstrap.ApplicationAssembly;
 import org.qi4j.bootstrap.ApplicationAssemblyFactory;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.LayerAssembly;
 import org.qi4j.bootstrap.ModuleAssembly;
+import org.qi4j.entitystore.memory.MemoryEntityStoreService;
+import org.qi4j.entitystore.prefs.PreferencesEntityStoreInfo;
+import org.qi4j.entitystore.prefs.PreferencesEntityStoreService;
+import org.qi4j.rest.MBeanServerImporter;
+import org.restlet.Client;
 import se.streamsource.surface.web.context.ContextsAssembler;
+import se.streamsource.surface.web.proxy.ConfigurationManagerService;
+import se.streamsource.surface.web.proxy.ProxyConfiguration;
+import se.streamsource.surface.web.proxy.ProxyService;
 import se.streamsource.surface.web.resource.SurfaceResourceAssembler;
 import se.streamsource.surface.web.rest.SurfaceRestAssembler;
+
+import javax.management.MBeanServer;
+import java.util.prefs.Preferences;
 
 public class SurfaceWebAssembler
    implements ApplicationAssembler
@@ -44,12 +57,19 @@ public class SurfaceWebAssembler
       assembly.setVersion( "0.3.20.962" );
       LayerAssembly contextLayer = assembly.layerAssembly( "Context" );
       LayerAssembly webLayer = assembly.layerAssembly( "Web" );
+      LayerAssembly appLayer = assembly.layerAssembly( "Application" );
+      LayerAssembly configLayer = assembly.layerAssembly("Configuration" );
 
-      webLayer.uses( contextLayer );
+      webLayer.uses( contextLayer, appLayer );
+      appLayer.uses( configLayer );
 
       assembleWebLayer( webLayer );
 
+      assembleAppLayer( appLayer);
+
       assembleContextLayer( contextLayer );
+
+      assembleConfigLayer(configLayer);
 
       for (Object serviceObject : serviceObjects)
       {
@@ -59,12 +79,57 @@ public class SurfaceWebAssembler
       return assembly;
    }
 
+   private void assembleConfigLayer( LayerAssembly configLayer ) throws AssemblyException
+   {
+      ModuleAssembly module = configLayer.moduleAssembly( "Configurations" );
+
+      module.addEntities( ProxyConfiguration.class ).visibleIn( Visibility.application );
+
+      // Configuration store
+      Application.Mode mode = module.layerAssembly().applicationAssembly().mode();
+      if (mode.equals( Application.Mode.development ))
+      {
+         // In-memory store
+         module.addServices( MemoryEntityStoreService.class ).visibleIn( Visibility.layer );
+      } else if (mode.equals( Application.Mode.test ))
+      {
+         // In-memory store
+         module.addServices( MemoryEntityStoreService.class ).visibleIn( Visibility.layer );
+      } else if (mode.equals( Application.Mode.production ))
+      {
+         // Preferences storage
+         ClassLoader cl = Thread.currentThread().getContextClassLoader();
+         Thread.currentThread().setContextClassLoader( null );
+         Preferences node;
+         try
+         {
+            node =  Preferences.userRoot().node( "streamsource/streamflow/web" );
+         } finally
+         {
+            Thread.currentThread().setContextClassLoader( cl );
+         }
+
+         module.addServices( PreferencesEntityStoreService.class ).setMetaInfo( new PreferencesEntityStoreInfo( node ) ).visibleIn( Visibility.layer );
+      }
+   }
 
    protected void assembleWebLayer( LayerAssembly webLayer ) throws AssemblyException
    {
       ModuleAssembly restModule = webLayer.moduleAssembly( "REST" );
       new SurfaceRestAssembler().assemble( restModule );
       new SurfaceResourceAssembler().assemble( restModule );
+   }
+
+   private void assembleAppLayer( LayerAssembly appLayer ) throws AssemblyException
+   {
+      ModuleAssembly proxyModule = appLayer.moduleAssembly( "Proxy" );
+
+      proxyModule.addServices( ProxyService.class ).visibleIn( Visibility.application ).instantiateOnStartup();
+      proxyModule.importServices( Client.class ).visibleIn( Visibility.application );
+
+      // TODO This should be in its own module (layer?)
+      proxyModule.importServices( MBeanServer.class ).importedBy( MBeanServerImporter.class );
+      proxyModule.addServices( ConfigurationManagerService.class ).instantiateOnStartup();
    }
 
    protected void assembleContextLayer( LayerAssembly contextLayer ) throws AssemblyException
