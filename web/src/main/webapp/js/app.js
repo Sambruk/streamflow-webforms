@@ -520,10 +520,10 @@ jQuery(document).ready(function()
             case "NumberFieldValue":
                 if ( field.field.fieldValue.integer )
                 {
-                    $('#'+id).find('div').filter('.fieldvalue').append( $('#'+fieldType).clone().attr({id: 'numberField'+id, value:value, "onBlur":"javascript:updateInteger(name);", name:id}) );
+                    $('#'+id).find('div').filter('.fieldvalue').append( $('#'+fieldType).clone().attr({id: 'numberField'+id, value:value, "onblur":"javascript:updateInteger(name);", name:id}) );
                 } else
                 {
-                    $('#'+id).find('div').filter('.fieldvalue').append( $('#'+fieldType).clone().attr({id: 'numberField'+id, value:value, "onBlur":"javascript:updateDouble(name);", name:id}) );
+                    $('#'+id).find('div').filter('.fieldvalue').append( $('#'+fieldType).clone().attr({id: 'numberField'+id, value:value, "onblur":"javascript:updateDouble(name);", name:id}) );
                 }
                 break;
             case "OptionButtonsFieldValue":
