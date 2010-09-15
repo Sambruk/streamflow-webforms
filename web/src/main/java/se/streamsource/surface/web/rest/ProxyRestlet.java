@@ -35,6 +35,7 @@ import org.restlet.representation.InputRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
+import se.streamsource.surface.web.proxy.ProxyService;
 import se.streamsource.surface.web.resource.SurfaceRootContextFactory;
 
 import java.io.ByteArrayInputStream;
@@ -44,55 +45,20 @@ import java.util.Collections;
 import java.util.ResourceBundle;
 
 /**
+ * Simple Restlet that delegates to the ProxyService.
+ *
  */
 public class ProxyRestlet
    extends Restlet
 {
    @Service
-   Client client;
+   ProxyService proxyService;
 
    @Override
    public void handle( Request request, Response response )
    {
       super.handle( request, response );
 
-      Reference ref = request.getResourceRef();
-      String remaining = ref.getRemainingPart();
-
-      ResourceBundle bundle = ResourceBundle.getBundle( SurfaceRootContextFactory.class.getName() );
-
-      String url = bundle.getString( "streamflow.url" );
-      Reference streamflowReference = new Reference( url + "/surface" + remaining );
-
-      String proxyusername = bundle.getString( "streamflow.proxyuser.username" );
-      String proxypassword = bundle.getString( "streamflow.proxyuser.password" );
-
-      ClientResource client = new ClientResource( streamflowReference );
-      client.setClientInfo( request.getClientInfo() );
-      client.setNext( this.client );
-      client.setChallengeResponse( new ChallengeResponse( ChallengeScheme.HTTP_BASIC, proxyusername, proxypassword ) );
-      client.setMethod( request.getMethod() );
-      client.getRequest().setEntity( request.getEntity() );
-
-      try
-      {
-         Representation representation = client.handle();
-         // just a test but should be changed
-         //response.setEntity( representation );
-         ByteArrayOutputStream bout = new ByteArrayOutputStream( );
-         BioUtils.copy( representation.getStream(), bout);
-         representation.exhaust();
-         representation.release();
-         response.setEntity( new InputRepresentation(new ByteArrayInputStream(bout.toByteArray()), representation.getMediaType(), bout.size()) );
-      } catch ( ResourceException re )
-      {
-         response.setStatus( re.getStatus(), re.getCause(), re.getMessage() );
-      } catch ( Exception ex )
-      {
-         response.setStatus( Status.SERVER_ERROR_INTERNAL, ex, ex.getMessage() );
-      } finally
-      {
-         request.release();
-      }
+      proxyService.handle( request, response );
    }
 }

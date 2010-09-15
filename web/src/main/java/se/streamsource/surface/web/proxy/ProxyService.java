@@ -75,7 +75,7 @@ public interface ProxyService
          Reference ref = request.getResourceRef();
          String remaining = ref.getRemainingPart();
 
-         Reference streamflowReference = new Reference( streamflowRef, remaining );
+         Reference streamflowReference = new Reference( streamflowRef.toString()+remaining );
 
          ClientResource client = new ClientResource( streamflowReference );
          client.setClientInfo( request.getClientInfo() );
@@ -87,6 +87,8 @@ public interface ProxyService
          try
          {
             Representation representation = client.handle();
+
+            response.setStatus( client.getStatus() );
             // just a test but should be changed
             //response.setEntity( representation );
             ByteArrayOutputStream bout = new ByteArrayOutputStream( );
