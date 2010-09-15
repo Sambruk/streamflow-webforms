@@ -254,7 +254,7 @@ jQuery(document).ready(function()
      * Functions called by html components
      */
     updateDate = function(fieldId, dateValue) {
-        var date = new Date(dateValue);
+        var date = $.datepicker.parseDate('yy-mm-dd', dateValue );
         updateFieldValue(fieldId, date.format("UTC:yyyy-mm-dd'T'HH:MM:ss.0000'Z'"));
     };
 
