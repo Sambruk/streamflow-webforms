@@ -259,7 +259,7 @@ jQuery(document).ready(function()
     };
 
     selectChanged = function(fieldId) {
-        var fieldValue = $('#'+fieldId+ ' input:checked').map(function() {return $('#label'+this.id).text() }).get().join(', ');
+        var fieldValue = $.map( $('#'+fieldId+ ' input:checked'), function( elm ) {return $('#label'+elm.id).text() }).join(', ');
         
         updateFieldValue(fieldId, fieldValue);
     };
@@ -329,7 +329,7 @@ jQuery(document).ready(function()
 
         box.append( elements );
 
-        var newValue = $('#'+toBox+' > option').map( function() { return this.value }).get().join(', ');
+        var newValue = $.map( $('#'+toBox+' > option'), function( elm ) { return elm.value } ).join(', ');
 
         updateFieldValue( id, newValue );
     }
@@ -341,7 +341,7 @@ jQuery(document).ready(function()
         var elements = $('#'+fromBox+' > option:selected');
 
         $('#'+toBox).append( elements );
-        var newValue = $('#'+fromBox+' > option').map( function() { return this.value }).get().join(', ');
+        var newValue = $.map ( $('#'+fromBox+' > option'), function( elm ) { return elm.value }).join(', ');
 
         updateFieldValue( id, newValue );
     }
@@ -378,7 +378,7 @@ jQuery(document).ready(function()
         {
             case "CheckboxesFieldValue":
                 var values = field.field.fieldValue.values;
-                var currentValue = $('#'+id+ ' input:checked').map(function() {return $('#label'+this.id).text() }).get().join(', ');
+                var currentValue = $.map( $('#'+id+ ' input:checked'), function( elm ) {return $('#label'+elm.id).text() }).join(', ');
                 if ( currentValue != value )
                 {
                     for (valueIdx in values)
