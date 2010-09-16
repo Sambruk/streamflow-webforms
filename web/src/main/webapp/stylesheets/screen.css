@@ -710,3 +710,9 @@ div.commentfield pre {
   word-wrap: break-word;
   /* Internet Explorer 5.5+ */
 }
+
+/* line 113, ../src/screen.scss */
+div.bp table {
+  margin-bottom: 1.4em;
+  width: auto;
+}
