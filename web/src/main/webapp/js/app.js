@@ -664,7 +664,11 @@ jQuery(document).ready(function()
 
     $('#form_page_previous').live('click', function() { changePage('previouspage.json', parseInt(formSubmissionValue['currentPage'])-1) });
 
+    $('#form_page_previous_disabled').live('click', function() { return false; });
+
     $('#form_page_next').live('click', function() { changePage('nextpage.json', parseInt(formSubmissionValue['currentPage'])+1) });
+
+    $('#form_page_next_disabled').live('click', function() { return false; });
 
     $('#goto_form_page').live('click', function() { changePageAlwaysRefresh('summary/gotopage.json', $(this).attr('accesskey')) });
 

@@ -25,8 +25,11 @@
   // the first three default to constants set in blueprint/buttons.sass
   // the last one defaults to a shade lighter than the border color.
   @include button-colors;
-//  @include button-hover-colors(#000, lighten(#006DA8, 10%), #000, #000);
   @include button-active-colors; }
+
+.bp a.button:visited {
+   color: #000066;
+}
 
 .bp button {
   // The +button-button mixin is just like the +anchor-button mixin, but for <button> elements.
@@ -45,3 +48,16 @@
   color: #d12f19;
   @include button-hover-colors(#d12f19, #fbe3e4, #fbc2c4);
   @include button-active-colors(white, #d12f19, #d12f19); }
+
+// Added disabled buttons
+.bp a.disabledbutton {
+  @include anchor-button;
+  @include button-colors(#c9c7c7);
+  @include button-hover-colors(#c9c7c7, #f5f5f5, #dedede);
+  @include button-active-colors(#c9c7c7, #f5f5f5, #dedede);
+  cursor: default;
+}
+
+.bp a.disabledbutton:visited {
+   color: #c9c7c7;
+}
