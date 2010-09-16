@@ -24,41 +24,56 @@ jQuery(document).ready(function()
     /**
      * Functions that call StreamFlow
      */
-    function try_login() {
+    function verifyAccessPoint() {
+        var result = false;
         $.ajax({
-            url: contextUrl + 'userreference.json',
+            url: proxyContextUrl,
             async: false,
-            success: function(data) {
-                proxyContextUrl += data.entity + '/';
-                if ( !queryCaseForm() )
-                {
-                    createCaseWithForm();           
-                }
-            },
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-               $('#app').empty().append( $('#login_div').clone() );
+            type: 'GET',
+            success: function() {
+                result = true;
             }
         });
-    };
+        return result;
+    }
 
     function login() {
-        $.ajax({
-            url: contextUrl + 'selectenduser.json',
-            async: false,
-            type: 'POST',
-            success: function(data, textStatus, XMLHttpRequest) {
-                $.ajax({
-                    url: contextUrl + 'userreference.json',
-                    cache: false,
-                    async: false,
-                    success: function(data) {
-                        proxyContextUrl += data.entity + '/';
-                    },
-                    error: errorHandler
-                });
-            },
-            error: errorHandler
-        });
+        if ( verifyAccessPoint() )
+        {
+            var loggedIn = true;
+            $.ajax({
+                url: contextUrl + 'selectenduser.json',
+                async: false,
+                type: 'POST',
+                success: function(data, textStatus, XMLHttpRequest) {
+                    $.ajax({
+                        url: contextUrl + 'userreference.json',
+                        cache: false,
+                        async: false,
+                        success: function(data) {
+                            proxyContextUrl += data.entity + '/';
+                        },
+                        error: function() {
+                            loggedIn = false;
+                        }
+                    });
+                },
+                error: function() {
+                    loggedIn = false;
+                }
+            });
+            if ( loggedIn )
+            {
+                if ( !queryCaseForm() )
+                {
+                    createCaseWithForm();
+                }
+            } else {
+                $('#app').append('<font color="red">Could not log in user</font>');
+            }
+        } else {
+            $('#app').append('<font color="red">Illegal access point</font>');
+        }
     };
 
     function queryCaseForm() {
@@ -642,10 +657,6 @@ jQuery(document).ready(function()
             proxyContextUrl += accesspoint + '/endusers/';
             //try_login();
             login();
-            if ( !queryCaseForm() )
-            {
-                createCaseWithForm();
-            }
         };
 	});
 
@@ -654,10 +665,6 @@ jQuery(document).ready(function()
      */
     $('#login_enduser_operation').live('click', function() {
         login();
-        if ( !queryCaseForm() )
-        {
-            createCaseWithForm();
-        }
     });
 
     $('#form_page_previous').live('click', function() { changePage('previouspage.json', parseInt(formSubmissionValue['currentPage'])-1) });
