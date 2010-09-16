@@ -52,12 +52,11 @@ public class SurfaceRootContextFactory
    public SurfaceRootContextFactory( @Service ProxyService proxyService )
    {
       ProxyConfiguration config = (ProxyConfiguration) proxyService.configuration();
-      String url = config.server().get() + "streamflow";
-      streamflowReference = new Reference( url );
 
-      String proxyusername = config.username().get();
-      String proxypassword = config.password().get();
-      ChallengeResponse challengeResponse = new ChallengeResponse( ChallengeScheme.HTTP_BASIC, proxyusername, proxypassword );
+      streamflowReference = new Reference( config.server().get() );
+      streamflowReference.setPath( "/streamflow" );
+      ChallengeResponse challengeResponse = new ChallengeResponse( ChallengeScheme.HTTP_BASIC, config.username().get(), config.password().get() );
+
       filter = new AuthenticationFilter( challengeResponse );
    }
 
