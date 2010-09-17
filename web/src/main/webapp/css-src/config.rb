@@ -1,6 +1,6 @@
 #
 #
-# Copyright 2009 Streamsource AB
+# Copyright 2009-2010 Streamsource AB
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@
 # Require any additional compass plugins here.
 # Set this to the root of your project when deployed:
 http_path = "/"
-css_dir = "stylesheets"
-sass_dir = "src"
+css_dir = "../css"
+sass_dir = ""
 images_dir = "images"
-javascripts_dir = "javascripts"
+javascripts_dir = "js"
 # To enable relative paths to assets via compass helper functions. Uncomment:
 # relative_assets = true
