@@ -128,6 +128,18 @@
             </roles>
             <timezone>UTC+1</timezone>
         </developer>
+        <developer>
+            <id>henrikreinhold</id>
+            <name>Henrik Reinhold</name>
+            <email>henrik.reinhold@jayway.com</email>
+            <url>http://www.jayway.com</url>
+            <organization>Jayway</organization>
+            <organizationUrl>http://www.jayway.com</organizationUrl>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>UTC+1</timezone>
+        </developer>
     </developers>
 
     <contributors>
@@ -140,7 +152,7 @@
         </contributor>
     </contributors>
 
-    <inceptionYear>2009</inceptionYear>
+    <inceptionYear>2009-2010</inceptionYear>
     <url>http://www.streamsource.se</url>
 
     <organization>
@@ -275,8 +287,8 @@
                         <exclude>**/docbkx/**</exclude>
                         <exclude>**/javadoc/**</exclude>
                         <exclude>**/site/**</exclude>
-                        <exclude>**/webapp/js/date.format.js</exclude>
-                        <exclude>**/webapp/js/atooltip.min.jquery.js</exclude>
+                        <exclude>**/webapp/js/external/**</exclude>
+                        <exclude>**/webapp/css/external/**</exclude>
                     </excludes>
                     <mapping>
                         <tcl>SCRIPT_STYLE</tcl>
