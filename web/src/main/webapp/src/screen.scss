@@ -110,7 +110,14 @@ div.commentfield pre {
   word-wrap: break-word;       /* Internet Explorer 5.5+ */
 }
 
-div.bp table {
-  margin-bottom: 1.4em;
-  width: auto;
+.bp .listbox {
+  text-align: center;
+  float: left;
+  clear: none;
+}
+
+.bp .listboxbuttons {
+  text-align: center;
+  float: left;
+  clear: none;
 }

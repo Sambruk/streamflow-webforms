@@ -101,28 +101,26 @@
 <input id="OptionButtonsFieldValue" type="radio" onChange="javascript:selectChanged(name);" />
 <label id="label"></label>
 <div id="CommentFieldValue" class="commentfield"></div>
-<table id="ListBoxFieldValue">
-    <tr>
-        <td>
-            <select id="possiblevalues" multiple="multiple" style="height:200px;width:100px;">
-            </select><br/>
-        </td>
-        <td>
-            <div>
-                <button id="move_right" type="button" onclick="javascript:selectItem(id, name);">&nbsp;>>&nbsp;</button>
-            </div>
-            <br/>
-            <div>
-                <button id="move_left" type="button" onclick="javascript:deselectItem(id, name);" >&nbsp;<<&nbsp;</button>
-            </div>
-        </td>
-        <td>
-            <select id="selectedvalues" multiple="multiple" style="height:200px;width:100px;">
-            </select><br/>
-        </td>
-    </tr>
-</table>
-
+<div id="ListBoxFieldValue" class="listbox">
+    <div class="listbox">
+        <select id="possiblevalues" multiple="multiple" style="height:200px;width:100px;">
+        </select><br/>
+    </div>
+    <div class="listboxbuttons" style="margin: 65px 5px 0px 10px;">
+        <div>
+            <button id="move_right" type="button" onclick="javascript:selectItem(id, name);">&nbsp;<img src="images/buttons/arrow_right.png"alt=""/></button>
+        </div>
+        <br/>
+        <div>
+            <button id="move_left" type="button" onclick="javascript:deselectItem(id, name);">&nbsp;<img src="images/buttons/arrow_left.png" alt=""/></button>
+        </div>
+     </div>
+     <div class="listbox">
+        <select id="selectedvalues" multiple="multiple" style="height:200px;width:100px;">
+        </select><br/>
+    </div>
+</div>
+        
 <a id="goto_form_page" href="#" accesskey=""></a>
 <li id="field_summary"><b></b><font id="mandatory" color="red">*</font>:</li>
 
