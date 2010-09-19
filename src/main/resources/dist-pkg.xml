@@ -28,18 +28,25 @@ http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 ">
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
         <fileSet>
-            <directory>war/target/classes</directory>
+            <directory>target/maven-shared-archive-resources</directory>
             <outputDirectory>.</outputDirectory>
+            <includes>
+                <include>**/LICENSE</include>
+                <include>**/NOTICE</include>
+            </includes>
         </fileSet>
     </fileSets>
     <files>
         <file>
-            <source>war/target/access-war-${project.version}.war</source>
-            <outputDirectory>.</outputDirectory>
-            <destName>access.war</destName>
+            <source>web/target/surface-web-${project.version}.war</source>
+            <outputDirectory>surface</outputDirectory>
         </file>
+        <!--<file>
+            <source>src/main/resources/Streamflow_Surface_Release_Notes.pdf</source>
+            <outputDirectory>.</outputDirectory>
+        </file> -->
         <file>
-            <source>src/main/resources/StreamflowSurfaceReleaseNotes.pdf</source>
+            <source>src/main/resources/Streamflow_Surface_Third_Party.pdf</source>
             <outputDirectory>.</outputDirectory>
         </file>
     </files>
