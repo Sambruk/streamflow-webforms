@@ -475,7 +475,7 @@ jQuery(document).ready(function()
             $('#'+id).find('#mandatory').hide();                    
         }
         if (field.field.fieldValue.hint){
-            $('#'+id).find('#hint').text('(' + field.field.fieldValue.hint + ')')
+            $('#'+id).find('#hint').text(' (' + field.field.fieldValue.hint + ')')
         }
         switch (fieldType) {
             case "CheckboxesFieldValue":
