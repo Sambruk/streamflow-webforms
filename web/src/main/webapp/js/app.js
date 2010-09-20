@@ -132,6 +132,7 @@ jQuery(document).ready(function()
     };
 
     updateFieldValue = function(fieldId, fieldValue) {
+        var successfulUpdate = false;
         var image = $('#'+fieldId+' .fieldwaiting > img');
         image.show();              
         var fieldDTO = {
@@ -144,7 +145,7 @@ jQuery(document).ready(function()
             data: fieldDTO,
             type: 'PUT',
             success: function(data) {
-                updateFormSubmissionValue( data );
+                successfulUpdate = updateFormSubmissionValue( data );
                 formFieldsChanged = {};
                 var pages = formSubmissionValue['pages'];
                 var page = pages[ formSubmissionValue['currentPage'] ];
@@ -155,6 +156,7 @@ jQuery(document).ready(function()
             } // todo add error handling!
         });
         image.hide();
+        return successfulUpdate;
     };
 
     function updatePage( command, page )
@@ -210,8 +212,10 @@ jQuery(document).ready(function()
             if ( event.name == "changedFormSubmission" )
             {
                 formSubmissionValue = $.parseJSON($.parseJSON(event.parameters)['param1']);
+                return true;
             }
         }
+        return false;
     }
 
     // Based on the formSubmissionValue
@@ -286,8 +290,14 @@ jQuery(document).ready(function()
     updateField = function(fieldId) {
         if ( formFieldsChanged[fieldId] )
         {
-            var value = $('#'+fieldId).find('input').attr('value');
-            updateFieldValue(fieldId, value);
+            var field = $('#'+fieldId).find('input');
+            var value = field.attr('value');
+            if (!updateFieldValue(fieldId, value)) {
+                field.attr('value', value);
+                setTimeout(function(){field.focus(); field.select()}, 10);
+                fieldChanged(fieldId);
+                alert( texts.invalidformat );
+            }
         }
     };
 
@@ -304,10 +314,10 @@ jQuery(document).ready(function()
         {
             var textfield = $('#numberField'+fieldId);
             var enteredValue = textfield.attr('value');
-            updateFieldValue( fieldId, enteredValue );
+            var result = updateFieldValue( fieldId, enteredValue );
 
             var updatedValue = textfield.attr('value');
-            if ( updatedValue != enteredValue )
+            if ( updatedValue != enteredValue && !result )
             {
                 textfield.attr('value', enteredValue);
                 setTimeout(function(){textfield.focus(); textfield.select()}, 10);
@@ -322,10 +332,10 @@ jQuery(document).ready(function()
         {
             var textfield = $('#numberField'+fieldId);
             var enteredValue = textfield.attr('value');
-            updateFieldValue( fieldId, enteredValue );
+            var result = updateFieldValue( fieldId, enteredValue );
 
             var updatedValue = textfield.attr('value');
-            if ( updatedValue != enteredValue )
+            if ( updatedValue != enteredValue && !result)
             {
                 textfield.attr('value', enteredValue);
                 setTimeout(function(){textfield.focus(); textfield.select()}, 10);
@@ -463,6 +473,9 @@ jQuery(document).ready(function()
         if ( !field.field.mandatory )
         {
             $('#'+id).find('#mandatory').hide();                    
+        }
+        if (field.field.fieldValue.hint){
+            $('#'+id).find('#hint').text('(' + field.field.fieldValue.hint + ')')
         }
         switch (fieldType) {
             case "CheckboxesFieldValue":
