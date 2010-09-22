@@ -278,6 +278,7 @@
                     <excludes>
                         <exclude>LICENSE.txt</exclude>
                         <exclude>NOTICE.txt</exclude>
+                        <exclude>README_LICENSE.txt</exclude>
                         <exclude>**/src/test/resources/**</exclude>
                         <exclude>**/src/test/data/**</exclude>
                         <exclude>**/.idea/**</exclude>
