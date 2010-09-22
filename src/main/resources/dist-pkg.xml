@@ -46,7 +46,15 @@ http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 ">
             <outputDirectory>.</outputDirectory>
         </file> -->
         <file>
-            <source>src/main/resources/Streamflow_Surface_Third_Party.pdf</source>
+            <source>src/main/resources/THIRDPARTY.pdf</source>
+            <outputDirectory>.</outputDirectory>
+        </file>
+        <file>
+            <source>src/main/resources/THIRDPARTYAPPENDIX.pdf</source>
+            <outputDirectory>.</outputDirectory>
+        </file>
+        <file>
+            <source>src/main/resources/README_LICENSE.txt</source>
             <outputDirectory>.</outputDirectory>
         </file>
     </files>
