@@ -18,7 +18,7 @@
 
 jQuery(document).ready(function()
 {
-    function errorHandler(XMLHttpRequest, textStatus, errorThrown) { alert('Error: '+ errorThrown + ', Status: '+textStatus +', Request: '+XMLHttpRequest); };
+    function errorPopup() { alert( texts.erroroccurred ); };
 
 
     /**
@@ -69,10 +69,10 @@ jQuery(document).ready(function()
                     createCaseWithForm();
                 }
             } else {
-                $('#app').append('<font color="red">Could not log in user</font>');
+                $('#app').append( $('#ErrorMessage').clone().attr({id:'loginFailed'}).text( texts.loginfailed ) );
             }
         } else {
-            $('#app').append('<font color="red">Illegal access point</font>');
+            $('#app').append( $('#ErrorMessage').clone().attr({id:'illegalAccessPoint'}).text( texts.invalidaccesspoint ) );
         }
     };
 
@@ -99,8 +99,7 @@ jQuery(document).ready(function()
                         }
                     });
                 }
-            },
-            error: errorHandler
+            }
         });
         return result;
     }
@@ -127,7 +126,7 @@ jQuery(document).ready(function()
                     }
                 }
             },
-            error: errorHandler
+            error: errorPopup
         });
     };
 
@@ -153,7 +152,8 @@ jQuery(document).ready(function()
                 {
                     updateComponent( page.fields[ idx ] );
                 }
-            } // todo add error handling!
+            },
+            error: errorPopup
         });
         image.hide();
         return successfulUpdate;
@@ -167,8 +167,7 @@ jQuery(document).ready(function()
         $.ajax({
             url: proxyContextUrl + command,
             type: 'PUT',
-            data: integerDTO,
-            error: errorHandler
+            data: integerDTO
         });
     }
 
@@ -182,9 +181,7 @@ jQuery(document).ready(function()
                 node.find('#end_message').text(texts.formSubmittedThankYou);
                 $('#app').empty().append( node );
             },
-            error: function() {
-                // todo show errors and stay on page
-            }
+            error: errorPopup
         });
     }
 
@@ -198,7 +195,7 @@ jQuery(document).ready(function()
                 node.find('#end_message').text( texts.formdiscarded );
                 $('#app').empty().append( node );
             },
-            error: errorHandler
+            error: errorPopup
         });
     }
 
