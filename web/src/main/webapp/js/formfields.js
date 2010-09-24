@@ -262,9 +262,9 @@ var FieldTypeModule = (function() {
     };
 
     inner.setupField = function( field, count ) {
+        fieldType = getFieldType( field.field.fieldValue._type );
         basicSetup( field );
         fieldCount = count;
-        fieldType = getFieldType( field.field.fieldValue._type );
         eval( fieldType + '( field )' );
     };
 
