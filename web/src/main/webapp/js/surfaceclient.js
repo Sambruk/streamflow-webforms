@@ -221,6 +221,7 @@ jQuery(document).ready(function()
         if ( formSubmissionValue != null )
         {
             formFieldsChanged = {};
+            fieldMap = {};
             var formFillingDiv = $('#form_filling_div').clone().attr({'id':'inserted_form_filling_div'});
             formFillingDiv.find('#form_description').text(formSubmissionValue.description);
             $('#app').empty().append( formFillingDiv );
@@ -271,7 +272,7 @@ jQuery(document).ready(function()
         for ( idx in fields )
         {
             var field = fields[ idx ];
-            FieldTypeM$odule.setupField( field, idx );
+            FieldTypeModule.setupField( field, idx );
         }
     };
 

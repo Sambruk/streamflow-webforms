@@ -45,7 +45,7 @@ updateTextAreaField = function(fieldId) {
     }
 }
 
-updateInteger = function(fieldId) {
+updateNumber = function( fieldId ) {
     if ( formFieldsChanged[fieldId] )
     {
         var textfield = $('#numberField'+fieldId);
@@ -58,30 +58,14 @@ updateInteger = function(fieldId) {
             textfield.attr('value', enteredValue);
             setTimeout(function(){textfield.focus(); textfield.select()}, 10);
             fieldChanged(fieldId);
-            alert( texts.invalidinteger );
+            if ( fieldMap[ fieldId ].field.fieldValue.integer ) {
+                alert( texts.invalidinteger );
+            } else {
+                alert( texts.invalidfloat );
+            }
         }
     }
 }
-
-updateDouble = function(fieldId) {
-    if ( formFieldsChanged[fieldId] )
-    {
-        var textfield = $('#numberField'+fieldId);
-        var enteredValue = textfield.attr('value');
-        var result = updateFieldValue( fieldId, enteredValue );
-
-        var updatedValue = textfield.attr('value');
-        if ( updatedValue != enteredValue && !result)
-        {
-            textfield.attr('value', enteredValue);
-            setTimeout(function(){textfield.focus(); textfield.select()}, 10);
-            fieldChanged(fieldId);
-            alert( texts.invalidfloat );
-        }
-    }
-}
-
-
 
 selectItem = function( id, name ) {
     var key = name.substring(2);
@@ -141,6 +125,7 @@ var FieldTypeModule = (function() {
         name = field.field.description;
         desc = field.field.note;
         value = (field.value == null ? "" : field.value);
+        fieldMap[ id ] = field;
         $('#form_table_body').append( $('#FormField').clone().attr('id', id) );
         if ( desc != "" && fieldType != "CommentFieldValue")
         {
@@ -234,13 +219,7 @@ var FieldTypeModule = (function() {
     };
 
     function NumberFieldValue( field ) {
-        if ( field.field.fieldValue.integer )
-        {
-            $('#'+id).find('div').filter('.fieldvalue').append( $('#'+fieldType+'Integer').clone().attr({id: 'numberField'+id, value:value, name:id}) );
-        } else
-        {
-            $('#'+id).find('div').filter('.fieldvalue').append( $('#'+fieldType+'Double').clone().attr({id: 'numberField'+id, value:value, name:id}) );
-        }
+        $('#'+id).find('div').filter('.fieldvalue').append( $('#'+fieldType).clone().attr({id: 'numberField'+id, value:value, name:id}) );
     };
 
     function OptionButtonsFieldValue( field ) {
