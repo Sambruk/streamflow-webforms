@@ -98,6 +98,10 @@
 <input id="DateFieldValue" onChange="javascript:updateDate(this.name, this.value);" type="text" value=""/>
 <input id="CheckboxesFieldValue" type="checkbox" onChange="javascript:selectChanged(name);" />
 <input id="OptionButtonsFieldValue" type="radio" onChange="javascript:selectChanged(name);" />
+<input id="OpenSelectionFieldValue" type="radio" onChange="javascript:selectOpenSelectChanged(name);" />
+<input id="OpenSelectionOption" type="radio" onChange="javascript:selectOpenSelectOption(name);" />
+<input id="OpenSelectionTextField" type="text" onChange="javascript:fieldChanged(name);" onblur="javascript:selectOpenSelectionTextChanged(name);" />
+
 <label id="label"></label>
 <div id="CommentFieldValue" class="commentfield"></div>
 <div id="ListBoxFieldValue" class="listbox">
@@ -119,10 +123,10 @@
         </select><br/>
     </div>
 </div>
-        
+<select id="ComboBoxFieldValue" onchange="javascript:updateFieldValue(name, value);">
+</select>
+
 <a id="goto_form_page" href="#" accesskey=""></a>
 <li id="field_summary"><b></b><font id="mandatory" color="red">*</font>:</li>
 
-<select id="ComboBoxFieldValue" onchange="javascript:updateFieldValue(name, value);">
-</select>
 <font id="ErrorMessage" color="red"></font>

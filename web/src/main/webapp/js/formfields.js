@@ -23,6 +23,31 @@ fieldChanged = function(fieldId) {
     formFieldsChanged[fieldId] = true;
 };
 
+selectOpenSelectChanged = function(fieldName) {
+    var fieldValue = $.map( $('#'+fieldName+ ' input:checked'), function( elm ) {return $('#label'+elm.id).text() }).join(', ');
+
+    var field = $('#openSelectionTextField'+fieldName);
+    field.attr('value','');
+    field.attr("disabled", true);
+    updateFieldValue(fieldName, fieldValue);
+};
+
+selectOpenSelectOption = function(fieldName) {
+    var field = $('#openSelectionTextField'+fieldName);
+    var value = field.attr('value');
+    field.removeAttr("disabled");
+    updateFieldValue(fieldName, value);
+};
+
+selectOpenSelectionTextChanged = function(fieldName) {
+    if ( formFieldsChanged[fieldName] )
+    {
+        var field = $('#openSelectionTextField'+fieldName);
+        var value = field.attr('value');
+        updateFieldValue(fieldName, value);
+    }
+};
+
 updateField = function(fieldId) {
     if ( formFieldsChanged[fieldId] )
     {
@@ -236,8 +261,43 @@ var FieldTypeModule = (function() {
             }
             var label = $('#label').clone().attr({'for': selectionId, id: 'label'+selectionId }).text(selectionValue);
             fieldSet.append( $('<div />').append( node ).append( label ) );
-            $('#'+id).find('#'+fieldType).append(node).append(label);
         };
+        $('#'+id).find('div').filter('.fieldvalue').append( fieldSet );
+    };
+
+    function OpenSelectionFieldValue( field ) {
+        var fieldSet = $('#FieldSet').clone().attr('id', 'FieldSet'+id);
+        var values = field.field.fieldValue.values;
+        var selected = false;
+        for (valueIdx in values)
+        {
+            var selectionValue = values[valueIdx];
+            var selectionId = fieldType + fieldCount + '' + valueIdx;
+            var node = $('#'+fieldType).clone().attr({id: selectionId, name: id });
+            if  ( value.indexOf(selectionValue)>-1 )
+            {
+                selected = true;
+                node.attr('checked', 'checked');
+            }
+            var label = $('#label').clone().attr({'for': selectionId, id: 'label'+selectionId }).text(selectionValue);
+            fieldSet.append( $('<div />').append( node ).append( label ) );
+        };
+        var node = $('#OpenSelectionOption').clone().attr({id: 'openSelectionOption' + id, name: id });
+
+        var label = $('#label').clone().attr({'for': selectionId, id: 'label'+selectionId }).text(field.field.fieldValue.openSelectionName  );
+        var openSelectionInput = $('#OpenSelectionTextField').clone().attr({id: 'openSelectionTextField' + id , name: id });
+        if (!selected)
+        {
+            if (value)
+            {
+                node.attr('checked', 'checked');
+                openSelectionInput.attr("value", value);
+            } else {
+                openSelectionInput.attr("disabled", true);
+            }
+        }
+        fieldSet.append( $('<div />').append( node ).append( label ).append('&nbsp;').append( openSelectionInput) );
+
         $('#'+id).find('div').filter('.fieldvalue').append( fieldSet );
     };
 
