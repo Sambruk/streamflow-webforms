@@ -337,63 +337,91 @@ function getFieldType( qualifiedField )
     return list[ list.length - 1 ];
 }
 
-function updateComponent( field )
-{
-    var id = field.field.field;
-    var fieldType = getFieldType( field.field.fieldValue._type );
-    var value = (field.value == null ? "" : field.value);
-    switch ( fieldType )
+
+/**
+ * This module if for updating the different field types
+ * with a new value. This is invoked for each field whenever the
+ * server sends a new version of the form draft
+ */
+var FieldTypeUpdateModule = (function() {
+    var inner = {};
+
+    var field;
+    var id;
+    var fieldType;
+    var value;
+
+    function basicSetup( )
     {
-        case "CheckboxesFieldValue":
-            var values = field.field.fieldValue.values;
-            var currentValue = $.map( $('#'+id+ ' input:checked'), function( elm ) {return $('#label'+elm.id).text() }).join(', ');
-            if ( currentValue != value )
+        id = field.field.field;
+        fieldType = getFieldType( field.field.fieldValue._type );
+        value = (field.value == null ? "" : field.value);
+    };
+
+    function CheckboxesFieldValue( ) {
+        var values = field.field.fieldValue.values;
+        var currentValue = $.map( $('#'+id+ ' input:checked'), function( elm ) {return $('#label'+elm.id).text() }).join(', ');
+        if ( currentValue != value )
+        {
+            for (valueIdx in values)
             {
-                for (valueIdx in values)
+                var selectionValue = values[valueIdx];
+                var selectionId = fieldType + fieldCount + '' + valueIdx;
+                var node = $('#'+selectionId);
+                if  ( value.indexOf(selectionValue)>-1 )
                 {
-                    var selectionValue = values[valueIdx];
-                    var selectionId = fieldType + fieldCount + '' + valueIdx;
-                    var node = $('#'+selectionId);
-                    if  ( value.indexOf(selectionValue)>-1 )
-                    {
-                        node.attr('checked', 'checked');
-                    } else
-                    {
-                        node.attr('checked', '');
-                    }
-                };
-            }
-            break;
-        case "ComboBoxFieldValue":
-            // todo
-            break;
-        case "DateFieldValue":
-            // todo
-            break;
-        case "ListBoxFieldValue":
-            // todo
-            break;
-        case "NumberFieldValue":
-            var numberField = $('#numberField'+id);
-            var currentValue = numberField.attr('value');
-            if ( value != currentValue )
-            {
-                numberField.attr('value', value );
-            }
-            break;
-        case "OptionButtonsFieldValue":
-            // todo
-            break;
-        case "TextAreaFieldValue":
-            // todo
-            break;
-        case "TextFieldValue":
-            // todo
-            break;
-        default:
-            //ignore
-    }
-}
+                    node.attr('checked', 'checked');
+                } else
+                {
+                    node.attr('checked', '');
+                }
+            };
+        }
+    };
+
+    function ComboBoxFieldValue( ) {
+    };
+
+    function CommentFieldValue( ) {
+    };
+
+    function DateFieldValue( ) {
+    };
+
+    function ListBoxFieldValue( ) {
+    };
+
+    function NumberFieldValue( ) {
+        var numberField = $('#numberField'+id);
+        var currentValue = numberField.attr('value');
+        if ( value != currentValue )
+        {
+            numberField.attr('value', value );
+        }
+    };
+
+    function OptionButtonsFieldValue( ) {
+    };
+
+    function OpenSelectionFieldValue( ) {
+        // update with the current value
+    };
+
+    function TextAreaFieldValue( ) {
+    };
+
+
+    function TextFieldValue( ) {
+    };
+
+    inner.updateField = function( theField ) {
+        field = theField;
+        basicSetup( );
+        eval( fieldType + '( )' );
+    };
+
+    return inner;
+}());
 
 
 function setupFormSummary() {

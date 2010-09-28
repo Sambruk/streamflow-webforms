@@ -86,6 +86,7 @@ jQuery(document).ready(function()
             success: function(data) {
                 if ( data.caze != null && data.caze != "" && data.form != null && data.form != "" )
                 {
+                    caseUrl = proxyContextUrl + data.caze;
                     proxyContextUrl += data.caze + '/formdrafts/' + data.form + '/';
                     $.ajax({
                         url: proxyContextUrl + 'index.json',
@@ -117,7 +118,9 @@ jQuery(document).ready(function()
                     var event = data.events[idx];
                     if ( event.name == "createdCase")
                     {
-                        proxyContextUrl += $.parseJSON(event.parameters)['param1'];
+                        var caseId = $.parseJSON(event.parameters)['param1'];
+                        caseUrl = proxyContextUrl + caseId;
+                        proxyContextUrl += caseId;
                     } else if ( event.name == "changedFormSubmission" )
                     {
                         proxyContextUrl += '/formdrafts/' + event.entity + '/';
@@ -150,7 +153,7 @@ jQuery(document).ready(function()
                 var page = pages[ formSubmissionValue['currentPage'] ];
                 for ( idx in page.fields )
                 {
-                    updateComponent( page.fields[ idx ] );
+                    FieldTypeUpdateModule.updateField( page.fields[ idx ] );
                 }
             },
             error: errorPopup
@@ -177,13 +180,36 @@ jQuery(document).ready(function()
             url: proxyContextUrl + 'summary/submitandsend.json',
             type: 'POST',
             success: function( ) {
+                var caseId = queryCaseInfo();
+
                 var node = $('#thank_you_div').clone();
-                node.find('#end_message').text(texts.formSubmittedThankYou);
+                var message = node.find('#end_message');
+                message.text(texts.formSubmittedThankYou);
+
+                if ( typeof( caseId )!="undefined") {
+                    message.append( '<br/> ' + texts.caseidmessage + ' ' + caseId );                    
+                }
                 $('#app').empty().append( node );
             },
             error: errorPopup
         });
     };
+
+    function queryCaseInfo()
+    {
+        var caseId;
+        $.ajax({
+            url: caseUrl + '/index.json',
+            async: false,
+            cache: false,
+            type: 'GET',
+            success: function( data ) {
+                caseId = data.caseId;
+            }
+        });
+        return caseId;
+    }
+
 
     function discard()
     {
@@ -329,6 +355,7 @@ jQuery(document).ready(function()
     var accesspoint = window.top.location.search.split('=')[1];
 	var proxyContextUrl = "surface/proxy/accesspoints/"
 	var contextUrl = "surface/surface/accesspoints/";
+	var caseUrl = "";
 	$('#app').empty();
 	$('#components').hide().load('components.html', function() {
         translate( );
