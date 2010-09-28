@@ -286,14 +286,14 @@ var FieldTypeModule = (function() {
 
         var label = $('#label').clone().attr({'for': selectionId, id: 'label'+selectionId }).text(field.field.fieldValue.openSelectionName  );
         var openSelectionInput = $('#OpenSelectionTextField').clone().attr({id: 'openSelectionTextField' + id , name: id });
-        if (!selected)
+        if (selected)
         {
+            openSelectionInput.attr("disabled", true);
+        } else {
             if (value)
             {
                 node.attr('checked', 'checked');
                 openSelectionInput.attr("value", value);
-            } else {
-                openSelectionInput.attr("disabled", true);
             }
         }
         fieldSet.append( $('<div />').append( node ).append( label ).append('&nbsp;').append( openSelectionInput) );
