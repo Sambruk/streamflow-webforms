@@ -92,15 +92,15 @@
 </div>
 
 <fieldset id="FieldSet"></fieldset>
-<input id="TextFieldValue" type="text" size="" onChange="javascript:fieldChanged(id);" onblur="javascript:updateField(id);" value=""/>
-<input id="NumberFieldValue" type="text" size="10" onChange="javascript:fieldChanged(name);" onblur="javascript:updateNumber(name);"/>
-<textarea id="TextAreaFieldValue" cols="" rows="" onChange="javascript:fieldChanged(id);" onblur="javascript:updateTextAreaField(id);"></textarea>
-<input id="DateFieldValue" onChange="javascript:updateDate(this.name, this.value);" type="text" value=""/>
-<input id="CheckboxesFieldValue" type="checkbox" onChange="javascript:selectChanged(name);" />
-<input id="OptionButtonsFieldValue" type="radio" onChange="javascript:selectChanged(name);" />
+<input id="TextFieldValue" type="text" size="" onChange="javascript:FieldTypeModule.markDirty(id);" onblur="javascript:FieldTypeModule.updateServer(id);" value=""/>
+<input id="NumberFieldValue" type="text" size="10" onChange="javascript:FieldTypeModule.markDirty(name);" onblur="javascript:FieldTypeModule.updateServer(name);"/>
+<textarea id="TextAreaFieldValue" cols="" rows="" onChange="javascript:FieldTypeModule.markDirty(id);" onblur="javascript:FieldTypeModule.updateServer(id);"></textarea>
+<input id="DateFieldValue" onChange="javascript:FieldTypeModule.markDirty(name);FieldTypeModule.updateServer(name);" type="text" value=""/>
+<input id="CheckboxesFieldValue" type="checkbox" onChange="javascript:FieldTypeModule.markDirty(name);FieldTypeModule.updateServer(name);" />
+<input id="OptionButtonsFieldValue" type="radio" onChange="javascript:FieldTypeModule.markDirty(name);FieldTypeModule.updateServer(name);" />
 <input id="OpenSelectionFieldValue" type="radio" onChange="javascript:selectOpenSelectChanged(name);" />
 <input id="OpenSelectionOption" type="radio" onChange="javascript:selectOpenSelectOption(name);" />
-<input id="OpenSelectionTextField" type="text" onChange="javascript:fieldChanged(name);" onblur="javascript:selectOpenSelectionTextChanged(name);" />
+<input id="OpenSelectionTextField" type="text" onChange="javascript:FieldTypeModule.markDirty(name);" onblur="javascript:FieldTypeModule.updateServer(name);" />
 
 <label id="label"></label>
 <div id="CommentFieldValue" class="commentfield"></div>
@@ -111,11 +111,11 @@
     </div>
     <div class="listboxbuttons" style="margin: 65px 5px 0px 10px;">
         <div>
-            <button id="move_right" type="button" onclick="javascript:selectItem(id, name);">&nbsp;<img src="images/buttons/arrow_right.png"alt=""/></button>
+            <button id="move_right" type="button" onclick="javascript:listBoxArrow(id, name);">&nbsp;<img src="images/buttons/arrow_right.png"alt=""/></button>
         </div>
         <br/>
         <div>
-            <button id="move_left" type="button" onclick="javascript:deselectItem(id, name);">&nbsp;<img src="images/buttons/arrow_left.png" alt=""/></button>
+            <button id="move_left" type="button" onclick="javascript:listBoxArrow(id, name);">&nbsp;<img src="images/buttons/arrow_left.png" alt=""/></button>
         </div>
      </div>
      <div class="listbox">

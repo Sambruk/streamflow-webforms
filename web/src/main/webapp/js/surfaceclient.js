@@ -20,7 +20,6 @@ jQuery(document).ready(function()
 {
     function errorPopup() { alert( texts.erroroccurred ); };
 
-
     /**
      * Functions that call StreamFlow
      */
@@ -153,7 +152,8 @@ jQuery(document).ready(function()
                 var page = pages[ formSubmissionValue['currentPage'] ];
                 for ( idx in page.fields )
                 {
-                    FieldTypeUpdateModule.updateField( page.fields[ idx ] );
+                    var field = page.fields[ idx ];
+                    FieldTypeModule.setFieldValue( field.field.field, (field.value == null ? "" : field.value) );
                 }
             },
             error: errorPopup
@@ -297,8 +297,7 @@ jQuery(document).ready(function()
     function insertRows( fields ) {
         for ( idx in fields )
         {
-            var field = fields[ idx ];
-            FieldTypeModule.setupField( field, idx );
+            FieldTypeModule.render( fields[ idx] );
         }
     };
 
@@ -352,6 +351,7 @@ jQuery(document).ready(function()
     /**
      * Main
      */
+    String.prototype.contains = function(it) { return this.indexOf(it) != -1; };
     var accesspoint = window.top.location.search.split('=')[1];
 	var proxyContextUrl = "surface/proxy/accesspoints/"
 	var contextUrl = "surface/surface/accesspoints/";
