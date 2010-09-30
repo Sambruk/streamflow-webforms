@@ -60,137 +60,107 @@ var FieldTypeModule = (function() {
     var inner = {};
     var fieldMap = {};
 
-    function renderGenericFieldPart( fieldComponent ) {
-        $('#form_table_body').append( $('#FormField').clone().attr('id', fieldComponent.id) );
+    // internal function to display the field using the field template
+    // and taking the fieldComponent.node as the UI
+    function displayField( fieldComponent ) {
+        var field = $('#FormField').clone().attr('id', fieldComponent.id);
         if ( fieldComponent.desc != "" && fieldComponent.fieldType != "CommentFieldValue")
         {
-            $('#'+fieldComponent.id).find('div.fieldname > img').aToolTip({
-                    fixed: true,
-                    tipContent: fieldComponent.desc
-            });
-            $('#'+fieldComponent.id).find('div.fieldname > img').show();
+            field.find('div.fieldname > img').show().aToolTip({ fixed: true, tipContent: fieldComponent.desc });
         }
-        $('#'+fieldComponent.id).find('div.fieldname > label').text( fieldComponent.name);
+        field.find('div.fieldname > label').text( fieldComponent.name);
+        if (fieldComponent.field.field.fieldValue.hint){
+            field.find('#hint').text(' (' + fieldComponent.field.field.fieldValue.hint + ')')
+        }
         if ( !fieldComponent.field.field.mandatory )
         {
-            $('#'+fieldComponent.id).find('#mandatory').hide();
+            field.find('#mandatory').hide();
         }
-        if (fieldComponent.field.field.fieldValue.hint){
-            $('#'+fieldComponent.id).find('#hint').text(' (' + fieldComponent.field.field.fieldValue.hint + ')')
-        }
+        field.find('div.fieldvalue').append( fieldComponent.node );
+        $('#form_table_body').append( field );
     }
 
     function CheckboxesFieldValue( field ) {
-        this.render = function() {
-            this.node = $('#FieldSet').clone().attr('id', 'FieldSet'+this.id);
-            var values = field.field.fieldValue.values;
-            for (valueIdx in values)
-            {
-                var selectionValue = values[valueIdx];
-                var selectionId = fieldType + this.id + '' + valueIdx;
-                var node = $('#'+fieldType).clone().attr({id: selectionId, name: this.id });
-                var label = $('#label').clone().attr({'for': selectionId, id: 'label'+selectionId }).text(selectionValue);
-                this.node.append( $('<div />').append( node ).append( label ) );
-            };
-            $('#'+this.id).find('div').filter('.fieldvalue').append( this.node );
-        };
+        var id = field.field.field;
+        this.node = $('#FieldSet').clone().attr('id', 'FieldSet'+id);
+        var node = this.node;
+        $.each( field.field.fieldValue.values, function( idx, selectionValue ) {
+            var selectionId = 'CheckboxesFieldValue' + id + idx;
+            var element = $('#CheckboxesFieldValue').clone().attr({id: selectionId, name: id });
+            var label = $('#label').clone().attr({'for': selectionId, id: 'label'+selectionId }).text(selectionValue);
+            node.append( $('<div />').append( element ).append( label ) );
+        });
 
         this.setFieldValue = function(value) {
-            var values = this.field.field.fieldValue.values;
-            for ( idx in values ) {
-                var selectionValue = values[ idx ];
-                var selectionId = this.fieldType + this.id + '' + idx;
+            $.each( field.field.fieldValue.values, function(idx, selectionValue ) {
                 if  ( value.indexOf(selectionValue)>-1 )
                 {
-                    this.node.find('#'+selectionId).attr('checked', 'checked');
+                    node.find('#CheckboxesFieldValue' + id + idx).attr('checked', 'checked');
                 }
-            }
-        };
+            });
+        }
 
         this.getFieldValue = function() {
             return $.map( $('#'+this.id+ ' input:checked'), function( elm ) {return $('#label'+elm.id).text() }).join(', ');
-        };
+        }
     }
 
     function ComboBoxFieldValue( field ) {
-        this.render = function() {
-            this.node = $('#'+fieldType).clone().attr({name: this.id, id: "ComboBox"+this.id});
-            var values = field.field.fieldValue.values;
-            this.node.append( $('<option />') );
-            for (valueIdx in values)
-            {
-                var selectionValue = values[valueIdx];
-                var selectionId = fieldType + this.id + '' + valueIdx;
-                var node = $('<option />').attr({value: selectionValue, id: selectionId}).text(selectionValue);
-                this.node.append( node );
-            };
-            $('#'+this.id).find('div').filter('.fieldvalue').append( this.node );
-        };
+        var id = field.field.field;
+        this.node = $('#ComboBoxFieldValue').clone().attr({name: id, id: "ComboBox"+id});
+        this.node.append( $('<option />') );
+        var node = this.node;
+        $.each(field.field.fieldValue.values, function(idx, value ) {
+            var selectionId = 'ComboBoxFieldValue' + id + idx;
+            node.append( $('<option />').attr({value: value, id: selectionId}).text(value) );
+        });
 
         this.setFieldValue = function(value) {
-            var values = this.field.field.fieldValue.values;
-            for ( idx in values ) {
-                var selectionValue = values[ idx ];
-                var selectionId = this.fieldType + this.id + '' + idx;
+            $.each( field.field.fieldValue.values, function(idx, selectionValue) {
                 if  ( value == selectionValue )
                 {
-                    this.node.find('#'+selectionId).attr('selected', 'selected');
+                    node.find('#ComboBoxFieldValue' + id + idx).attr('selected', 'selected');
                 }
-            }
-        };
+            });
+        }
 
         this.getFieldValue = function() {
             return this.node.find('option:selected');
-        };
+        }
     }
 
     function CommentFieldValue( field ) {
-        this.render = function() {
-            var comment = $('#'+fieldType).clone();
-            comment.append( '<pre>'+field.field.note+'</pre>' );
-            $('#'+this.id).find('div').filter('.fieldvalue').append( comment );
-        };
+        this.node = $('#CommentFieldValue').clone().attr("id", "Comment"+field.field.field).append( '<pre>'+field.field.note+'</pre>' );
 
-        this.setFieldValue = function(value) {};
+        this.setFieldValue = function(value) {}
     }
 
     function DateFieldValue( field ) {
-        this.render = function() {
-            this.node = $('#'+fieldType).clone().attr({name:this.id, id: 'datefield'+this.id}).datepicker();
-            $('#'+this.id).find('div').filter('.fieldvalue').append( this.node );
-        };
+        this.node = $('#DateFieldValue').clone().attr({name:field.field.field, id: 'datefield'+field.field.field}).datepicker();
 
-        this.setFieldValue = function(value) {
+        this.setFieldValue = function( value ) {
             this.node.attr('value', formatUTCStringToIsoString(value));
-        };
+        }
 
         this.updateServer = function() {
             var date = $.datepicker.parseDate('yy-mm-dd', this.getFieldValue() );
             updateFieldValue(this.id, date.format("UTC:yyyy-mm-dd'T'HH:MM:ss.0000'Z'"));
-        };
+        }
     }
 
     function ListBoxFieldValue( field ) {
-        this.render = function() {
-            this.node = $('#'+fieldType).clone().attr({id:this.id});
-            var possible = this.node.find('#possiblevalues').attr({id: 'Possible'+this.id});
-            var selected = this.node.find('#selectedvalues').attr({id: 'Selected'+this.id});
+        var id = field.field.field;
+        this.node = $('#ListBoxFieldValue').clone().attr({id:id});
+        var possible = this.node.find('#possiblevalues').attr({id: 'Possible'+id});
+        var selected = this.node.find('#selectedvalues').attr({id: 'Selected'+id});
+        this.node.find('#move_left').attr({id: id, name: 'Possible'+id});
+        this.node.find('#move_right').attr({id: id, name: 'Selected'+id});
 
-            var leftButton = this.node.find('#move_left').attr({id: this.id, name: 'Possible'+this.id});
-            var rightButton = this.node.find('#move_right').attr({id: this.id, name: 'Selected'+this.id});
-
-            $('#'+this.id).find('div').filter('.fieldvalue').append( this.node );
-        };
 
         this.setFieldValue = function( value ) {
-            var possible = this.node.find('#Possible'+this.id);
-            var selected = this.node.find('#Selected'+this.id);
             possible.find('option').remove();
             selected.find('option').remove();
-            var values = this.field.field.fieldValue.values;
-            for ( valueIdx in values )
-            {
-                var selectionValue = values[valueIdx];
+            $.each( field.field.fieldValue.values, function(idx, selectionValue) {
                 var node = $('<option />').text(selectionValue);
                 if  ( value.indexOf(selectionValue)>-1 )
                 {
@@ -199,19 +169,16 @@ var FieldTypeModule = (function() {
                 {
                     possible.append( node );
                 }
-            };
-        };
+            });
+        }
 
         this.getFieldValue = function() {
             return $.map ( this.node.find('#Selected'+this.id+' > option'), function( elm ) { return elm.text }).join(', ');
-        };
+        }
     }
 
     function NumberFieldValue( field ) {
-        this.render = function() {
-            this.node = $('#'+fieldType).clone().attr({id: 'numberField'+this.id, name:this.id});
-            $('#'+this.id).find('div').filter('.fieldvalue').append( this.node );
-        };
+        this.node = $('#NumberFieldValue').clone().attr({id: 'numberField'+field.field.field, name:field.field.field});
 
         this.updateServer = function() {
             var textfield = $('#numberField'+this.id);
@@ -232,90 +199,74 @@ var FieldTypeModule = (function() {
                     alert( texts.invalidfloat );
                 }
             }
-        };
+        }
     }
 
     function OptionButtonsFieldValue( field ) {
-        this.render = function() {
-            this.node = $('#FieldSet').clone().attr('id', 'FieldSet'+this.id);
-            var values = field.field.fieldValue.values;
-            for (valueIdx in values)
-            {
-                var selectionValue = values[valueIdx];
-                var selectionId = fieldType + this.id + '' + valueIdx;
-                var node = $('#'+fieldType).clone().attr({id: selectionId, name: this.id });
-                var label = $('#label').clone().attr({'for': selectionId, id: 'label'+selectionId }).text(selectionValue);
-                this.node.append( $('<div />').append( node ).append( label ) );
-            };
-            $('#'+this.id).find('div').filter('.fieldvalue').append( this.node );
-        };
+        var id = field.field.field;
+        this.node = $('#FieldSet').clone().attr('id', 'FieldSet'+id);
+        var node = this.node;
+        $.each( field.field.fieldValue.values, function(idx, selectionValue) {
+            var selectionId = 'OptionButtonsFieldValue' + field.field.field + idx;
+            var element = $('#OptionButtonsFieldValue').clone().attr({id: selectionId, name: field.field.field });
+            var label = $('#label').clone().attr({'for': selectionId, id: 'label'+selectionId }).text(selectionValue);
+            node.append( $('<div />').append( element ).append( label ) );
+        });
 
         this.setFieldValue = function(value) {
-            var values = this.field.field.fieldValue.values;
-            for ( idx in values ) {
-                var selectionValue = values[ idx ];
-                var selectionId = this.fieldType + this.id + '' + idx;
+            $.each( field.field.fieldValue.values, function(idx, selectionValue){
                 if  ( value == selectionValue )
                 {
-                    this.node.find('#'+selectionId).attr('checked', 'checked');
+                    node.find('#OptionButtonsFieldValue' + id + idx).attr('checked', 'checked');
                 }
-            }
-        };
+            });
+        }
 
         this.getFieldValue = function() {
             return $.map( $('#'+this.id+ ' input:checked'), function( elm ) {return $('#label'+elm.id).text() }).join(', ');
-        };
+        }
     }
 
     function OpenSelectionFieldValue( field ) {
-        this.render = function() {
-            this.node = $('#FieldSet').clone().attr('id', 'FieldSet'+this.id);
-            var values = field.field.fieldValue.values;
-            var selected = false;
-            for (valueIdx in values)
-            {
-                var selectionValue = values[valueIdx];
-                var selectionId = fieldType + this.id + '' + valueIdx;
-                var node = $('#'+fieldType).clone().attr({id: selectionId, name: this.id });
-                var label = $('#label').clone().attr({'for': selectionId, id: 'label'+selectionId }).text(selectionValue);
-                this.node.append( $('<div />').append( node ).append( label ) );
-            };
+        var id = field.field.field;
+        this.node = $('#FieldSet').clone().attr('id', 'FieldSet'+id);
+        var node = this.node;
+        var selected = false;
+        $.each( field.field.fieldValue.values, function(idx, selectionValue){
+            var selectionId = 'OpenSelectionFieldValue' + id + idx;
+            var element = $('#OpenSelectionFieldValue').clone().attr({id: selectionId, name: id });
+            var label = $('#label').clone().attr({'for': selectionId, id: 'label'+selectionId }).text(selectionValue);
+            node.append( $('<div />').append( element ).append( label ) );
+        });
 
-            var selectionId = 'openSelectionOption' + this.id;
-            var node = $('#OpenSelectionOption').clone().attr({id: selectionId, name: this.id });
-            var label = $('#label').clone().attr({'for': selectionId, id: 'label'+selectionId }).text(field.field.fieldValue.openSelectionName  );
+        var selectionId = 'openSelectionOption' + id;
+        var node = $('#OpenSelectionOption').clone().attr({id: selectionId, name:id });
+        var label = $('#label').clone().attr({'for': selectionId, id: 'label'+selectionId }).text(field.field.fieldValue.openSelectionName  );
 
-            var openSelectionInput = $('#OpenSelectionTextField').clone().attr({id: 'openSelectionTextField' + this.id , name: this.id });
-            this.node.append( $('<div />').append( node ).append( label ).append('&nbsp;').append( openSelectionInput) );
+        var openSelectionInput = $('#OpenSelectionTextField').clone().attr({id: 'openSelectionTextField' + id , name: id });
+        this.node.append( $('<div />').append( node ).append( label ).append('&nbsp;').append( openSelectionInput) );
 
-            $('#'+this.id).find('div').filter('.fieldvalue').append( this.node );
-        };
 
         this.setFieldValue = function(value) {
-            var values = field.field.fieldValue.values;
             var selected = false;
-            for (valueIdx in values)
-            {
-                var selectionValue = values[valueIdx];
-                var selectionId = fieldType + this.id + '' + valueIdx;
+            $.each( field.field.fieldValue.values, function(idx, selectionValue){
                 if  ( value == selectionValue )
                 {
                     selected = true;
-                    $('#'+selectionId).attr('checked', 'checked');
-
+                    $('#OpenSelectionFieldValue' + id + idx).attr('checked', 'checked');
                 }
-            };
-            var node = $('#openSelectionOption' + this.id);
+            });
+            var node = $('#openSelectionOption' + id);
             if (selected)
             {
-                $('#openSelectionTextField' + this.id).attr({disabled: true, value: ""});
+                $('#openSelectionTextField' + id).attr({disabled: true, value: ""});
             } else {
                 if (value) {
                     node.attr('checked', 'checked');
-                    $('#openSelectionTextField' + this.id).attr("value", value);
+                    $('#openSelectionTextField' + id).attr("value", value);
                 }
             }
-        };
+        }
 
         this.getFieldValue = function() {
             var fieldValue = $.map( $('#'+this.id+ ' input:checked'), function( elm ) {return $('#label'+elm.id).text() }).join(', ');
@@ -323,33 +274,25 @@ var FieldTypeModule = (function() {
                 fieldValue = $('#openSelectionTextField'+this.id).attr('value');
             }
             return fieldValue;
-        };
+        }
     }
 
     function TextAreaFieldValue( field ) {
-        this.render = function() {
-            var cols = field.field.fieldValue.cols;
-            var rows = field.field.fieldValue.rows;
-            this.node = $('#'+fieldType).clone().attr({
-                id: this.id,
-                cols: cols,
-                rows: rows-1
-            });
-
-            $('#'+this.id).find('div').filter('.fieldvalue').append( this.node );
-        };
+        var cols = field.field.fieldValue.cols;
+        var rows = field.field.fieldValue.rows;
+        this.node = $('#TextAreaFieldValue').clone().attr({
+            id: field.field.field,
+            cols: cols,
+            rows: rows-1
+        });
     }
 
 
     function TextFieldValue( field ) {
-        this.render = function() {
-            var width = field.field.fieldValue.width;
-            this.node = $('#'+fieldType).clone().attr({
-                id: this.id,
-                size: width
-            });
-            $('#'+this.id).find('div').filter('.fieldvalue').append( this.node );
-        };
+        this.node = $('#TextFieldValue').clone().attr({
+            id: field.field.field,
+            size: field.field.fieldValue.width
+        });
 
         this.updateServer = function() {
             var oldValue = this.getFieldValue();
@@ -364,19 +307,12 @@ var FieldTypeModule = (function() {
                     alert( texts.invalidformat );
                 }
             }
-        };
+        }
     }
 
     inner.render = function( field ) {
-        fieldType = getFieldType( field.field.fieldValue._type );
+        var fieldType = getFieldType( field.field.fieldValue._type );
         var fieldTypeUI = eval( 'new '+fieldType + '(field)');
-
-        // add standard implementations
-        if ( !fieldTypeUI.updateServer ) {
-            fieldTypeUI.updateServer = function() {
-                updateFieldValue( this.id, this.getFieldValue() );
-            }
-        }
 
         if ( !fieldTypeUI.getFieldValue ) {
             fieldTypeUI.getFieldValue = function() {
@@ -400,8 +336,7 @@ var FieldTypeModule = (function() {
         fieldTypeUI.dirty = false;
         fieldMap[ fieldTypeUI.id ] = fieldTypeUI;
 
-        renderGenericFieldPart( fieldTypeUI );
-        fieldTypeUI.render();
+        displayField(fieldTypeUI);
         fieldTypeUI.setFieldValue( fieldTypeUI.value );
     }
 
@@ -417,7 +352,11 @@ var FieldTypeModule = (function() {
         var component = fieldMap[ fieldId ];
         if ( component.dirty )
         {
-            component.updateServer();
+            if ( !component.updateServer ) {
+                updateFieldValue( component.id, component.getFieldValue() );
+            } else {
+                component.updateServer();
+            }
             component.dirty = false;
         }
     }
@@ -441,13 +380,11 @@ function setupFormSummary() {
     summaryDiv.find('#form_description').text(formSubmissionValue.description);
     $('#app').empty().append( summaryDiv );
 
-    for (idx in formSubmissionValue.pages) {
+    $.each(formSubmissionValue.pages, function(idx, page){
         var pageDiv = $('#form_page_summary').clone().attr('id', 'page'+idx);
-        var page = formSubmissionValue.pages[idx];
         var page_ref = $('#goto_form_page').clone().attr('accesskey', idx).text(page.title);
         pageDiv.find('h3').append( page_ref );
-        for (field_idx in page.fields) {
-            var field = page.fields[field_idx];
+        $.each( page.fields, function(fieldIdx, field){
             var value = (field.value == null ? "" : field.value);
             var fieldType = getFieldType( field.field.fieldValue._type );
             if ( fieldType != "CommentFieldValue")
@@ -474,9 +411,9 @@ function setupFormSummary() {
                 }
                 ul.append( li );
             }
-        }
+        });
         $('#form_pages_summary').append( pageDiv );
-    }
+    });
     if ( missingFields != "" )
     {
         $('#form_submit').aToolTip({

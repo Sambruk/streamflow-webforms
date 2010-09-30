@@ -112,7 +112,20 @@ jQuery(document).ready(function()
             type: 'POST',
             success: function(data) {
                 // get case id and formsubmision id and contruct url
-                for ( idx in data.events )
+                $.each( data.events, function( idx, event){
+                    if ( event.name == "createdCase")
+                    {
+                        var caseId = $.parseJSON(event.parameters)['param1'];
+                        caseUrl = proxyContextUrl + caseId;
+                        proxyContextUrl += caseId;
+                    } else if ( event.name == "changedFormSubmission" )
+                    {
+                        proxyContextUrl += '/formdrafts/' + event.entity + '/';
+                        formSubmissionValue = $.parseJSON($.parseJSON(event.parameters)['param1']);
+                        refreshPageComponents();
+                    }
+                });
+                /*for ( idx in data.events )
                 {
                     var event = data.events[idx];
                     if ( event.name == "createdCase")
@@ -126,7 +139,7 @@ jQuery(document).ready(function()
                         formSubmissionValue = $.parseJSON($.parseJSON(event.parameters)['param1']);
                         refreshPageComponents();
                     }
-                }
+                }*/
             },
             error: errorPopup
         });
@@ -150,11 +163,9 @@ jQuery(document).ready(function()
                 formFieldsChanged = {};
                 var pages = formSubmissionValue['pages'];
                 var page = pages[ formSubmissionValue['currentPage'] ];
-                for ( idx in page.fields )
-                {
-                    var field = page.fields[ idx ];
+                $.each( page.fields, function(idx, field){
                     FieldTypeModule.setFieldValue( field.field.field, (field.value == null ? "" : field.value) );
-                }
+                });
             },
             error: errorPopup
         });
@@ -335,14 +346,20 @@ jQuery(document).ready(function()
             })
             .each(function(){
                 var words = this.nodeValue.split(' ');
-                for ( idx in words )
+                $.each( words, function(idx, word){
+                    if ( word.length > 0 && word.charAt(0)=='$' )
+                    {
+                        words[ idx ] = texts[ $.trim( word.substring(1) ) ];
+                    }
+                });
+                /*for ( idx in words )
                 {
                     var word = words[ idx ];
                     if ( word.length > 0 && word.charAt(0)=='$' )
                     {
                         words[ idx ] = texts[ $.trim( word.substring(1) ) ];
                     }
-                }
+                }*/
                 this.nodeValue = words.join(' ');
             });
     };
