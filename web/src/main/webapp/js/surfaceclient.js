@@ -125,21 +125,6 @@ jQuery(document).ready(function()
                         refreshPageComponents();
                     }
                 });
-                /*for ( idx in data.events )
-                {
-                    var event = data.events[idx];
-                    if ( event.name == "createdCase")
-                    {
-                        var caseId = $.parseJSON(event.parameters)['param1'];
-                        caseUrl = proxyContextUrl + caseId;
-                        proxyContextUrl += caseId;
-                    } else if ( event.name == "changedFormSubmission" )
-                    {
-                        proxyContextUrl += '/formdrafts/' + event.entity + '/';
-                        formSubmissionValue = $.parseJSON($.parseJSON(event.parameters)['param1']);
-                        refreshPageComponents();
-                    }
-                }*/
             },
             error: errorPopup
         });
@@ -160,7 +145,6 @@ jQuery(document).ready(function()
             type: 'PUT',
             success: function(data) {
                 successfulUpdate = updateFormSubmissionValue( data );
-                formFieldsChanged = {};
                 var pages = formSubmissionValue['pages'];
                 var page = pages[ formSubmissionValue['currentPage'] ];
                 $.each( page.fields, function(idx, field){
@@ -240,84 +224,68 @@ jQuery(document).ready(function()
      * Functions that manipulates the DOM
      */
     function updateFormSubmissionValue( data ) {
-        for ( idx in data.events )
-        {
-            var event = data.events[ idx ];
-            if ( event.name == "changedFormSubmission" )
-            {
+        var updated = false;
+        $.each( data.events, function(idx, event){
+            if ( event.name == "changedFormSubmission" ) {
                 formSubmissionValue = $.parseJSON($.parseJSON(event.parameters)['param1']);
-                return true;
+                updated = true;
             }
-        }
-        return false;
+        });
+        return updated;
     };
+
+
+    function lastPage() {
+        var currentPage = formSubmissionValue['currentPage'];
+        var pages = formSubmissionValue['pages'];
+        return (currentPage == pages.length -1);
+    }
+
+    function firstPage() {
+        return ( formSubmissionValue['currentPage'] == 0);
+    }
 
     // Based on the formSubmissionValue
     // the current page is updated
     function refreshPageComponents() {
         if ( formSubmissionValue != null )
         {
-            formFieldsChanged = {};
-            fieldMap = {};
             var formFillingDiv = $('#form_filling_div').clone().attr({'id':'inserted_form_filling_div'});
             formFillingDiv.find('#form_description').text(formSubmissionValue.description);
             $('#app').empty().append( formFillingDiv );
 
-            var currentPage = formSubmissionValue['currentPage'];
-            var pages = formSubmissionValue['pages'];
-            var page = pages[ currentPage ];
+            $('#form_page_previous_'+(!firstPage())).clone().appendTo('#form_buttons_div');
+            $('#form_page_next_'+(!lastPage())).clone().appendTo('#form_buttons_div');
 
-            if (currentPage == 0)
-            {
-                $('#form_page_previous_disabled').clone().appendTo('#form_buttons_div');
-            } else {
-                $('#form_page_previous').clone().appendTo('#form_buttons_div');
-            }
-            if (currentPage == pages.length -1)
-            {
-                $('#form_page_next_disabled').clone().appendTo('#form_buttons_div');
-            } else {
-                $('#form_page_next').clone().appendTo('#form_buttons_div');
-            }
             $('#form_page_discard').clone().appendTo('#form_buttons_div');
             $('#form_summary').clone().appendTo('#form_buttons_div');
 
-            insertPageOverview( pages, currentPage );
-            insertRows( page.fields );
+            var pages = formSubmissionValue['pages'];
+            insertPageOverview( pages );
+            $.each( pages[ formSubmissionValue['currentPage'] ].fields, function(idx, field){
+                FieldTypeModule.render( field );
+            });
         }
     };
 
-    function insertPageOverview( pages, currentPage )
+    function insertPageOverview( pages )
     {
-        var lastIdx = pages.length - 1;
-        for ( idx in pages ) {
-            var page = $('<li />').text(pages[idx].title );
-            if ( currentPage == idx )
-            {
-                page.attr({"class": "selected"});
+        var currentPage = formSubmissionValue['currentPage'];
+        $.each( pages, function(idx, page){
+            var pageElm = $('<li />').text(page.title );
+            if ( currentPage == idx ) {
+                pageElm.attr({"class": "selected"});
             }
-            $('#form_pages').append( page );
-            if ( idx < lastIdx )
-            {
+            $('#form_pages').append( pageElm );
+            if ( idx < pages.length - 1 ) {
                 $('#form_pages').append( $('<li />').text('>>') );
             }
-        }
-    };
-
-
-    function insertRows( fields ) {
-        for ( idx in fields )
-        {
-            FieldTypeModule.render( fields[ idx] );
-        }
+        });
     };
 
     function changeFormSubmissionPage( page )
     {
-        var currentPage = formSubmissionValue['currentPage'];
-        var pages = formSubmissionValue['pages'];
-        var lastIndex = pages.length-1;
-        if ( (page == currentPage) || (page < 0) || (page > lastIndex) ) return false;
+        if (page == formSubmissionValue['currentPage']) return false;
         formSubmissionValue['currentPage'] = page;
         return true;
     };
@@ -352,14 +320,6 @@ jQuery(document).ready(function()
                         words[ idx ] = texts[ $.trim( word.substring(1) ) ];
                     }
                 });
-                /*for ( idx in words )
-                {
-                    var word = words[ idx ];
-                    if ( word.length > 0 && word.charAt(0)=='$' )
-                    {
-                        words[ idx ] = texts[ $.trim( word.substring(1) ) ];
-                    }
-                }*/
                 this.nodeValue = words.join(' ');
             });
     };
@@ -368,7 +328,6 @@ jQuery(document).ready(function()
     /**
      * Main
      */
-    String.prototype.contains = function(it) { return this.indexOf(it) != -1; };
     var accesspoint = window.top.location.search.split('=')[1];
 	var proxyContextUrl = "surface/proxy/accesspoints/"
 	var contextUrl = "surface/surface/accesspoints/";
@@ -392,13 +351,17 @@ jQuery(document).ready(function()
      */
     $('#login_enduser_operation').live('click', function() { login(); });
 
-    $('#form_page_previous').live('click', function() { changePage('previouspage.json', parseInt(formSubmissionValue['currentPage'])-1, false) });
+    $('#form_page_previous_true').live('click', function() {
+        if (!firstPage()) changePage('previouspage.json', parseInt(formSubmissionValue['currentPage'])-1, false)
+    });
 
-    $('#form_page_previous_disabled').live('click', function() { return false; });
+    $('#form_page_previous_false').live('click', function() { return false; });
 
-    $('#form_page_next').live('click', function() { changePage('nextpage.json', parseInt(formSubmissionValue['currentPage'])+1, false) });
+    $('#form_page_next_true').live('click', function() {
+        if (!lastPage()) changePage('nextpage.json', parseInt(formSubmissionValue['currentPage'])+1, false)
+    });
 
-    $('#form_page_next_disabled').live('click', function() { return false; });
+    $('#form_page_next_false').live('click', function() { return false; });
 
     $('#goto_form_page').live('click', function() { changePage('summary/gotopage.json', $(this).attr('accesskey'), true) });
 
@@ -406,10 +369,10 @@ jQuery(document).ready(function()
 
     $('#form_summary').live('click', function() { setupFormSummary(); });
 
-   $('#form_submit').live('click', function() {
+    $('#form_submit').live('click', function() {
         if ( missingFields == "" )
         {
             submitAndSend();
         }
-   });
+    });
 })
