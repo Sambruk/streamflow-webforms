@@ -184,6 +184,7 @@ jQuery(document).ready(function()
                 if ( typeof( caseId )!="undefined") {
                     message.append( '<br/> ' + texts.caseidmessage + ' ' + caseId );                    
                 }
+                $('#print').clone().appendTo(node);
                 $('#app').empty().append( node );
             },
             error: errorPopup
@@ -205,6 +206,10 @@ jQuery(document).ready(function()
         return caseId;
     }
 
+    function printForm()
+    {
+        alert("CaseId: " + texts.caseidmessage + "\nUrl:" + proxyContextUrl);
+    }
 
     function discard()
     {
@@ -375,4 +380,6 @@ jQuery(document).ready(function()
             submitAndSend();
         }
     });
+
+    $('#print_link').live('click', function() { printForm(); });
 })
