@@ -208,7 +208,16 @@ jQuery(document).ready(function()
 
     function printForm()
     {
-        alert("CaseId: " + texts.caseidmessage + "\nUrl:" + proxyContextUrl);
+        var url = caseUrl +'/submittedforms/'+formSubmissionValue.form + '/generateformaspdf';
+        $.ajax({
+            url: url,
+            async: false,
+            cache: false,
+            type: 'GET',
+            success: function( data ) {
+                
+            }
+        });
     }
 
     function discard()
