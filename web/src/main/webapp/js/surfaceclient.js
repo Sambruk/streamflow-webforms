@@ -184,7 +184,11 @@ jQuery(document).ready(function()
                 if ( typeof( caseId )!="undefined") {
                     message.append( '<br/> ' + texts.caseidmessage + ' ' + caseId );                    
                 }
-                $('#print').clone().appendTo(node);
+                var url = caseUrl +'/submittedforms/'+formSubmissionValue.form + '/generateformaspdf';
+                var print_node = $('#print').clone();
+                var print_url = print_node.find("#print_link").attr("href", url );
+                print_node.appendTo(node);
+
                 $('#app').empty().append( node );
             },
             error: errorPopup
@@ -204,20 +208,6 @@ jQuery(document).ready(function()
             }
         });
         return caseId;
-    }
-
-    function printForm()
-    {
-        var url = caseUrl +'/submittedforms/'+formSubmissionValue.form + '/generateformaspdf';
-        $.ajax({
-            url: url,
-            async: false,
-            cache: false,
-            type: 'GET',
-            success: function( data ) {
-                
-            }
-        });
     }
 
     function discard()
@@ -390,5 +380,4 @@ jQuery(document).ready(function()
         }
     });
 
-    $('#print_link').live('click', function() { printForm(); });
 })
