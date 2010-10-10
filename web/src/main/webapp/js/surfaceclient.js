@@ -18,7 +18,7 @@
 
 jQuery(document).ready(function()
 {
-    function errorPopup() { alert( texts.erroroccurred ); };
+    function errorPopup() { alert( texts.erroroccurred ); }
 
     /**
      * Functions that call StreamFlow
@@ -34,7 +34,7 @@ jQuery(document).ready(function()
             }
         });
         return result;
-    };
+    }
 
     function login() {
         if ( verifyAccessPoint() )
@@ -73,7 +73,7 @@ jQuery(document).ready(function()
         } else {
             $('#app').append( $('#ErrorMessage').clone().attr({id:'illegalAccessPoint'}).text( texts.invalidaccesspoint ) );
         }
-    };
+    }
 
     function queryCaseForm() {
         var result = false;
@@ -102,7 +102,7 @@ jQuery(document).ready(function()
             }
         });
         return result;
-    };
+    }
 
 
     function createCaseWithForm() {
@@ -128,7 +128,7 @@ jQuery(document).ready(function()
             },
             error: errorPopup
         });
-    };
+    }
 
     updateFieldValue = function(fieldId, fieldValue) {
         var successfulUpdate = false;
@@ -155,7 +155,7 @@ jQuery(document).ready(function()
         });
         image.hide();
         return successfulUpdate;
-    };
+    }
 
     function updatePage( command, page )
     {
@@ -167,7 +167,7 @@ jQuery(document).ready(function()
             type: 'PUT',
             data: integerDTO
         });
-    };
+    }
 
     function submitAndSend()
     {
@@ -193,7 +193,7 @@ jQuery(document).ready(function()
             },
             error: errorPopup
         });
-    };
+    }
 
     function queryCaseInfo()
     {
@@ -222,7 +222,7 @@ jQuery(document).ready(function()
             },
             error: errorPopup
         });
-    };
+    }
 
     /**
      * Functions that manipulates the DOM
@@ -236,7 +236,7 @@ jQuery(document).ready(function()
             }
         });
         return updated;
-    };
+    }
 
 
     function lastPage() {
@@ -270,7 +270,7 @@ jQuery(document).ready(function()
                 FieldTypeModule.render( field );
             });
         }
-    };
+    }
 
     function insertPageOverview( pages )
     {
@@ -285,14 +285,14 @@ jQuery(document).ready(function()
                 $('#form_pages').append( $('<li />').text('>>') );
             }
         });
-    };
+    }
 
     function changeFormSubmissionPage( page )
     {
         if (page == formSubmissionValue['currentPage']) return false;
         formSubmissionValue['currentPage'] = page;
         return true;
-    };
+    }
 
     function changePage( command, page, forceRefresh ) {
         if ( changeFormSubmissionPage( page ) )
@@ -302,7 +302,7 @@ jQuery(document).ready(function()
         } else if ( forceRefresh ) {
             refreshPageComponents();
         }
-    };
+    }
 
     function translate( )
     {
@@ -326,7 +326,7 @@ jQuery(document).ready(function()
                 });
                 this.nodeValue = words.join(' ');
             });
-    };
+    }
 
 
     /**
@@ -373,11 +373,7 @@ jQuery(document).ready(function()
 
     $('#form_summary').live('click', function() { setupFormSummary(); });
 
-    $('#form_submit').live('click', function() {
-        if ( missingFields == "" )
-        {
-            submitAndSend();
-        }
-    });
+    $('#form_submit_true').live('click', function() { submitAndSend(); });
 
+    $('#form_submit_false').live('click', function() {return false; });
 })

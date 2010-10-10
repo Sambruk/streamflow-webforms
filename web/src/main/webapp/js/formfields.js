@@ -3,37 +3,26 @@
  */
 var missingFields = "";
 var formSubmissionValue;
+var nameMap = {Possible:'Selected', Selected:'Possible'};
+var formValidates = true;
 
 selectOpenSelectChanged = function(fieldName) {
-    var fieldValue = $.map( $('#'+fieldName+ ' input:checked'), function( elm ) {return $('#label'+elm.id).text() }).join(', ');
-
-    var field = $('#openSelectionTextField'+fieldName);
-    field.attr('value','');
-    field.attr("disabled", true);
+    $('#openSelectionTextField'+fieldName).attr({value:'', disabled:true});
     FieldTypeModule.markDirty( fieldName );
     FieldTypeModule.updateServer( fieldName );
 };
 
 selectOpenSelectOption = function(fieldName) {
-    var field = $('#openSelectionTextField'+fieldName);
-    field.removeAttr("disabled");
+    var field = $('#openSelectionTextField'+fieldName).removeAttr("disabled");
     FieldTypeModule.markDirty( fieldName );
     setTimeout(function(){field.focus(); }, 10);
 };
 
 listBoxArrow = function(id, toBox) {
-    var fromBox;
-    if ( toBox.substring(0,8)=='Possible') {
-        fromBox = 'Selected' + id;
-    } else {
-        fromBox = 'Possible' + id;
-    }
-    var elements = $('#'+fromBox+' > option:selected');
-    var box = $('#'+toBox);
+    var fromBox = nameMap[ toBox.substring(0,8) ] + id;
+    $('#'+toBox).append( $('#'+fromBox+' > option:selected') );
 
-    box.append( elements );
     var newValue = $.map( $('#Selected'+id+' > option'), function( elm ) { return elm.text } ).join(', ');
-    
     FieldTypeModule.markDirty( id );
     FieldTypeModule.setFieldValue(id, newValue );
     FieldTypeModule.updateServer( id );
@@ -61,23 +50,65 @@ var FieldTypeModule = (function() {
     var fieldMap = {};
 
     // internal function to display the field using the field template
-    // and taking the fieldComponent.node as the UI
-    function displayField( fieldComponent ) {
-        var field = $('#FormField').clone().attr('id', fieldComponent.id);
-        if ( fieldComponent.desc != "" && fieldComponent.fieldType != "CommentFieldValue")
-        {
-            field.find('div.fieldname > img').show().aToolTip({ fixed: true, tipContent: fieldComponent.desc });
-        }
-        field.find('div.fieldname > label').text( fieldComponent.name);
-        if (fieldComponent.field.field.fieldValue.hint){
-            field.find('#hint').text(' (' + fieldComponent.field.field.fieldValue.hint + ')')
-        }
-        if ( !fieldComponent.field.field.mandatory )
-        {
-            field.find('#mandatory').hide();
-        }
-        field.find('div.fieldvalue').append( fieldComponent.node );
+    // and taking the fieldComponent.node as the input widget
+    function displayField( fieldDefinition ) {
+        var field = $('#FormField').clone().attr('id', fieldDefinition.id);
+        
+        field.find('div.fieldname > label').text( fieldDefinition.name );
+        showHint( fieldDefinition, field );
+        showMandatory( fieldDefinition, field );
+        showToolTip( fieldDefinition, field );
+        field.find('div.fieldvalue').append( fieldDefinition.node );
+
         $('#form_table_body').append( field );
+    }
+
+    function getFieldType( qualifiedField ) {
+        var list = qualifiedField.split('.');
+        return list[ list.length - 1 ];
+    }
+
+
+    function showMandatory( fieldDefinition, node ) {
+        if ( !fieldDefinition.field.field.mandatory )
+        {
+            node.find('#mandatory').hide();
+        }
+    }
+
+    inner.displayReadOnlyField = function( field, target ) {
+        var value = (field.value == null ? "" : field.value);
+        var fieldType = getFieldType( field.field.fieldValue._type );
+        if ( fieldType != "CommentFieldValue")
+        {
+            var li = $('#field_summary').clone().attr('id', field.field );
+            li.find('b').text( field.field.description );
+            showMandatory( field, li );
+            if (fieldType == "DateFieldValue") {
+                li.append(formatUTCStringToIsoString(value));
+            } else {
+                li.append( value );
+            }
+            target.append( li );
+            if ( field.field.mandatory && !value) {
+                formValidates = false;
+                return texts.missingfield + " '"+field.field.description+"' <br>";
+            }
+        }
+        return "";
+    }
+
+    function showHint( fieldDefinition, field ) {
+        if (fieldDefinition.field.field.fieldValue.hint){
+            field.find('#hint').text(' (' + fieldDefinition.field.field.fieldValue.hint + ')')
+        }
+    }
+
+    function showToolTip( fieldDefinition, widget ) {
+        if ( fieldDefinition.field.field.note != "" && getFieldType( fieldDefinition.field.field.fieldValue._type ) != "CommentFieldValue")
+        {
+            widget.find('div.fieldname > img').show().aToolTip({ fixed: true, tipContent: fieldDefinition.field.field.note });
+        }
     }
 
     function CheckboxesFieldValue( field ) {
@@ -241,7 +272,7 @@ var FieldTypeModule = (function() {
 
         var selectionId = 'openSelectionOption' + id;
         var node = $('#OpenSelectionOption').clone().attr({id: selectionId, name:id });
-        var label = $('#label').clone().attr({'for': selectionId, id: 'label'+selectionId }).text(field.field.fieldValue.openSelectionName  );
+        var label = $('#label').clone().attr({'for': selectionId, id: 'label'+selectionId }).text(field.field.fieldValue.openSelectionName );
 
         var openSelectionInput = $('#OpenSelectionTextField').clone().attr({id: 'openSelectionTextField' + id , name: id });
         this.node.append( $('<div />').append( node ).append( label ).append('&nbsp;').append( openSelectionInput) );
@@ -253,18 +284,13 @@ var FieldTypeModule = (function() {
                 if  ( value == selectionValue )
                 {
                     selected = true;
+                    $('#openSelectionTextField' + id).attr({disabled: true, value: ""});
                     $('#OpenSelectionFieldValue' + id + idx).attr('checked', 'checked');
                 }
             });
-            var node = $('#openSelectionOption' + id);
-            if (selected)
-            {
-                $('#openSelectionTextField' + id).attr({disabled: true, value: ""});
-            } else {
-                if (value) {
-                    node.attr('checked', 'checked');
-                    $('#openSelectionTextField' + id).attr("value", value);
-                }
+            if ( !selected && value ) {
+                $('#openSelectionOption' + id).attr('checked', 'checked');
+                $('#openSelectionTextField' + id).attr("value", value);
             }
         }
 
@@ -295,12 +321,12 @@ var FieldTypeModule = (function() {
         });
 
         this.updateServer = function() {
-            var oldValue = this.getFieldValue();
-            if ( !updateFieldValue(this.id, this.getFieldValue() ) ) {
+            var value = this.getFieldValue();
+            if ( !updateFieldValue(this.id, value ) ) {
                 var newValue = this.getFieldValue();
-                if ( newValue != oldValue)
+                if ( newValue != value)
                 {
-                    this.setFieldValue(oldValue);
+                    this.setFieldValue(value);
                     var node = this.node;
                     setTimeout(function(){ node.focus(); node.select()}, 10);
                     this.dirty = true;
@@ -327,12 +353,10 @@ var FieldTypeModule = (function() {
         }
 
         // set field properties
-        fieldTypeUI.fieldType = fieldType;
         fieldTypeUI.field = field;
         fieldTypeUI.id = field.field.field;
-        fieldTypeUI.name = field.field.description;
-        fieldTypeUI.desc = field.field.note;
         fieldTypeUI.value = (field.value == null ? "" : field.value);
+        fieldTypeUI.name = field.field.description;
         fieldTypeUI.dirty = false;
         fieldMap[ fieldTypeUI.id ] = fieldTypeUI;
 
@@ -352,10 +376,10 @@ var FieldTypeModule = (function() {
         var component = fieldMap[ fieldId ];
         if ( component.dirty )
         {
-            if ( !component.updateServer ) {
-                updateFieldValue( component.id, component.getFieldValue() );
-            } else {
+            if ( component.updateServer ) {
                 component.updateServer();
+            } else {
+                updateFieldValue( component.id, component.getFieldValue() );
             }
             component.dirty = false;
         }
@@ -368,56 +392,25 @@ var FieldTypeModule = (function() {
     return inner;
 }());
 
-function getFieldType( qualifiedField )
-{
-    var list = qualifiedField.split('.');
-    return list[ list.length - 1 ];
-}
 
 function setupFormSummary() {
-    missingFields = "";
+    var missingFields = "";
     var summaryDiv = $('#form_summary_div').clone().attr({'id':'inserted_form_summary_div'});
-    summaryDiv.find('#form_description').text(formSubmissionValue.description);
+    summaryDiv.find('#form_description').text( formSubmissionValue.description );
     $('#app').empty().append( summaryDiv );
 
     $.each(formSubmissionValue.pages, function(idx, page){
         var pageDiv = $('#form_page_summary').clone().attr('id', 'page'+idx);
-        var page_ref = $('#goto_form_page').clone().attr('accesskey', idx).text(page.title);
-        pageDiv.find('h3').append( page_ref );
-        $.each( page.fields, function(fieldIdx, field){
-            var value = (field.value == null ? "" : field.value);
-            var fieldType = getFieldType( field.field.fieldValue._type );
-            if ( fieldType != "CommentFieldValue")
-            {
-                var ul = pageDiv.find('ul');
-                var li = $('#field_summary').clone().attr('id', field.field );
-                li.find('b').text(field.field.description);
-                if ( !field.field.mandatory )
-                {
-                    li.find('#mandatory').hide();
-                } else
-                {
-                    if ( value == "" )
-                    {
-                        missingFields += texts.missingfield + " '"+field.field.description+"' <br>";
-                    }
-                }
-                if (fieldType == "DateFieldValue")
-                {
-                    li.append(formatUTCStringToIsoString(value));
-                } else
-                {
-                    li.append( value );
-                }
-                ul.append( li );
-            }
+        pageDiv.find('h3').append( $('#goto_form_page').clone().attr('accesskey', idx).text(page.title) );
+        var ul = pageDiv.find('ul');
+        $.each( page.fields, function( fieldIdx, field ){
+            missingFields += FieldTypeModule.displayReadOnlyField( field, ul );
         });
         $('#form_pages_summary').append( pageDiv );
     });
-    if ( missingFields != "" )
-    {
-        $('#form_submit').aToolTip({
-            tipContent: missingFields
-        });
+    var button = $('#form_submit_'+formValidates).clone();
+    $('#form_submission_status').append( button );
+    if ( !formValidates ) {
+        button.aToolTip({ tipContent: missingFields });
     }
 }
