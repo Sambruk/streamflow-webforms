@@ -36,11 +36,9 @@ import org.restlet.representation.InputRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
-import se.streamsource.surface.web.resource.SurfaceRootContextFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.ResourceBundle;
 
 /**
  * Proxy service that is used to invoke Streamflow from Surface. Calls from the browser are routed
@@ -100,7 +98,9 @@ public interface ProxyService
             BioUtils.copy( representation.getStream(), bout);
             representation.exhaust();
             representation.release();
-            response.setEntity( new InputRepresentation(new ByteArrayInputStream(bout.toByteArray()), representation.getMediaType(), bout.size()) );
+            InputRepresentation inputRepresentation = new InputRepresentation( new ByteArrayInputStream( bout.toByteArray() ), representation.getMediaType(), bout.size() );
+            inputRepresentation.setDisposition( representation.getDisposition() );
+            response.setEntity( inputRepresentation );
          } catch ( ResourceException re )
          {
             response.setStatus( re.getStatus(), re.getCause(), re.getMessage() );
