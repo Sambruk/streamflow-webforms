@@ -171,7 +171,9 @@ var FieldTypeModule = (function() {
         this.node.find('#move_left').attr({id: id, name: 'Possible'});
         this.node.find('#move_right').attr({id: id, name: 'Selected'});
         $.each( field.field.fieldValue.values, function( idx, selectionValue ){
-            possible.append( $('<option />').attr({id: 'ListBoxFieldValue'+id+safeIdString(selectionValue), text: selectionValue}) );
+            var optionNode = $('<option />').attr('id', 'ListBoxFieldValue'+id+safeIdString(selectionValue));
+            optionNode.text( selectionValue );
+            possible.append( optionNode );
         });
 
 
