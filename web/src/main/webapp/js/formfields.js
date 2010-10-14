@@ -3,6 +3,7 @@
  */
 var missingFields = "";
 var formSubmissionValue;
+var formSignaturesValue = "";
 var nameMap = {Possible:'Selected', Selected:'Possible'};
 
 selectOpenSelectChanged = function(fieldName) {
@@ -385,10 +386,16 @@ function setupFormSummary() {
         });
         $('#form_pages_summary').append( pageDiv );
     });
-    var formValidates = (missingFields == "");
-    var button = $('#form_submit_'+formValidates).clone();
+    var formFilledIn = (missingFields == "");
+    var button;
+    if ( formRequiresSignatures() ) {
+        button = $('#form_sign_'+formFilledIn).clone();
+    } else {
+        button = $('#form_submit_'+formFilledIn).clone();
+    }
+
     $('#form_submission_status').append( button );
-    if ( !formValidates ) {
+    if ( !formFilledIn ) {
         button.aToolTip({ tipContent: missingFields });
     }
 }

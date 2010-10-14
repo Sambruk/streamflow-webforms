@@ -287,6 +287,23 @@ jQuery(document).ready(function()
         });
     }
 
+    function getFormSignatures() {
+        $.ajax({
+            url: proxyContextUrl + 'summary/signatures.json',
+            type: 'GET',
+            cache: false,
+            success: function( data ) {
+                formSignaturesValue = data;
+            },
+            error: errorPopup
+        });
+    }
+
+    formRequiresSignatures = function() {
+        getFormSignatures();
+        return formSignaturesValue.signatures.length != 0
+    }
+
     function changeFormSubmissionPage( page )
     {
         if (page == formSubmissionValue['currentPage']) return false;
