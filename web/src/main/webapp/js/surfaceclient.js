@@ -94,7 +94,7 @@ jQuery(document).ready(function()
                         type: 'GET',
                         success: function( data ) {
                             formSubmissionValue = data;
-                            refreshPageComponents();
+                            navigate( window.top.location.hash.substring(1) );
                             result = true;
                         }
                     });
@@ -118,11 +118,11 @@ jQuery(document).ready(function()
                         var caseId = $.parseJSON(event.parameters)['param1'];
                         caseUrl = proxyContextUrl + caseId;
                         proxyContextUrl += caseId;
-                    } else if ( event.name == "changedFormSubmission" )
+                    } else if ( event.name == "changedFormDraft" )
                     {
                         proxyContextUrl += '/formdrafts/' + event.entity + '/';
                         formSubmissionValue = $.parseJSON($.parseJSON(event.parameters)['param1']);
-                        refreshPageComponents();
+                        navigate( window.top.location.hash.substring(1) );
                     }
                 });
             },
@@ -146,7 +146,7 @@ jQuery(document).ready(function()
             success: function(data) {
                 successfulUpdate = updateFormSubmissionValue( data );
                 var pages = formSubmissionValue['pages'];
-                var page = pages[ formSubmissionValue['currentPage'] ];
+                var page = pages[ currentPage ];
                 $.each( page.fields, function(idx, field){
                     FieldTypeModule.setFieldValue( field.field.field, (field.value == null ? "" : field.value) );
                 });
@@ -155,18 +155,6 @@ jQuery(document).ready(function()
         });
         image.hide();
         return successfulUpdate;
-    }
-
-    function updatePage( command, page )
-    {
-        var integerDTO = {
-            "integer": page
-        };
-        $.ajax({
-            url: proxyContextUrl + command,
-            type: 'PUT',
-            data: integerDTO
-        });
     }
 
     function submitAndSend()
@@ -230,7 +218,7 @@ jQuery(document).ready(function()
     function updateFormSubmissionValue( data ) {
         var updated = false;
         $.each( data.events, function(idx, event){
-            if ( event.name == "changedFormSubmission" ) {
+            if ( event.name == "changedFormDraft" ) {
                 formSubmissionValue = $.parseJSON($.parseJSON(event.parameters)['param1']);
                 updated = true;
             }
@@ -240,13 +228,20 @@ jQuery(document).ready(function()
 
 
     function lastPage() {
-        var currentPage = formSubmissionValue['currentPage'];
-        var pages = formSubmissionValue['pages'];
-        return (currentPage == pages.length -1);
+        var pages = formSubmissionValue['pages'].length;
+        return (currentPage == pages -1);
     }
 
     function firstPage() {
-        return ( formSubmissionValue['currentPage'] == 0);
+        return ( currentPage == 0);
+    }
+
+    function inferPage( page ) {
+        if ( isNaN(page) ) return 0;
+        if ( page < 0 ) return 0;
+        var pages = formSubmissionValue['pages'].length;
+        if ( page >= pages ) return pages-1;
+        return page;
     }
 
     // Based on the formSubmissionValue
@@ -258,15 +253,15 @@ jQuery(document).ready(function()
             formFillingDiv.find('#form_description').text(formSubmissionValue.description);
             $('#app').empty().append( formFillingDiv );
 
-            $('#form_page_previous_'+(!firstPage())).clone().appendTo('#form_buttons_div');
-            $('#form_page_next_'+(!lastPage())).clone().appendTo('#form_buttons_div');
+            $('#form_page_previous_'+(!firstPage())).clone().attr('href','#'+(currentPage-1)).appendTo('#form_buttons_div');
+            $('#form_page_next_'+(!lastPage())).clone().attr('href','#'+(currentPage+1)).appendTo('#form_buttons_div');
 
             $('#form_page_discard').clone().appendTo('#form_buttons_div');
             $('#form_summary').clone().appendTo('#form_buttons_div');
 
             var pages = formSubmissionValue['pages'];
             insertPageOverview( pages );
-            $.each( pages[ formSubmissionValue['currentPage'] ].fields, function(idx, field){
+            $.each( pages[ currentPage ].fields, function(idx, field){
                 FieldTypeModule.render( field );
             });
         }
@@ -274,7 +269,6 @@ jQuery(document).ready(function()
 
     function insertPageOverview( pages )
     {
-        var currentPage = formSubmissionValue['currentPage'];
         $.each( pages, function(idx, page){
             var pageElm = $('<li />').text(page.title );
             if ( currentPage == idx ) {
@@ -287,11 +281,31 @@ jQuery(document).ready(function()
         });
     }
 
-    function getFormSignatures() {
+    function setupFormSigning() {
+        // get list of providers show them in a dropdown
+        //var url = "https://175.145.48.194:8443/eid/sign/";
+        var url = proxyContextUrl + 'signing/providers.json';
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            cache: false,
+            success: function ( data ) {
+                var node = $('<option />');
+                $.each( data.links, function(idx, link ) {
+                    node.append( $('<option />').attr({value: link.href, id: 'idProvider_'+idx}).text( link.text ) );
+                });
+                $('#app').empty().append();
+            }
+        })
+    }
+
+    function setupFormSignaturesValue() {
         $.ajax({
             url: proxyContextUrl + 'summary/signatures.json',
             type: 'GET',
             cache: false,
+            async: false,
             success: function( data ) {
                 formSignaturesValue = data;
             },
@@ -300,25 +314,27 @@ jQuery(document).ready(function()
     }
 
     formRequiresSignatures = function() {
-        getFormSignatures();
+        setupFormSignaturesValue();
         return formSignaturesValue.signatures.length != 0
     }
 
-    function changeFormSubmissionPage( page )
-    {
-        if (page == formSubmissionValue['currentPage']) return false;
-        formSubmissionValue['currentPage'] = page;
-        return true;
+    function navigate( newPage ) {
+        switch ( newPage ) {
+            case 'summary':
+                setupFormSummary();
+                break;
+            case 'signature':
+                setupFormSigning();
+                break;
+            default:
+                var page = parseInt( newPage );
+                currentPage = inferPage( page );
+                refreshPageComponents();
+        }
     }
 
-    function changePage( command, page, forceRefresh ) {
-        if ( changeFormSubmissionPage( page ) )
-        {
-            updatePage( command, page );
-            refreshPageComponents();
-        } else if ( forceRefresh ) {
-            refreshPageComponents();
-        }
+    function linkNavigate() {
+        navigate( this.href.substring(this.href.indexOf('#') + 1) );
     }
 
     function translate( )
@@ -345,6 +361,7 @@ jQuery(document).ready(function()
             });
     }
 
+    function disabled() { return false; }
 
     /**
      * Main
@@ -353,6 +370,7 @@ jQuery(document).ready(function()
 	var proxyContextUrl = "surface/proxy/accesspoints/"
 	var contextUrl = "surface/surface/accesspoints/";
 	var caseUrl = "";
+    var currentPage;
 	$('#app').empty();
 	$('#components').hide().load('components.html', function() {
         translate( );
@@ -370,27 +388,18 @@ jQuery(document).ready(function()
     /**
      * Listeners
      */
-    $('#login_enduser_operation').live('click', function() { login(); });
+    $('#login_enduser_operation').live('click', function() { login(); } );
+    $('#form_submit_true').live('click',        function() { submitAndSend(); } );
+    $('#form_page_discard').live('click',       function() { discard(); } );
 
-    $('#form_page_previous_true').live('click', function() {
-        if (!firstPage()) changePage('previouspage.json', parseInt(formSubmissionValue['currentPage'])-1, false)
-    });
+    $('#form_page_previous_true').live('click', linkNavigate );
+    $('#form_page_next_true').live('click',     linkNavigate );
+    $('#goto_form_page').live('click',          linkNavigate );
+    $('#form_summary').live('click',            linkNavigate );
+    $('#form_sign_true').live('click',          linkNavigate );
 
-    $('#form_page_previous_false').live('click', function() { return false; });
-
-    $('#form_page_next_true').live('click', function() {
-        if (!lastPage()) changePage('nextpage.json', parseInt(formSubmissionValue['currentPage'])+1, false)
-    });
-
-    $('#form_page_next_false').live('click', function() { return false; });
-
-    $('#goto_form_page').live('click', function() { changePage('summary/gotopage.json', $(this).attr('accesskey'), true) });
-
-    $('#form_page_discard').live('click', function() { discard(); });
-
-    $('#form_summary').live('click', function() { setupFormSummary(); });
-
-    $('#form_submit_true').live('click', function() { submitAndSend(); });
-
-    $('#form_submit_false').live('click', function() {return false; });
+    $('#form_page_previous_false').live('click', disabled );
+    $('#form_page_next_false').live('click',     disabled );
+    $('#form_submit_false').live('click',        disabled );
+    $('#form_sign_false').live('click',          disabled );
 })

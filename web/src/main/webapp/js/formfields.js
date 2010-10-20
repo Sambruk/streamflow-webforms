@@ -376,7 +376,7 @@ function setupFormSummary() {
 
     $.each(formSubmissionValue.pages, function(idx, page){
         var pageDiv = $('#form_page_summary').clone().attr('id', 'page'+idx);
-        pageDiv.find('h3').append( $('#goto_form_page').clone().attr('accesskey', idx).text(page.title) );
+        pageDiv.find('h3').append( $('#goto_form_page').clone().attr('href', '#'+idx).text(page.title) );
         var ul = pageDiv.find('ul');
         $.each( page.fields, function( fieldIdx, field ){
             FieldTypeModule.displayReadOnlyField( field, ul );
