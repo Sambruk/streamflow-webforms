@@ -253,17 +253,25 @@ jQuery(document).ready(function()
             formFillingDiv.find('#form_description').text(formSubmissionValue.description);
             $('#app').empty().append( formFillingDiv );
 
-            $('#form_page_previous_'+(!firstPage())).clone().attr('href','#'+(currentPage-1)).appendTo('#form_buttons_div');
-            $('#form_page_next_'+(!lastPage())).clone().attr('href','#'+(currentPage+1)).appendTo('#form_buttons_div');
-
-            $('#form_page_discard').clone().appendTo('#form_buttons_div');
-            $('#form_summary').clone().appendTo('#form_buttons_div');
+            createButton(firstPage, 'previous', '#'+(currentPage-1) ).appendTo('#form_buttons_div');
+            createButton(lastPage, 'next', '#'+(currentPage+1) ).appendTo('#form_buttons_div');
+            createButton(alwaysFalse, 'discard', '#').appendTo('#form_buttons_div');
+            createButton(alwaysFalse, 'summary', '#summary' ).appendTo('#form_buttons_div');
 
             var pages = formSubmissionValue['pages'];
             insertPageOverview( pages );
             $.each( pages[ currentPage ].fields, function(idx, field){
                 FieldTypeModule.render( field );
             });
+        }
+    }
+
+    function createButton( disabledFunction, name, href ) {
+        if ( disabledFunction() ) {
+            var img = $('#'+name).clone().fadeTo(0, 0.4);
+            return $('#link').clone().attr({id:"disabled","class":"disabledbutton"}).append( img ).append( texts[ name ] );
+        } else {
+            return $('#link').clone().attr({id:name+'_page', href:href}).append( $('#'+name).clone() ).append( texts[ name ] );
         }
     }
 
@@ -361,7 +369,39 @@ jQuery(document).ready(function()
             });
     }
 
-    function disabled() { return false; }
+    function alwaysFalse() { return false; }
+
+    function setupFormSummary() {
+        var errorString = "";
+        var summaryDiv = $('#form_summary_div').clone().attr({'id':'inserted_form_summary_div'});
+        summaryDiv.find('#form_description').text( formSubmissionValue.description );
+        $('#app').empty().append( summaryDiv );
+
+        $.each(formSubmissionValue.pages, function(idx, page){
+            var pageDiv = $('#form_page_summary').clone().attr('id', 'page'+idx);
+            pageDiv.find('h3').append( $('#goto_page').clone().attr('href','#'+idx).text(page.title) );
+            var ul = pageDiv.find('ul');
+            $.each( page.fields, function( fieldIdx, field ){
+                FieldTypeModule.displayReadOnlyField( field, ul );
+                if ( field.field.mandatory && !field.value) {
+                    errorString += texts.missingfield + " '"+field.field.description+"' <br>";
+                }
+            });
+            $('#form_pages_summary').append( pageDiv );
+        });
+        var missingFields = function() { return (errorString!="") }
+        var button;
+        if ( formRequiresSignatures() ) {
+            button = createButton( missingFields, 'signature', '#');
+        } else {
+            button = createButton( missingFields, 'submit', '#');
+        }
+
+        $('#form_submission_status').append( button );
+        if ( missingFields() ) {
+            button.aToolTip({ tipContent: errorString });
+        }
+    }
 
     /**
      * Main
@@ -388,18 +428,15 @@ jQuery(document).ready(function()
     /**
      * Listeners
      */
-    $('#login_enduser_operation').live('click', function() { login(); } );
-    $('#form_submit_true').live('click',        function() { submitAndSend(); } );
-    $('#form_page_discard').live('click',       function() { discard(); } );
+    $('#login_enduser_operation').live('click', login );
+    $('#submit_page').live('click',             submitAndSend );
+    $('#discard_page').live('click',            discard );
 
-    $('#form_page_previous_true').live('click', linkNavigate );
-    $('#form_page_next_true').live('click',     linkNavigate );
-    $('#goto_form_page').live('click',          linkNavigate );
-    $('#form_summary').live('click',            linkNavigate );
-    $('#form_sign_true').live('click',          linkNavigate );
+    $('#previous_page').live('click',  linkNavigate );
+    $('#next_page').live('click',      linkNavigate );
+    $('#goto_page').live('click',      linkNavigate );
+    $('#summary_page').live('click',   linkNavigate );
+    $('#signature_page').live('click', linkNavigate );
 
-    $('#form_page_previous_false').live('click', disabled );
-    $('#form_page_next_false').live('click',     disabled );
-    $('#form_submit_false').live('click',        disabled );
-    $('#form_sign_false').live('click',          disabled );
+    $('#disabled').live('click', alwaysFalse );
 })

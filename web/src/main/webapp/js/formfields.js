@@ -54,7 +54,7 @@ var FieldTypeModule = (function() {
         
         field.find('div.fieldname > label').text( fieldDefinition.name );
         showHint( fieldDefinition, field );
-        showMandatory( fieldDefinition, field );
+        showMandatory( fieldDefinition.field, field );
         showToolTip( fieldDefinition, field );
         field.find('div.fieldvalue').append( fieldDefinition.node );
 
@@ -68,7 +68,7 @@ var FieldTypeModule = (function() {
 
 
     function showMandatory( fieldDefinition, node ) {
-        if ( !fieldDefinition.field.field.mandatory )
+        if ( !fieldDefinition.field.mandatory )
         {
             node.find('#mandatory').hide();
         }
@@ -367,35 +367,3 @@ var FieldTypeModule = (function() {
     return inner;
 }());
 
-
-function setupFormSummary() {
-    var missingFields = "";
-    var summaryDiv = $('#form_summary_div').clone().attr({'id':'inserted_form_summary_div'});
-    summaryDiv.find('#form_description').text( formSubmissionValue.description );
-    $('#app').empty().append( summaryDiv );
-
-    $.each(formSubmissionValue.pages, function(idx, page){
-        var pageDiv = $('#form_page_summary').clone().attr('id', 'page'+idx);
-        pageDiv.find('h3').append( $('#goto_form_page').clone().attr('href', '#'+idx).text(page.title) );
-        var ul = pageDiv.find('ul');
-        $.each( page.fields, function( fieldIdx, field ){
-            FieldTypeModule.displayReadOnlyField( field, ul );
-            if ( field.field.mandatory && !field.value) {
-                missingFields += texts.missingfield + " '"+field.field.description+"' <br>";
-            }
-        });
-        $('#form_pages_summary').append( pageDiv );
-    });
-    var formFilledIn = (missingFields == "");
-    var button;
-    if ( formRequiresSignatures() ) {
-        button = $('#form_sign_'+formFilledIn).clone();
-    } else {
-        button = $('#form_submit_'+formFilledIn).clone();
-    }
-
-    $('#form_submission_status').append( button );
-    if ( !formFilledIn ) {
-        button.aToolTip({ tipContent: missingFields });
-    }
-}

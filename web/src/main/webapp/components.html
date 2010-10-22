@@ -34,45 +34,15 @@
     <div id="form_buttons_div"></div>
 </div>
 
-<a href="#" id="form_page_previous_true" class="button">
-    <img src="images/buttons/arrow_left.png" alt=""/> $previous
-</a>
+<a id="link" href="#" class="button"></a>
+<a id="goto_page" href="#"></a>
 
-<a href="#" id="form_page_previous_false" class="disabledbutton">
-    <img src="images/buttons/arrow_left_disabled.png" alt=""/> $previous
-</a>
-
-<a href="#" id="form_page_next_true" class="button">
-    <img src="images/buttons/arrow_right.png" alt=""/> $next
-</a>
-
-<a href="#" id="form_page_next_false" class="disabledbutton">
-    <img src="images/buttons/arrow_right_disabled.png" alt=""/> $next
-</a>
-
-<a href="#" id="form_page_discard" class="button">
-    <img src="images/buttons/cross.png" alt=""/> $discard
-</a>
-
-<a href="#summary" id="form_summary" class="button">
-    <img src="images/buttons/sum.png" alt=""/> $summary
-</a>
-
-<a href="#" id="form_submit_true" class="button">
-    <img src="images/buttons/tick.png" alt=""/> $submit
-</a>
-
-<a href="#" id="form_submit_false" class="disabledbutton">
-    <img src="images/buttons/tick.png" alt=""/> $submit
-</a>
-
-<a href="#signature" id="form_sign_true" class="button">
-    <img src="images/buttons/edit.png" alt=""/> $sign
-</a>
-
-<a href="#" id="form_sign_false" class="disabledbutton">
-    <img src="images/buttons/edit.png" alt=""/> $sign
-</a>
+<img id="previous" src="images/buttons/arrow_left.png" alt=""/>
+<img id="next" src="images/buttons/arrow_right.png" alt=""/>
+<img id="discard" src="images/buttons/cross.png" alt=""/>
+<img id="summary" src="images/buttons/sum.png" alt=""/>
+<img id="signature" src="images/buttons/edit.png" alt=""/>
+<img id="submit" src="images/buttons/tick.png" alt=""/>
 
 <div id="form_summary_div">
     <h2 id="form_description"></h2>
@@ -144,7 +114,7 @@
 <select id="ComboBoxFieldValue" onchange="javascript:updateFieldValue(name, value);">
 </select>
 
-<a id="goto_form_page" href="#" accesskey=""></a>
+
 <li id="field_summary"><b></b><font id="mandatory" color="red">*</font>:</li>
 
 <font id="ErrorMessage" color="red"></font>
