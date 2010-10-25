@@ -253,10 +253,10 @@ jQuery(document).ready(function()
             formFillingDiv.find('#form_description').text(formSubmissionValue.description);
             $('#app').empty().append( formFillingDiv );
 
-            createButton(firstPage, 'previous', '#'+(currentPage-1) ).appendTo('#form_buttons_div');
-            createButton(lastPage, 'next', '#'+(currentPage+1) ).appendTo('#form_buttons_div');
-            createButton(alwaysFalse, 'discard', '#').appendTo('#form_buttons_div');
-            createButton(alwaysFalse, 'summary', '#summary' ).appendTo('#form_buttons_div');
+            createButton('previous', '#'+(currentPage-1), firstPage ).appendTo('#form_buttons_div');
+            createButton('next', '#'+(currentPage+1), lastPage ).appendTo('#form_buttons_div');
+            createButton('discard', '#').appendTo('#form_buttons_div');
+            createButton('summary', '#summary' ).appendTo('#form_buttons_div');
 
             var pages = formSubmissionValue['pages'];
             insertPageOverview( pages );
@@ -266,12 +266,14 @@ jQuery(document).ready(function()
         }
     }
 
-    function createButton( disabledFunction, name, href ) {
-        if ( disabledFunction() ) {
+    function createButton( name, href, disabledFunction ) {
+        if ( !disabledFunction || !disabledFunction() ) {
+            // disabledFunction: is not defined or is defined and returns false
+            // => render the enabled button
+            return $('#link').clone().attr({id:name+'_page', href:href}).append( $('#'+name).clone() ).append( texts[ name ] );
+        } else {
             var img = $('#'+name).clone().fadeTo(0, 0.4);
             return $('#link').clone().attr({id:"disabled","class":"disabledbutton"}).append( img ).append( texts[ name ] );
-        } else {
-            return $('#link').clone().attr({id:name+'_page', href:href}).append( $('#'+name).clone() ).append( texts[ name ] );
         }
     }
 
@@ -289,7 +291,7 @@ jQuery(document).ready(function()
         });
     }
 
-    function setupFormSigning() {
+    function formSigning() {
         var url = eidProxyUrl + 'sign/providers.json';
 
         $.ajax({
@@ -304,10 +306,33 @@ jQuery(document).ready(function()
                 });
                 var div = $('#form_signing_div').clone();
                 div.find('#signing_providers').append( node );
+                div.append( createButton( 'signature', '#signature') );
                 $('#app').empty().append( div );
             },
             error: errorPopup
         })
+    }
+
+    function requiredSignaturesPage() {
+        if ( formSignaturesValue == "" ) {
+            if ( !formRequiresSignatures() ) {
+                // form does not require signatures
+                // redirect to summary page
+                navigate('summary');
+            }
+        }
+        var requiredSignatures = $('#required_signatures_div').clone();
+        var list = requiredSignatures.find('#required_signatures_list').append( $('<ul />') );
+
+        $.each( formSignaturesValue, function(idx, signature) {
+            var link = $('#link').clone().attr('id','signing_page').text( signature.name );
+            list.append( $('<li />').append( link ) );
+        });
+
+        requiredSignatures.append( createButton( 'summary', '#summary' ) );
+        // check number of signatures on form with number of required
+        requiredSignatures.append( createButton( 'submit', '#', function() {return true;}) );
+        $('#app').empty().append( requiredSignatures );
     }
 
     function setupFormSignaturesValue() {
@@ -317,7 +342,7 @@ jQuery(document).ready(function()
             cache: false,
             async: false,
             success: function( data ) {
-                formSignaturesValue = data;
+                formSignaturesValue = data.signatures;
             },
             error: errorPopup
         });
@@ -325,7 +350,7 @@ jQuery(document).ready(function()
 
     formRequiresSignatures = function() {
         setupFormSignaturesValue();
-        return formSignaturesValue.signatures.length != 0
+        return formSignaturesValue.length != 0
     }
 
     function navigate( newPage ) {
@@ -334,7 +359,7 @@ jQuery(document).ready(function()
                 setupFormSummary();
                 break;
             case 'signature':
-                setupFormSigning();
+                requiredSignaturesPage();
                 break;
             default:
                 var page = parseInt( newPage );
@@ -394,9 +419,9 @@ jQuery(document).ready(function()
         var missingFields = function() { return (errorString!="") }
         var button;
         if ( formRequiresSignatures() ) {
-            button = createButton( missingFields, 'signature', '#signature');
+            button = createButton( 'signature', '#signature', missingFields);
         } else {
-            button = createButton( missingFields, 'submit', '#');
+            button = createButton( 'submit', '#', missingFields);
         }
 
         $('#form_submission_status').append( button );
@@ -434,6 +459,7 @@ jQuery(document).ready(function()
     $('#login_enduser_operation').live('click', login );
     $('#submit_page').live('click',             submitAndSend );
     $('#discard_page').live('click',            discard );
+    $('#signing_page').live('click',            formSigning)
 
     $('#previous_page').live('click',  linkNavigate );
     $('#next_page').live('click',      linkNavigate );
