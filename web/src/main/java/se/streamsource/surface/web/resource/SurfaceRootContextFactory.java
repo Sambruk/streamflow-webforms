@@ -18,10 +18,8 @@
 package se.streamsource.surface.web.resource;
 
 import org.qi4j.api.composite.TransientBuilderFactory;
-import org.qi4j.api.configuration.Configuration;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Structure;
-import org.qi4j.api.injection.scope.This;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.ChallengeResponse;
@@ -31,11 +29,8 @@ import org.restlet.routing.Filter;
 import se.streamsource.dci.api.RoleMap;
 import se.streamsource.dci.restlet.server.RootContextFactory;
 import se.streamsource.surface.web.context.RootContext;
-import se.streamsource.dci.api.Context;
 import se.streamsource.surface.web.proxy.ProxyConfiguration;
 import se.streamsource.surface.web.proxy.ProxyService;
-
-import java.util.ResourceBundle;
 
 /**
  */
@@ -53,7 +48,7 @@ public class SurfaceRootContextFactory
    {
       ProxyConfiguration config = (ProxyConfiguration) proxyService.configuration();
 
-      streamflowReference = new Reference( config.server().get() );
+      streamflowReference = new Reference( config.url().get() );
       streamflowReference.setPath( "/streamflow" );
       ChallengeResponse challengeResponse = new ChallengeResponse( ChallengeScheme.HTTP_BASIC, config.username().get(), config.password().get() );
 

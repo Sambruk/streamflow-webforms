@@ -59,13 +59,12 @@ public interface ProxyService
 
       @This
       Configuration<ProxyConfiguration> config;
-      public Reference streamflowRef;
+      public Reference proxyRef;
       public ChallengeResponse challengeResponse;
 
       public void activate() throws Exception
       {
-         streamflowRef = new Reference(config.configuration().server().get());
-         streamflowRef.setPath( "/streamflow/surface" );
+         proxyRef = new Reference(config.configuration().url().get());
          challengeResponse = new ChallengeResponse( ChallengeScheme.HTTP_BASIC, config.configuration().username().get(), config.configuration().password().get() );
       }
 
@@ -78,9 +77,9 @@ public interface ProxyService
          Reference ref = request.getResourceRef();
          String remaining = ref.getRemainingPart();
 
-         Reference streamflowReference = new Reference( streamflowRef.toString()+remaining );
+         Reference proxyReference = new Reference( proxyRef.toString()+remaining );
 
-         ClientResource client = new ClientResource( streamflowReference );
+         ClientResource client = new ClientResource( proxyReference );
          client.setClientInfo( request.getClientInfo() );
          client.setNext( this.client );
          client.setChallengeResponse( challengeResponse );

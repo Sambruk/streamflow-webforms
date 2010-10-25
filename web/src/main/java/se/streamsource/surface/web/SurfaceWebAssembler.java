@@ -124,7 +124,8 @@ public class SurfaceWebAssembler
    {
       ModuleAssembly proxyModule = appLayer.moduleAssembly( "Proxy" );
 
-      proxyModule.addServices( ProxyService.class ).visibleIn( Visibility.application ).instantiateOnStartup();
+      proxyModule.addServices( ProxyService.class ).visibleIn( Visibility.application ).identifiedBy( "streamflowproxy" ).instantiateOnStartup();
+      proxyModule.addServices( ProxyService.class ).visibleIn( Visibility.application ).identifiedBy( "eidproxy" ).instantiateOnStartup();
       proxyModule.importServices( Client.class ).visibleIn( Visibility.application );
 
       // TODO This should be in its own module (layer?)

@@ -290,21 +290,23 @@ jQuery(document).ready(function()
     }
 
     function setupFormSigning() {
-        // get list of providers show them in a dropdown
-        //var url = "https://175.145.48.194:8443/eid/sign/";
-        var url = proxyContextUrl + 'signing/providers.json';
+        var url = eidProxyUrl + 'sign/providers.json';
 
         $.ajax({
             url: url,
             type: 'GET',
             cache: false,
             success: function ( data ) {
-                var node = $('<option />');
+                var node = $('<select />');
+                node.append( $('<option />') );
                 $.each( data.links, function(idx, link ) {
                     node.append( $('<option />').attr({value: link.href, id: 'idProvider_'+idx}).text( link.text ) );
                 });
-                $('#app').empty().append();
-            }
+                var div = $('#form_signing_div').clone();
+                div.find('#signing_providers').append( node );
+                $('#app').empty().append( div );
+            },
+            error: errorPopup
         })
     }
 
@@ -392,7 +394,7 @@ jQuery(document).ready(function()
         var missingFields = function() { return (errorString!="") }
         var button;
         if ( formRequiresSignatures() ) {
-            button = createButton( missingFields, 'signature', '#');
+            button = createButton( missingFields, 'signature', '#signature');
         } else {
             button = createButton( missingFields, 'submit', '#');
         }
@@ -409,6 +411,7 @@ jQuery(document).ready(function()
     var accesspoint = window.top.location.search.split('=')[1];
 	var proxyContextUrl = "surface/proxy/accesspoints/"
 	var contextUrl = "surface/surface/accesspoints/";
+	var eidProxyUrl = "surface/eidproxy/";
 	var caseUrl = "";
     var currentPage;
 	$('#app').empty();

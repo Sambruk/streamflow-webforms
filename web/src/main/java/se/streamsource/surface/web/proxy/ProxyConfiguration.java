@@ -26,7 +26,7 @@ import org.qi4j.api.property.Property;
 public interface ProxyConfiguration
    extends ConfigurationComposite
 {
-   Property<String> server();
+   Property<String> url();
    Property<String> username();
    Property<String> password();
 }

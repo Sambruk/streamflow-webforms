@@ -18,40 +18,21 @@
 package se.streamsource.surface.web.rest;
 
 import org.qi4j.api.injection.scope.Service;
-import org.restlet.Client;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
-import org.restlet.Uniform;
-import org.restlet.data.ChallengeResponse;
-import org.restlet.data.ChallengeScheme;
-import org.restlet.data.ClientInfo;
-import org.restlet.data.MediaType;
-import org.restlet.data.Preference;
-import org.restlet.data.Reference;
-import org.restlet.data.Status;
-import org.restlet.engine.io.BioUtils;
-import org.restlet.representation.InputRepresentation;
-import org.restlet.representation.Representation;
-import org.restlet.resource.ClientResource;
-import org.restlet.resource.ResourceException;
 import se.streamsource.surface.web.proxy.ProxyService;
-import se.streamsource.surface.web.resource.SurfaceRootContextFactory;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.ResourceBundle;
+import se.streamsource.surface.web.qualifier.IdentifiedBy;
 
 /**
  * Simple Restlet that delegates to the ProxyService.
  *
  */
-public class ProxyRestlet
+public class StreamflowProxyRestlet
    extends Restlet
 {
    @Service
+   @IdentifiedBy( "streamflowproxy" )
    ProxyService proxyService;
 
    @Override

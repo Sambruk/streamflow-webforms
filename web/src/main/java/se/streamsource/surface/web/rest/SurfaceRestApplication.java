@@ -83,7 +83,9 @@ public class SurfaceRestApplication
       Router router = new Router();
 
       Restlet cqr = factory.newObjectBuilder( CommandQueryRestlet.class ).use( getContext() ).newInstance();
-      ProxyRestlet proxyRestlet = factory.newObject( ProxyRestlet.class );
+      StreamflowProxyRestlet proxyRestlet = factory.newObject( StreamflowProxyRestlet.class );
+      EidProxyRestlet eidProxyRestlet = factory.newObject( EidProxyRestlet.class );
+      router.attach( "/eidproxy", eidProxyRestlet, Template.MODE_STARTS_WITH );
       router.attach( "/proxy", proxyRestlet, Template.MODE_STARTS_WITH );
       router.attach( "/surface", cqr, Template.MODE_STARTS_WITH );
       router.attach("/texts", new TextsRestlet());
