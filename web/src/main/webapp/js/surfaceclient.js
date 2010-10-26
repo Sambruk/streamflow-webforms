@@ -93,7 +93,7 @@ jQuery(document).ready(function()
                         cache: false,
                         type: 'GET',
                         success: function( data ) {
-                            formSubmissionValue = data;
+                            formDraft = data;
                             navigate( window.top.location.hash.substring(1) );
                             result = true;
                         }
@@ -121,7 +121,7 @@ jQuery(document).ready(function()
                     } else if ( event.name == "changedFormDraft" )
                     {
                         proxyContextUrl += '/formdrafts/' + event.entity + '/';
-                        formSubmissionValue = $.parseJSON($.parseJSON(event.parameters)['param1']);
+                        formDraft = $.parseJSON($.parseJSON(event.parameters)['param1']);
                         navigate( window.top.location.hash.substring(1) );
                     }
                 });
@@ -144,11 +144,16 @@ jQuery(document).ready(function()
             data: fieldDTO,
             type: 'PUT',
             success: function(data) {
-                successfulUpdate = updateFormSubmissionValue( data );
-                var pages = formSubmissionValue['pages'];
-                var page = pages[ currentPage ];
-                $.each( page.fields, function(idx, field){
-                    FieldTypeModule.setFieldValue( field.field.field, (field.value == null ? "" : field.value) );
+                $.each( data.events, function( idx, event) {
+                    if ( event.name == "changedFieldValue" ) {
+                        var fieldId = $.parseJSON(event.parameters)['param1'];
+                        var fieldValue = $.parseJSON(event.parameters)['param2'];
+
+                        var onPage = updateFormDraftField( fieldId, fieldValue );
+                        if ( onPage == currentPage) {
+                            FieldTypeModule.setFieldValue( fieldId, fieldValue );
+                        }
+                    }
                 });
             },
             error: errorPopup
@@ -172,7 +177,7 @@ jQuery(document).ready(function()
                 if ( typeof( caseId )!="undefined") {
                     message.append( '<br/> ' + texts.caseidmessage + ' ' + caseId );                    
                 }
-                var url = caseUrl +'/submittedforms/'+formSubmissionValue.form + '/generateformaspdf';
+                var url = caseUrl +'/submittedforms/'+formDraft.form + '/generateformaspdf';
                 var print_node = $('#print').clone();
                 var print_url = print_node.find("#print_link").attr("href", url );
                 print_node.appendTo(node);
@@ -215,20 +220,22 @@ jQuery(document).ready(function()
     /**
      * Functions that manipulates the DOM
      */
-    function updateFormSubmissionValue( data ) {
-        var updated = false;
-        $.each( data.events, function(idx, event){
-            if ( event.name == "changedFormDraft" ) {
-                formSubmissionValue = $.parseJSON($.parseJSON(event.parameters)['param1']);
-                updated = true;
-            }
+    function updateFormDraftField( fieldId, fieldValue ) {
+        var pageNumber = -1;
+        $.each( formDraft.pages, function(idx, page) {
+            $.each( page.fields, function(fieldIdx, field) {
+                if ( field.field.field == fieldId ) {
+                    field.value = fieldValue;
+                    pageNumber = idx;
+                }
+            });
         });
-        return updated;
+        return pageNumber;
     }
 
 
     function lastPage() {
-        var pages = formSubmissionValue['pages'].length;
+        var pages = formDraft['pages'].length;
         return (currentPage == pages -1);
     }
 
@@ -239,18 +246,18 @@ jQuery(document).ready(function()
     function inferPage( page ) {
         if ( isNaN(page) ) return 0;
         if ( page < 0 ) return 0;
-        var pages = formSubmissionValue['pages'].length;
+        var pages = formDraft['pages'].length;
         if ( page >= pages ) return pages-1;
         return page;
     }
 
-    // Based on the formSubmissionValue
+    // Based on the formDraft
     // the current page is updated
     function refreshPageComponents() {
-        if ( formSubmissionValue != null )
+        if ( formDraft != null )
         {
             var formFillingDiv = $('#form_filling_div').clone().attr({'id':'inserted_form_filling_div'});
-            formFillingDiv.find('#form_description').text(formSubmissionValue.description);
+            formFillingDiv.find('#form_description').text( formDraft.description);
             $('#app').empty().append( formFillingDiv );
 
             createButton('previous', '#'+(currentPage-1), firstPage ).appendTo('#form_buttons_div');
@@ -258,7 +265,7 @@ jQuery(document).ready(function()
             createButton('discard', '#').appendTo('#form_buttons_div');
             createButton('summary', '#summary' ).appendTo('#form_buttons_div');
 
-            var pages = formSubmissionValue['pages'];
+            var pages = formDraft['pages'];
             insertPageOverview( pages );
             $.each( pages[ currentPage ].fields, function(idx, field){
                 FieldTypeModule.render( field );
@@ -314,17 +321,15 @@ jQuery(document).ready(function()
     }
 
     function requiredSignaturesPage() {
-        if ( formSignaturesValue == "" ) {
-            if ( !formRequiresSignatures() ) {
-                // form does not require signatures
-                // redirect to summary page
-                navigate('summary');
-            }
+        if ( !formRequiresSignatures() ) {
+            // form does not require signatures
+            // redirect to summary page
+            navigate('summary');
         }
         var requiredSignatures = $('#required_signatures_div').clone();
         var list = requiredSignatures.find('#required_signatures_list').append( $('<ul />') );
 
-        $.each( formSignaturesValue, function(idx, signature) {
+        $.each( formSignatures, function(idx, signature) {
             var link = $('#link').clone().attr('id','signing_page').text( signature.name );
             list.append( $('<li />').append( link ) );
         });
@@ -335,22 +340,24 @@ jQuery(document).ready(function()
         $('#app').empty().append( requiredSignatures );
     }
 
-    function setupFormSignaturesValue() {
+    function setupFormSignatures() {
         $.ajax({
             url: proxyContextUrl + 'summary/signatures.json',
             type: 'GET',
             cache: false,
             async: false,
             success: function( data ) {
-                formSignaturesValue = data.signatures;
+                formSignatures = data.signatures;
             },
             error: errorPopup
         });
     }
 
     formRequiresSignatures = function() {
-        setupFormSignaturesValue();
-        return formSignaturesValue.length != 0
+        if ( formSignatures == "" ) {
+            setupFormSignatures();
+        }
+        return formSignatures.length != 0
     }
 
     function navigate( newPage ) {
@@ -401,10 +408,10 @@ jQuery(document).ready(function()
     function setupFormSummary() {
         var errorString = "";
         var summaryDiv = $('#form_summary_div').clone().attr({'id':'inserted_form_summary_div'});
-        summaryDiv.find('#form_description').text( formSubmissionValue.description );
+        summaryDiv.find('#form_description').text( formDraft.description );
         $('#app').empty().append( summaryDiv );
 
-        $.each(formSubmissionValue.pages, function(idx, page){
+        $.each(formDraft.pages, function(idx, page){
             var pageDiv = $('#form_page_summary').clone().attr('id', 'page'+idx);
             pageDiv.find('h3').append( $('#goto_page').clone().attr('href','#'+idx).text(page.title) );
             var ul = pageDiv.find('ul');
@@ -438,7 +445,9 @@ jQuery(document).ready(function()
 	var contextUrl = "surface/surface/accesspoints/";
 	var eidProxyUrl = "surface/eidproxy/";
 	var caseUrl = "";
+	var formDraft;
     var currentPage;
+    var formSignatures = "";
 	$('#app').empty();
 	$('#components').hide().load('components.html', function() {
         translate( );

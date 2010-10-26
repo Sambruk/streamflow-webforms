@@ -19,8 +19,6 @@
  * Methods handling inserting/updating form fields
  */
 var missingFields = "";
-var formSubmissionValue;
-var formSignaturesValue = "";
 var nameMap = {Possible:'Selected', Selected:'Possible'};
 
 selectOpenSelectChanged = function(fieldName) {
