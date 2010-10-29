@@ -484,9 +484,9 @@ jQuery(document).ready(function()
      * Main
      */
     var accesspoint = window.top.location.search.split('=')[1];
-	var proxyContextUrl = "surface/proxy/accesspoints/"
-	var contextUrl = "surface/surface/accesspoints/";
-	var eidProxyUrl = "surface/eidproxy/";
+	var proxyContextUrl = "proxy/accesspoints/"
+	var contextUrl = "surface/accesspoints/";
+	var eidProxyUrl = "eidproxy/";
 	var caseUrl = "";
 	var formDraft;
     var currentPage;
@@ -494,7 +494,7 @@ jQuery(document).ready(function()
     var lastUpdatedHash = "";
     var eIdProviders = "";
 	$('#app').empty();
-	$('#components').hide().load('components.html', function() {
+	$('#components').hide().load('static/components.html', function() {
         translate( );
         if ( !accesspoint )
         {

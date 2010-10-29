@@ -16,7 +16,7 @@ a.aToolTipCloseBtn {
 	display:block;
 	height:18px;
 	width:18px;
-	background:url(../images/closeBtn.png) no-repeat;
+	background:url(../static/images/closeBtn.png) no-repeat;
 	text-indent:-9999px;
 	outline:none;
 	position:absolute;

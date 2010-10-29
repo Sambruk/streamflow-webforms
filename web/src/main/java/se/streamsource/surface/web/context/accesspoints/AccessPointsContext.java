@@ -55,7 +55,7 @@ public interface AccessPointsContext
             for (LinkValue linkValue : linksValue.links().get())
             {
                linkBuilder.withPrototype( linkValue );
-               linkBuilder.prototype().href().set( "../../../?ap="+linkValue.id().get() );
+               linkBuilder.prototype().href().set( "../../?ap="+linkValue.id().get() );
                builder.addLink( linkBuilder.newInstance() );
             }
 
