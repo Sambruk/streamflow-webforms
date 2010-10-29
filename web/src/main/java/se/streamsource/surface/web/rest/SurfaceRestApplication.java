@@ -29,6 +29,7 @@ import org.restlet.Context;
 import org.restlet.Restlet;
 import org.restlet.data.MediaType;
 import org.restlet.data.Protocol;
+import org.restlet.resource.Directory;
 import org.restlet.routing.Router;
 import org.restlet.routing.Template;
 import se.streamsource.dci.restlet.server.CommandQueryRestlet;
@@ -80,19 +81,21 @@ public class SurfaceRestApplication
    @Override
    public Restlet createInboundRoot()
    {
-      Router router = new Router();
+      Router surfaceRouter = new Router();
 
       Restlet cqr = factory.newObjectBuilder( CommandQueryRestlet.class ).use( getContext() ).newInstance();
       StreamflowProxyRestlet proxyRestlet = factory.newObject( StreamflowProxyRestlet.class );
       EidProxyRestlet eidProxyRestlet = factory.newObject( EidProxyRestlet.class );
-      router.attach( "/eidproxy", eidProxyRestlet, Template.MODE_STARTS_WITH );
-      router.attach( "/proxy", proxyRestlet, Template.MODE_STARTS_WITH );
-      router.attach( "/surface", cqr, Template.MODE_STARTS_WITH );
-      router.attach("/texts", new TextsRestlet());
+      surfaceRouter.attachDefault( new IndexRestlet() );
+      surfaceRouter.attach( "/eidproxy", eidProxyRestlet, Template.MODE_STARTS_WITH );
+      surfaceRouter.attach( "/proxy", proxyRestlet, Template.MODE_STARTS_WITH );
+      surfaceRouter.attach( "/surface", new ExtensionMediaTypeFilter( getContext(), cqr ), Template.MODE_STARTS_WITH );
+      surfaceRouter.attach( "/texts", new TextsRestlet());
+      surfaceRouter.attach( "/static", new Directory( getContext(), "clap://thread/files/" ) );
 
       getTunnelService().setLanguageParameter("locale");
 
-      return new ExtensionMediaTypeFilter( getContext(), router );
+      return surfaceRouter;
    }
 
 

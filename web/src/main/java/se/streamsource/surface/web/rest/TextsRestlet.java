@@ -61,7 +61,7 @@ public class TextsRestlet
       }
       jsonBuilder.append( "}" );
 
-      response.setEntity( new StringRepresentation(jsonBuilder, MediaType.APPLICATION_JSON, preferredLanguage, CharacterSet.UTF_8));
+      response.setEntity( new StringRepresentation(jsonBuilder, MediaType.APPLICATION_JAVASCRIPT, preferredLanguage, CharacterSet.UTF_8));
 
       response.setStatus( Status.SUCCESS_OK );
       request.release();

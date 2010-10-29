@@ -64,7 +64,7 @@ var FieldTypeModule = (function() {
 
     // internal function to display the field using the field template
     // and taking the fieldComponent.node as the input widget
-    function displayField( fieldDefinition ) {
+    function displayField( fieldDefinition, node ) {
         var field = $('#FormField').clone().attr('id', fieldDefinition.id);
         
         field.find('div.fieldname > label').text( fieldDefinition.name );
@@ -73,7 +73,7 @@ var FieldTypeModule = (function() {
         showToolTip( fieldDefinition, field );
         field.find('div.fieldvalue').append( fieldDefinition.node );
 
-        $('#form_table_body').append( field );
+        node.append( field );
     }
 
     function getFieldType( qualifiedField ) {
@@ -212,10 +212,10 @@ var FieldTypeModule = (function() {
             var textfield = $('#numberField'+this.id);
             var enteredValue = this.getFieldValue();
 
-            var result = updateFieldValue( this.id, enteredValue );
+            updateFieldValue( this.id, enteredValue );
 
             var updatedValue = this.getFieldValue();
-            if ( updatedValue != enteredValue && !result )
+            if ( updatedValue != enteredValue )
             {
                 this.setFieldValue( enteredValue );
                 var node = this.node;
@@ -312,21 +312,20 @@ var FieldTypeModule = (function() {
 
         this.updateServer = function() {
             var value = this.getFieldValue();
-            if ( !updateFieldValue(this.id, value ) ) {
-                var newValue = this.getFieldValue();
-                if ( newValue != value)
-                {
-                    this.setFieldValue(value);
-                    var node = this.node;
-                    setTimeout(function(){ node.focus(); node.select()}, 10);
-                    this.dirty = true;
-                    alert( texts.invalidformat );
-                }
+            updateFieldValue(this.id, value );
+            var newValue = this.getFieldValue();
+            if ( newValue != value)
+            {
+                this.setFieldValue(value);
+                var node = this.node;
+                setTimeout(function(){ node.focus(); node.select()}, 10);
+                this.dirty = true;
+                alert( texts.invalidformat );
             }
         }
     }
 
-    inner.render = function( field ) {
+    inner.render = function( field, node ) {
         var fieldType = getFieldType( field.field.fieldValue._type );
         var fieldTypeUI = eval( 'new '+fieldType + '(field)');
 
@@ -350,7 +349,7 @@ var FieldTypeModule = (function() {
         fieldTypeUI.dirty = false;
         fieldMap[ fieldTypeUI.id ] = fieldTypeUI;
 
-        displayField(fieldTypeUI);
+        displayField(fieldTypeUI, node);
         fieldTypeUI.setFieldValue( fieldTypeUI.value );
     }
 

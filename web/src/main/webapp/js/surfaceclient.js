@@ -24,43 +24,27 @@ jQuery(document).ready(function()
      * Functions that call StreamFlow
      */
     function verifyAccessPoint() {
-        var result = false;
-        $.ajax({
-            url: proxyContextUrl,
-            async: false,
-            type: 'GET',
-            success: function() {
-                result = true;
-            }
-        });
+        var result = true;
+        var parameters = request('GET', proxyContextUrl);
+        parameters.error = function() { result = false; };
+        $.ajax(parameters);
         return result;
     }
 
     function login() {
-        if ( verifyAccessPoint() )
-        {
+        if ( verifyAccessPoint() ) {
             var loggedIn = true;
-            $.ajax({
-                url: contextUrl + 'selectenduser.json',
-                async: false,
-                type: 'POST',
-                success: function(data, textStatus, XMLHttpRequest) {
-                    $.ajax({
-                        url: contextUrl + 'userreference.json',
-                        cache: false,
-                        async: false,
-                        success: function(data) {
-                            proxyContextUrl += data.entity + '/';
-                        },
-                        error: function() {
-                            loggedIn = false;
-                        }
-                    });
-                },
-                error: function() {
-                    loggedIn = false;
-                }
-            });
+            var parameters = request('POST', contextUrl + 'selectenduser.json');
+            parameters.success = function(data) {
+                var params = request('GET', contextUrl + 'userreference.json');
+                params.success = function(data) {
+                    proxyContextUrl += data.entity + '/';
+                };
+                params.error = function() { loggedIn = false; };
+                $.ajax(params);
+            };
+            parameters.error = function() { loggedIn = false; };
+            $.ajax(parameters);
             if ( loggedIn )
             {
                 if ( !queryCaseForm() )
@@ -68,157 +52,176 @@ jQuery(document).ready(function()
                     createCaseWithForm();
                 }
             } else {
-                $('#app').append( $('#ErrorMessage').clone().attr({id:'loginFailed'}).text( texts.loginfailed ) );
+                $('#app').append( clone('ErrorMessage').text( texts.loginfailed ) );
+                return false;
             }
         } else {
-            $('#app').append( $('#ErrorMessage').clone().attr({id:'illegalAccessPoint'}).text( texts.invalidaccesspoint ) );
+            $('#app').append( clone('ErrorMessage').text( texts.invalidaccesspoint ) );
+            return false;
         }
+        return true;
     }
 
     function queryCaseForm() {
         var result = false;
-        $.ajax({
-            url: proxyContextUrl + 'findcasewithform.json',
-            async: false,
-            cache: false,
-            type: 'GET',
-            success: function(data) {
-                if ( data.caze != null && data.caze != "" && data.form != null && data.form != "" )
+        var parameters = request('GET', proxyContextUrl + 'findcasewithform.json');
+        parameters.error = null;
+        parameters.success = function(data) {
+                if ( data.caze && data.form )
                 {
                     caseUrl = proxyContextUrl + data.caze;
                     proxyContextUrl += data.caze + '/formdrafts/' + data.form + '/';
-                    $.ajax({
-                        url: proxyContextUrl + 'index.json',
-                        async: false,
-                        cache: false,
-                        type: 'GET',
-                        success: function( data ) {
-                            formDraft = data;
-                            navigate( window.top.location.hash.substring(1) );
-                            result = true;
-                        }
-                    });
+                    var params = request('GET', proxyContextUrl + 'index.json');
+                    params.success = function( data ) {
+                                        formDraft = data;
+                                        result = true;
+                                     };
+                    $.ajax(params);
                 }
-            }
-        });
+             };
+        $.ajax(parameters);
         return result;
     }
 
+    function parseEvents( eventMap ) {
+        $.each( eventMap.events, function( idx, event){
+            if ( event.name == "createdCase")
+            {
+                var caseId = $.parseJSON(event.parameters)['param1'];
+                caseUrl = proxyContextUrl + caseId;
+                proxyContextUrl += caseId;
+            } else if ( event.name == "changedFormDraft" )
+            {
+                proxyContextUrl += '/formdrafts/' + event.entity + '/';
+                formDraft = $.parseJSON($.parseJSON(event.parameters)['param1']);
+            } else if ( event.name == "changedFieldValue" ) {
+                var fieldId = $.parseJSON(event.parameters)['param1'];
+                var fieldValue = $.parseJSON(event.parameters)['param2'];
 
-    function createCaseWithForm() {
-        $.ajax({
-            url: proxyContextUrl + 'createcasewithform.json',
-            async: false,
-            type: 'POST',
-            success: function(data) {
-                // get case id and formsubmision id and contruct url
-                $.each( data.events, function( idx, event){
-                    if ( event.name == "createdCase")
-                    {
-                        var caseId = $.parseJSON(event.parameters)['param1'];
-                        caseUrl = proxyContextUrl + caseId;
-                        proxyContextUrl += caseId;
-                    } else if ( event.name == "changedFormDraft" )
-                    {
-                        proxyContextUrl += '/formdrafts/' + event.entity + '/';
-                        formDraft = $.parseJSON($.parseJSON(event.parameters)['param1']);
-                        navigate( window.top.location.hash.substring(1) );
-                    }
-                });
-            },
-            error: errorPopup
+                var onPage = updateFormDraftField( fieldId, fieldValue );
+                if ( onPage == currentPage) {
+                    FieldTypeModule.setFieldValue( fieldId, fieldValue );
+                }
+            }
         });
     }
 
+    function createCaseWithForm() {
+        var parameters = request('POST', proxyContextUrl + 'createcasewithform.json');
+        parameters.success = parseEvents;
+        $.ajax(parameters);
+    }
+
     updateFieldValue = function(fieldId, fieldValue) {
-        var successfulUpdate = false;
         var image = $('#'+fieldId+' .fieldwaiting > img');
         image.show();
         var fieldDTO = {
             field: fieldId,
             value: fieldValue
         };
-        $.ajax({
-            url: proxyContextUrl + 'updatefield.json',
-            async: false,
-            data: fieldDTO,
-            type: 'PUT',
-            success: function(data) {
-                $.each( data.events, function( idx, event) {
-                    if ( event.name == "changedFieldValue" ) {
-                        var fieldId = $.parseJSON(event.parameters)['param1'];
-                        var fieldValue = $.parseJSON(event.parameters)['param2'];
 
-                        var onPage = updateFormDraftField( fieldId, fieldValue );
-                        if ( onPage == currentPage) {
-                            FieldTypeModule.setFieldValue( fieldId, fieldValue );
-                        }
-                    }
-                });
-            },
-            error: errorPopup
-        });
+        var parameters = request('PUT', proxyContextUrl + 'updatefield.json');
+        parameters.data = fieldDTO;
+        parameters.success = parseEvents;
+        $.ajax(parameters);
         image.hide();
-        return successfulUpdate;
     }
 
-    function submitAndSend()
-    {
-        $.ajax({
-            url: proxyContextUrl + 'summary/submitandsend.json',
-            type: 'POST',
-            success: function( ) {
-                var caseId = queryCaseInfo();
+    function submitAndSend() {
+        var parameters = request('POST', proxyContextUrl + 'summary/submitandsend.json');
+        parameters.success = function( ) {
+            var caseId = queryCaseInfo();
 
-                var node = $('#thank_you_div').clone();
-                var message = node.find('#end_message');
-                message.text(texts.formSubmittedThankYou);
+            var node = clone('thank_you_div');
+            var message = node.find('#end_message');
+            message.text(texts.formSubmittedThankYou);
 
-                if ( typeof( caseId )!="undefined") {
-                    message.append( '<br/> ' + texts.caseidmessage + ' ' + caseId );                    
-                }
-                var url = caseUrl +'/submittedforms/'+formDraft.form + '/generateformaspdf';
-                var print_node = $('#print').clone();
-                var print_url = print_node.find("#print_link").attr("href", url );
-                print_node.appendTo(node);
-
-                $('#app').empty().append( node );
-            },
-            error: errorPopup
-        });
-    }
-
-    function queryCaseInfo()
-    {
-        var caseId;
-        $.ajax({
-            url: caseUrl + '/index.json',
-            async: false,
-            cache: false,
-            type: 'GET',
-            success: function( data ) {
-                caseId = data.caseId;
+            if ( typeof( caseId )!="undefined") {
+                message.append( '<br/> ' + texts.caseidmessage + ' ' + caseId );
             }
-        });
+            var url = caseUrl +'/submittedforms/'+formDraft.form + '/generateformaspdf';
+            var print_node = clone('print');
+            var print_url = print_node.find("#print_link").attr("href", url );
+            print_node.appendTo(node);
+
+            $('#app').empty().append( node );
+        }
+        $.ajax(parameters);
+    }
+
+    function queryCaseInfo() {
+        var caseId;
+        var parameters = request('GET', caseUrl + '/index.json');
+        parameters.success = function( data ) {
+                caseId = data.caseId;
+            };
         return caseId;
     }
 
     function discard()
     {
-        $.ajax({
-            url: proxyContextUrl + 'discard.json',
-            type: 'POST',
-            success: function() {
-                var node = $('#thank_you_div').clone();
+        var parameters = request('POST', proxyContextUrl + 'discard.json');
+        parameters.success = function() {
+                var node = clone('thank_you_div');
                 node.find('#end_message').text( texts.formdiscarded );
                 $('#app').empty().append( node );
-            },
-            error: errorPopup
-        });
+            };
+        $.ajax(parameters);
+    }
+
+    function initiateSignature( provider ) {
+        var tbs = getFormTBS();
+
+        var signDTO = {
+            transactionId: formDraft.form,
+            tbs: tbs,
+            provider: provider,
+            successUrl: "#signsuccess",
+            errorUrl: "#signfailed"
+        };
+
+        var parameters = request('GET', eidProxyUrl + 'sign/sign.htm');
+        parameters.data = signDTO;
+        parameters.success = function ( htmlSnippet ) {
+                var array = $(htmlSnippet);
+                $.each(array, function(idx,element ) {
+                    switch (element.tagName) {
+                        case "SCRIPT":
+                            eval( element );
+                            break;
+                        case "FORM":
+                            $('#app').empty().append( element );
+                            break;
+                    }
+                });
+                //$('#app').empty().append( htmlSnippet );
+                //$('#app').empty().html( htmlSnippet );
+            };
+        $.ajax(parameters);
+    }
+
+    function getProviderList() {
+        //eIdProviders = {"links":[{"classes":"","href":"sign.htm?provider=ibm-cbt_25","id":"1","rel":"sign","text":"BankId"},{"classes":"","href":"sign.htm?provider=nexus-personal_4X","id":"6","rel":"sign","text":"Nexus Personal"}]};
+
+        var parameters = request('GET', eidProxyUrl + 'sign/providers.json');
+        parameters.success = function( data ) { eIdProviders = data; };
+        $.ajax(parameters);
+    }
+
+    function setupFormSignatures() {
+        var parameters = request('GET', proxyContextUrl + 'summary/signatures.json');
+        parameters.success = function( data ) {
+                formSignatures = data.signatures;
+            };
+        $.ajax(parameters);
+    }
+
+    function request(type, url) {
+        return {type:type, url:url, async:false, cache:false, error:errorPopup};
     }
 
     /**
-     * Functions that manipulates the DOM
+     * Helper functions
      */
     function updateFormDraftField( fieldId, fieldValue ) {
         var pageNumber = -1;
@@ -251,106 +254,113 @@ jQuery(document).ready(function()
         return page;
     }
 
+    function createButton( name, href, disabledFunction ) {
+        if ( !disabledFunction || !disabledFunction() ) {
+            // disabledFunction: is not defined or is defined and returns false
+            // => render the enabled button
+            var img = clone(name);
+            return clone('link', name+'_page').attr({'href':href,"class":"button"}).append( img ).append( texts[ name ] );
+        } else {
+            var img = clone(name).fadeTo(0, 0.4);
+            return clone('disabled').append( img ).append( texts[ name ] );
+        }
+    }
+
     // Based on the formDraft
     // the current page is updated
     function refreshPageComponents() {
         if ( formDraft != null )
         {
-            var formFillingDiv = $('#form_filling_div').clone().attr({'id':'inserted_form_filling_div'});
+            $('#app').empty();
+            var formFillingDiv = clone('form_filling_div');
             formFillingDiv.find('#form_description').text( formDraft.description);
-            $('#app').empty().append( formFillingDiv );
+            var toolbar = formFillingDiv.find('#form_buttons_div');
 
-            createButton('previous', '#'+(currentPage-1), firstPage ).appendTo('#form_buttons_div');
-            createButton('next', '#'+(currentPage+1), lastPage ).appendTo('#form_buttons_div');
-            createButton('discard', '#').appendTo('#form_buttons_div');
-            createButton('summary', '#summary' ).appendTo('#form_buttons_div');
+            toolbar.append( createButton('previous', '#'+(currentPage-1), firstPage ) );
+            toolbar.append( createButton('next', '#'+(currentPage+1), lastPage ) );
+            toolbar.append( createButton('discard', '#') );
+            toolbar.append( createButton('summary', '#summary' ) );
 
             var pages = formDraft['pages'];
-            insertPageOverview( pages );
+            insertPageOverview( pages, formFillingDiv.find('#form_pages') );
+            var fieldList = formFillingDiv.find('#form_table_body');
             $.each( pages[ currentPage ].fields, function(idx, field){
-                FieldTypeModule.render( field );
+                FieldTypeModule.render( field, fieldList );
             });
+            $('#app').append( formFillingDiv );
         }
     }
 
-    function createButton( name, href, disabledFunction ) {
-        if ( !disabledFunction || !disabledFunction() ) {
-            // disabledFunction: is not defined or is defined and returns false
-            // => render the enabled button
-            return $('#link').clone().attr({id:name+'_page', href:href}).append( $('#'+name).clone() ).append( texts[ name ] );
-        } else {
-            var img = $('#'+name).clone().fadeTo(0, 0.4);
-            return $('#link').clone().attr({id:"disabled","class":"disabledbutton"}).append( img ).append( texts[ name ] );
-        }
-    }
-
-    function insertPageOverview( pages )
+    function insertPageOverview( pages, pagesNode )
     {
         $.each( pages, function(idx, page){
             var pageElm = $('<li />').text(page.title );
             if ( currentPage == idx ) {
                 pageElm.attr({"class": "selected"});
             }
-            $('#form_pages').append( pageElm );
+            pagesNode.append( pageElm );
             if ( idx < pages.length - 1 ) {
-                $('#form_pages').append( $('<li />').text('>>') );
+                pagesNode.append( $('<li />').text('>>') );
             }
         });
     }
 
-    function formSigning() {
-        var url = eidProxyUrl + 'sign/providers.json';
+    function providerView( providerIdx ) {
+        if ( eIdProviders == "" ) {
+            getProviderList();
+        }
 
-        $.ajax({
-            url: url,
-            type: 'GET',
-            cache: false,
-            success: function ( data ) {
-                var node = $('<select />');
-                node.append( $('<option />') );
-                $.each( data.links, function(idx, link ) {
-                    node.append( $('<option />').attr({value: link.href, id: 'idProvider_'+idx}).text( link.text ) );
-                });
-                var div = $('#form_signing_div').clone();
-                div.find('#signing_providers').append( node );
-                div.append( createButton( 'signature', '#signature') );
-                $('#app').empty().append( div );
-            },
-            error: errorPopup
+        var div = clone('form_signing_div');
+        var providers = div.find('#signing_providers');
+        var signatureDescription = formSignatures[ providerIdx ]
+        $.each( eIdProviders.links, function(idx, link ) {
+            providers.append( clone('link').attr({"class":"button", "href":location.hash+'/'+ link.href.split('=')[1] }).text( link.text ) );
+            providers.append( '<br/>');
+        });
+        $('#app').empty().append( div );
+    }
+
+    function getFormTBS() {
+        var tbs = "";
+        $.each( formDraft.pages, function(idx, page) {
+            $.each( page.fields, function(fieldIdx, field) {
+                // filter fieldtype comment
+                tbs += field.field.description + ' = ' + field.value + '. ';
+            })
         })
+        return tbs;
     }
 
     function requiredSignaturesPage() {
         if ( !formRequiresSignatures() ) {
             // form does not require signatures
             // redirect to summary page
-            navigate('summary');
+            redirect( 'summary' );
+            return;
         }
-        var requiredSignatures = $('#required_signatures_div').clone();
-        var list = requiredSignatures.find('#required_signatures_list').append( $('<ul />') );
+        //$('#app').empty();
+        var list = $('<ul />');
 
         $.each( formSignatures, function(idx, signature) {
-            var link = $('#link').clone().attr('id','signing_page').text( signature.name );
-            list.append( $('<li />').append( link ) );
+            //var button = createButton( 'signed', '#signatures/'+idx, function() { checkSignature( signature.name ); } )
+            var button = clone('link').attr({'href':'#signatures/'+idx, "class":"button"}).removeAttr('id').text( signature.name );
+            list.append( $('<li />').append( button ) );
         });
 
+        var requiredSignatures = clone('required_signatures_div');
+        requiredSignatures.find('#required_signatures_list').append( list );
         requiredSignatures.append( createButton( 'summary', '#summary' ) );
         // check number of signatures on form with number of required
         requiredSignatures.append( createButton( 'submit', '#', function() {return true;}) );
         $('#app').empty().append( requiredSignatures );
     }
 
-    function setupFormSignatures() {
-        $.ajax({
-            url: proxyContextUrl + 'summary/signatures.json',
-            type: 'GET',
-            cache: false,
-            async: false,
-            success: function( data ) {
-                formSignatures = data.signatures;
-            },
-            error: errorPopup
+    function checkSignature( name ) {
+        var result = false;
+        $.each( formDraft.signatures, function( idx, value) {
+
         });
+        return false;
     }
 
     formRequiresSignatures = function() {
@@ -358,25 +368,6 @@ jQuery(document).ready(function()
             setupFormSignatures();
         }
         return formSignatures.length != 0
-    }
-
-    function navigate( newPage ) {
-        switch ( newPage ) {
-            case 'summary':
-                setupFormSummary();
-                break;
-            case 'signature':
-                requiredSignaturesPage();
-                break;
-            default:
-                var page = parseInt( newPage );
-                currentPage = inferPage( page );
-                refreshPageComponents();
-        }
-    }
-
-    function linkNavigate() {
-        navigate( this.href.substring(this.href.indexOf('#') + 1) );
     }
 
     function translate( )
@@ -403,17 +394,17 @@ jQuery(document).ready(function()
             });
     }
 
-    function alwaysFalse() { return false; }
-
     function setupFormSummary() {
         var errorString = "";
-        var summaryDiv = $('#form_summary_div').clone().attr({'id':'inserted_form_summary_div'});
+        var summaryDiv = clone('form_summary_div');
         summaryDiv.find('#form_description').text( formDraft.description );
-        $('#app').empty().append( summaryDiv );
+        var summaryPages = summaryDiv.find('#form_pages_summary');
+        var summaryStatus = summaryDiv.find('#form_submission_status');
 
         $.each(formDraft.pages, function(idx, page){
-            var pageDiv = $('#form_page_summary').clone().attr('id', 'page'+idx);
-            pageDiv.find('h3').append( $('#goto_page').clone().attr('href','#'+idx).text(page.title) );
+            var pageDiv = clone('form_page_summary', 'page_'+idx);
+
+            pageDiv.find('h3').append( clone('link').attr('href','#'+idx).text(page.title) );
             var ul = pageDiv.find('ul');
             $.each( page.fields, function( fieldIdx, field ){
                 FieldTypeModule.displayReadOnlyField( field, ul );
@@ -421,19 +412,71 @@ jQuery(document).ready(function()
                     errorString += texts.missingfield + " '"+field.field.description+"' <br>";
                 }
             });
-            $('#form_pages_summary').append( pageDiv );
+            summaryPages.append( pageDiv );
         });
         var missingFields = function() { return (errorString!="") }
         var button;
         if ( formRequiresSignatures() ) {
-            button = createButton( 'signature', '#signature', missingFields);
+            button = createButton( 'signatures', '#signatures', missingFields);
         } else {
             button = createButton( 'submit', '#', missingFields);
         }
 
-        $('#form_submission_status').append( button );
+        summaryStatus.append( button );
         if ( missingFields() ) {
             button.aToolTip({ tipContent: errorString });
+        }
+        $('#app').empty().append( summaryDiv );
+    }
+
+    function clone( templateId, insertedId ) {
+        if ( !insertedId ) {
+            return $('#'+templateId).clone().attr('id', 'inserted_'+templateId );
+        } else {
+            return $('#'+templateId).clone().attr('id', insertedId );
+        }
+    }
+
+    function redirect( view ) {
+        location.hash = '#'+view;
+    }
+
+    function findView(  ) {
+        var segments = location.hash.split('/');
+        switch ( segments[0] ) {
+            case "#summary":
+                setupFormSummary();
+                break;
+            case "#signatures":
+                if ( segments.length == 1 ) {
+                    requiredSignaturesPage();
+                } else if ( segments.length == 2) {
+                    providerView( parseInt( segments[1] ) );
+                } else {
+                    initiateSignature( segments[2] );
+                }
+                break;
+            case "#signsuccess":
+                $('#app').empty().append( 'SUCCESS');
+                break;
+            case "#signfailure":
+                $('#app').empty().append( 'FAILURE');
+                break;
+            default:
+                currentPage = inferPage( parseInt( location.hash.substring(1) ) );
+                refreshPageComponents();
+        }
+    }
+
+    function checkLastView() {
+
+    }
+
+    function checkHash() {
+        if ( location.hash == "" ) {
+            location.hash = "#0";
+        } else {
+            findView();
         }
     }
 
@@ -448,33 +491,28 @@ jQuery(document).ready(function()
 	var formDraft;
     var currentPage;
     var formSignatures = "";
+    var lastUpdatedHash = "";
+    var eIdProviders = "";
 	$('#app').empty();
 	$('#components').hide().load('components.html', function() {
         translate( );
-        if ( accesspoint == null || accesspoint.length < 1 )
+        if ( !accesspoint )
         {
-            $('#app').append( $('#ErrorMessage').clone().attr({id:'illegalAccessPoint'}).text( texts.invalidaccesspoint ) );
+            $('#app').append( clone('ErrorMessage').text( texts.invalidaccesspoint ) );
         } else
         {
             contextUrl += accesspoint + '/endusers/';
             proxyContextUrl += accesspoint + '/endusers/';
-            login();
+            if ( login() ) {
+                checkHash();
+                $(window).hashchange( findView );
+            }
         };
 	});
-
     /**
      * Listeners
      */
     $('#login_enduser_operation').live('click', login );
     $('#submit_page').live('click',             submitAndSend );
     $('#discard_page').live('click',            discard );
-    $('#signing_page').live('click',            formSigning)
-
-    $('#previous_page').live('click',  linkNavigate );
-    $('#next_page').live('click',      linkNavigate );
-    $('#goto_page').live('click',      linkNavigate );
-    $('#summary_page').live('click',   linkNavigate );
-    $('#signature_page').live('click', linkNavigate );
-
-    $('#disabled').live('click', alwaysFalse );
 })

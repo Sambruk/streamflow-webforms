@@ -70,6 +70,15 @@
                             <port>8083</port>
                             <maxIdleTime>3600000</maxIdleTime>
                         </connector>
+                        <connector implementation="org.mortbay.jetty.security.SslSocketConnector">
+                            <port>8443</port>
+                            <maxIdleTime>3600000</maxIdleTime>
+                            <keystore>${project.basedir}/src/etc/keystore</keystore>
+                            <password>eiddemo</password>
+                            <keyPassword>eiddemo</keyPassword>
+                            <truststore>${project.basedir}/src/etc/keystore</truststore>
+                            <trustPassword>eiddemo</trustPassword>
+                        </connector>
                     </connectors>
                     <stopKey>stopit</stopKey>
                     <stopPort>9998</stopPort>

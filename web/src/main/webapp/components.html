@@ -34,15 +34,16 @@
     <div id="form_buttons_div"></div>
 </div>
 
-<a id="link" href="#" class="button"></a>
-<a id="goto_page" href="#"></a>
+<a id="link" href="#"></a>
+<a id="disabled" href="#0" class="disabledbutton" onclick="return false;"></a>
 
 <img id="previous" src="images/buttons/arrow_left.png" alt=""/>
 <img id="next" src="images/buttons/arrow_right.png" alt=""/>
 <img id="discard" src="images/buttons/cross.png" alt=""/>
 <img id="summary" src="images/buttons/sum.png" alt=""/>
-<img id="signature" src="images/buttons/edit.png" alt=""/>
+<img id="signatures" src="images/buttons/edit.png" alt=""/>
 <img id="submit" src="images/buttons/tick.png" alt=""/>
+<img id="signed" src="images/buttons/signed.png" alt=""/>
 
 <div id="form_summary_div">
     <h2 id="form_description"></h2>
@@ -122,6 +123,11 @@
 <div id="form_signing_div">
     $provider
     <div id="signing_providers"></div>
+</div>
+
+<div id="verify_signature_div">
+    <div id="tbs"></div>
+    <div id="htmlsnippet"></div>
 </div>
 
 <div id="required_signatures_div">
