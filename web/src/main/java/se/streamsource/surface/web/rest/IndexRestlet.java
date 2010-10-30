@@ -4,6 +4,7 @@ import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
 import org.restlet.data.MediaType;
+import org.restlet.representation.StringRepresentation;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,7 +30,6 @@ public class IndexRestlet
          template = template.replace( "$hostname", request.getResourceRef().getHostIdentifier() );
 
          response.setEntity( template, MediaType.TEXT_HTML );
-
       } catch (IOException e)
       {
          e.printStackTrace();

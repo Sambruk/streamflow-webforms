@@ -18,96 +18,45 @@
 
 jQuery(document).ready(function()
 {
-    function errorPopup() { alert( texts.erroroccurred ); }
-
     /**
      * Functions that call StreamFlow
      */
     function verifyAccessPoint() {
-        var result = true;
-        var parameters = request('GET', proxyContextUrl);
-        parameters.error = function() { result = false; };
+        var parameters = request('GET', state.streamflow );
+        parameters.error = function() { error( texts.invalidaccesspoint ); };
         $.ajax(parameters);
-        return result;
     }
 
     function login() {
-        if ( verifyAccessPoint() ) {
-            var loggedIn = true;
-            var parameters = request('POST', contextUrl + 'selectenduser.json');
-            parameters.success = function(data) {
-                var params = request('GET', contextUrl + 'userreference.json');
-                params.success = function(data) {
-                    proxyContextUrl += data.entity + '/';
-                };
-                params.error = function() { loggedIn = false; };
-                $.ajax(params);
-            };
-            parameters.error = function() { loggedIn = false; };
-            $.ajax(parameters);
-            if ( loggedIn )
-            {
-                if ( !queryCaseForm() )
-                {
-                    createCaseWithForm();
-                }
-            } else {
-                $('#app').append( clone('ErrorMessage').text( texts.loginfailed ) );
-                return false;
-            }
-        } else {
-            $('#app').append( clone('ErrorMessage').text( texts.invalidaccesspoint ) );
-            return false;
-        }
-        return true;
-    }
-
-    function queryCaseForm() {
-        var result = false;
-        var parameters = request('GET', proxyContextUrl + 'findcasewithform.json');
-        parameters.error = null;
-        parameters.success = function(data) {
-                if ( data.caze && data.form )
-                {
-                    caseUrl = proxyContextUrl + data.caze;
-                    proxyContextUrl += data.caze + '/formdrafts/' + data.form + '/';
-                    var params = request('GET', proxyContextUrl + 'index.json');
-                    params.success = function( data ) {
-                                        formDraft = data;
-                                        result = true;
-                                     };
-                    $.ajax(params);
-                }
-             };
+        verifyAccessPoint();
+        var parameters = request('POST', state.surface + 'selectenduser.json');
+        parameters.error = function() { error( texts.loginfailed ); };
         $.ajax(parameters);
-        return result;
+
+        var params = request('GET', state.surface + 'userreference.json');
+        params.error = function() { error( texts.loginfailed ); };
+        var data = getData(params);
+        state.streamflow += data.entity + '/';
+        setupCaseAndForm();
     }
 
-    function parseEvents( eventMap ) {
-        $.each( eventMap.events, function( idx, event){
-            if ( event.name == "createdCase")
-            {
-                var caseId = $.parseJSON(event.parameters)['param1'];
-                caseUrl = proxyContextUrl + caseId;
-                proxyContextUrl += caseId;
-            } else if ( event.name == "changedFormDraft" )
-            {
-                proxyContextUrl += '/formdrafts/' + event.entity + '/';
-                formDraft = $.parseJSON($.parseJSON(event.parameters)['param1']);
-            } else if ( event.name == "changedFieldValue" ) {
-                var fieldId = $.parseJSON(event.parameters)['param1'];
-                var fieldValue = $.parseJSON(event.parameters)['param2'];
-
-                var onPage = updateFormDraftField( fieldId, fieldValue );
-                if ( onPage == currentPage) {
-                    FieldTypeModule.setFieldValue( fieldId, fieldValue );
-                }
-            }
-        });
+    function setupCaseAndForm() {
+        var parameters = request('GET', state.streamflow + 'findcasewithform.json');
+        parameters.error = null;
+        var data = getData( parameters);
+        if ( data.caze && data.form )
+        {
+            state.caseUrl = state.streamflow + data.caze;
+            state.streamflow += data.caze + '/formdrafts/' + data.form + '/';
+            var params = request('GET', state.streamflow + 'index.json');
+            state.formDraft = getData( params );
+        } else {
+            createCaseWithForm();
+        }
     }
 
     function createCaseWithForm() {
-        var parameters = request('POST', proxyContextUrl + 'createcasewithform.json');
+        var parameters = request('POST', state.streamflow + 'createcasewithform.json');
         parameters.success = parseEvents;
         $.ajax(parameters);
     }
@@ -120,7 +69,7 @@ jQuery(document).ready(function()
             value: fieldValue
         };
 
-        var parameters = request('PUT', proxyContextUrl + 'updatefield.json');
+        var parameters = request('PUT', state.streamflow + 'updatefield.json');
         parameters.data = fieldDTO;
         parameters.success = parseEvents;
         $.ajax(parameters);
@@ -128,104 +77,70 @@ jQuery(document).ready(function()
     }
 
     function submitAndSend() {
-        var parameters = request('POST', proxyContextUrl + 'summary/submitandsend.json');
-        parameters.success = function( ) {
-            var caseId = queryCaseInfo();
-
-            var node = clone('thank_you_div');
-            var message = node.find('#end_message');
-            message.text(texts.formSubmittedThankYou);
-
-            if ( typeof( caseId )!="undefined") {
-                message.append( '<br/> ' + texts.caseidmessage + ' ' + caseId );
-            }
-            var url = caseUrl +'/submittedforms/'+formDraft.form + '/generateformaspdf';
-            var print_node = clone('print');
-            var print_url = print_node.find("#print_link").attr("href", url );
-            print_node.appendTo(node);
-
-            $('#app').empty().append( node );
-        }
+        var parameters = request('POST', state.streamflow + 'summary/submitandsend.json');
+        parameters.success = insertFormSubmitted;
         $.ajax(parameters);
+        insertFormSubmitted();
     }
 
-    function queryCaseInfo() {
-        var caseId;
-        var parameters = request('GET', caseUrl + '/index.json');
-        parameters.success = function( data ) {
-                caseId = data.caseId;
-            };
-        return caseId;
-    }
-
-    function discard()
-    {
-        var parameters = request('POST', proxyContextUrl + 'discard.json');
-        parameters.success = function() {
-                var node = clone('thank_you_div');
-                node.find('#end_message').text( texts.formdiscarded );
-                $('#app').empty().append( node );
-            };
+    function discard() {
+        var parameters = request('POST', state.streamflow + 'discard.json');
         $.ajax(parameters);
-    }
-
-    function initiateSignature( provider ) {
-        var tbs = getFormTBS();
-
-        var signDTO = {
-            transactionId: formDraft.form,
-            tbs: tbs,
-            provider: provider,
-            successUrl: "#signsuccess",
-            errorUrl: "#signfailed"
-        };
-
-        var parameters = request('GET', eidProxyUrl + 'sign/sign.htm');
-        parameters.data = signDTO;
-        parameters.success = function ( htmlSnippet ) {
-                var array = $(htmlSnippet);
-                $.each(array, function(idx,element ) {
-                    switch (element.tagName) {
-                        case "SCRIPT":
-                            eval( element );
-                            break;
-                        case "FORM":
-                            $('#app').empty().append( element );
-                            break;
-                    }
-                });
-                //$('#app').empty().append( htmlSnippet );
-                //$('#app').empty().html( htmlSnippet );
-            };
-        $.ajax(parameters);
-    }
-
-    function getProviderList() {
-        //eIdProviders = {"links":[{"classes":"","href":"sign.htm?provider=ibm-cbt_25","id":"1","rel":"sign","text":"BankId"},{"classes":"","href":"sign.htm?provider=nexus-personal_4X","id":"6","rel":"sign","text":"Nexus Personal"}]};
-
-        var parameters = request('GET', eidProxyUrl + 'sign/providers.json');
-        parameters.success = function( data ) { eIdProviders = data; };
-        $.ajax(parameters);
+        insertDiscard();
     }
 
     function setupFormSignatures() {
-        var parameters = request('GET', proxyContextUrl + 'summary/signatures.json');
-        parameters.success = function( data ) {
-                formSignatures = data.signatures;
-            };
-        $.ajax(parameters);
+        var parameters = request('GET', state.streamflow + 'summary/signatures.json');
+        state.formSignatures = getData(parameters).signatures;
     }
 
-    function request(type, url) {
-        return {type:type, url:url, async:false, cache:false, error:errorPopup};
+    function getProviderList() {
+        state.eIdProviders = {"links":[{"classes":"","href":"sign.htm?provider=ibm-cbt_25","id":"1","rel":"sign","text":"BankId"},{"classes":"","href":"sign.htm?provider=nexus-personal_4X","id":"6","rel":"sign","text":"Bank Id"}]};
+
+        /*var parameters = request('GET', state.eid + 'sign/providers.json');
+        state.eIdProviders = getData( parameters );*/
     }
 
     /**
-     * Helper functions
+     * Utility methods
      */
+    function getFormTBS() {
+        var tbs = "";
+        $.each( state.formDraft.pages, function(idx, page) {
+            $.each( page.fields, function(fieldIdx, field) {
+                // filter fieldtype comment
+                tbs += field.field.description + ' = ' + field.value + '. ';
+            })
+        })
+        return tbs;
+    }
+
+    function parseEvents( eventMap ) {
+        $.each( eventMap.events, function( idx, event){
+            if ( event.name == "createdCase")
+            {
+                var caseId = $.parseJSON(event.parameters)['param1'];
+                state.caseUrl = state.streamflow + caseId;
+                state.streamflow += caseId;
+            } else if ( event.name == "changedFormDraft" )
+            {
+                state.streamflow += '/formdrafts/' + event.entity + '/';
+                state.formDraft = $.parseJSON($.parseJSON(event.parameters)['param1']);
+            } else if ( event.name == "changedFieldValue" ) {
+                var fieldId = $.parseJSON(event.parameters)['param1'];
+                var fieldValue = $.parseJSON(event.parameters)['param2'];
+
+                var onPage = updateFormDraftField( fieldId, fieldValue );
+                if ( onPage == currentPage) {
+                    FieldTypeModule.setFieldValue( fieldId, fieldValue );
+                }
+            }
+        });
+    }
+
     function updateFormDraftField( fieldId, fieldValue ) {
         var pageNumber = -1;
-        $.each( formDraft.pages, function(idx, page) {
+        $.each( state.formDraft.pages, function(idx, page) {
             $.each( page.fields, function(fieldIdx, field) {
                 if ( field.field.field == fieldId ) {
                     field.value = fieldValue;
@@ -236,9 +151,8 @@ jQuery(document).ready(function()
         return pageNumber;
     }
 
-
     function lastPage() {
-        var pages = formDraft['pages'].length;
+        var pages = state.formDraft['pages'].length;
         return (currentPage == pages -1);
     }
 
@@ -249,10 +163,23 @@ jQuery(document).ready(function()
     function inferPage( page ) {
         if ( isNaN(page) ) return 0;
         if ( page < 0 ) return 0;
-        var pages = formDraft['pages'].length;
+        var pages = state.formDraft['pages'].length;
         if ( page >= pages ) return pages-1;
         return page;
     }
+
+    function request(type, url) {
+        return {type:type, url:url, async:false, cache:false, error:errorPopup};
+    }
+
+    function errorPopup() {
+        alert( texts.erroroccurred );
+        throw "http call failed";
+    }
+
+    /**
+     * Helper functions
+     */
 
     function createButton( name, href, disabledFunction ) {
         if ( !disabledFunction || !disabledFunction() ) {
@@ -266,32 +193,52 @@ jQuery(document).ready(function()
         }
     }
 
-    // Based on the formDraft
-    // the current page is updated
-    function refreshPageComponents() {
-        if ( formDraft != null )
-        {
-            $('#app').empty();
-            var formFillingDiv = clone('form_filling_div');
-            formFillingDiv.find('#form_description').text( formDraft.description);
-            var toolbar = formFillingDiv.find('#form_buttons_div');
-
-            toolbar.append( createButton('previous', '#'+(currentPage-1), firstPage ) );
-            toolbar.append( createButton('next', '#'+(currentPage+1), lastPage ) );
-            toolbar.append( createButton('discard', '#') );
-            toolbar.append( createButton('summary', '#summary' ) );
-
-            var pages = formDraft['pages'];
-            insertPageOverview( pages, formFillingDiv.find('#form_pages') );
-            var fieldList = formFillingDiv.find('#form_table_body');
-            $.each( pages[ currentPage ].fields, function(idx, field){
-                FieldTypeModule.render( field, fieldList );
-            });
-            $('#app').append( formFillingDiv );
-        }
+    /**
+     * Functions that creates DOM nodes and inserts them
+     */
+    function insert( node ) {
+        $('#app').empty().append( node );
     }
 
-    function insertPageOverview( pages, pagesNode )
+    function insertFormSubmitted() {
+        var parameters = request('GET', state.caseUrl + '/index.json');
+        var caseId = getData( parameters ).caseId;
+
+        var node = clone('thank_you_div');
+        var message = node.find('#end_message');
+        message.text(texts.formSubmittedThankYou);
+
+        if ( typeof( caseId )!="undefined") {
+            message.append( '<br/> ' + texts.caseidmessage + ' ' + caseId );
+        }
+        var url = state.caseUrl +'/submittedforms/'+state.formDraft.form + '/generateformaspdf';
+        var print_node = clone('print');
+        var print_url = print_node.find("#print_link").attr("href", url );
+        print_node.appendTo(node);
+
+        insert( node );
+    }
+
+    function insertPage() {
+        var formFillingDiv = clone('form_filling_div');
+        formFillingDiv.find('#form_description').text( state.formDraft.description);
+        var toolbar = formFillingDiv.find('#form_buttons_div');
+
+        toolbar.append( createButton('previous', '#'+(currentPage-1), firstPage ) );
+        toolbar.append( createButton('next', '#'+(currentPage+1), lastPage ) );
+        toolbar.append( createButton('discard', '#') );
+        toolbar.append( createButton('summary', '#summary' ) );
+
+        var pages = state.formDraft['pages'];
+        appendPageNames( pages, formFillingDiv.find('#form_pages') );
+        var fieldList = formFillingDiv.find('#form_table_body');
+        $.each( pages[ currentPage ].fields, function(idx, field){
+            FieldTypeModule.render( field, fieldList );
+        });
+        insert( formFillingDiv );
+    }
+
+    function appendPageNames( pages, pagesNode )
     {
         $.each( pages, function(idx, page){
             var pageElm = $('<li />').text(page.title );
@@ -305,43 +252,31 @@ jQuery(document).ready(function()
         });
     }
 
-    function providerView( providerIdx ) {
-        if ( eIdProviders == "" ) {
+    function insertProviders( providerIdx ) {
+        if ( !state.eIdProviders ) {
             getProviderList();
         }
 
         var div = clone('form_signing_div');
         var providers = div.find('#signing_providers');
-        var signatureDescription = formSignatures[ providerIdx ]
-        $.each( eIdProviders.links, function(idx, link ) {
+        var signatureDescription = state.formSignatures[ providerIdx ]
+        $.each( state.eIdProviders.links, function(idx, link ) {
             providers.append( clone('link').attr({"class":"button", "href":location.hash+'/'+ link.href.split('=')[1] }).text( link.text ) );
             providers.append( '<br/>');
         });
-        $('#app').empty().append( div );
+        insert( div );
     }
 
-    function getFormTBS() {
-        var tbs = "";
-        $.each( formDraft.pages, function(idx, page) {
-            $.each( page.fields, function(fieldIdx, field) {
-                // filter fieldtype comment
-                tbs += field.field.description + ' = ' + field.value + '. ';
-            })
-        })
-        return tbs;
-    }
-
-    function requiredSignaturesPage() {
+    function insertRequiredSignatures() {
         if ( !formRequiresSignatures() ) {
             // form does not require signatures
             // redirect to summary page
             redirect( 'summary' );
             return;
         }
-        //$('#app').empty();
         var list = $('<ul />');
 
-        $.each( formSignatures, function(idx, signature) {
+        $.each( state.formSignatures, function(idx, signature) {
             //var button = createButton( 'signed', '#signatures/'+idx, function() { checkSignature( signature.name ); } )
             var button = clone('link').attr({'href':'#signatures/'+idx, "class":"button"}).removeAttr('id').text( signature.name );
             list.append( $('<li />').append( button ) );
@@ -352,23 +287,121 @@ jQuery(document).ready(function()
         requiredSignatures.append( createButton( 'summary', '#summary' ) );
         // check number of signatures on form with number of required
         requiredSignatures.append( createButton( 'submit', '#', function() {return true;}) );
-        $('#app').empty().append( requiredSignatures );
+        insert( requiredSignatures );
     }
 
-    function checkSignature( name ) {
-        var result = false;
-        $.each( formDraft.signatures, function( idx, value) {
+    function insertSummary() {
+        var errorString = "";
+        var summaryDiv = clone('form_summary_div');
+        summaryDiv.find('#form_description').text( state.formDraft.description );
+        var summaryPages = summaryDiv.find('#form_pages_summary');
+        var summaryStatus = summaryDiv.find('#form_submission_status');
 
+        $.each(state.formDraft.pages, function(idx, page){
+            var pageDiv = clone('form_page_summary', 'page_'+idx);
+
+            pageDiv.find('h3').append( clone('link').attr('href','#'+idx).text(page.title) );
+            var ul = pageDiv.find('ul');
+            $.each( page.fields, function( fieldIdx, field ){
+                FieldTypeModule.displayReadOnlyField( field, ul );
+                if ( field.field.mandatory && !field.value) {
+                    errorString += texts.missingfield + " '"+field.field.description+"' <br>";
+                }
+            });
+            summaryPages.append( pageDiv );
         });
-        return false;
+        var missingFields = function() { return (errorString!="") }
+        var button;
+        if ( formRequiresSignatures() ) {
+            button = createButton( 'signatures', '#signatures', missingFields);
+        } else {
+            button = createButton( 'submit', '#', missingFields);
+        }
+
+        summaryStatus.append( button );
+        if ( missingFields() ) {
+            button.aToolTip({ tipContent: errorString });
+        }
+        insert( summaryDiv );
     }
 
     formRequiresSignatures = function() {
-        if ( formSignatures == "" ) {
+        if ( !state.formSignatures ) {
             setupFormSignatures();
         }
-        return formSignatures.length != 0
+        return state.formSignatures.length != 0
     }
+
+
+    function insertDiscard() {
+        var node = clone('thank_you_div');
+        node.find('#end_message').text( texts.formdiscarded );
+        insert( node );
+    }
+
+    function insertSign( provider ) {
+        var tbs = getFormTBS();
+
+        var htmlSnippet = '<html> <body> <script type="text/javascript"> alert("script evaluated"); if (/MSIE/.test(navigator.userAgent)){ document.write("<object name=' +
+        "'signer' classid='CLSID:FB25B6FD-2119-4CEF-A915-A056184C565E'></object> "+
+        '"); } else { document.write("<object name='+
+        "'signer' type='application/x-personal-signer2'></object> "+
+        '"); } function doSign() { var signer2 = document.signer; retVal = signer2.SetParam('+
+        "'TextToBeSigned', 'VGVrc3RmZWx0ID0gTWFkcy4gdGVrc3Qgb21yw6VkZSA9IGFzZGZhc2RmLiBDaGVja2Jva3NlciA9IGNoaW1wYW5zZS4gbGlzdGJva3MgPSBLw6VsLiByYWRpb2tuYXBwZXIgPSBLdmluZGUuIGRhdG8gPSAyMDEwLTEwLTA3VDIyOjAwOjAwLjAwMDBaLiBoZWx0YWwgPSAyLiByZWFsdGFsID0gMi4ga29tbWVudGFyID0gbnVsbC4gQ29tYm9ib3ggPSBOZXRhdmlzLiBHb3QgeW91ISA9IG51bGwuIEZpbmFsIHJlbWFyayA9IG51bGwuIA=='); if (0 != retVal) { alert("+
+        '"[This is a webpage dialog.] SetParam TextToBeSigned to '+
+        "'VGVrc3RmZWx0ID0gTWFkcy4gdGVrc3Qgb21yw6VkZSA9IGFzZGZhc2RmLiBDaGVja2Jva3NlciA9IGNoaW1wYW5zZS4gbGlzdGJva3MgPSBLw6VsLiByYWRpb2tuYXBwZXIgPSBLdmluZGUuIGRhdG8gPSAyMDEwLTEwLTA3VDIyOjAwOjAwLjAwMDBaLiBoZWx0YWwgPSAyLiByZWFsdGFsID0gMi4ga29tbWVudGFyID0gbnVsbC4gQ29tYm9ib3ggPSBOZXRhdmlzLiBHb3QgeW91ISA9IG51bGwuIEZpbmFsIHJlbWFyayA9IG51bGwuIA==' did not return zero.\n "+
+        '"+ "retVal = " + retVal); return false; } retVal = signer2.SetParam('+
+        "'ServerTime', '1288338227'); if (0 != retVal) { alert("+
+        '"[This is a webpage dialog.] SetParam ServerTime to '+
+        "'1288338227' did not return zero.\n "+
+        '"+ "retVal = " + retVal); return false; } retVal = signer2.SetParam('+
+        "'Nonce', 'ASv277kc6nZ++IYKTmdsDzTVPamPWLv6ybJBawpa513X'); if (0 != retVal) { alert("+
+        '"[This is a webpage dialog.] SetParam Nonce to '+
+        "'ASv277kc6nZ++IYKTmdsDzTVPamPWLv6ybJBawpa513X' did not return zero.\n "+
+        '"+ "retVal = " + retVal); return false; } retVal = signer2.PerformAction('+
+        "'Sign'); if (retVal == 0) { document.signerData.signature.value = signer2 .GetParam('Signature'); } else { alert('Failed to create signature! retVal = ' + retVal); return false; } document.signerData.submit(); return true; } </script> <form method="+
+        '"POST" name="signerData" action="#signsuccess"> <input name="nonce" value="ASv277kc6nZ++IYKTmdsDzTVPamPWLv6ybJBawpa513X" type="hidden"> <input name="signature" value="" type="hidden"> <input name="encodedTbs" value="VGVrc3RmZWx0ID0gTWFkcy4gdGVrc3Qgb21yw6VkZSA9IGFzZGZhc2RmLiBDaGVja2Jva3NlciA9IGNoaW1wYW5zZS4gbGlzdGJva3MgPSBLw6VsLiByYWRpb2tuYXBwZXIgPSBLdmluZGUuIGRhdG8gPSAyMDEwLTEwLTA3VDIyOjAwOjAwLjAwMDBaLiBoZWx0YWwgPSAyLiByZWFsdGFsID0gMi4ga29tbWVudGFyID0gbnVsbC4gQ29tYm9ib3ggPSBOZXRhdmlzLiBHb3QgeW91ISA9IG51bGwuIEZpbmFsIHJlbWFyayA9IG51bGwuIA==" type="hidden"/> <input name="provider" value="nexus-personal_4X" type="hidden"/> <input type="submit" onclick="doSign()" value="Sign"> </form> </body> </html>';
+
+        $('#app').empty().html( htmlSnippet ).hide();
+
+        //$('#app').find('').submit();
+
+        var array = $(htmlSnippet);
+        $.each(array, function(idx,element ) {
+            switch (element.tagName) {
+                case "SCRIPT":
+                    //eval( element.text );
+                    break;
+                case "FORM":
+                    var argDTO = {};
+
+                    $.each( $(element).find('input'), function(idx, inputElm)
+                    {
+                        if ( inputElm.name )
+                        {
+                            argDTO[ inputElm.name ] = inputElm.value;
+                        }
+                    });
+                    var parameters = request('POST', state.eid + 'sign/verify');
+                    parameters.data = argDTO;
+                    $.ajax(parameters);
+                    break;
+            }
+        });
+
+
+/*
+        var signDTO = {
+            transactionId: state.formDraft.form,
+            tbs: tbs,
+            provider: provider,
+            successUrl: "#signsuccess",
+            errorUrl: "#signfailed"
+        };
+
+        */
+    }
+
 
     function translate( )
     {
@@ -394,40 +427,6 @@ jQuery(document).ready(function()
             });
     }
 
-    function setupFormSummary() {
-        var errorString = "";
-        var summaryDiv = clone('form_summary_div');
-        summaryDiv.find('#form_description').text( formDraft.description );
-        var summaryPages = summaryDiv.find('#form_pages_summary');
-        var summaryStatus = summaryDiv.find('#form_submission_status');
-
-        $.each(formDraft.pages, function(idx, page){
-            var pageDiv = clone('form_page_summary', 'page_'+idx);
-
-            pageDiv.find('h3').append( clone('link').attr('href','#'+idx).text(page.title) );
-            var ul = pageDiv.find('ul');
-            $.each( page.fields, function( fieldIdx, field ){
-                FieldTypeModule.displayReadOnlyField( field, ul );
-                if ( field.field.mandatory && !field.value) {
-                    errorString += texts.missingfield + " '"+field.field.description+"' <br>";
-                }
-            });
-            summaryPages.append( pageDiv );
-        });
-        var missingFields = function() { return (errorString!="") }
-        var button;
-        if ( formRequiresSignatures() ) {
-            button = createButton( 'signatures', '#signatures', missingFields);
-        } else {
-            button = createButton( 'submit', '#', missingFields);
-        }
-
-        summaryStatus.append( button );
-        if ( missingFields() ) {
-            button.aToolTip({ tipContent: errorString });
-        }
-        $('#app').empty().append( summaryDiv );
-    }
 
     function clone( templateId, insertedId ) {
         if ( !insertedId ) {
@@ -441,19 +440,31 @@ jQuery(document).ready(function()
         location.hash = '#'+view;
     }
 
+    function error( message ) {
+        insert( clone('ErrorMessage').text( message ) );
+        throw message;
+    }
+
+    function getData( parameters ) {
+        var data;
+        parameters.success = function(arg) { data = arg; };
+        $.ajax(parameters);
+        return data;
+    }
+
     function findView(  ) {
         var segments = location.hash.split('/');
         switch ( segments[0] ) {
             case "#summary":
-                setupFormSummary();
+                showView( function() { insertSummary(); })
                 break;
             case "#signatures":
                 if ( segments.length == 1 ) {
-                    requiredSignaturesPage();
+                    showView( function() { insertRequiredSignatures(); } );
                 } else if ( segments.length == 2) {
-                    providerView( parseInt( segments[1] ) );
+                    showView( function() { insertProviders( parseInt( segments[1] ) ); } );
                 } else {
-                    initiateSignature( segments[2] );
+                    showView( function() { insertSign( segments[2] ); } );
                 }
                 break;
             case "#signsuccess":
@@ -464,12 +475,15 @@ jQuery(document).ready(function()
                 break;
             default:
                 currentPage = inferPage( parseInt( location.hash.substring(1) ) );
-                refreshPageComponents();
+                showView( function() { insertPage(); } );
         }
     }
 
-    function checkLastView() {
-
+    function showView( renderFunction ) {
+        if ( state.currentlyShowing != location.hash ) {
+            renderFunction();
+            state.currentlyShowing = location.hash;
+        }
     }
 
     function checkHash() {
@@ -483,30 +497,25 @@ jQuery(document).ready(function()
     /**
      * Main
      */
-    var accesspoint = window.top.location.search.split('=')[1];
-	var proxyContextUrl = "proxy/accesspoints/"
-	var contextUrl = "surface/accesspoints/";
-	var eidProxyUrl = "eidproxy/";
-	var caseUrl = "";
-	var formDraft;
-    var currentPage;
-    var formSignatures = "";
-    var lastUpdatedHash = "";
-    var eIdProviders = "";
+    var state = {
+        streamflow: "proxy/accesspoints/",
+	    surface:    "surface/accesspoints/",
+	    eid:        "eidproxy/",
+    };
+
 	$('#app').empty();
 	$('#components').hide().load('static/components.html', function() {
         translate( );
         if ( !accesspoint )
         {
-            $('#app').append( clone('ErrorMessage').text( texts.invalidaccesspoint ) );
+            error( texts.invalidaccesspoint );
         } else
         {
-            contextUrl += accesspoint + '/endusers/';
-            proxyContextUrl += accesspoint + '/endusers/';
-            if ( login() ) {
-                checkHash();
-                $(window).hashchange( findView );
-            }
+            state.surface += accesspoint + '/endusers/';
+            state.streamflow += accesspoint + '/endusers/';
+            login();
+            checkHash();
+            $(window).hashchange( findView );
         };
 	});
     /**
