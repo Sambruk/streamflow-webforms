@@ -418,7 +418,7 @@ jQuery(document).ready(function()
             currentPage = 0;
         } else {
             currentPage = i
-            nferPage( parseInt( page ) );
+            inferPage( parseInt( page ) );
         }
         showView( insertPage );
     }
