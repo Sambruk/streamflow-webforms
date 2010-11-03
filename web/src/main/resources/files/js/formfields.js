@@ -212,10 +212,9 @@ var FieldTypeModule = (function() {
             var textfield = $('#numberField'+this.id);
             var enteredValue = this.getFieldValue();
 
-            updateFieldValue( this.id, enteredValue );
-
+            var updated = updateFieldValue( this.id, enteredValue );
             var updatedValue = this.getFieldValue();
-            if ( updatedValue != enteredValue )
+            if ( !updated || updatedValue != enteredValue )
             {
                 this.setFieldValue( enteredValue );
                 var node = this.node;
@@ -312,9 +311,9 @@ var FieldTypeModule = (function() {
 
         this.updateServer = function() {
             var value = this.getFieldValue();
-            updateFieldValue(this.id, value );
+            var updated = updateFieldValue(this.id, value );
             var newValue = this.getFieldValue();
-            if ( newValue != value)
+            if ( !updated || newValue != value )
             {
                 this.setFieldValue(value);
                 var node = this.node;

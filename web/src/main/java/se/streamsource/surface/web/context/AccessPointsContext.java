@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package se.streamsource.surface.web.context.accesspoints;
+package se.streamsource.surface.web.context;
 
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.value.ValueBuilder;
@@ -24,7 +24,6 @@ import se.streamsource.dci.api.ContextMixin;
 import se.streamsource.dci.value.LinkValue;
 import se.streamsource.dci.value.LinksValue;
 import se.streamsource.streamflow.infrastructure.application.LinksBuilder;
-import se.streamsource.surface.web.context.IndexInteractionLinksValue;
 import se.streamsource.dci.api.ContextNotFoundException;
 import se.streamsource.dci.api.SubContexts;
 import se.streamsource.dci.restlet.client.CommandQueryClient;

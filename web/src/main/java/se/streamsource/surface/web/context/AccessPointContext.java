@@ -15,32 +15,33 @@
  * limitations under the License.
  */
 
-package se.streamsource.surface.web.context.projects;
+package se.streamsource.surface.web.context;
 
 import org.qi4j.api.mixin.Mixins;
 import se.streamsource.dci.api.Context;
 import se.streamsource.dci.api.ContextMixin;
-import se.streamsource.surface.web.context.IndexInteractionLinksValue;
-import se.streamsource.dci.api.SubContexts;
+import se.streamsource.dci.api.SubContext;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
+import se.streamsource.surface.web.context.accesspoints.endusers.EndUsersContext;
 
 /**
  */
-@Mixins(ProjectsContext.Mixin.class)
-public interface ProjectsContext
-      extends SubContexts<CaseTypesContext>, IndexInteractionLinksValue, Context
+@Mixins(AccessPointContext.Mixin.class)
+public interface AccessPointContext
+   extends Context
 {
+   @SubContext
+   EndUsersContext endusers();
 
    abstract class Mixin
          extends ContextMixin
-         implements ProjectsContext
+         implements AccessPointContext
    {
-      public CaseTypesContext context( String id )
+      public EndUsersContext endusers()
       {
-         roleMap.set( roleMap.get( CommandQueryClient.class ).getSubClient( id ));
-         return subContext( CaseTypesContext.class );
+         roleMap.set( roleMap.get( CommandQueryClient.class ).getSubClient( "endusers" ));
+         return subContext( EndUsersContext.class );
       }
    }
-
 
 }

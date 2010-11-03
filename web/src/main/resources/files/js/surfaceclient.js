@@ -48,18 +48,42 @@ jQuery(document).ready(function()
             value: fieldValue
         };
 
-        parseEvents( RequestModule.updateField( fieldDTO ) );
+        var updated = parseEvents( RequestModule.updateField( fieldDTO ) );
         image.hide();
+        return updated;
     }
 
     function submitAndSend() {
         RequestModule.submitAndSend();
-        insertFormSubmitted();
+        var caseName = RequestModule.getCaseName();
+        var formId = state.formDraft.form;
+        var caseUrl = RequestModule.getCaseUrl();
+        state.formDraft = null;
+        insertFormSubmitted( caseName, formId, caseUrl );
     }
 
     function discard() {
         RequestModule.discard();
+        state.formDraft = null;
         insertDiscard();
+    }
+
+    function gotoProviders( index ) {
+        state.requiredSignatureName = state.formSignatures[ index ].name;
+        insertProviders( state.eIdProviders.links );
+    }
+
+    function gotoSummary() {
+        var description = state.formDraft.description;
+        var pages = state.formDraft.pages;
+        var signatures = state.formSignatures.length != 0;
+        insertSummary( description, pages, signatures );
+    }
+
+    function gotoSignatures() {
+        var hasSignature = state.formDraft.signatures.length > 0;
+        var required = state.formSignatures;
+        insertRequiredSignatures( hasSignature, required );
     }
 
     function setupSignatures() {
@@ -84,25 +108,30 @@ jQuery(document).ready(function()
     }
 
     function parseEvents( eventMap ) {
+        var match = false;
         $.each( eventMap.events, function( idx, event){
             if ( event.name == "createdCase")
             {
                 var caseId = $.parseJSON(event.parameters)['param1'];
                 RequestModule.createCaseUrl( caseId );
+                match = true;
             } else if ( event.name == "changedFormDraft" )
             {
                 RequestModule.createFormDraftUrl( event.entity );
                 state.formDraft = $.parseJSON($.parseJSON(event.parameters)['param1']);
+                match = true;
             } else if ( event.name == "changedFieldValue" ) {
                 var fieldId = $.parseJSON(event.parameters)['param1'];
                 var fieldValue = $.parseJSON(event.parameters)['param2'];
 
                 var onPage = updateFormDraftField( fieldId, fieldValue );
-                if ( onPage == currentPage) {
+                if ( onPage == parseInt( state.hash.substring(1) )) {
                     FieldTypeModule.setFieldValue( fieldId, fieldValue );
                 }
+                match = true;
             }
         });
+        return match;
     }
 
     function updateFormDraftField( fieldId, fieldValue ) {
@@ -118,46 +147,74 @@ jQuery(document).ready(function()
         return pageNumber;
     }
 
-    function lastPage() {
-        var pages = state.formDraft['pages'].length;
-        return (currentPage == pages -1);
+    function lastPage( page, pages ) {
+        return ( page == pages.length -1);
     }
 
-    function firstPage() {
-        return ( currentPage == 0);
+    function firstPage( page ) {
+        return ( page == 0);
+    }
+
+    function performSign( provider ) {
+        var tbs = getFormTBS();
+
+        var signDTO = {
+            transactionId: state.formDraft.form,
+            tbs: tbs,
+            provider: provider,
+            successUrl: "#success",
+            errorUrl: "#failed"
+        };
+
+        var htmlSnippet = RequestModule.sign( signDTO );
+        $('#app').html( htmlSnippet ).hide();
+
+        doSign();
+
+        // strip parameters
+        var verifyDTO = {};
+        $.each( $('#app').find('form > input:hidden'), function(idx, value ) {
+            verifyDTO[ value.name ] = value.value;
+        });
+        var signatureDTO = RequestModule.verify( verifyDTO );
+
+        signatureDTO.form = tbs;
+        signatureDTO.encodedForm = verifyDTO.encodedTbs;
+        signatureDTO.provider = provider;
+        signatureDTO.name = state.requiredSignatureName;
+        RequestModule.addSignature( signatureDTO );
+        state.formDraft = RequestModule.getFormDraft();
+
+        $('#app').show();
+        redirect("signatures");
     }
 
     /**
-     * Helper functions
+     * Functions that creates DOM nodes and inserts them
      */
     function createButton( name, href, disabled ) {
         if ( !disabled ) {
             var img = clone(name);
-            return clone('link', name+'_page').attr({'href':href,"class":"button"}).append( img ).append( texts[ name ] );
+            return clone('link').attr({'href':href,"class":"button"}).append( img ).append( texts[ name ] );
         } else {
             var img = clone(name).fadeTo(0, 0.4);
             return clone('disabled').append( img ).append( texts[ name ] );
         }
     }
 
-    /**
-     * Functions that creates DOM nodes and inserts them
-     */
     function insert( node ) {
         $('#app').empty().append( node );
     }
 
-    function insertFormSubmitted() {
-        var caseId = RequestModule.getCaseName();
-
+    function insertFormSubmitted( caseName, formId, caseUrl ) {
         var node = clone('thank_you_div');
         var message = node.find('#end_message');
         message.text(texts.formSubmittedThankYou);
 
-        if ( typeof( caseId )!="undefined") {
-            message.append( '<br/> ' + texts.caseidmessage + ' ' + caseId );
+        if ( typeof( caseName )!="undefined") {
+            message.append( '<br/> ' + texts.caseidmessage + ' ' + caseName );
         }
-        var url = RequestModule.getCaseUrl() +'submittedforms/'+state.formDraft.form + '/generateformaspdf';
+        var url = caseUrl +'submittedforms/'+ formId + '/generateformaspdf';
         var print_node = clone('print');
         var print_url = print_node.find("#print_link").attr("href", url );
         print_node.appendTo(node);
@@ -165,30 +222,29 @@ jQuery(document).ready(function()
         insert( node );
     }
 
-    function insertPage() {
+    function insertPage( page, pages, description ) {
         var formFillingDiv = clone('form_filling_div');
-        formFillingDiv.find('#form_description').text( state.formDraft.description);
+        formFillingDiv.find('#form_description').text( description );
         var toolbar = formFillingDiv.find('#form_buttons_div');
 
-        toolbar.append( createButton('previous', '#'+(currentPage-1), firstPage() ) );
-        toolbar.append( createButton('next', '#'+(currentPage+1), lastPage() ) );
+        toolbar.append( createButton('previous', '#'+(page-1), firstPage(page) ) );
+        toolbar.append( createButton('next', '#'+(page+1), lastPage(page, pages) ) );
         toolbar.append( createButton('discard', '#discard') );
         toolbar.append( createButton('summary', '#summary' ) );
 
-        var pages = state.formDraft['pages'];
-        appendPageNames( pages, formFillingDiv.find('#form_pages') );
+        appendPageNames( page, pages, formFillingDiv.find('#form_pages') );
         var fieldList = formFillingDiv.find('#form_table_body');
-        $.each( pages[ currentPage ].fields, function(idx, field){
+        $.each( pages[ page ].fields, function(idx, field){
             FieldTypeModule.render( field, fieldList );
         });
         insert( formFillingDiv );
     }
 
-    function appendPageNames( pages, pagesNode )
+    function appendPageNames( current, pages, pagesNode )
     {
         $.each( pages, function(idx, page){
             var pageElm = $('<li />').text(page.title );
-            if ( currentPage == idx ) {
+            if ( current == idx ) {
                 pageElm.attr({"class": "selected"});
             }
             pagesNode.append( pageElm );
@@ -198,25 +254,25 @@ jQuery(document).ready(function()
         });
     }
 
-    function insertProviders( providerIdx ) {
+    function insertProviders( eIdProviders ) {
         var div = clone('form_signing_div');
         var providers = div.find('#signing_providers');
-        state.requiredSignatureName = state.formSignatures[ providerIdx ].name;
-        $.each( state.eIdProviders.links, function(idx, link ) {
+        $.each( eIdProviders, function(idx, link ) {
             providers.append( clone('link').attr({"class":"button", "href":location.hash+'/'+ link.href.split('=')[1] }).text( link.text ) );
             providers.append( '<br/>');
         });
         insert( div );
     }
 
-    function insertRequiredSignatures() {
+    function insertRequiredSignatures( hasSignature, required ) {
+        var requiredSignatures = clone('required_signatures_div');
         var list = $('<ul />');
 
         var submitDisabled = true;
-        $.each( state.formSignatures, function(idx, signature) {
-            // for now only allow one signature
+        $.each( required, function(idx, signature) {
             var button;
-            if ( state.formDraft.signatures.length > 0 ) {
+            // for now only allow one signature
+            if ( hasSignature ) {
                 submitDisabled = false;
                 var img = clone('signed').fadeTo(0, 0.4);
                 button = clone('disabled').append( img ).append( signature.name );
@@ -226,22 +282,21 @@ jQuery(document).ready(function()
             list.append( $('<li />').append( button ) );
         });
 
-        var requiredSignatures = clone('required_signatures_div');
         requiredSignatures.find('#required_signatures_list').append( list );
         requiredSignatures.append( createButton( 'summary', '#summary' ) );
         requiredSignatures.append( createButton( 'submit', '#submit', submitDisabled ) );
         insert( requiredSignatures );
     }
 
-    function insertSummary() {
-        var errorString = "";
+    function insertSummary( description, pages, signatures ) {
         var summaryDiv = clone('form_summary_div');
-        summaryDiv.find('#form_description').text( state.formDraft.description );
+        var errorString = "";
+        summaryDiv.find('#form_description').text( description );
         var summaryPages = summaryDiv.find('#form_pages_summary');
         var summaryStatus = summaryDiv.find('#form_submission_status');
 
-        $.each(state.formDraft.pages, function(idx, page){
-            var pageDiv = clone('form_page_summary', 'page_'+idx);
+        $.each( pages, function(idx, page){
+            var pageDiv = clone('form_page_summary');
 
             pageDiv.find('h3').append( clone('link').attr('href','#'+idx).text(page.title) );
             var ul = pageDiv.find('ul');
@@ -255,7 +310,7 @@ jQuery(document).ready(function()
         });
         var formOk = (errorString=="");
         var button;
-        if ( state.formSignatures.length != 0 ) {
+        if ( signatures ) {
             button = createButton( 'signatures', '#signatures', !formOk);
         } else {
             button = createButton( 'submit', '#', !formOk);
@@ -273,45 +328,6 @@ jQuery(document).ready(function()
         node.find('#end_message').text( texts.formdiscarded );
         insert( node );
     }
-
-    function insertSign( provider ) {
-        var tbs = getFormTBS();
-
-        var signDTO = {
-            transactionId: state.formDraft.form,
-            tbs: tbs,
-            provider: provider,
-            successUrl: "#success",
-            errorUrl: "#failed"
-        };
-
-        var htmlSnippet = RequestModule.sign( signDTO );
-        $('#app').html( htmlSnippet ).hide();
-
-        $('#app').find('form').submit( function() {
-            return false;
-        });
-
-        doSign();
-
-        // strip parameters
-        var verifyDTO = {};
-        $.each( $('#app').find('form > input:hidden'), function(idx, value ) {
-            verifyDTO[ value.name ] = value.value;
-        });
-        var signatureDTO = RequestModule.verify( verifyDTO );
-        signatureDTO.form = tbs;
-        signatureDTO.encodedForm = verifyDTO.encodedTbs;
-        signatureDTO.provider = provider;
-        signatureDTO.name = state.requiredSignatureName;
-
-        // put parameters in
-        RequestModule.addSignature( signatureDTO );
-        state.formDraft = RequestModule.getFormDraft();
-        $('#app').show();
-        redirect("signatures");
-    }
-
 
     function translate( )
     {
@@ -355,20 +371,13 @@ jQuery(document).ready(function()
         throw message;
     }
 
-    function getData( parameters ) {
-        var data;
-        parameters.success = function(arg) { data = arg; };
-        $.ajax(parameters);
-        return data;
-    }
-
     function gotoPage( page ) {
         if ( !page ) {
-            currentPage = 0;
+            redirect('0');
         } else {
-            currentPage = parseInt( page );
+            var pages = state.formDraft['pages'];
+            insertPage( parseInt( page ), pages, state.formDraft.description );
         }
-        insertPage();
     }
 
     function showInfo() {
@@ -389,6 +398,7 @@ jQuery(document).ready(function()
             var view = findView( state.rootContext, segments, {});
             view();
             showInfo();
+            $(window).scrollTop( 0 ); 
         } catch ( e ) {
             state.info = e;
             redirect('0');
@@ -413,7 +423,7 @@ jQuery(document).ready(function()
         return findView( subContext, segments.slice(1), map );
     }
 
-    function canListSignatures() {
+    function verifyListSignatures() {
         if (state.formSignatures.length == 0)
             throw "No Signatures Needed";
 
@@ -431,7 +441,7 @@ jQuery(document).ready(function()
         });
     }
 
-    function formCanBeSubmitted() {
+    function verifySubmit() {
         formIsFilled( "Form cannot be submitted" );
         //is form signed
         if ( state.formSignatures.length > 0 ) {
@@ -439,7 +449,6 @@ jQuery(document).ready(function()
                 throw "Form must be signed before it can be submitted";
             }
         }
-
     }
 
     function verifySelectedSignature( number ) {
@@ -460,13 +469,13 @@ jQuery(document).ready(function()
 
     function setupContexts() {
         state.rootContext     = new Context( gotoPage, setupCaseAndForm);
-        var summaryContext    = new Context( insertSummary, setupSignatures );
-        var signaturesContext = new Context( insertRequiredSignatures, setupSignatures, canListSignatures);
+        var summaryContext    = new Context( gotoSummary, setupSignatures );
+        var signaturesContext = new Context( gotoSignatures, setupSignatures, verifyListSignatures);
         var pageContext       = new Context( gotoPage, $.noop, verifyPage );
-        var signatureContext  = new Context( insertSign, $.noop );
-        var providerContext   = new Context( insertProviders, setupProviders, verifySelectedSignature );
-        var discardContext    = new Context( discard, $.noop );
-        var submitContext     = new Context( submitAndSend, $.noop, formCanBeSubmitted );
+        var providersContext  = new Context( gotoProviders, setupProviders, verifySelectedSignature );
+        var signatureContext  = new Context( performSign );
+        var discardContext    = new Context( discard );
+        var submitContext     = new Context( submitAndSend, $.noop, verifySubmit );
 
         state.rootContext.addSubContext( 'summary', summaryContext );
         state.rootContext.addSubContext( 'signatures', signaturesContext );
@@ -474,14 +483,14 @@ jQuery(document).ready(function()
         state.rootContext.addSubContext( 'submit', submitContext );
         state.rootContext.addIdContext( pageContext );
 
-        signaturesContext.addIdContext( providerContext );
+        signaturesContext.addIdContext( providersContext );
 
-        providerContext.addIdContext( signatureContext );
+        providersContext.addIdContext( signatureContext );
     }
 
     function Context( view, initialize, verifier ) {
         this.subContexts = {};
-        this.initialize = initialize;
+        this.initialize = initialize ? initialize : $.noop;
         this.verify = verifier ? verifier : $.noop;
         this.view = view;
     }

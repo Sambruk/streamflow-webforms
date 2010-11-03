@@ -51,14 +51,7 @@ import se.streamsource.streamflow.resource.roles.EntityReferenceDTO;
 import se.streamsource.streamflow.resource.roles.IntegerDTO;
 import se.streamsource.streamflow.resource.user.NewProxyUserCommand;
 import se.streamsource.surface.web.ClientEventSourceService;
-import se.streamsource.surface.web.context.accesspoints.AccessPointContext;
-import se.streamsource.surface.web.context.accesspoints.AccessPointsContext;
-import se.streamsource.surface.web.context.accesspoints.ProxyUserContext;
 import se.streamsource.surface.web.context.accesspoints.endusers.EndUsersContext;
-import se.streamsource.surface.web.context.projects.CaseTypesContext;
-import se.streamsource.surface.web.context.projects.LabelsContext;
-import se.streamsource.surface.web.context.projects.ProjectsContext;
-import se.streamsource.surface.web.context.proxyusers.ProxyUsersContext;
 import se.streamsource.surface.web.rest.CookieResponseHandler;
 
 /**
@@ -110,15 +103,7 @@ public class ContextsAssembler
       module.addTransients(
             AccessPointContext.class,
             AccessPointsContext.class,
-            EndUsersContext.class,
-            OrganizationContext.class,
-            OrganizationsContext.class,
-            ProxyUserContext.class,
-            ProxyUsersContext.class,
-
-            CaseTypesContext.class,
-            LabelsContext.class,
-            ProjectsContext.class
+            EndUsersContext.class
       );
 
       module.importServices( Restlet.class ).visibleIn( Visibility.application );
