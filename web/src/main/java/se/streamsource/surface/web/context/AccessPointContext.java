@@ -22,7 +22,6 @@ import se.streamsource.dci.api.Context;
 import se.streamsource.dci.api.ContextMixin;
 import se.streamsource.dci.api.SubContext;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
-import se.streamsource.surface.web.context.accesspoints.endusers.EndUsersContext;
 
 /**
  */

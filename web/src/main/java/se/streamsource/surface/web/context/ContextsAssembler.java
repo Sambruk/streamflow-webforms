@@ -51,7 +51,6 @@ import se.streamsource.streamflow.resource.roles.EntityReferenceDTO;
 import se.streamsource.streamflow.resource.roles.IntegerDTO;
 import se.streamsource.streamflow.resource.user.NewProxyUserCommand;
 import se.streamsource.surface.web.ClientEventSourceService;
-import se.streamsource.surface.web.context.accesspoints.endusers.EndUsersContext;
 import se.streamsource.surface.web.rest.CookieResponseHandler;
 
 /**
