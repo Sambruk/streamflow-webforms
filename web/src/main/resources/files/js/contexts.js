@@ -10,6 +10,7 @@
 var Contexts = (function() {
     var inner = {};
     var rootContext;
+    var hash;
 
     // Context has a view, initialize, and a verifyer
     // first initialize is called, then the verifyer
@@ -24,6 +25,7 @@ var Contexts = (function() {
 
     Context.prototype.addSubContext = function( name, context ) {
         this.subContexts[ name ] = context;
+        return this;
     }
 
     Context.prototype.addIdContext = function( context ) {
@@ -46,10 +48,32 @@ var Contexts = (function() {
         return subContext;
     }
 
+    Context.prototype.getViewFunction = function( segments, map, fn) {
+        var context = this;
+        if ( segments.length == 0 ) {
+            return function() { fn(); context.view( map[context] )};
+        }
+        var name = segments[0];
+        var subContext;
+        if ( this.subContexts[ name ] ) {
+            subContext = this.subContexts[ name ];
+        } else {
+            if ( !this.subContexts.idContext ) return null;
+            map[ this.subContexts.idContext ] = name;
+            subContext = this.subContexts.idContext;
+        }
+        return subContext.getViewFunction( segments.slice(1), map,
+            function () {
+                fn();
+                subContext.initialize();
+                subContext.verify( name );
+            });
+    }
 
-    function findView( context, segments, map ) {
+
+    function findView( context, segments, map, fn ) {
         var subContext = context.getSubContext( segments, map );
-        if ( !subContext ) return function() { context.view( map[context]) }
+        if ( !subContext ) return function() { fn(); context.view( map[context]) }
         return findView( subContext, segments.slice(1), map );
     }
 
@@ -65,31 +89,45 @@ var Contexts = (function() {
     }
 
     inner.findView = function( ) {
+        if ( hash == location.hash ) return $.noop;
+        hash = location.hash;
         rootContext.initialize();
         var segments = trim( location.hash.substring(1).split('/') );
-        return findView( rootContext, segments, {});
+        //return findView( rootContext, segments, {});
+        return rootContext.getViewFunction( segments, {}, rootContext.initialize );        
     }
 
-    inner.setupContexts = function() {
-        rootContext           = new Context( gotoPage, { initialize:setupCaseAndForm });
-        var summaryContext    = new Context( gotoSummary, {initialize:setupSignatures} );
-        var signaturesContext = new Context( gotoSignatures, {initialize:setupSignatures, verifier:verifyListSignatures});
-        var pageContext       = new Context( gotoPage, { verifier:verifyPage });
-        var providersContext  = new Context( gotoProviders, {initialize:setupProviders, verifier:verifySelectedSignature} );
-        var signatureContext  = new Context( performSign, {} );
-        var discardContext    = new Context( discard, {} );
-        var submitContext     = new Context( submitAndSend, {verifier:verifySubmit});
+    inner.init = function( map ) {
+        rootContext = setup( map );
+    }
 
-        rootContext.addSubContext( 'summary', summaryContext );
-        rootContext.addSubContext( 'signatures', signaturesContext );
-        rootContext.addSubContext( 'discard', discardContext );
-        rootContext.addSubContext( 'submit', submitContext );
-        rootContext.addIdContext( pageContext );
+    function setup( map )Ê{
+        var context = create( map );
+        if ( !map.subContexts ) return create( map );
+        $.each( map.subContexts, function(key, value ) {
+            if ( key == 'named' ) {
+                context.addIdContext( setup( value ) )
+            } else {
+                context.addSubContext( key, setup( value ) );
+            }
+        })
+        return context;
+    }
 
-        signaturesContext.addIdContext( providersContext );
-
-        providersContext.addIdContext( signatureContext );
+    function create( map ) {
+        return new Context( map.view, {initialize:map.initialize, verifier:map.verifier});
     }
 
     return inner;
 }());
+
+/*
+{view:gotoPage, initialize:setupCaseAndForm, subContexts: {
+    'summary'   : {view:gotoSummary, initialize:setupSignatures},
+    'discard'   : {view:discard},
+    'submit'    : {view:submitAndSend, verifier:verifySubmit},
+    'named'     : {view:gotoPage, initialize:verifyPage},
+    'signatures': {view:gotoSignatures, initialize: setupSignatures, subContexts: {
+         'named': {view:gotoProviders, initialize:setupProviders, verifier:verifySelectedSignature, subContexts: {
+            'named': {view:performSign}}}}}}};
+  */
