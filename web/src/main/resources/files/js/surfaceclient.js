@@ -23,11 +23,11 @@ jQuery(document).ready(function()
         RequestModule.selectEndUser();
         var data = RequestModule.getUser();
         RequestModule.createUserUrl( data.entity );
-        setupContexts();
+        Contexts.setupContexts();
         setupView();
     }
 
-    function setupCaseAndForm() {
+    setupCaseAndForm = function() {
         if ( state.formDraft ) return;
         var data = RequestModule.getCaseForm();
         if ( data.caze && data.form )
@@ -53,45 +53,54 @@ jQuery(document).ready(function()
         return updated;
     }
 
-    function submitAndSend() {
+    submitAndSend = function() {
         RequestModule.submitAndSend();
         var caseName = RequestModule.getCaseName();
         var formId = state.formDraft.form;
         var caseUrl = RequestModule.getCaseUrl();
         state.formDraft = null;
-        insertFormSubmitted( caseName, formId, caseUrl );
+        show( 'thank_you_div', buildFormSubmitted, {caseName:caseName, formId:formId, caseUrl:caseUrl} );
     }
 
-    function discard() {
+    discard = function() {
         RequestModule.discard();
         state.formDraft = null;
-        insertDiscard();
+        show( 'thank_you_div', buildDiscard, {});
     }
 
-    function gotoProviders( index ) {
+    gotoPage = function( page ) {
+        if ( !page ) {
+            redirect('0');
+        } else {
+            var pages = state.formDraft['pages'];
+            show( 'form_filling_div', buildPage, {page:parseInt( page ), pages:pages, description: state.formDraft.description});
+        }
+    }
+
+    gotoProviders = function( index ) {
         state.requiredSignatureName = state.formSignatures[ index ].name;
-        insertProviders( state.eIdProviders.links );
+        show('form_signing_div', buildProviders, { eIdProviders:state.eIdProviders.links });
     }
 
-    function gotoSummary() {
+    gotoSummary = function() {
         var description = state.formDraft.description;
         var pages = state.formDraft.pages;
         var signatures = state.formSignatures.length != 0;
-        insertSummary( description, pages, signatures );
+        show( 'form_summary_div' , buildSummary, {description: description, pages:pages, signatures:signatures});
     }
 
-    function gotoSignatures() {
+    gotoSignatures = function() {
         var hasSignature = state.formDraft.signatures.length > 0;
         var required = state.formSignatures;
-        insertRequiredSignatures( hasSignature, required );
+        show( 'required_signatures_div', buildRequiredSignatures, {hasSignature:hasSignature, required:required});
     }
 
-    function setupSignatures() {
+    setupSignatures = function() {
         if ( state.formSignatures ) return;
         state.formSignatures = RequestModule.getFormSignatures();
     }
 
-    function setupProviders() {
+    setupProviders = function() {
         if ( state.eIdProviders ) return;
         state.eIdProviders = RequestModule.getProviders();
     }
@@ -155,7 +164,7 @@ jQuery(document).ready(function()
         return ( page == 0);
     }
 
-    function performSign( provider ) {
+    performSign = function( provider ) {
         var tbs = getFormTBS();
 
         var signDTO = {
@@ -192,52 +201,51 @@ jQuery(document).ready(function()
     /**
      * Functions that creates DOM nodes and inserts them
      */
-    function createButton( name, href, disabled ) {
-        if ( !disabled ) {
-            var img = clone(name);
-            return clone('link').attr({'href':href,"class":"button"}).append( img ).append( texts[ name ] );
-        } else {
-            var img = clone(name).fadeTo(0, 0.4);
-            return clone('disabled').append( img ).append( texts[ name ] );
+    function createButton( map ) {
+        var image, button;
+        if ( map.image ) {
+            image = clone( map.image );
         }
+        if ( !map.disabled ) {
+            button = clone('link').attr({'href':map.href,"class":"button positive"});
+        } else {
+            image.fadeTo(0, 0.4);
+            button = clone('disabled');
+        }
+        return button.append( image ).append( map.name );
     }
 
-    function insert( node ) {
-        $('#app').empty().append( node );
+    function show( id, fn, args ) {
+        args.node = clone( id );
+        fn( args );
+        $('#app').empty().append( args.node );
     }
 
-    function insertFormSubmitted( caseName, formId, caseUrl ) {
-        var node = clone('thank_you_div');
-        var message = node.find('#end_message');
+    function buildFormSubmitted( args, caseName, formId, caseUrl ) {
+        var message = args.node.find('#end_message');
         message.text(texts.formSubmittedThankYou);
 
-        if ( typeof( caseName )!="undefined") {
-            message.append( '<br/> ' + texts.caseidmessage + ' ' + caseName );
+        if ( typeof( args.caseName )!="undefined") {
+            message.append( '<br/> ' + texts.caseidmessage + ' ' + args.caseName );
         }
-        var url = caseUrl +'submittedforms/'+ formId + '/generateformaspdf';
-        var print_node = clone('print');
-        var print_url = print_node.find("#print_link").attr("href", url );
-        print_node.appendTo(node);
-
-        insert( node );
+        var url = args.caseUrl +'submittedforms/'+ args.formId + '/generateformaspdf';
+        createButton({image: 'print', name:texts.print, href:url}).attr('target','_new').appendTo(args.node);
     }
 
-    function insertPage( page, pages, description ) {
-        var formFillingDiv = clone('form_filling_div');
-        formFillingDiv.find('#form_description').text( description );
-        var toolbar = formFillingDiv.find('#form_buttons_div');
+    function buildPage( args ) {
+        args.node.find('#form_description').text( args.description );
+        var toolbar = args.node.find('#form_buttons_div');
 
-        toolbar.append( createButton('previous', '#'+(page-1), firstPage(page) ) );
-        toolbar.append( createButton('next', '#'+(page+1), lastPage(page, pages) ) );
-        toolbar.append( createButton('discard', '#discard') );
-        toolbar.append( createButton('summary', '#summary' ) );
+        toolbar.append( createButton({image:'previous', name:texts.previous, href:'#'+(args.page-1), disabled:firstPage(args.page)} ) );
+        toolbar.append( createButton({image:'next',name:texts.next,href:'#'+(args.page+1), disabled:lastPage(args.page, args.pages) } ) );
+        toolbar.append( createButton({image:'discard',name:texts.discard,href:'#discard'} ) );
+        toolbar.append( createButton({image:'summary',name:texts.summary,href:'#summary'} ) );
 
-        appendPageNames( page, pages, formFillingDiv.find('#form_pages') );
-        var fieldList = formFillingDiv.find('#form_table_body');
-        $.each( pages[ page ].fields, function(idx, field){
+        appendPageNames( args.page, args.pages, args.node.find('#form_pages') );
+        var fieldList = args.node.find('#form_table_body');
+        $.each( args.pages[ args.page ].fields, function(idx, field){
             FieldTypeModule.render( field, fieldList );
         });
-        insert( formFillingDiv );
     }
 
     function appendPageNames( current, pages, pagesNode )
@@ -254,48 +262,42 @@ jQuery(document).ready(function()
         });
     }
 
-    function insertProviders( eIdProviders ) {
-        var div = clone('form_signing_div');
-        var providers = div.find('#signing_providers');
-        $.each( eIdProviders, function(idx, link ) {
-            providers.append( clone('link').attr({"class":"button", "href":location.hash+'/'+ link.href.split('=')[1] }).text( link.text ) );
-            providers.append( '<br/>');
+    function buildProviders( args ) {
+        args.node.append( texts.provider );
+        $.each( args.eIdProviders, function(idx, link ) {
+            args.node.append( '<br/>');
+            createButton( {name:link.text, href:location.hash+'/'+ link.href.split('=')[1] } ).appendTo( args.node );
         });
-        insert( div );
     }
 
-    function insertRequiredSignatures( hasSignature, required ) {
-        var requiredSignatures = clone('required_signatures_div');
+    function buildRequiredSignatures( args ) {
         var list = $('<ul />');
 
         var submitDisabled = true;
-        $.each( required, function(idx, signature) {
+        $.each( args.required, function(idx, signature) {
             var button;
             // for now only allow one signature
-            if ( hasSignature ) {
+            if ( args.hasSignature ) {
+                button = createButton({image:'signed', name: signature.name, disabled:true});
                 submitDisabled = false;
-                var img = clone('signed').fadeTo(0, 0.4);
-                button = clone('disabled').append( img ).append( signature.name );
             } else {
-                button = clone('link').attr({'href':'#signatures/'+idx, "class":"button"}).removeAttr('id').text( signature.name );
+                button = createButton({name:signature.name, href:'#signatures/'+idx});
             }
             list.append( $('<li />').append( button ) );
         });
 
-        requiredSignatures.find('#required_signatures_list').append( list );
-        requiredSignatures.append( createButton( 'summary', '#summary' ) );
-        requiredSignatures.append( createButton( 'submit', '#submit', submitDisabled ) );
-        insert( requiredSignatures );
+        args.node.append( list );
+        args.node.append( createButton({image:'summary', name:texts.summary, href:'#summary'} ) );
+        args.node.append( createButton({image:'submit', name:texts.submit, href:'#submit', disabled:submitDisabled} ) );
     }
 
-    function insertSummary( description, pages, signatures ) {
-        var summaryDiv = clone('form_summary_div');
+    function buildSummary( args ) {
         var errorString = "";
-        summaryDiv.find('#form_description').text( description );
-        var summaryPages = summaryDiv.find('#form_pages_summary');
-        var summaryStatus = summaryDiv.find('#form_submission_status');
+        args.node.find('#form_description').text( args.description );
+        var summaryPages = args.node.find('#form_pages_summary');
+        var summaryStatus = args.node.find('#form_submission_status');
 
-        $.each( pages, function(idx, page){
+        $.each( args.pages, function(idx, page){
             var pageDiv = clone('form_page_summary');
 
             pageDiv.find('h3').append( clone('link').attr('href','#'+idx).text(page.title) );
@@ -310,74 +312,33 @@ jQuery(document).ready(function()
         });
         var formOk = (errorString=="");
         var button;
-        if ( signatures ) {
-            button = createButton( 'signatures', '#signatures', !formOk);
+        if ( args.signatures ) {
+            button = createButton( {image:'signatures', name:texts.signatures, href:'#signatures', disabled:!formOk });
         } else {
-            button = createButton( 'submit', '#', !formOk);
+            button = createButton( {image:'submit', name:texts.submit, href:'#submit', disabled:!formOk });
         }
 
         summaryStatus.append( button );
         if ( !formOk ) {
             button.aToolTip({ tipContent: errorString });
         }
-        insert( summaryDiv );
     }
 
-    function insertDiscard() {
-        var node = clone('thank_you_div');
-        node.find('#end_message').text( texts.formdiscarded );
-        insert( node );
+    function buildDiscard( args ) {
+        args.node.find('#end_message').text( texts.formdiscarded );
     }
 
-    function translate( )
-    {
-        $('*', 'body')
-            .andSelf()
-            .contents()
-            .filter(function(){
-                return this.nodeType === 3;
-            })
-            .filter(function(){
-                // Only match when contains '$' anywhere in the text
-                return this.nodeValue.indexOf( '$' ) != -1;
-            })
-            .each(function(){
-                var words = this.nodeValue.split(' ');
-                $.each( words, function(idx, word){
-                    if ( word.length > 0 && word.charAt(0)=='$' )
-                    {
-                        words[ idx ] = texts[ $.trim( word.substring(1) ) ];
-                    }
-                });
-                this.nodeValue = words.join(' ');
-            });
+    error = function( message ) {
+        show('ErrorMessage', function(args){args.node.text(message)}, {});
+        throw message;
     }
 
-
-    function clone( templateId, insertedId ) {
-        if ( !insertedId ) {
-            return $('#'+templateId).clone().attr('id', 'inserted_'+templateId );
-        } else {
-            return $('#'+templateId).clone().attr('id', insertedId );
-        }
+    function clone( templateId ) {
+        return $('#'+templateId).clone().attr('id', 'inserted_'+templateId );
     }
 
     function redirect( view ) {
         location.hash = '#'+view;
-    }
-
-    error = function( message ) {
-        insert( clone('ErrorMessage').text( message ) );
-        throw message;
-    }
-
-    function gotoPage( page ) {
-        if ( !page ) {
-            redirect('0');
-        } else {
-            var pages = state.formDraft['pages'];
-            insertPage( parseInt( page ), pages, state.formDraft.description );
-        }
     }
 
     function showInfo() {
@@ -392,10 +353,9 @@ jQuery(document).ready(function()
         // so ensure this is called only once
         if ( state.hash == location.hash ) return;
         state.hash = location.hash;
-        var segments = trim( location.hash.substring(1).split('/') );
         try {
-            state.rootContext.initialize();
-            var view = findView( state.rootContext, segments, {});
+            
+            var view = Contexts.findView( );
             view();
             showInfo();
             $(window).scrollTop( 0 ); 
@@ -405,25 +365,7 @@ jQuery(document).ready(function()
         }
     }
 
-    function trim(a){
-        var tmp=new Array();
-        for(j=0;j<a.length;j++)
-            if(a[j]!='')
-                tmp[tmp.length]=a[j];
-        a.length=tmp.length;
-        for(j=0;j<tmp.length;j++)
-            a[j]=tmp[j];
-        return a;
-    }
-
-
-    function findView( context, segments, map ) {
-        var subContext = context.getSubContext( segments, map );
-        if ( !subContext ) return function() { context.view( map[context]) }
-        return findView( subContext, segments.slice(1), map );
-    }
-
-    function verifyListSignatures() {
+    verifyListSignatures = function() {
         if (state.formSignatures.length == 0)
             throw "No Signatures Needed";
 
@@ -441,17 +383,18 @@ jQuery(document).ready(function()
         });
     }
 
-    function verifySubmit() {
-        formIsFilled( "Form cannot be submitted" );
-        //is form signed
+    verifySubmit = function() {
+        formIsFilled( "All mandatory filed must be filled before the form can be submitted" );
+
         if ( state.formSignatures.length > 0 ) {
+            //is form signed
             if ( state.formSignatures.length != state.formDraft.signatures.length ) {
                 throw "Form must be signed before it can be submitted";
             }
         }
     }
 
-    function verifySelectedSignature( number ) {
+    verifySelectedSignature = function( number ) {
         var nr = parseInt( number );
         var max = state.formSignatures.length;
         if ( isNaN(nr) || nr < 0 || nr >= max ) {
@@ -459,7 +402,7 @@ jQuery(document).ready(function()
         }
     }
 
-    function verifyPage( pageSegment ) {
+    verifyPage = function( pageSegment ) {
         var page = parseInt( pageSegment );
         var pages = state.formDraft['pages'].length;
         if ( isNaN(page) || page < 0 || page >= pages ) {
@@ -467,68 +410,8 @@ jQuery(document).ready(function()
         }
     }
 
-    function setupContexts() {
-        state.rootContext     = new Context( gotoPage, setupCaseAndForm);
-        var summaryContext    = new Context( gotoSummary, setupSignatures );
-        var signaturesContext = new Context( gotoSignatures, setupSignatures, verifyListSignatures);
-        var pageContext       = new Context( gotoPage, $.noop, verifyPage );
-        var providersContext  = new Context( gotoProviders, setupProviders, verifySelectedSignature );
-        var signatureContext  = new Context( performSign );
-        var discardContext    = new Context( discard );
-        var submitContext     = new Context( submitAndSend, $.noop, verifySubmit );
-
-        state.rootContext.addSubContext( 'summary', summaryContext );
-        state.rootContext.addSubContext( 'signatures', signaturesContext );
-        state.rootContext.addSubContext( 'discard', discardContext );
-        state.rootContext.addSubContext( 'submit', submitContext );
-        state.rootContext.addIdContext( pageContext );
-
-        signaturesContext.addIdContext( providersContext );
-
-        providersContext.addIdContext( signatureContext );
-    }
-
-    function Context( view, initialize, verifier ) {
-        this.subContexts = {};
-        this.initialize = initialize ? initialize : $.noop;
-        this.verify = verifier ? verifier : $.noop;
-        this.view = view;
-    }
-
-    Context.prototype.addSubContext = function( name, context ) {
-        this.subContexts[ name ] = context;
-    }
-
-    Context.prototype.addIdContext = function( context ) {
-        this.addSubContext( 'idContext', context );
-    }
-
-    Context.prototype.getSubContext = function( segments, map ) {
-        if ( segments.length == 0 ) return null;
-        var name = segments[0];
-        var subContext;
-        if ( this.subContexts[ name ] ) {
-            subContext = this.subContexts[ name ];
-        } else {
-            if ( !this.subContexts.idContext ) return null;
-            map[ this.subContexts.idContext ] = name;
-            subContext = this.subContexts.idContext;
-        }
-        subContext.initialize();
-        subContext.verify( name );
-        return subContext;
-    }
-
-    /**
-     * Main
-     */
-    var state = {
-        info: ''
-    };
-
-	$('#app').empty();
+    var state = {};
 	$('#components').hide().load('static/components.html', function() {
-        translate( );
         RequestModule.updateAccesspoint( accesspoint );
         login();
         $(window).hashchange( setupView );
