@@ -28,7 +28,7 @@ import org.restlet.data.Method;
 import org.restlet.representation.EmptyRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
-import se.streamsource.surface.web.context.accesspoints.endusers.EndUsersContext;
+import se.streamsource.surface.web.context.EndUsersContext;
 import se.streamsource.dci.restlet.client.ResponseHandler;
 import se.streamsource.streamflow.infrastructure.event.DomainEvent;
 import se.streamsource.streamflow.infrastructure.event.TransactionEvents;
