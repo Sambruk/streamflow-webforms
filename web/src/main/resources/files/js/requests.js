@@ -25,7 +25,7 @@ var RequestModule = (function() {
     var urls = {
         streamflow: "proxy/accesspoints/",
 	    surface:    "surface/accesspoints/",
-	    eid:        "eidproxy/",
+	    eid:        "eidproxy/"
     };
 
     function errorPopup() {
@@ -73,25 +73,25 @@ var RequestModule = (function() {
     inner.verifyAccessPoint = function() {
         var parameters = request('GET', urls.streamflow + '.json');
         parameters.error = function() { error( texts.invalidaccesspoint ); };
-        $.ajax(parameters);
+        $.ajax( parameters );
     }
 
     inner.selectEndUser = function() {
         var parameters = request('POST', urls.surface + 'selectenduser.json');
         parameters.error = function() { error( texts.loginfailed ); };
-        $.ajax(parameters);
+        $.ajax( parameters );
     }
 
     inner.getUser = function() {
         var params = request('GET', urls.surface + 'userreference.json');
         params.error = function() { error( texts.loginfailed ); };
-        return getData(params);
+        return getData( params );
     }
 
     inner.getCaseForm = function() {
         var parameters = request('GET', urls.user + 'findcasewithform.json');
         parameters.error = null;
-        return getData( parameters);
+        return getData( parameters );
     }
 
     inner.getFormDraft = function() {
@@ -112,17 +112,17 @@ var RequestModule = (function() {
 
     inner.submitAndSend = function() {
         var parameters = request('POST', urls.draft + 'summary/submitandsend.json');
-        $.ajax(parameters);
+        $.ajax( parameters );
     }
 
     inner.discard = function() {
         var parameters = request('POST', urls.draft + 'discard.json');
-        $.ajax(parameters);
+        $.ajax( parameters );
     }
 
     inner.getFormSignatures = function() {
         var parameters = request('GET', urls.draft + 'summary/signatures.json');
-        return getData(parameters).signatures;
+        return getData( parameters ).signatures;
     }
 
     inner.getProviders = function() {
@@ -141,21 +141,21 @@ var RequestModule = (function() {
 
     inner.sign = function( signDTO ) {
         var parameters = request('GET', urls.eid + 'sign/sign.htm');
-        parameteres.dataType = null;
+        parameters.dataType = null;
         parameters.data = signDTO;
         return getData( parameters );
     }
 
     inner.verify = function( verifyDTO ) {
-        var parameteres = request('POST', urls.eid + 'sign/verify.json');
-        parameteres.data = verifyDTO;
-        return getData( parameteres);
+        var parameters = request('POST', urls.eid + 'sign/verify.json');
+        parameters.data = verifyDTO;
+        return getData( parameters );
     }
 
     inner.addSignature = function( signatureDTO ) {
-        var parameteres = request('PUT', urls.draft + 'addsignature.json');
-        parameteres.data = signatureDTO;
-        $.ajax(parameteres);
+        var parameters = request('PUT', urls.draft + 'addsignature.json');
+        parameters.data = signatureDTO;
+        $.ajax( parameters );
     }
 
     return inner;

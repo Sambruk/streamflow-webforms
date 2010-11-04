@@ -161,30 +161,32 @@ jQuery(document).ready(function()
         };
 
         var htmlSnippet = RequestModule.sign( signDTO );
-        $('#app').html( htmlSnippet ).hide();
 
-        // issue with "alerts" in the code...
-        // Figure out how to fetch the error message
-        if ( !doSign() ) {
-            // Cancel/Wrong password/Expired certificate
-            throw "Signature aborted: "+retVal;
+        try {
+            $('#app').html( htmlSnippet ).hide();
+            if ( !doSign() ) {
+                throw "Signature aborted: "+retVal;
+            }
+
+            // strip parameters
+            var verifyDTO = {};
+            $.each( $('#app').find('form > input:hidden'), function(idx, value ) {
+                verifyDTO[ value.name ] = value.value;
+            });
+            var signatureDTO = RequestModule.verify( verifyDTO );
+
+            signatureDTO.form = tbs;
+            signatureDTO.encodedForm = verifyDTO.encodedTbs;
+            signatureDTO.provider = provider;
+            signatureDTO.name = state.requiredSignatureName;
+            RequestModule.addSignature( signatureDTO );
+            state.formDraft = RequestModule.getFormDraft();
+
+        } catch ( e ) {
+            throw e;
+        } finally {
+            $('#app').show();
         }
-
-        // strip parameters
-        var verifyDTO = {};
-        $.each( $('#app').find('form > input:hidden'), function(idx, value ) {
-            verifyDTO[ value.name ] = value.value;
-        });
-        var signatureDTO = RequestModule.verify( verifyDTO );
-
-        signatureDTO.form = tbs;
-        signatureDTO.encodedForm = verifyDTO.encodedTbs;
-        signatureDTO.provider = provider;
-        signatureDTO.name = state.requiredSignatureName;
-        RequestModule.addSignature( signatureDTO );
-        state.formDraft = RequestModule.getFormDraft();
-
-        $('#app').show();
         redirect("signatures");
     }
 
