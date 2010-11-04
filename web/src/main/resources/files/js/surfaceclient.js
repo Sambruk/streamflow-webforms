@@ -19,6 +19,7 @@
 jQuery(document).ready(function()
 {
     function login() {
+        RequestModule.setErrorHandler( error );
         RequestModule.verifyAccessPoint();
         RequestModule.selectEndUser();
         var data = RequestModule.getUser();
@@ -165,7 +166,7 @@ jQuery(document).ready(function()
         try {
             $('#app').html( htmlSnippet ).hide();
             if ( !doSign() ) {
-                throw "Signature aborted: "+retVal;
+                throw {info:"Signature aborted: "+retVal, redirect:'signatures'};
             }
 
             // strip parameters
@@ -190,9 +191,9 @@ jQuery(document).ready(function()
         redirect("signatures");
     }
 
-    error = function( message ) {
+    function error( message ) {
         Builder.show('ErrorMessage', function(args){args.node.text(message)}, {});
-        throw message;
+        throw {info:message};
     }
 
     function redirect( view ) {
@@ -200,38 +201,48 @@ jQuery(document).ready(function()
     }
 
     function setupView() {
-        if ( !Builder.runView( Contexts.findView( ) ) ) {
+        var path = Builder.runView( Contexts.findView( ));
+        if ( path ) {
             // error when executing view
-            redirect('0');
+            redirect( path );
         }
     }
 
     function verifyListSignatures() {
         if (state.formSignatures.length == 0)
-            throw "No Signatures Needed";
+            throw {info:"No Signatures Needed", redirect:'summary'};
 
-        formIsFilled( "You must fill in the form before it can be signed" );
+        formIsFilled( {info:"You must fill in the form before it can be signed", redirect:'summary' } );
     }
 
-    function formIsFilled( errorMessage ) {
+    function formIsFilled( ifError ) {
         // is form filled in
         $.each(state.formDraft.pages, function(idx, page){
             $.each( page.fields, function( fieldIdx, field ){
                 if ( field.field.mandatory && !field.value) {
-                    throw errorMessage;
+                    throw ifError;
                 }
             });
         });
     }
 
     function verifySubmit() {
-        formIsFilled( "All mandatory filed must be filled before the form can be submitted" );
+        formIsFilled( {info:"All mandatory filed must be filled before the form can be submitted",
+            redirect: 'summary'});
 
         if ( state.formSignatures.length > 0 ) {
             //is form signed
             if ( state.formSignatures.length != state.formDraft.signatures.length ) {
-                throw "Form must be signed before it can be submitted";
+                throw {info:"Form must be signed before it can be submitted",
+                    redirect:'signatures'};
             }
+        }
+    }
+
+    // If a form is signed it must not be edited
+    function verifyFormEditing() {
+        if ( state.formDraft.signatures.length > 0) {
+            throw {info: "Form is signed so it cannot be edited", redirect: 'signatures' };
         }
     }
 
@@ -239,7 +250,7 @@ jQuery(document).ready(function()
         var nr = parseInt( number );
         var max = state.formSignatures.length;
         if ( isNaN(nr) || nr < 0 || nr >= max ) {
-            throw "Required signature not valid: "+number;
+            throw {info:"Required signature not valid: "+number};
         }
     }
 
@@ -247,7 +258,7 @@ jQuery(document).ready(function()
         var page = parseInt( pageSegment );
         var pages = state.formDraft['pages'].length;
         if ( isNaN(page) || page < 0 || page >= pages ) {
-            throw "Page not valid: "+pageSegment;
+            throw {info:"Page not valid: "+pageSegment};
         }
     }
 
@@ -255,8 +266,8 @@ jQuery(document).ready(function()
         'summary'   : {view:gotoSummary,    init: [ setupSignatures ]},
         'discard'   : {view:discard},
         'submit'    : {view:submitAndSend,  init: [ verifySubmit ]},
-        'named'     : {view:gotoPage,       init: [ verifyPage ]},
-        'signatures': {view:gotoSignatures, init: [ setupSignatures ], subContexts: {
+        'named'     : {view:gotoPage,       init: [ verifyPage, verifyFormEditing ]},
+        'signatures': {view:gotoSignatures, init: [ setupSignatures, verifyListSignatures ], subContexts: {
              'named': {view:gotoProviders,  init: [ setupProviders, verifySelectedSignature ], subContexts: {
                 'named': {view:performSign}}}}}}};
 

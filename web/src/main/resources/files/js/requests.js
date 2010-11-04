@@ -21,17 +21,13 @@
  */
 var RequestModule = (function() {
     var inner = {};
+    var error;
 
     var urls = {
         streamflow: "proxy/accesspoints/",
 	    surface:    "surface/accesspoints/",
 	    eid:        "eidproxy/"
     };
-
-    function errorPopup() {
-        alert( texts.erroroccurred );
-        throw "http call failed";
-    }
 
     function request(type, url) {
         return {type:type, url:url, async:false, cache:false, error:errorPopup, dataType:'json'};
@@ -47,6 +43,10 @@ var RequestModule = (function() {
     function errorPopup() {
         alert( texts.erroroccurred );
         throw "http call failed";
+    }
+
+    inner.setErrorHandler = function( errorHandler ) {
+        error = errorHandler;
     }
 
     inner.updateAccesspoint = function( accesspoint ) {

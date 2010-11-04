@@ -126,10 +126,12 @@ var Builder = (function() {
             view();
             showInfo();
             $(window).scrollTop( 0 );
-            return true;
+            return "";
         } catch ( e ) {
-            info = e;
-            return false;
+            if ( e.info ) info = e.info;
+            if ( e.redirect ) return e.redirect;
+            //default redirect
+            return "0";
         }
     }
 
