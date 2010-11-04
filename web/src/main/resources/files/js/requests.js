@@ -34,7 +34,7 @@ var RequestModule = (function() {
     }
 
     function request(type, url) {
-        return {type:type, url:url, async:false, cache:false, error:errorPopup};
+        return {type:type, url:url, async:false, cache:false, error:errorPopup, dataType:'json'};
     }
 
     function getData( parameters ) {
@@ -141,6 +141,7 @@ var RequestModule = (function() {
 
     inner.sign = function( signDTO ) {
         var parameters = request('GET', urls.eid + 'sign/sign.htm');
+        parameteres.dataType = null;
         parameters.data = signDTO;
         return getData( parameters );
     }
