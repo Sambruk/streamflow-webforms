@@ -12,14 +12,11 @@ var Contexts = (function() {
     var rootContext;
     var hash;
 
-    // Context has a view, initialize, and a verifyer
-    // first initialize is called, then the verifyer
-    // if the verifyer succeeds (i.e. does not throws an exception
-    // the view will be shown
-    function Context( view, args ) {
+    // Context has a view, and an array of setup functions
+    // before showing the view the setup functions are called
+    function Context( view, init ) {
         this.subContexts = {};
-        this.initialize = args.initialize ? args.initialize : $.noop;
-        this.verify = args.verifier ? args.verifier : $.noop;
+        this.init = init ? init : [];
         this.view = view;
     }
 
@@ -32,23 +29,7 @@ var Contexts = (function() {
         this.addSubContext( 'idContext', context );
     }
 
-    Context.prototype.getSubContext = function( segments, map ) {
-        if ( segments.length == 0 ) return null;
-        var name = segments[0];
-        var subContext;
-        if ( this.subContexts[ name ] ) {
-            subContext = this.subContexts[ name ];
-        } else {
-            if ( !this.subContexts.idContext ) return null;
-            map[ this.subContexts.idContext ] = name;
-            subContext = this.subContexts.idContext;
-        }
-        subContext.initialize();
-        subContext.verify( name );
-        return subContext;
-    }
-
-    Context.prototype.getViewFunction = function( segments, map, fn) {
+    Context.prototype.buildViewFunction = function( segments, map, fn) {
         var context = this;
         if ( segments.length == 0 ) {
             return function() { fn(); context.view( map[context] )};
@@ -58,23 +39,17 @@ var Contexts = (function() {
         if ( this.subContexts[ name ] ) {
             subContext = this.subContexts[ name ];
         } else {
-            if ( !this.subContexts.idContext ) return null;
+            if ( !this.subContexts.idContext ) return function() { fn(); context.view( map[context] )};
             map[ this.subContexts.idContext ] = name;
             subContext = this.subContexts.idContext;
         }
-        return subContext.getViewFunction( segments.slice(1), map,
+        return subContext.buildViewFunction( segments.slice(1), map,
             function () {
                 fn();
-                subContext.initialize();
-                subContext.verify( name );
+                $.each( subContext.init, function(idx, fn ){
+                    fn( name );
+                });
             });
-    }
-
-
-    function findView( context, segments, map, fn ) {
-        var subContext = context.getSubContext( segments, map );
-        if ( !subContext ) return function() { fn(); context.view( map[context]) }
-        return findView( subContext, segments.slice(1), map );
     }
 
     function trim(a){
@@ -91,43 +66,35 @@ var Contexts = (function() {
     inner.findView = function( ) {
         if ( hash == location.hash ) return $.noop;
         hash = location.hash;
-        rootContext.initialize();
         var segments = trim( location.hash.substring(1).split('/') );
-        //return findView( rootContext, segments, {});
-        return rootContext.getViewFunction( segments, {}, rootContext.initialize );        
+        var fn = function() {
+            $.each( rootContext.init, function(idx, fun ){
+                fun( );
+            });
+        }
+        return rootContext.buildViewFunction( segments, {}, fn );
     }
 
     inner.init = function( map ) {
-        rootContext = setup( map );
+        rootContext = build( map );
     }
 
-    function setup( map )Ê{
+    function build( map) {
         var context = create( map );
         if ( !map.subContexts ) return create( map );
         $.each( map.subContexts, function(key, value ) {
             if ( key == 'named' ) {
-                context.addIdContext( setup( value ) )
+                context.addIdContext( build( value ) )
             } else {
-                context.addSubContext( key, setup( value ) );
+                context.addSubContext( key, build( value ) );
             }
         })
         return context;
     }
 
     function create( map ) {
-        return new Context( map.view, {initialize:map.initialize, verifier:map.verifier});
+        return new Context( map.view, map.init );
     }
 
     return inner;
 }());
-
-/*
-{view:gotoPage, initialize:setupCaseAndForm, subContexts: {
-    'summary'   : {view:gotoSummary, initialize:setupSignatures},
-    'discard'   : {view:discard},
-    'submit'    : {view:submitAndSend, verifier:verifySubmit},
-    'named'     : {view:gotoPage, initialize:verifyPage},
-    'signatures': {view:gotoSignatures, initialize: setupSignatures, subContexts: {
-         'named': {view:gotoProviders, initialize:setupProviders, verifier:verifySelectedSignature, subContexts: {
-            'named': {view:performSign}}}}}}};
-  */

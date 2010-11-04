@@ -61,6 +61,7 @@ formatUTCStringToIsoString = function( value){
 var FieldTypeModule = (function() {
     var inner = {};
     var fieldMap = {};
+    var updater;
 
     // internal function to display the field using the field template
     // and taking the fieldComponent.node as the input widget
@@ -175,7 +176,7 @@ var FieldTypeModule = (function() {
 
         this.updateServer = function() {
             var date = $.datepicker.parseDate('yy-mm-dd', this.getFieldValue() );
-            updateFieldValue(this.id, date.format("UTC:yyyy-mm-dd'T'HH:MM:ss.0000'Z'"));
+            updater(this.id, date.format("UTC:yyyy-mm-dd'T'HH:MM:ss.0000'Z'"));
         }
     }
 
@@ -212,7 +213,7 @@ var FieldTypeModule = (function() {
             var textfield = $('#numberField'+this.id);
             var enteredValue = this.getFieldValue();
 
-            var updated = updateFieldValue( this.id, enteredValue );
+            var updated = updater( this.id, enteredValue );
             var updatedValue = this.getFieldValue();
             if ( !updated || updatedValue != enteredValue )
             {
@@ -311,7 +312,7 @@ var FieldTypeModule = (function() {
 
         this.updateServer = function() {
             var value = this.getFieldValue();
-            var updated = updateFieldValue(this.id, value );
+            var updated = updater(this.id, value );
             var newValue = this.getFieldValue();
             if ( !updated || newValue != value )
             {
@@ -367,7 +368,7 @@ var FieldTypeModule = (function() {
             if ( component.updateServer ) {
                 component.updateServer();
             } else {
-                updateFieldValue( component.id, component.getFieldValue() );
+                updater( component.id, component.getFieldValue() );
             }
             component.dirty = false;
         }
@@ -375,6 +376,10 @@ var FieldTypeModule = (function() {
 
     inner.markDirty = function( fieldId ) {
         fieldMap[ fieldId ].dirty = true;
+    }
+
+    inner.setFieldUpdater = function( fieldUpdater ) {
+        updater = fieldUpdater;
     }
 
     return inner;

@@ -93,6 +93,24 @@ var Builder = (function() {
         }
     }
 
+    inner.updateField = function(fn, fieldId, fieldValue) {
+        var fieldDTO = {
+            field: fieldId,
+            value: fieldValue
+        };
+        var image = $('#'+fieldId+' .fieldwaiting > img').show();
+        try{
+            return fn( fieldDTO );
+        } catch( e ) {
+            info = e;
+            showInfo();
+            return "";
+        }finally{
+            image.hide();
+        }
+    }
+
+
     inner.discard = function( args ) {
         args.node.find('#end_message').text( texts.formdiscarded );
     }

@@ -24,10 +24,11 @@ jQuery(document).ready(function()
         var data = RequestModule.getUser();
         RequestModule.createUserUrl( data.entity );
         Contexts.init( contexts );
+        FieldTypeModule.setFieldUpdater( updateField );
         setupView();
     }
 
-    setupCaseAndForm = function() {
+    function setupCaseAndForm() {
         if ( state.formDraft ) return;
         var data = RequestModule.getCaseForm();
         if ( data.caze && data.form )
@@ -40,20 +41,11 @@ jQuery(document).ready(function()
         }
     }
 
-    updateFieldValue = function(fieldId, fieldValue) {
-        var image = $('#'+fieldId+' .fieldwaiting > img');
-        image.show();
-        var fieldDTO = {
-            field: fieldId,
-            value: fieldValue
-        };
-
-        var updated = parseEvents( RequestModule.updateField( fieldDTO ) );
-        image.hide();
-        return updated;
+    function updateField( fieldId, fieldValue ) {
+        return parseEvents( Builder.updateField( RequestModule.updateField, fieldId, fieldValue ) );
     }
 
-    submitAndSend = function() {
+    function submitAndSend() {
         RequestModule.submitAndSend();
         var caseName = RequestModule.getCaseName();
         var formId = state.formDraft.form;
@@ -62,7 +54,7 @@ jQuery(document).ready(function()
         Builder.show( 'thank_you_div', Builder.formSubmitted, {caseName:caseName, formId:formId, caseUrl:caseUrl} );
     }
 
-    discard = function() {
+    function discard() {
         RequestModule.discard();
         state.formDraft = null;
         Builder.show( 'thank_you_div', Builder.discard, {});
@@ -77,30 +69,30 @@ jQuery(document).ready(function()
         }
     }
 
-    gotoProviders = function( index ) {
+    function gotoProviders( index ) {
         state.requiredSignatureName = state.formSignatures[ index ].name;
         Builder.show('form_signing_div', Builder.providers, { eIdProviders:state.eIdProviders.links });
     }
 
-    gotoSummary = function() {
+    function gotoSummary() {
         var description = state.formDraft.description;
         var pages = state.formDraft.pages;
         var signatures = state.formSignatures.length != 0;
         Builder.show( 'form_summary_div' , Builder.summary, {description: description, pages:pages, signatures:signatures});
     }
 
-    gotoSignatures = function() {
+    function gotoSignatures() {
         var hasSignature = state.formDraft.signatures.length > 0;
         var required = state.formSignatures;
         Builder.show( 'required_signatures_div', Builder.requiredSignatures, {hasSignature:hasSignature, required:required});
     }
 
-    setupSignatures = function() {
+    function setupSignatures() {
         if ( state.formSignatures ) return;
         state.formSignatures = RequestModule.getFormSignatures();
     }
 
-    setupProviders = function() {
+    function setupProviders() {
         if ( state.eIdProviders ) return;
         state.eIdProviders = RequestModule.getProviders();
     }
@@ -118,9 +110,10 @@ jQuery(document).ready(function()
 
     function parseEvents( eventMap ) {
         var match = false;
+        if ( !eventMap.events ) return false;
         $.each( eventMap.events, function( idx, event){
             if ( event.name == "createdCase")
-            {
+           {
                 var caseId = $.parseJSON(event.parameters)['param1'];
                 RequestModule.createCaseUrl( caseId );
                 match = true;
@@ -156,7 +149,7 @@ jQuery(document).ready(function()
         return pageNumber;
     }
 
-    performSign = function( provider ) {
+    function performSign( provider ) {
         var tbs = getFormTBS();
 
         var signDTO = {
@@ -170,7 +163,12 @@ jQuery(document).ready(function()
         var htmlSnippet = RequestModule.sign( signDTO );
         $('#app').html( htmlSnippet ).hide();
 
-        doSign();
+        // issue with "alerts" in the code...
+        // Figure out how to fetch the error message
+        if ( !doSign() ) {
+            // Cancel/Wrong password/Expired certificate
+            throw "Signature aborted: "+retVal;
+        }
 
         // strip parameters
         var verifyDTO = {};
@@ -206,7 +204,7 @@ jQuery(document).ready(function()
         }
     }
 
-    verifyListSignatures = function() {
+    function verifyListSignatures() {
         if (state.formSignatures.length == 0)
             throw "No Signatures Needed";
 
@@ -224,7 +222,7 @@ jQuery(document).ready(function()
         });
     }
 
-    verifySubmit = function() {
+    function verifySubmit() {
         formIsFilled( "All mandatory filed must be filled before the form can be submitted" );
 
         if ( state.formSignatures.length > 0 ) {
@@ -235,7 +233,7 @@ jQuery(document).ready(function()
         }
     }
 
-    verifySelectedSignature = function( number ) {
+    function verifySelectedSignature( number ) {
         var nr = parseInt( number );
         var max = state.formSignatures.length;
         if ( isNaN(nr) || nr < 0 || nr >= max ) {
@@ -243,7 +241,7 @@ jQuery(document).ready(function()
         }
     }
 
-    verifyPage = function( pageSegment ) {
+    function verifyPage( pageSegment ) {
         var page = parseInt( pageSegment );
         var pages = state.formDraft['pages'].length;
         if ( isNaN(page) || page < 0 || page >= pages ) {
@@ -251,13 +249,13 @@ jQuery(document).ready(function()
         }
     }
 
-    var contexts = {view:gotoPage, initialize:setupCaseAndForm, subContexts: {
-        'summary'   : {view:gotoSummary, initialize:setupSignatures},
+    var contexts = {view:gotoPage,          init: [ setupCaseAndForm ], subContexts: {
+        'summary'   : {view:gotoSummary,    init: [ setupSignatures ]},
         'discard'   : {view:discard},
-        'submit'    : {view:submitAndSend, verifier:verifySubmit},
-        'named'     : {view:gotoPage, verifier:verifyPage},
-        'signatures': {view:gotoSignatures, initialize: setupSignatures, subContexts: {
-             'named': {view:gotoProviders, initialize:setupProviders, verifier:verifySelectedSignature, subContexts: {
+        'submit'    : {view:submitAndSend,  init: [ verifySubmit ]},
+        'named'     : {view:gotoPage,       init: [ verifyPage ]},
+        'signatures': {view:gotoSignatures, init: [ setupSignatures ], subContexts: {
+             'named': {view:gotoProviders,  init: [ setupProviders, verifySelectedSignature ], subContexts: {
                 'named': {view:performSign}}}}}}};
 
     var state = {};
