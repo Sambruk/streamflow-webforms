@@ -107,7 +107,7 @@
         </select><br/>
     </div>
 </div>
-<select id="ComboBoxFieldValue" onchange="javascript:updateFieldValue(name, value);">
+<select id="ComboBoxFieldValue" onchange="javascript:FieldTypeModule.markDirty(name);FieldTypeModule.updateServer(name);">
 </select>
 
 

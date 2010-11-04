@@ -157,7 +157,7 @@ var FieldTypeModule = (function() {
         }
 
         this.getFieldValue = function() {
-            return this.node.find('option:selected');
+            return node.find('option:selected').text();
         }
     }
 
@@ -267,20 +267,20 @@ var FieldTypeModule = (function() {
         });
 
         var selectionId = 'openSelectionOption' + id;
-        var node = $('#OpenSelectionOption').clone().attr({id: selectionId, name:id });
+        var option = $('#OpenSelectionOption').clone().attr({id: selectionId, name:id });
         var label = $('#label').clone().attr({'for': selectionId, id: 'label'+selectionId }).text(field.field.fieldValue.openSelectionName );
 
         var openSelectionInput = $('#OpenSelectionTextField').clone().attr({id: 'openSelectionTextField' + id , name: id });
-        this.node.append( $('<div />').append( node ).append( label ).append('&nbsp;').append( openSelectionInput) );
+        this.node.append( $('<div />').append( option ).append( label ).append('&nbsp;').append( openSelectionInput) );
 
 
         this.setFieldValue = function(value) {
-            var node = $('#OpenSelectionFieldValue' + id + safeIdString(value)).attr('checked', 'checked');
-            if (node.size()!=0) {
-                $('#openSelectionTextField' + id).attr({disabled: true, value: ""});
+            var selected = node.find('#OpenSelectionFieldValue' + id + safeIdString(value)).attr('checked', 'checked');
+            if (selected.size()!=0) {
+                node.find('#openSelectionTextField' + id).attr({disabled: true, value: ""});
             } else if ( value ) {
-                $('#openSelectionOption' + id).attr('checked', 'checked');
-                $('#openSelectionTextField' + id).attr("value", value);
+                node.find('#openSelectionOption' + id).attr('checked', 'checked');
+                node.find('#openSelectionTextField' + id).attr("value", value);
             }
         }
 
