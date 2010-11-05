@@ -52,12 +52,14 @@ jQuery(document).ready(function()
         var formId = state.formDraft.form;
         var caseUrl = RequestModule.getCaseUrl();
         state.formDraft = null;
+        state.formSignatures = null;
         Builder.show( 'thank_you_div', Builder.formSubmitted, {caseName:caseName, formId:formId, caseUrl:caseUrl} );
     }
 
     function discard() {
         RequestModule.discard();
         state.formDraft = null;
+        state.formSignatures = null;
         Builder.show( 'thank_you_div', Builder.discard, {});
     }
 
@@ -81,12 +83,6 @@ jQuery(document).ready(function()
         var signatures = state.formSignatures;
         var addedSignatures = state.formDraft.signatures;
         Builder.show( 'form_summary_div' , Builder.summary, {description: description, pages:pages, signatures:signatures, addedSignatures:addedSignatures});
-    }
-
-    function gotoSignatures() {
-        var signatures = state.formDraft.signatures;
-        var required = state.formSignatures;
-        Builder.show( 'required_signatures_div', Builder.requiredSignatures, {signatures:signatures, required:required});
     }
 
     function setupSignatures() {
@@ -167,34 +163,36 @@ jQuery(document).ready(function()
         try {
             $('#app').html( htmlSnippet ).hide();
             if ( !doSign() ) {
-                throw {info:"Signature aborted: "+retVal, redirect:'signatures'};
+                Builder.setWarning( "Signature cancelled: "+retVal );
+            } else {
+                // strip parameters
+                var verifyDTO = {};
+                $.each( $('#app').find('form > input:hidden'), function(idx, value ) {
+                    verifyDTO[ value.name ] = value.value;
+                });
+                var signatureDTO = RequestModule.verify( verifyDTO );
+
+                signatureDTO.form = tbs;
+                signatureDTO.encodedForm = verifyDTO.encodedTbs;
+                signatureDTO.provider = provider;
+                signatureDTO.name = state.requiredSignatureName;
+                RequestModule.addSignature( signatureDTO );
+                state.formDraft = RequestModule.getFormDraft();
+
+                Builder.setInfo( "Form signed successfully" );
             }
 
-            // strip parameters
-            var verifyDTO = {};
-            $.each( $('#app').find('form > input:hidden'), function(idx, value ) {
-                verifyDTO[ value.name ] = value.value;
-            });
-            var signatureDTO = RequestModule.verify( verifyDTO );
-
-            signatureDTO.form = tbs;
-            signatureDTO.encodedForm = verifyDTO.encodedTbs;
-            signatureDTO.provider = provider;
-            signatureDTO.name = state.requiredSignatureName;
-            RequestModule.addSignature( signatureDTO );
-            state.formDraft = RequestModule.getFormDraft();
-
         } catch ( e ) {
-            throw e;
+            //throw e;
         } finally {
             $('#app').show();
         }
-        redirect("signatures");
+        redirect("summary");
     }
 
     function error( message ) {
         Builder.show('ErrorMessage', function(args){args.node.text(message)}, {});
-        throw {info:message};
+        throw {error:message};
     }
 
     function redirect( view ) {
@@ -211,9 +209,9 @@ jQuery(document).ready(function()
 
     function verifyListSignatures() {
         if (state.formSignatures.length == 0)
-            throw {info:"No Signatures Needed", redirect:'summary'};
+            throw {error:"No Signatures Needed", redirect:'summary'};
 
-        formIsFilled( {info:"You must fill in the form before it can be signed", redirect:'summary' } );
+        formIsFilled( {error:"You must fill in the form before it can be signed", redirect:'summary' } );
     }
 
     function formIsFilled( ifError ) {
@@ -228,14 +226,14 @@ jQuery(document).ready(function()
     }
 
     function verifySubmit() {
-        formIsFilled( {info:"All mandatory filed must be filled before the form can be submitted",
+        formIsFilled( {error:"All mandatory filed must be filled before the form can be submitted",
             redirect: 'summary'});
 
         if ( state.formSignatures.length > 0 ) {
             //is form signed
             if ( state.formSignatures.length != state.formDraft.signatures.length ) {
-                throw {info:"Form must be signed before it can be submitted",
-                    redirect:'signatures'};
+                throw {error:"Form must be signed before it can be submitted",
+                    redirect:'summary'};
             }
         }
     }
@@ -243,41 +241,48 @@ jQuery(document).ready(function()
     // If a form is signed it must not be edited
     function verifyFormEditing() {
         if ( state.formDraft.signatures.length > 0) {
-            throw {info: "Form is signed so it cannot be edited", redirect: 'summary' };
+            throw {error: "Form is signed so it cannot be edited", redirect: 'summary' };
         }
+    }
+
+    function needSigning() {
+        if ( state.formSignatures.length == 0 )
+            throw {error:"Form does not require any signatures", redirect:'summary'};
+    }
+
+    function canBeSigned() {
+        formIsFilled( {error:"Fill the form before signing", redirect:'summary'} );
     }
 
     function verifySelectedSignature( number ) {
         var nr = parseInt( number );
         var max = state.formSignatures.length;
         if ( isNaN(nr) || nr < 0 || nr >= max ) {
-            throw {info:"Required signature not valid: "+number};
+            throw {error:"Required signature not valid: "+number};
         }
 
         //check if the selected signature is already signed
         var name = state.formSignatures[ nr ].name;
         $.each( state.formDraft.signatures, function(idx, value) {
             if ( value.name == name )
-                throw {info: "'"+name+"' has already signed the form", redirect: 'signatures'}
+                throw {error: "'"+name+"' has already signed the form", redirect: 'summary'}
         });
-
     }
 
     function verifyPage( pageSegment ) {
         var page = parseInt( pageSegment );
         var pages = state.formDraft['pages'].length;
         if ( isNaN(page) || page < 0 || page >= pages ) {
-            throw {info:"Page not valid: "+pageSegment};
+            throw {error:"Page not valid: "+pageSegment};
         }
     }
 
     var contexts = {view:gotoPage,          init: [ setupCaseAndForm ], subContexts: {
-        'summary'   : {view:gotoSummary,    init: [ setupSignatures ]},
         'discard'   : {view:discard},
         'submit'    : {view:submitAndSend,  init: [ verifySubmit ]},
         'named'     : {view:gotoPage,       init: [ verifyPage, verifyFormEditing ]},
-        'signatures': {view:gotoSignatures, init: [ setupSignatures, verifyListSignatures ], subContexts: {
-             'named': {view:gotoProviders,  init: [ setupProviders, verifySelectedSignature ], subContexts: {
+        'summary'   : {view:gotoSummary,    init: [ setupSignatures ], subContexts: { 
+            'named': {view:gotoProviders,  init: [ setupProviders, needSigning, canBeSigned, verifySelectedSignature ], subContexts: {
                 'named': {view:performSign}}}}}}};
 
     var state = {};

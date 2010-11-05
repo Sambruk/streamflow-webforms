@@ -63,6 +63,7 @@ var RequestModule = (function() {
     inner.createCaseUrl = function( caze ) {
         if ( !urls.user ) throw "URL to user not defined";
         urls.caze = urls.user + caze + '/';
+        urls.draft = null;
     }
 
     inner.createFormDraftUrl = function( form ) {

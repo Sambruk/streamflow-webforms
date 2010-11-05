@@ -2,14 +2,14 @@
 
 var Builder = (function() {
     var inner = {};
-    var info;
+    var messages;
 
     inner.formSubmitted = function( args, caseName, formId, caseUrl ) {
         var message = args.node.find('#end_message');
         message.text(texts.formSubmittedThankYou);
 
         if ( typeof( args.caseName )!="undefined") {
-            message.append( '<br/> ' + texts.caseidmessage + ' ' + args.caseName );
+            message.append( '<br/> ' + texts.caseidmessage + ' <b>' + args.caseName+'</b>' );
         }
         var url = args.caseUrl +'submittedforms/'+ args.formId + '/generateformaspdf';
         createButton({image: 'print', name:texts.print, href:url}).attr('target','_new').appendTo(args.node);
@@ -32,36 +32,47 @@ var Builder = (function() {
     }
 
     inner.providers = function( args ) {
-        args.node.append( texts.provider );
+        args.node.append( $('<h3 />').text( texts.provider ) );
         $.each( args.eIdProviders, function(idx, link ) {
             args.node.append( '<br/>');
             createButton( {name:link.text, href:location.hash+'/'+ link.href.split('=')[1] } ).appendTo( args.node );
         });
     }
 
-    inner.requiredSignatures = function( args ) {
+    function addSignatures( summarySignatures, required, signatures, disabled ) {
         var list = $('<ul />');
 
-        $.each( args.required, function(idx, signature) {
+        $.each( required, function(idx, reqSign ) {
             var button;
-            // for now only allow one signature
-            if ( args.signatures.length > 0 ) {
-                button = createButton({image:'signed', name: signature.name, disabled:true});
-                button.aToolTip({ tipContent: 'Signed by ' + args.signatures[0].signerName });
+            var signature = getSignature( reqSign.name, signatures );
+            if ( signature ) {
+                button = createButton({image:'signed', name: reqSign.name, disabled:true});
+                button.aToolTip({ tipContent: 'Signed by ' + signature.signerName });
             } else {
-                button = createButton({name:signature.name, href:'#signatures/'+idx});
+                button = createButton({name:reqSign.name, href:'#summary/'+idx, disabled:disabled});
             }
             list.append( $('<li />').append( button ) );
         });
 
-        args.node.append( list );
-        args.node.append( createButton({image:'summary', name:texts.summary, href:'#summary'} ) );
+        if ( required.length > 0) {
+            summarySignatures.append( $('<h3 />').text( texts.signatures ) );
+            summarySignatures.append( list );
+        }
+    }
+
+    function getSignature( name, signatures ) {
+        var match;
+        $.each( signatures, function( idxSign, signature ) {
+            if ( name == signature.name ) match = signature;
+        });
+        return match;
     }
 
     inner.summary = function( args ) {
         var errorString = "";
         args.node.find('#form_description').text( args.description );
         var summaryPages = args.node.find('#form_pages_summary');
+        var summarySignatures = args.node.find('#form_signatures');
         var summaryStatus = args.node.find('#form_submission_status');
 
         $.each( args.pages, function(idx, page){
@@ -77,16 +88,15 @@ var Builder = (function() {
             });
             summaryPages.append( pageDiv );
         });
+
         var formOk = (errorString=="");
+        addSignatures( summarySignatures, args.signatures, args.addedSignatures, !formOk );
+
         var formCanSubmit = formOk && ( args.signatures.length == args.addedSignatures.length );
 
         var button = createButton( {image:'submit', name:texts.submit, href:'#submit', disabled:!formCanSubmit });
         summaryStatus.append( button );
         summaryStatus.append( createButton( {image:'discard', name:texts.discard, href:'#discard'}) );
-
-        if ( args.signatures.length != 0 ) {
-            summaryStatus.append( createButton( {image:'signatures', name:texts.signatures, href:'#signatures', disabled:!formOk }) );
-        }
 
         if ( !formOk ) {
             button.aToolTip({ tipContent: errorString });
@@ -102,8 +112,8 @@ var Builder = (function() {
         try{
             return fn( fieldDTO );
         } catch( e ) {
-            info = e;
-            showInfo();
+            message = { error: e.info };
+            showMessages();
             return "";
         }finally{
             image.hide();
@@ -124,22 +134,37 @@ var Builder = (function() {
     inner.runView = function( view ) {
         try {
             view();
-            showInfo();
+            showMessages();
             $(window).scrollTop( 0 );
             return "";
         } catch ( e ) {
-            if ( e.info ) info = e.info;
-            if ( e.redirect ) return e.redirect;
-            //default redirect
-            return "0";
+            messages = {};
+            if ( e.info ) messages.info = e.info;
+            if ( e.warning ) messages.warning = e.warning;
+            if ( e.error ) messages.error = e.error;
+            return e.redirect ? e.redirect : 'summary';
         }
     }
 
-    function showInfo() {
-        if ( info ) {
-            $('#app').prepend( clone( 'ErrorMessage' ).append( info ) );
-            info = null;
+    inner.setInfo = function( info ) {
+        messages ? message.info = info : messages = {info:message};
+    }
+
+    inner.setWarning = function( warning ) {
+        messages ? messages.warning = warning : messages = {warning:warning};
+    }
+
+    function showMessages() {
+        if ( messages && messages.info ) {
+            $('#app').prepend( clone( 'InfoMessage' ).append( messages.info ) );
         }
+        if ( messages && messages.warning ) {
+            $('#app').prepend( clone( 'WarningMessage' ).append( messages.warning ) );
+        }
+        if ( messages && messages.error ) {
+            $('#app').prepend( clone( 'ErrorMessage' ).append( messages.error ) );
+        }
+        messages = null;
     }
 
     function appendPageNames( current, pages, pagesNode )
@@ -164,7 +189,7 @@ var Builder = (function() {
         if ( !map.disabled ) {
             button = clone('link').attr({'href':map.href,"class":"button positive"});
         } else {
-            image.fadeTo(0, 0.4);
+            if ( image ) image.fadeTo(0, 0.4);
             button = clone('disabled');
         }
         return button.append( image ).append( map.name );
