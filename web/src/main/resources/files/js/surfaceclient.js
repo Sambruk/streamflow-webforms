@@ -252,6 +252,14 @@ jQuery(document).ready(function()
         if ( isNaN(nr) || nr < 0 || nr >= max ) {
             throw {info:"Required signature not valid: "+number};
         }
+
+        //check if the selected signature is already signed
+        var name = state.formSignatures[ nr ].name;
+        $.each( state.formSignatures, function(idx, value) {
+            if ( value.name == name )
+                throw {info: "'"+name+"' has already signed the form", redirect: 'signatures'}
+        });
+
     }
 
     function verifyPage( pageSegment ) {
