@@ -23,6 +23,18 @@ $main_color: #003358; // #ccf;
 $page_background_color: #f0f0f0;
 $fieldset_background: lighten($page_background_color, 0%); //#220;
 
+$error_background_color: #fcc;
+$error_border_color: #f00;
+$error_color: #000;
+
+$warning_background_color: #ffffce;
+$warning_border_color: #eac117;
+$warning_color: #000;
+
+$info_background_color: #d8e4f1;
+$info_border_color: #153e7e;
+$info_color: #000;
+
 div.bp {
 @include blueprint-nested-reset;
 @include blueprint-typography(true);
@@ -124,4 +136,37 @@ div.commentfield pre {
 
 #mandatory {
     color: #f00;
+}
+
+@mixin message-box {
+  display: block;
+  padding: 14px 5px 12px 35px; 
+  font-size: 125%;
+  border: 1px solid;
+  background-repeat:no-repeat;
+  background-position:6px 15px;
+}
+
+#inserted_ErrorMessage {
+  @include message-box;
+  background-color: $error_background_color;
+  color: $error_color;
+  border-color: $error_border_color;
+  background-image:url('../images/forbidden.png');
+}
+
+#inserted_WarningMessage {
+  @include message-box;
+  background-color: $warning_background_color;
+  color: $warning_color;
+  border-color: $warning_border_color;
+  background-image:url('../images/warning.png');
+}
+
+#inserted_InfoMessage {
+  @include message-box;
+  background-color: $info_background_color;
+  color: $info_color;
+  border-color: $info_border_color;
+  background-image:url('../images/information.png');
 }
