@@ -78,14 +78,15 @@ jQuery(document).ready(function()
     function gotoSummary() {
         var description = state.formDraft.description;
         var pages = state.formDraft.pages;
-        var signatures = state.formSignatures.length != 0;
-        Builder.show( 'form_summary_div' , Builder.summary, {description: description, pages:pages, signatures:signatures});
+        var signatures = state.formSignatures;
+        var addedSignatures = state.formDraft.signatures;
+        Builder.show( 'form_summary_div' , Builder.summary, {description: description, pages:pages, signatures:signatures, addedSignatures:addedSignatures});
     }
 
     function gotoSignatures() {
-        var hasSignature = state.formDraft.signatures.length > 0;
+        var signatures = state.formDraft.signatures;
         var required = state.formSignatures;
-        Builder.show( 'required_signatures_div', Builder.requiredSignatures, {hasSignature:hasSignature, required:required});
+        Builder.show( 'required_signatures_div', Builder.requiredSignatures, {signatures:signatures, required:required});
     }
 
     function setupSignatures() {
@@ -242,7 +243,7 @@ jQuery(document).ready(function()
     // If a form is signed it must not be edited
     function verifyFormEditing() {
         if ( state.formDraft.signatures.length > 0) {
-            throw {info: "Form is signed so it cannot be edited", redirect: 'signatures' };
+            throw {info: "Form is signed so it cannot be edited", redirect: 'summary' };
         }
     }
 
@@ -255,7 +256,7 @@ jQuery(document).ready(function()
 
         //check if the selected signature is already signed
         var name = state.formSignatures[ nr ].name;
-        $.each( state.formSignatures, function(idx, value) {
+        $.each( state.formDraft.signatures, function(idx, value) {
             if ( value.name == name )
                 throw {info: "'"+name+"' has already signed the form", redirect: 'signatures'}
         });

@@ -42,13 +42,12 @@ var Builder = (function() {
     inner.requiredSignatures = function( args ) {
         var list = $('<ul />');
 
-        var submitDisabled = true;
         $.each( args.required, function(idx, signature) {
             var button;
             // for now only allow one signature
-            if ( args.hasSignature ) {
+            if ( args.signatures.length > 0 ) {
                 button = createButton({image:'signed', name: signature.name, disabled:true});
-                submitDisabled = false;
+                button.aToolTip({ tipContent: 'Signed by ' + args.signatures[0].signerName });
             } else {
                 button = createButton({name:signature.name, href:'#signatures/'+idx});
             }
@@ -57,7 +56,6 @@ var Builder = (function() {
 
         args.node.append( list );
         args.node.append( createButton({image:'summary', name:texts.summary, href:'#summary'} ) );
-        args.node.append( createButton({image:'submit', name:texts.submit, href:'#submit', disabled:submitDisabled} ) );
     }
 
     inner.summary = function( args ) {
@@ -80,14 +78,16 @@ var Builder = (function() {
             summaryPages.append( pageDiv );
         });
         var formOk = (errorString=="");
-        var button;
-        if ( args.signatures ) {
-            button = createButton( {image:'signatures', name:texts.signatures, href:'#signatures', disabled:!formOk });
-        } else {
-            button = createButton( {image:'submit', name:texts.submit, href:'#submit', disabled:!formOk });
+        var formCanSubmit = formOk && ( args.signatures.length == args.addedSignatures.length );
+
+        var button = createButton( {image:'submit', name:texts.submit, href:'#submit', disabled:!formCanSubmit });
+        summaryStatus.append( button );
+        summaryStatus.append( createButton( {image:'discard', name:texts.discard, href:'#discard'}) );
+
+        if ( args.signatures.length != 0 ) {
+            summaryStatus.append( createButton( {image:'signatures', name:texts.signatures, href:'#signatures', disabled:!formOk }) );
         }
 
-        summaryStatus.append( button );
         if ( !formOk ) {
             button.aToolTip({ tipContent: errorString });
         }
@@ -137,7 +137,7 @@ var Builder = (function() {
 
     function showInfo() {
         if ( info ) {
-            $('#app').prepend( clone( 'ErrorMessage' ).text( info ) );
+            $('#app').prepend( clone( 'ErrorMessage' ).append( info ) );
             info = null;
         }
     }
