@@ -35,6 +35,10 @@ $info_background_color: #d8e4f1;
 $info_border_color: #153e7e;
 $info_color: #000;
 
+$success_background_color: #dfd;
+$success_border_color: #347235;
+$success_color: #000;
+
 div.bp {
 @include blueprint-nested-reset;
 @include blueprint-typography(true);
@@ -141,7 +145,8 @@ div.commentfield pre {
 @mixin message-box {
   display: block;
   padding: 14px 5px 12px 35px; 
-  font-size: 125%;
+  margin-bottom: 15px;
+  font-size: 1.2em;
   border: 1px solid;
   background-repeat:no-repeat;
   background-position:6px 15px;
@@ -169,4 +174,23 @@ div.commentfield pre {
   color: $info_color;
   border-color: $info_border_color;
   background-image:url('../images/information.png');
+}
+
+#inserted_SuccessMessage {
+  @include message-box;
+  background-color: $success_background_color;
+  color: $success_color;
+  border-color: $success_border_color;
+  background-image:url('../images/check.png');
+}
+
+#caseid_message {
+  font-size: 1.2em
+}
+
+#caseid {
+  font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+  font-style: italic;
+  font-weight: bold;
+  font-size: 3em
 }
