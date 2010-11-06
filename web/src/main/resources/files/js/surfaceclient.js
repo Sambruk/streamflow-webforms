@@ -65,7 +65,7 @@ jQuery(document).ready(function()
 
     function gotoPage( page ) {
         if ( !page ) {
-            redirect('0');
+            throw { redirect:'0' };
         } else {
             var pages = state.formDraft['pages'];
             Builder.show( 'form_filling_div', Builder.page, {page:parseInt( page ), pages:pages, description: state.formDraft.description});
@@ -163,7 +163,8 @@ jQuery(document).ready(function()
         try {
             $('#app').html( htmlSnippet ).hide();
             if ( !doSign() ) {
-                Builder.setWarning( "Signature cancelled: "+retVal );
+                throw { warning:"Signature cancelled: "+retVal, redirect:'summary' };
+                //Builder.setWarning( "Signature cancelled: "+retVal );
             } else {
                 // strip parameters
                 var verifyDTO = {};
@@ -178,16 +179,12 @@ jQuery(document).ready(function()
                 signatureDTO.name = state.requiredSignatureName;
                 RequestModule.addSignature( signatureDTO );
                 state.formDraft = RequestModule.getFormDraft();
-
-                Builder.setInfo( "Form signed successfully" );
             }
 
-        } catch ( e ) {
-            //throw e;
         } finally {
             $('#app').show();
         }
-        redirect("summary");
+        throw {info:"Form signed successfully", redirect:'summary'};
     }
 
     function error( message ) {
@@ -195,16 +192,13 @@ jQuery(document).ready(function()
         throw {error:message};
     }
 
+/*
     function redirect( view ) {
         location.hash = '#'+view;
-    }
+    }*/
 
     function setupView() {
-        var path = Builder.runView( Contexts.findView( ));
-        if ( path ) {
-            // error when executing view
-            redirect( path );
-        }
+        Builder.runView( Contexts.findView( ));
     }
 
     function verifyListSignatures() {

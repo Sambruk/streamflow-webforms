@@ -155,27 +155,26 @@ var Builder = (function() {
         $('#app').empty().append( args.node );
     }
 
+    function redirect( view ) {
+        location.hash = '#'+view;
+    }
+
     inner.runView = function( view ) {
         try {
             view();
             showMessages();
             $(window).scrollTop( 0 );
-            return "";
         } catch ( e ) {
             messages = {};
             if ( e.info ) messages.info = e.info;
             if ( e.warning ) messages.warning = e.warning;
             if ( e.error ) messages.error = e.error;
-            return e.redirect ? e.redirect : 'summary';
+            if ( e.redirect ) {
+                redirect( e.redirect );
+            } else {
+                redirect( 'summary' );
+            }
         }
-    }
-
-    inner.setInfo = function( info ) {
-        messages ? message.info = info : messages = {info:message};
-    }
-
-    inner.setWarning = function( warning ) {
-        messages ? messages.warning = warning : messages = {warning:warning};
     }
 
     function showMessages() {
