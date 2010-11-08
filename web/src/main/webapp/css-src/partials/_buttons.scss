@@ -40,7 +40,7 @@
 
 // We can change the colors for buttons of certain classes, etc.
 .bp a.positive, .bp button.positive {
-  color: #529214;
+  color: #000066;
   @include button-hover-colors(#529214, #e6efc2, #c6d880);
   @include button-active-colors(white, #529214, #529214); }
 
