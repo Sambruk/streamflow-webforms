@@ -63,17 +63,17 @@ jQuery(document).ready(function()
         Builder.show( 'thank_you_div', Builder.discard, {});
     }
 
-    function gotoPage( page ) {
-        if ( !page ) {
+    function gotoPage( args ) {
+        if ( !args ) {
             throw { redirect:'0' };
         } else {
             var pages = state.formDraft['pages'];
-            Builder.show( 'form_filling_div', Builder.page, {page:parseInt( page ), pages:pages, description: state.formDraft.description});
+            Builder.show( 'form_filling_div', Builder.page, {page:parseInt( args.segment ), pages:pages, description: state.formDraft.description});
         }
     }
 
-    function gotoProviders( index ) {
-        state.requiredSignatureName = state.formSignatures[ index ].name;
+    function gotoProviders( args ) {
+        state.requiredSignatureName = state.formSignatures[ args.segment ].name;
         Builder.show('form_signing_div', Builder.providers, { eIdProviders:state.eIdProviders.links });
     }
 
@@ -147,13 +147,13 @@ jQuery(document).ready(function()
         return pageNumber;
     }
 
-    function performSign( provider ) {
+    function performSign( args ) {
         var tbs = getFormTBS();
 
         var signDTO = {
             transactionId: state.formDraft.form,
             tbs: tbs,
-            provider: provider,
+            provider: args.provider,
             successUrl: "#success",
             errorUrl: "#failed"
         };
@@ -175,7 +175,7 @@ jQuery(document).ready(function()
 
                 signatureDTO.form = tbs;
                 signatureDTO.encodedForm = verifyDTO.encodedTbs;
-                signatureDTO.provider = provider;
+                signatureDTO.provider = args.provider;
                 signatureDTO.name = state.requiredSignatureName;
                 RequestModule.addSignature( signatureDTO );
                 state.formDraft = RequestModule.getFormDraft();
@@ -191,11 +191,6 @@ jQuery(document).ready(function()
         Builder.show('ErrorMessage', function(args){args.node.text(message)}, {});
         throw {error:message};
     }
-
-/*
-    function redirect( view ) {
-        location.hash = '#'+view;
-    }*/
 
     function setupView() {
         Builder.runView( Contexts.findView( ));
@@ -248,11 +243,11 @@ jQuery(document).ready(function()
         formIsFilled( {error:"Fill the form before signing", redirect:'summary'} );
     }
 
-    function verifySelectedSignature( number ) {
-        var nr = parseInt( number );
+    function verifySelectedSignature( args ) {
+        var nr = parseInt( args.segment );
         var max = state.formSignatures.length;
         if ( isNaN(nr) || nr < 0 || nr >= max ) {
-            throw {error:"Required signature not valid: "+number};
+            throw {error:"Required signature not valid: "+args.segment};
         }
 
         //check if the selected signature is already signed
@@ -263,21 +258,22 @@ jQuery(document).ready(function()
         });
     }
 
-    function verifyPage( pageSegment ) {
-        var page = parseInt( pageSegment );
+    function verifyPage( args ) {
+        var page = parseInt( args.segment );
         var pages = state.formDraft['pages'].length;
         if ( isNaN(page) || page < 0 || page >= pages ) {
-            throw {error:"Page not valid: "+pageSegment};
+            throw {error:"Page not valid: "+args.segment};
         }
     }
 
+    
     var contexts = {view:gotoPage,          init: [ setupCaseAndForm ], subContexts: {
         'discard'   : {view:discard},
         'submit'    : {view:submitAndSend,  init: [ verifySubmit ]},
-        'named'     : {view:gotoPage,       init: [ verifyPage, verifyFormEditing ]},
+        'idContext' : {view:gotoPage,       init: [ verifyPage, verifyFormEditing ]},
         'summary'   : {view:gotoSummary,    init: [ setupSignatures ], subContexts: { 
-            'named': {view:gotoProviders,  init: [ setupProviders, needSigning, canBeSigned, verifySelectedSignature ], subContexts: {
-                'named': {view:performSign}}}}}}};
+            'idContext': {view:gotoProviders,  init: [ setupProviders, needSigning, canBeSigned, verifySelectedSignature ], subContexts: {
+                'idContext': {view:performSign}}}}}}};
 
     var state = {};
 	$('#components').hide().load('static/components.html', function() {

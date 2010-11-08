@@ -42,10 +42,6 @@ var Contexts = (function() {
         this.subContexts[ name ] = context;
     }
 
-    Context.prototype.addIdContext = function( context ) {
-        this.addSubContext( 'idContext', context );
-    }
-
     Context.prototype.sub = function( name ) {
         if ( this.subContexts[ name ] ) {
             return this.subContexts[ name ];
@@ -54,14 +50,14 @@ var Contexts = (function() {
         }
     }
 
-    Context.prototype.viewFn = function( fn, name ) {
+    Context.prototype.viewFn = function( fn, args ) {
         var context = this;
-        return function() { fn(); context.view( name )};
+        return function() { fn(); context.view( args )};
     }
 
-    Context.prototype.initFn = function( fn, name ) {
+    Context.prototype.initFn = function( fn, args ) {
         var context = this;
-        if ( !name ) {
+        if ( !args ) {
             return function() {
                 $.each( context.init, function(idx, fun ){
                     fun( );
@@ -71,7 +67,7 @@ var Contexts = (function() {
             return function () {
                 fn();
                 $.each( context.init, function(idx, fun ){
-                    fun( name );
+                    fun( args );
                 });
             };
         }
@@ -83,12 +79,11 @@ var Contexts = (function() {
             return context.viewFn( fn, previous );
         }
         var args = getArgs( segments[0] );
-        var name = args.segment;
-        var subContext = context.sub( name );
+        var subContext = context.sub( args.segment );
         if ( !subContext ) {
             return context.viewFn( fn, previous );
         }
-        return subContext.buildViewFunction( segments.slice(1), name, subContext.initFn( fn, name ) );
+        return subContext.buildViewFunction( segments.slice(1), args, subContext.initFn( fn, args ) );
     }
 
     function getArgs( segment ) {
@@ -136,11 +131,7 @@ var Contexts = (function() {
         var context = create( map );
         if ( !map.subContexts ) return create( map );
         $.each( map.subContexts, function(key, value ) {
-            if ( key == 'named' ) {
-                context.addIdContext( build( value ) )
-            } else {
-                context.addSubContext( key, build( value ) );
-            }
+            context.addSubContext( key, build( value ) );
         })
         return context;
     }

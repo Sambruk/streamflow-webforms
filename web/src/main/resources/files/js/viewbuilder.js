@@ -57,7 +57,7 @@ var Builder = (function() {
         args.node.append( $('<h3 />').text( texts.provider ) );
         $.each( args.eIdProviders, function(idx, link ) {
             args.node.append( '<br/>');
-            createButton( {name:link.text, href:location.hash+'/'+ link.href.split('=')[1] } ).appendTo( args.node );
+            createButton( {name:link.text, href:location.hash+'/'+ link.href } ).appendTo( args.node );
         });
     }
 
