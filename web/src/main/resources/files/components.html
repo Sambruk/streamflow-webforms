@@ -89,6 +89,7 @@
 <input id="OpenSelectionFieldValue" type="radio" onChange="javascript:selectOpenSelectChanged(name);" />
 <input id="OpenSelectionOption" type="radio" onChange="javascript:selectOpenSelectOption(name);" />
 <input id="OpenSelectionTextField" type="text" onChange="javascript:FieldTypeModule.markDirty(name);" onblur="javascript:FieldTypeModule.updateServer(name);" />
+<input id="AttachmentFieldValue" type="file" onchange="javascript:FieldTypeModule.markDirty(name);FieldTypeModule.updateServer(name);"/>
 
 <label id="label"></label>
 <div id="CommentFieldValue" class="commentfield"></div>
@@ -127,3 +128,5 @@
 
 <div id="required_signatures_div">
 </div>
+
+<form id="uploadform" action="POST" enctype="multipart/form-data" ></form>
