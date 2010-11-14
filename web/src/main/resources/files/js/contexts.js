@@ -27,7 +27,6 @@
 var Contexts = (function() {
     var inner = {};
     var rootContext;
-    var rootInit;
     var hash;
 
     // Context has a view, and an array of setup functions
@@ -43,6 +42,7 @@ var Contexts = (function() {
     }
 
     Context.prototype.sub = function( name ) {
+        if ( !name ) return null;
         if ( this.subContexts[ name ] ) {
             return this.subContexts[ name ];
         } else {
@@ -50,58 +50,49 @@ var Contexts = (function() {
         }
     }
 
-    Context.prototype.viewFn = function( fn, args ) {
-        var context = this;
-        return function() { fn(); context.view( args )};
+    Context.prototype.initEval = function( args ) {
+        $.each( this.init, function(idx, fun ){
+            fun( args );
+        });
     }
 
-    Context.prototype.initFn = function( fn, args ) {
-        var context = this;
-        if ( !args ) {
-            return function() {
-                $.each( context.init, function(idx, fun ){
-                    fun( );
-                });
-            }
-        } else {
-            return function () {
-                fn();
-                $.each( context.init, function(idx, fun ){
-                    fun( args );
-                });
-            };
-        }
-    }
-
-    Context.prototype.buildViewFunction = function( segments, previous, fn) {
-        var context = this;
-        if ( segments.length == 0 ) {
-            return context.viewFn( fn, previous );
-        }
-        var args = getArgs( segments[0] );
-        var subContext = context.sub( args.segment );
+    Context.prototype.runView = function( segments, previous ) {
+        this.initEval( previous );
+        var args = firstSegment( segments );
+        var subContext = this.sub( args.segment );
         if ( !subContext ) {
-            return context.viewFn( fn, previous );
+            this.view( previous );
+            return;
         }
-        return subContext.buildViewFunction( segments.slice(1), args, subContext.initFn( fn, args ) );
+        subContext.runView( segments.slice(1), args );
     }
 
-    function getArgs( segment ) {
-        args = {};
-        if ( segment.indexOf('?') > 0 ) {
-            var split = segment.split('?');
-            args[ 'segment' ] = split[0];
-            var list = split[1].split('=');
-            if ( list.length % 2 != 0 ) return args;
-            $.each( list, function(idx,val) {
-                if ( idx % 2 == 0) {
-                    args[ val ] = list[ idx +1 ];
-                }
-            })
+    function firstSegment( segments ) {
+        var arguments = {};
+        if ( !segments || segments.length == 0 ) {
+            return arguments;
         } else {
-            args[ 'segment' ] = segment;
+            var segment = segments[0];
+            if ( segment.indexOf('?') > 0 ) {
+                var split = segment.split('?');
+                arguments[ 'segment' ] = split[0];
+                var list = split[1].split('=');
+                if ( list.length % 2 != 0 ) return args;
+                $.each( list, function(idx,val) {
+                    if ( idx % 2 == 0) {
+                        arguments[ val ] = list[ idx +1 ];
+                    }
+                })
+            } else {
+                arguments[ 'segment' ] = segment;
+            }
         }
-        return args;
+        return arguments;
+    }
+
+    // maps the hash segments to a list of strings
+    function getSegments() {
+        return location.hash.substring(1).split('/');
     }
 
     function trim(a){
@@ -118,26 +109,21 @@ var Contexts = (function() {
     inner.findView = function( ) {
         if ( hash == location.hash ) return $.noop;
         hash = location.hash;
-        var segments = trim( location.hash.substring(1).split('/') );
-        return rootContext.buildViewFunction( segments, '', rootInit );
+        var segments = getSegments();
+        return function() { rootContext.runView( segments ); }
     }
 
     inner.init = function( map ) {
         rootContext = build( map );
-        rootInit = rootContext.initFn();
     }
 
-    function build( map) {
-        var context = create( map );
-        if ( !map.subContexts ) return create( map );
+    function build( map ) {
+        var context = new Context( map.view, map.init );
+        if ( !map.subContexts ) return context;
         $.each( map.subContexts, function(key, value ) {
             context.addSubContext( key, build( value ) );
         })
         return context;
-    }
-
-    function create( map ) {
-        return new Context( map.view, map.init );
     }
 
     return inner;
