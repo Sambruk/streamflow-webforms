@@ -17,26 +17,25 @@
 
 package se.streamsource.surface.web.rest;
 
+import java.util.logging.Logger;
+
 import org.qi4j.api.injection.scope.Structure;
-import org.qi4j.api.injection.scope.Uses;
 import org.qi4j.api.object.ObjectBuilderFactory;
 import org.qi4j.api.unitofwork.UnitOfWorkFactory;
 import org.qi4j.bootstrap.Energy4Java;
 import org.qi4j.spi.structure.ApplicationSPI;
 import org.restlet.Application;
 import org.restlet.Client;
-import org.restlet.Context;
 import org.restlet.Restlet;
 import org.restlet.data.MediaType;
 import org.restlet.data.Protocol;
 import org.restlet.resource.Directory;
 import org.restlet.routing.Router;
 import org.restlet.routing.Template;
+
 import se.streamsource.dci.restlet.server.CommandQueryRestlet;
 import se.streamsource.dci.restlet.server.ExtensionMediaTypeFilter;
 import se.streamsource.surface.web.SurfaceWebAssembler;
-
-import java.util.logging.Logger;
 
 public class SurfaceRestApplication
    extends Application
@@ -52,10 +51,8 @@ public class SurfaceRestApplication
    @Structure
    ApplicationSPI app;
 
-   public SurfaceRestApplication( @Uses Context parentContext ) throws Exception
+   public SurfaceRestApplication() throws Exception
    {
-      super( parentContext );
-
       getMetadataService().addExtension( "srj", APPLICATION_SPARQL_JSON );
 
    }
