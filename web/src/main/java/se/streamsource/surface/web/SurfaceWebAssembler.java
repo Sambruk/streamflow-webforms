@@ -30,8 +30,9 @@ import org.qi4j.entitystore.prefs.PreferencesEntityStoreInfo;
 import org.qi4j.entitystore.prefs.PreferencesEntityStoreService;
 import org.qi4j.rest.MBeanServerImporter;
 import org.restlet.Client;
+
+import se.streamsource.streamflow.infrastructure.ConfigurationManagerService;
 import se.streamsource.surface.web.context.ContextsAssembler;
-import se.streamsource.surface.web.proxy.ConfigurationManagerService;
 import se.streamsource.surface.web.proxy.ProxyConfiguration;
 import se.streamsource.surface.web.proxy.ProxyService;
 import se.streamsource.surface.web.resource.SurfaceResourceAssembler;
@@ -103,7 +104,7 @@ public class SurfaceWebAssembler
          Preferences node;
          try
          {
-            node =  Preferences.userRoot().node( "streamsource/streamflow/web" );
+            node =  Preferences.userRoot().node( "streamsource/streamflow/surface" );
          } finally
          {
             Thread.currentThread().setContextClassLoader( cl );

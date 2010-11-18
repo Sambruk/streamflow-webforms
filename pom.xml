@@ -381,6 +381,11 @@
                 <version>${version.streamflow}</version>
             </dependency>
 
+            <dependency>
+                <groupId>se.streamsource.streamflow</groupId>
+                <artifactId>streamflow-infrastructure</artifactId>
+                <version>1.2-SNAPSHOT</version>
+            </dependency>
 
             <!-- Qi4j -->
             <dependency>

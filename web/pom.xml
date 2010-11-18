@@ -92,18 +92,21 @@
         <dependency>
             <groupId>se.streamsource.streamflow</groupId>
             <artifactId>streamflow-common</artifactId>
-            <version>${version.streamflow}</version>
         </dependency>
         <dependency>
             <groupId>se.streamsource.streamflow</groupId>
             <artifactId>streamflow-dci</artifactId>
-            <version>${version.streamflow}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.sitemesh</groupId>
                     <artifactId>sitemesh</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        
+        <dependency>
+            <groupId>se.streamsource.streamflow</groupId>
+            <artifactId>streamflow-infrastructure</artifactId>
         </dependency>
 
         <!-- Qi4j -->
