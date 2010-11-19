@@ -21,14 +21,11 @@ import org.qi4j.api.common.Visibility;
 import org.qi4j.bootstrap.Assembler;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.spi.service.importer.NewObjectImporter;
 import org.restlet.Client;
-import se.streamsource.dci.restlet.server.CommandResult;
-import se.streamsource.surface.web.ClientEventSourceService;
-import se.streamsource.surface.web.rest.CookieResponseHandler;
-import se.streamsource.dci.restlet.client.ResponseHandler;
 import se.streamsource.dci.restlet.server.DCIAssembler;
 import se.streamsource.dci.restlet.server.DefaultResponseWriterFactory;
+import se.streamsource.dci.restlet.server.NullCommandResult;
+import se.streamsource.surface.web.rest.CookieResponseHandler;
 import se.streamsource.surface.web.rest.EidProxyRestlet;
 import se.streamsource.surface.web.rest.StreamflowProxyRestlet;
 
@@ -37,29 +34,25 @@ import static org.qi4j.bootstrap.ImportedServiceDeclaration.NEW_OBJECT;
 /**
  */
 public class SurfaceResourceAssembler
-   implements Assembler
+      implements Assembler
 {
-   public void assemble( ModuleAssembly module ) throws AssemblyException
+   public void assemble( ModuleAssembly module )
+         throws AssemblyException
    {
-     module.addObjects( DefaultResponseWriterFactory.class, EventsCommandResult.class );
+      module.addObjects( DefaultResponseWriterFactory.class );
       new DCIAssembler().assemble( module );
 
-      module.importServices( CommandResult.class).importedBy( NEW_OBJECT );
-      module.importServices( SurfaceRootContextFactory.class ).importedBy( NewObjectImporter.class );
+      module.importServices( NullCommandResult.class ).importedBy( NEW_OBJECT );
+      module.addObjects( NullCommandResult.class ).visibleIn( Visibility.layer );
 
       // Resources
       module.addObjects(
-            SurfaceRootContextFactory.class,
             StreamflowProxyRestlet.class,
             EidProxyRestlet.class
       );
 
-      module.addServices( ClientEventSourceService.class ).visibleIn( Visibility.application );
-      
-      module.importServices( ResponseHandler.class ).importedBy( NewObjectImporter.class ).visibleIn( Visibility.application );
+      module.addObjects( CookieResponseHandler.class ).visibleIn( Visibility.layer );
 
-      module.addObjects( CookieResponseHandler.class ).visibleIn( Visibility.application );
-
-      module.importServices( Client.class ).visibleIn( Visibility.application );
+      module.importServices( Client.class ).visibleIn( Visibility.layer );
    }
 }

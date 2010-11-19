@@ -17,8 +17,6 @@
 
 package se.streamsource.surface.web.rest;
 
-import java.util.logging.Logger;
-
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.object.ObjectBuilderFactory;
 import org.qi4j.api.unitofwork.UnitOfWorkFactory;
@@ -32,10 +30,11 @@ import org.restlet.data.Protocol;
 import org.restlet.resource.Directory;
 import org.restlet.routing.Router;
 import org.restlet.routing.Template;
-
-import se.streamsource.dci.restlet.server.CommandQueryRestlet;
 import se.streamsource.dci.restlet.server.ExtensionMediaTypeFilter;
 import se.streamsource.surface.web.SurfaceWebAssembler;
+import se.streamsource.surface.web.resource.SurfaceRestlet;
+
+import java.util.logging.Logger;
 
 public class SurfaceRestApplication
    extends Application
@@ -80,7 +79,7 @@ public class SurfaceRestApplication
    {
       Router surfaceRouter = new Router();
 
-      Restlet cqr = factory.newObjectBuilder( CommandQueryRestlet.class ).use( getContext() ).newInstance();
+      Restlet cqr = factory.newObjectBuilder( SurfaceRestlet.class ).use( getContext() ).newInstance();
       StreamflowProxyRestlet proxyRestlet = factory.newObject( StreamflowProxyRestlet.class );
       EidProxyRestlet eidProxyRestlet = factory.newObject( EidProxyRestlet.class );
       surfaceRouter.attachDefault( new IndexRestlet() );

@@ -56,19 +56,16 @@ public class SurfaceWebAssembler
       ApplicationAssembly assembly = applicationFactory.newApplicationAssembly();
       assembly.setName( "StreamFlowSurface" );
       assembly.setVersion( "0.3.20.962" );
-      LayerAssembly contextLayer = assembly.layerAssembly( "Context" );
       LayerAssembly webLayer = assembly.layerAssembly( "Web" );
       LayerAssembly appLayer = assembly.layerAssembly( "Application" );
       LayerAssembly configLayer = assembly.layerAssembly("Configuration" );
 
-      webLayer.uses( contextLayer, appLayer );
+      webLayer.uses( appLayer );
       appLayer.uses( configLayer );
 
       assembleWebLayer( webLayer );
 
       assembleAppLayer( appLayer);
-
-      assembleContextLayer( contextLayer );
 
       assembleConfigLayer(configLayer);
 
@@ -119,6 +116,7 @@ public class SurfaceWebAssembler
       ModuleAssembly restModule = webLayer.moduleAssembly( "REST" );
       new SurfaceRestAssembler().assemble( restModule );
       new SurfaceResourceAssembler().assemble( restModule );
+      new ContextsAssembler().assemble( restModule );
    }
 
    private void assembleAppLayer( LayerAssembly appLayer ) throws AssemblyException
@@ -132,11 +130,5 @@ public class SurfaceWebAssembler
       // TODO This should be in its own module (layer?)
       proxyModule.importServices( MBeanServer.class ).importedBy( MBeanServerImporter.class );
       proxyModule.addServices( ConfigurationManagerService.class ).instantiateOnStartup();
-   }
-
-   protected void assembleContextLayer( LayerAssembly contextLayer ) throws AssemblyException
-   {
-      ModuleAssembly moduleAssembly = contextLayer.moduleAssembly( "Context" );
-      new ContextsAssembler().assemble( moduleAssembly );
    }
 }

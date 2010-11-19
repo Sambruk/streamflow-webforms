@@ -18,13 +18,14 @@
 package se.streamsource.surface.web.proxy;
 
 import org.qi4j.api.configuration.ConfigurationComposite;
+import org.qi4j.api.configuration.Enabled;
 import org.qi4j.api.property.Property;
 
 /**
  * Configuration for proxy service
  */
 public interface ProxyConfiguration
-   extends ConfigurationComposite
+   extends ConfigurationComposite, Enabled
 {
    Property<String> url();
    Property<String> username();

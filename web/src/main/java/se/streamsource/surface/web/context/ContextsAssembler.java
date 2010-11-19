@@ -31,27 +31,22 @@ import se.streamsource.dci.value.LinkValue;
 import se.streamsource.dci.value.LinksValue;
 import se.streamsource.dci.value.StringValue;
 import se.streamsource.dci.value.TitledLinksValue;
-import se.streamsource.streamflow.domain.form.CommentFieldValue;
-import se.streamsource.streamflow.domain.form.DateFieldValue;
-import se.streamsource.streamflow.domain.form.FieldDefinitionValue;
-import se.streamsource.streamflow.domain.form.FieldSubmissionValue;
-import se.streamsource.streamflow.domain.form.FieldValue;
-import se.streamsource.streamflow.domain.form.FormSubmissionValue;
-import se.streamsource.streamflow.domain.form.NumberFieldValue;
-import se.streamsource.streamflow.domain.form.PageSubmissionValue;
-import se.streamsource.streamflow.domain.form.SelectionFieldValue;
-import se.streamsource.streamflow.domain.form.TextFieldValue;
-import se.streamsource.streamflow.infrastructure.event.DomainEvent;
-import se.streamsource.streamflow.infrastructure.event.TransactionEvents;
+import se.streamsource.streamflow.domain.form.*;
+import se.streamsource.streamflow.infrastructure.event.domain.DomainEvent;
+import se.streamsource.streamflow.infrastructure.event.domain.TransactionDomainEvents;
 import se.streamsource.streamflow.resource.caze.EndUserCaseDTO;
 import se.streamsource.streamflow.resource.caze.FieldDTO;
 import se.streamsource.streamflow.resource.caze.SubmittedFormListDTO;
 import se.streamsource.streamflow.resource.caze.SubmittedFormsListDTO;
-import se.streamsource.streamflow.resource.roles.EntityReferenceDTO;
 import se.streamsource.streamflow.resource.roles.IntegerDTO;
 import se.streamsource.streamflow.resource.user.NewProxyUserCommand;
-import se.streamsource.surface.web.ClientEventSourceService;
+import se.streamsource.surface.web.resource.AccessPointResource;
+import se.streamsource.surface.web.resource.AccessPointsResource;
+import se.streamsource.surface.web.resource.RootResource;
+import se.streamsource.surface.web.resource.SurfaceRestlet;
 import se.streamsource.surface.web.rest.CookieResponseHandler;
+import se.streamsource.surface.web.rest.EidProxyRestlet;
+import se.streamsource.surface.web.rest.StreamflowProxyRestlet;
 
 /**
  */
@@ -65,9 +60,7 @@ public class ContextsAssembler
             visibleIn( Visibility.application );
       module.addObjects( InteractionConstraintsService.class,
             CommandQueryClient.class, CookieResponseHandler.class);
-      module.addValues( TransactionEvents.class, DomainEvent.class ).visibleIn( Visibility.application );
-
-      module.addServices( ClientEventSourceService.class ).visibleIn( Visibility.application );
+      module.addValues( TransactionDomainEvents.class, DomainEvent.class ).visibleIn( Visibility.application );
 
       module.addValues(
             LinksValue.class,
@@ -88,20 +81,18 @@ public class ContextsAssembler
             SelectionFieldValue.class,
             TextFieldValue.class,
             ValueComposite.class,
-            EntityReferenceDTO.class,
-            FormSubmissionValue.class,
+            FormDraftValue.class,
             IntegerDTO.class,
             FieldDTO.class
       ).visibleIn( Visibility.application );
 
-
-      // Only expose the root the upper layers
-      module.addTransients(
-            RootContext.class).visibleIn( Visibility.application);
-
-      module.addTransients(
-            AccessPointContext.class,
+      // Resources
+      module.addObjects(
+            SurfaceRestlet.class,
+            RootResource.class,
             AccessPointsContext.class,
+            AccessPointsResource.class,
+            AccessPointResource.class,
             EndUsersContext.class
       );
 

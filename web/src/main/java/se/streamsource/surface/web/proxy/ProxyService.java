@@ -47,7 +47,7 @@ import java.io.ByteArrayOutputStream;
  */
 @Mixins(ProxyService.Mixin.class)
 public interface ProxyService
-   extends ServiceComposite, Activatable, Configuration, Uniform
+   extends ServiceComposite, Activatable, Configuration<ProxyConfiguration>, Uniform
 {
    
 
@@ -64,8 +64,11 @@ public interface ProxyService
 
       public void activate() throws Exception
       {
-         proxyRef = new Reference(config.configuration().url().get());
-         challengeResponse = new ChallengeResponse( ChallengeScheme.HTTP_BASIC, config.configuration().username().get(), config.configuration().password().get() );
+         if (config.configuration().enabled().get())
+         {
+            proxyRef = new Reference(config.configuration().url().get());
+            challengeResponse = new ChallengeResponse( ChallengeScheme.HTTP_BASIC, config.configuration().username().get(), config.configuration().password().get() );
+         }
       }
 
       public void passivate() throws Exception
@@ -74,10 +77,23 @@ public interface ProxyService
 
       public void handle( Request request, Response response )
       {
-         Reference ref = request.getResourceRef();
-         String remaining = ref.getRemainingPart();
+         if (proxyRef == null)
+         {
+            // Not enabled
+            response.setStatus( Status.SERVER_ERROR_SERVICE_UNAVAILABLE, "Streamflow proxy is not enabled" );
+            return;
+         }
 
-         Reference proxyReference = new Reference( proxyRef.toString()+remaining );
+         Reference proxyReference;
+         Reference ref = request.getResourceRef();
+         if (ref.getBaseRef() == null)
+         {
+            proxyReference = ref;
+         } else
+         {
+            String remaining = ref.getRemainingPart();
+            proxyReference = new Reference( proxyRef.toString()+remaining.substring(1 ));
+         }
 
          ClientResource client = new ClientResource( proxyReference );
          client.setClientInfo( request.getClientInfo() );
@@ -99,6 +115,12 @@ public interface ProxyService
             representation.release();
             InputRepresentation inputRepresentation = new InputRepresentation( new ByteArrayInputStream( bout.toByteArray() ), representation.getMediaType(), bout.size() );
             inputRepresentation.setDisposition( representation.getDisposition() );
+            inputRepresentation.setCharacterSet( representation.getCharacterSet() );
+            inputRepresentation.setDigest( representation.getDigest() );
+            inputRepresentation.setLanguages( representation.getLanguages() );
+            inputRepresentation.setEncodings( representation.getEncodings() );
+            inputRepresentation.setExpirationDate( representation.getExpirationDate() );
+            inputRepresentation.setModificationDate( representation.getModificationDate() );
             response.setEntity( inputRepresentation );
          } catch ( ResourceException re )
          {

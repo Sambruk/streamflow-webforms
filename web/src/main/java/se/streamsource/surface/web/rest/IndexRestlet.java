@@ -21,7 +21,8 @@ import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
 import org.restlet.data.MediaType;
-import org.restlet.representation.StringRepresentation;
+import org.restlet.data.Reference;
+import org.restlet.data.Status;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -39,19 +40,27 @@ public class IndexRestlet
    {
       super.handle( request, response );
 
-      try
-      {
-         String template = getTemplate( "index.html", getClass() );
+      String accessPointId = request.getResourceRef().getQueryAsForm().getFirstValue( "ap" );
 
-         template = template.replace( "$accesspoint", request.getResourceRef().getQueryAsForm().getFirstValue( "ap" ) );
-         template = template.replace( "$hostname", request.getResourceRef().getHostIdentifier() );
-
-         response.setEntity( template, MediaType.TEXT_HTML );
-      } catch (IOException e)
+      if (accessPointId != null)
       {
-         e.printStackTrace();
+         try
+         {
+            String template = getTemplate( "index.html", getClass() );
+
+            template = template.replace( "$accesspoint", accessPointId );
+            template = template.replace( "$hostname", request.getResourceRef().getHostIdentifier() );
+
+            response.setEntity( template, MediaType.TEXT_HTML );
+         } catch (IOException e)
+         {
+            e.printStackTrace();
+         }
+      } else
+      {
+         response.setLocationRef( new Reference(request.getResourceRef(), "/surface/surface/accesspoints/index" ));
+         response.setStatus( Status.REDIRECTION_TEMPORARY );
       }
-
    }
 
    public static String getTemplate( String resourceName, Class resourceClass ) throws IOException

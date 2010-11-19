@@ -17,10 +17,7 @@
 
 package se.streamsource.surface.web.rest;
 
-import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.qi4j.api.injection.scope.Structure;
-import org.qi4j.api.injection.scope.Uses;
 import org.qi4j.api.value.ValueBuilderFactory;
 import org.restlet.Response;
 import org.restlet.data.CookieSetting;
@@ -28,13 +25,17 @@ import org.restlet.data.Method;
 import org.restlet.representation.EmptyRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
-import se.streamsource.surface.web.context.EndUsersContext;
+import org.slf4j.LoggerFactory;
 import se.streamsource.dci.restlet.client.ResponseHandler;
-import se.streamsource.streamflow.infrastructure.event.DomainEvent;
-import se.streamsource.streamflow.infrastructure.event.TransactionEvents;
+import se.streamsource.streamflow.infrastructure.event.domain.DomainEvent;
+import se.streamsource.streamflow.infrastructure.event.domain.TransactionDomainEvents;
+import se.streamsource.streamflow.infrastructure.event.domain.source.helper.EventParameters;
+import se.streamsource.surface.web.context.EndUsersContext;
 
 import java.io.IOException;
-import java.util.List;
+
+import static org.qi4j.api.util.Iterables.first;
+import static se.streamsource.streamflow.infrastructure.event.domain.source.helper.Events.events;
 
 /**
  */
@@ -44,8 +45,7 @@ public class CookieResponseHandler
    @Structure
    ValueBuilderFactory vbf;
 
-   @Uses
-   Response response;
+   private CookieSetting cookieSetting;
 
    public void handleResponse( Response response ) throws ResourceException
    {
@@ -61,22 +61,16 @@ public class CookieResponseHandler
             {
                String source = entity.getText();
 
-               final TransactionEvents transactionEvents = vbf.newValueFromJSON( TransactionEvents.class, source );
+               final TransactionDomainEvents transactionEvents = vbf.newValueFromJSON( TransactionDomainEvents.class, source );
 
-               List<DomainEvent> domainEvents = transactionEvents.events().get();
-               if ( domainEvents.size()>0 )
+               DomainEvent domainEvent = first( events( transactionEvents ));
+               if ( domainEvent != null)
                {
-                  DomainEvent domainEvent = domainEvents.get( 0 );
-                  String params = domainEvent.parameters().get();
-                  JSONTokener jsonTokener = new JSONTokener( params );
-                  JSONObject jsonObject = new JSONObject( jsonTokener );
-                  String userId = jsonObject.getString( "param1" );
+                  String userId = EventParameters.getParameter( domainEvent, "param1" );
 
-
-                  CookieSetting cookieSetting = new CookieSetting( EndUsersContext.COOKIE_NAME, userId );
+                  cookieSetting = new CookieSetting( EndUsersContext.COOKIE_NAME, userId );
                   // two weeks
                   cookieSetting.setMaxAge( 60 * 60 * 24 * 14 );
-                  this.response.getCookieSettings().add( cookieSetting );
                }
 
             }
@@ -89,9 +83,14 @@ public class CookieResponseHandler
             response.getEntity().exhaust();
          } catch (IOException e)
          {
-            //e.printStackTrace();
+            LoggerFactory.getLogger( getClass() ).error( "Could not parse cookies", e );
          }
          response.release();
       }
+   }
+
+   public CookieSetting getCookieSetting()
+   {
+      return cookieSetting;
    }
 }

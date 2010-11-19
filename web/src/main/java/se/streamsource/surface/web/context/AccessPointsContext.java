@@ -17,60 +17,46 @@
 
 package se.streamsource.surface.web.context;
 
-import org.qi4j.api.mixin.Mixins;
+import org.qi4j.api.injection.scope.Structure;
+import org.qi4j.api.structure.Module;
 import org.qi4j.api.value.ValueBuilder;
-import se.streamsource.dci.api.Context;
-import se.streamsource.dci.api.ContextMixin;
+import se.streamsource.dci.api.IndexContext;
+import se.streamsource.dci.api.RoleMap;
+import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.dci.value.LinkValue;
 import se.streamsource.dci.value.LinksValue;
 import se.streamsource.streamflow.infrastructure.application.LinksBuilder;
-import se.streamsource.dci.api.ContextNotFoundException;
-import se.streamsource.dci.api.SubContexts;
-import se.streamsource.dci.restlet.client.CommandQueryClient;
 
 /**
  */
-@Mixins(AccessPointsContext.Mixin.class)
-public interface AccessPointsContext
-      extends SubContexts<AccessPointContext>, Context
+public class AccessPointsContext
+      implements IndexContext<LinksValue>
 {
+   @Structure
+   Module module;
 
-   LinksValue surfacelinks();
-
-   abstract class Mixin
-         extends ContextMixin
-         implements AccessPointsContext
+   public LinksValue index()
    {
-      public LinksValue surfacelinks()
+      CommandQueryClient client = RoleMap.current().get( CommandQueryClient.class );
+
+      try
       {
-         CommandQueryClient client = roleMap.get( CommandQueryClient.class );
+         LinksValue linksValue = client.query( "index", LinksValue.class );
+         LinksBuilder builder = new LinksBuilder( module.valueBuilderFactory() );
+         ValueBuilder<LinkValue> linkBuilder = module.valueBuilderFactory().newValueBuilder( LinkValue.class );
 
-         try
+         for (LinkValue linkValue : linksValue.links().get())
          {
-            LinksValue linksValue = client.query( "index", LinksValue.class );
-            LinksBuilder builder = new LinksBuilder( module.valueBuilderFactory() );
-            ValueBuilder<LinkValue> linkBuilder = module.valueBuilderFactory().newValueBuilder( LinkValue.class );
-
-            for (LinkValue linkValue : linksValue.links().get())
-            {
-               linkBuilder.withPrototype( linkValue );
-               linkBuilder.prototype().href().set( "../../?ap="+linkValue.id().get() );
-               builder.addLink( linkBuilder.newInstance() );
-            }
-
-            return builder.newLinks();
-         } catch (Throwable e)
-         {
-            e.printStackTrace();
+            linkBuilder.withPrototype( linkValue );
+            linkBuilder.prototype().href().set( "../../?ap=" + linkValue.id().get() );
+            builder.addLink( linkBuilder.newInstance() );
          }
-         return null;
-      }
 
-      public AccessPointContext context( String id ) throws ContextNotFoundException
+         return builder.newLinks();
+      } catch (Throwable e)
       {
-         roleMap.set( roleMap.get( CommandQueryClient.class ).getSubClient( id ));
-         return subContext( AccessPointContext.class );
+         e.printStackTrace();
       }
+      return null;
    }
-
 }
