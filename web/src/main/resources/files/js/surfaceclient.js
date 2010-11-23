@@ -92,15 +92,17 @@ jQuery(document).ready(function()
 
     function setupProviders() {
         if ( state.eIdProviders ) return;
-        state.eIdProviders = RequestModule.getProviders();
-        $.each (state.eIdProviders.links, function(idx, provider) {
-        	var list = provider.href.split('=');
-            if ( list.length  != 2 ) {
-                throw { error:"Provider list is incorrect", redirect:'summary' };
-            } else {
-            	provider.provider = list[1];
-            }
-        });
+        if (state.formSignatures){
+	        state.eIdProviders = RequestModule.getProviders();
+	        $.each (state.eIdProviders.links, function(idx, provider) {
+	        	var list = provider.href.split('=');
+	            if ( list.length  != 2 ) {
+	                throw { error:"Provider list is incorrect", redirect:'summary' };
+	            } else {
+	            	provider.provider = list[1];
+	            }
+	        });
+        }
     }
 
     function getFormTBS() {
