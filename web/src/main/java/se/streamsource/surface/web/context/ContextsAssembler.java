@@ -17,6 +17,8 @@
 
 package se.streamsource.surface.web.context;
 
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.value.ValueComposite;
 import org.qi4j.bootstrap.Assembler;
@@ -31,6 +33,7 @@ import se.streamsource.dci.value.LinkValue;
 import se.streamsource.dci.value.LinksValue;
 import se.streamsource.dci.value.StringValue;
 import se.streamsource.dci.value.TitledLinksValue;
+import se.streamsource.streamflow.domain.attachment.AttachmentValue;
 import se.streamsource.streamflow.domain.form.*;
 import se.streamsource.streamflow.infrastructure.event.domain.DomainEvent;
 import se.streamsource.streamflow.infrastructure.event.domain.TransactionDomainEvents;
@@ -40,18 +43,25 @@ import se.streamsource.streamflow.resource.caze.SubmittedFormListDTO;
 import se.streamsource.streamflow.resource.caze.SubmittedFormsListDTO;
 import se.streamsource.streamflow.resource.roles.IntegerDTO;
 import se.streamsource.streamflow.resource.user.NewProxyUserCommand;
+import se.streamsource.surface.web.ClientEventSourceService;
 import se.streamsource.surface.web.resource.AccessPointResource;
 import se.streamsource.surface.web.resource.AccessPointsResource;
+import se.streamsource.surface.web.resource.CaseResource;
+import se.streamsource.surface.web.resource.EndUserResource;
+import se.streamsource.surface.web.resource.EndUsersResource;
+import se.streamsource.surface.web.resource.FormDraftResource;
+import se.streamsource.surface.web.resource.FormDraftsResource;
 import se.streamsource.surface.web.resource.RootResource;
 import se.streamsource.surface.web.resource.SurfaceRestlet;
+import se.streamsource.surface.web.rest.AttachmentResponseHandler;
 import se.streamsource.surface.web.rest.CookieResponseHandler;
-import se.streamsource.surface.web.rest.EidProxyRestlet;
-import se.streamsource.surface.web.rest.StreamflowProxyRestlet;
+
+import static org.qi4j.bootstrap.ImportedServiceDeclaration.INSTANCE;
 
 /**
  */
 public class ContextsAssembler
-   implements Assembler
+      implements Assembler
 {
    public void assemble( ModuleAssembly module ) throws AssemblyException
    {
@@ -59,8 +69,15 @@ public class ContextsAssembler
             importedBy( NewObjectImporter.class ).
             visibleIn( Visibility.application );
       module.addObjects( InteractionConstraintsService.class,
-            CommandQueryClient.class, CookieResponseHandler.class);
+            CommandQueryClient.class, CookieResponseHandler.class, AttachmentResponseHandler.class );
       module.addValues( TransactionDomainEvents.class, DomainEvent.class ).visibleIn( Visibility.application );
+
+      module.addServices( ClientEventSourceService.class ).visibleIn( Visibility.application );
+
+      // Import file handling service for file uploads
+      DiskFileItemFactory factory = new DiskFileItemFactory();
+      factory.setSizeThreshold( 1024 * 1000 * 30 ); // 30 Mb threshold TODO Make this into real service and make this number configurable
+      module.importServices( FileItemFactory.class ).importedBy( INSTANCE ).setMetaInfo( factory );
 
       module.addValues(
             LinksValue.class,
@@ -68,6 +85,8 @@ public class ContextsAssembler
             StringValue.class,
             TitledLinksValue.class,
             NewProxyUserCommand.class,
+            AttachmentValue.class,
+            AttachmentFieldDTO.class,
             EndUserCaseDTO.class,
             SubmittedFormsListDTO.class,
             SubmittedFormListDTO.class,
@@ -75,10 +94,17 @@ public class ContextsAssembler
             FieldSubmissionValue.class,
             FieldDefinitionValue.class,
             FieldValue.class,
+            AttachmentFieldValue.class,
+            CheckboxesFieldValue.class,
+            ComboBoxFieldValue.class,
             CommentFieldValue.class,
             DateFieldValue.class,
+            ListBoxFieldValue.class,
             NumberFieldValue.class,
+            OpenSelectionFieldValue.class,
+            OptionButtonsFieldValue.class,
             SelectionFieldValue.class,
+            TextAreaFieldValue.class,
             TextFieldValue.class,
             ValueComposite.class,
             FormDraftValue.class,
@@ -90,10 +116,17 @@ public class ContextsAssembler
       module.addObjects(
             SurfaceRestlet.class,
             RootResource.class,
-            AccessPointsContext.class,
             AccessPointsResource.class,
             AccessPointResource.class,
-            EndUsersContext.class
+            EndUsersResource.class,
+            EndUserResource.class,
+            CaseResource.class,
+            FormDraftsResource.class,
+            FormDraftResource.class,
+
+            AccessPointsContext.class,
+            EndUsersContext.class,
+            FormDraftContext.class
       );
 
       module.importServices( Restlet.class ).visibleIn( Visibility.application );

@@ -25,6 +25,7 @@ import org.restlet.Client;
 import se.streamsource.dci.restlet.server.DCIAssembler;
 import se.streamsource.dci.restlet.server.DefaultResponseWriterFactory;
 import se.streamsource.dci.restlet.server.NullCommandResult;
+import se.streamsource.surface.web.rest.AttachmentResponseHandler;
 import se.streamsource.surface.web.rest.CookieResponseHandler;
 import se.streamsource.surface.web.rest.EidProxyRestlet;
 import se.streamsource.surface.web.rest.StreamflowProxyRestlet;
@@ -51,7 +52,7 @@ public class SurfaceResourceAssembler
             EidProxyRestlet.class
       );
 
-      module.addObjects( CookieResponseHandler.class ).visibleIn( Visibility.layer );
+      module.addObjects( CookieResponseHandler.class, AttachmentResponseHandler.class ).visibleIn( Visibility.layer );
 
       module.importServices( Client.class ).visibleIn( Visibility.layer );
    }

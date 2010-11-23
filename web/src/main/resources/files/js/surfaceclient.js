@@ -26,6 +26,8 @@ jQuery(document).ready(function()
         RequestModule.createUserUrl( data.entity );
         Contexts.init( contexts );
         FieldTypeModule.setFieldUpdater( updateField );
+        FieldTypeModule.setFieldRefresher( refreshField );
+        FieldTypeModule.setAttachmentUpload( RequestModule.attach );
         setupView();
     }
 
@@ -44,6 +46,12 @@ jQuery(document).ready(function()
 
     function updateField( fieldId, fieldValue ) {
         return parseEvents( Builder.updateField( RequestModule.updateField, fieldId, fieldValue ) );
+    }
+
+    function refreshField( fieldId ) {
+        var value = RequestModule.refreshField( fieldId );
+        updateFormDraftField( fieldId, value );
+        return value;
     }
 
     function submitAndSend() {
@@ -80,9 +88,19 @@ jQuery(document).ready(function()
     function gotoSummary() {
         var description = state.formDraft.description;
         var pages = state.formDraft.pages;
-        var signatures = state.formSignatures;
-        var addedSignatures = state.formDraft.signatures;
-        Builder.show( 'form_summary_div' , Builder.summary, {description: description, pages:pages, signatures:signatures, addedSignatures:addedSignatures, eIdProviders:state.eIdProviders.links});
+        Builder.show( 'form_summary_div' , Builder.summary, {description: description, pages:pages, signatures: signatures() });
+    }
+
+    function signatures() {
+        if ( state.formSignatures.length > 0 ) {
+            return {
+                required:  state.formSignatures,
+                addedSignatures: state.formDraft.signatures,
+                eIdProviders:state.eIdProviders.links
+            };
+        } else {
+            return null;
+        }
     }
 
     function setupSignatures() {
@@ -92,7 +110,7 @@ jQuery(document).ready(function()
 
     function setupProviders() {
         if ( state.eIdProviders ) return;
-        if (state.formSignatures){
+        if (state.formSignatures.length > 0){
 	        state.eIdProviders = RequestModule.getProviders();
 	        $.each (state.eIdProviders.links, function(idx, provider) {
 	        	var list = provider.href.split('=');
@@ -210,12 +228,12 @@ jQuery(document).ready(function()
             throw {error:"No Signatures Needed", redirect:'summary'};
 
         formIsFilled( {error:"You must fill in the form before it can be signed", redirect:'summary' } );
-    	Ê Ê Ê 
+
         var nr = parseInt( args.segment );
     	var max = state.formSignatures.length;
     	if ( isNaN(nr) || nr < 0 || nr >= max ) {
     		throw {error:"Required signature not valid: "+args.segment, redirect:'summary' };
- Ê Ê Ê Ê}
+        }
     }
     
     function verifyProvider(args ) {

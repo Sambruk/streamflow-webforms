@@ -53,7 +53,6 @@ public class EndUsersContext
          try
          {
             CommandQueryClient client = RoleMap.current().get( CommandQueryClient.class );
-            client = client.getSubClient( "endusers" );
             CookieResponseHandler responseHandler = module.objectBuilderFactory()
                   .newObjectBuilder( CookieResponseHandler.class )
                   .newInstance();

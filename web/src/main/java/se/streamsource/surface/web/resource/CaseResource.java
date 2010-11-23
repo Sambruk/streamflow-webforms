@@ -17,10 +17,9 @@
 
 package se.streamsource.surface.web.resource;
 
-import org.restlet.resource.ResourceException;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.dci.restlet.server.CommandQueryResource;
-import se.streamsource.dci.restlet.server.SubResources;
+import se.streamsource.dci.restlet.server.SubResource;
 import se.streamsource.surface.web.context.EndUsersContext;
 
 import static se.streamsource.dci.api.RoleMap.current;
@@ -28,18 +27,19 @@ import static se.streamsource.dci.api.RoleMap.current;
 /**
  * JAVADOC
  */
-public class EndUsersResource
+public class CaseResource
    extends CommandQueryResource
-   implements SubResources
 {
-   public EndUsersResource( )
+   public CaseResource( )
    {
       super( EndUsersContext.class );
    }
 
-   public void resource( String segment ) throws ResourceException
+   @SubResource
+   public void formdrafts()
    {
-      current().set( current().get( CommandQueryClient.class ).getSubClient( segment ));
-      subResource( EndUserResource.class );
+      current().set( current().get( CommandQueryClient.class ).getSubClient( "formdrafts" ));
+      subResource( FormDraftsResource.class );
    }
+
 }

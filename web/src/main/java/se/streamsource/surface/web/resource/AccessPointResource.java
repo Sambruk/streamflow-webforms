@@ -17,19 +17,23 @@
 
 package se.streamsource.surface.web.resource;
 
+import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.dci.restlet.server.CommandQueryResource;
 import se.streamsource.dci.restlet.server.SubResource;
 import se.streamsource.surface.web.context.EndUsersContext;
+
+import static se.streamsource.dci.api.RoleMap.current;
 
 /**
  * JAVADOC
  */
 public class AccessPointResource
-    extends CommandQueryResource
+      extends CommandQueryResource
 {
-    @SubResource
-    public void endusers()
-    {
-        subResourceContexts( EndUsersContext.class );
-    }
+   @SubResource
+   public void endusers()
+   {
+      current().set( current().get( CommandQueryClient.class ).getSubClient( "endusers" ));
+      subResource( EndUsersResource.class );
+   }
 }

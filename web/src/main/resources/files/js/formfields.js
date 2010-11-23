@@ -48,11 +48,13 @@ var FieldTypeModule = (function() {
     var inner = {};
     var fieldMap = {};
     var updater;
+    var refresher;
+    var uploader;
 
     // internal function to display the field using the field template
     // and taking the fieldComponent.node as the input widget
     function displayField( fieldDefinition, node ) {
-        var field = $('#FormField').clone().attr('id', fieldDefinition.id);
+        var field = $('#FormField').clone().attr('id', 'Field'+fieldDefinition.id);
         
         field.find('div.fieldname > label').text( fieldDefinition.name );
         showHint( fieldDefinition, field );
@@ -86,6 +88,12 @@ var FieldTypeModule = (function() {
             showMandatory( field, li );
             if (fieldType == "DateFieldValue") {
                 li.append(formatUTCStringToIsoString(value));
+            } else if (fieldType =='AttachmentFieldValue') {
+                if ( !value ) {
+                    li.append( "" );
+                } else {
+                    li.append( $.parseJSON( value ).name );
+                }
             } else {
                 li.append( value );
             }
@@ -107,7 +115,35 @@ var FieldTypeModule = (function() {
     }
 
     function AttachmentFieldValue( field ) {
-        field.node = $('#AttachmentFieldValue').clone().attr({name:field.id});
+        field.node = $('#AttachmentFieldValue').clone();
+        field.node.find('#Attachment').attr({id:field.id, name:field.id});
+
+        field.updateServer = function() {
+            $("#uploading")
+            .ajaxStart(function(){
+                $(this).show();
+            })
+            .ajaxComplete(function(){
+                $(this).hide();
+            });
+
+            var attachmentDTO = {
+                secureuri: false,
+                fileElementId: field.id,
+                dataType: 'json',
+                fieldName: field.name,
+                success: function() { field.setFieldValue( refresher( attachmentDTO.fileElementId ) ); }
+            }
+
+            upload( attachmentDTO );
+        }
+
+        field.setFieldValue = function(value) {
+            if ( value ) {
+                this.node.find('#attachmentLabel').text( $.parseJSON( value ).name );
+            }
+        }
+
     }
 
     function CheckboxesFieldValue( field ) {
@@ -126,7 +162,7 @@ var FieldTypeModule = (function() {
         }
 
         field.getFieldValue = function() {
-            return $.map( $('#'+field.id+ ' input:checked'), function( elm ) {return $('#label'+elm.id).text() }).join(', ');
+            return $.map( $('#Field'+field.id+ ' input:checked'), function( elm ) {return $('#label'+elm.id).text() }).join(', ');
         }
     }
 
@@ -238,7 +274,7 @@ var FieldTypeModule = (function() {
         }
 
         field.getFieldValue = function() {
-            return $.map( $('#'+field.id+ ' input:checked'), function( elm ) {return $('#label'+elm.id).text() }).join(', ');
+            return $.map( $('#Field'+field.id+ ' input:checked'), function( elm ) {return $('#label'+elm.id).text() }).join(', ');
         }
     }
 
@@ -271,7 +307,7 @@ var FieldTypeModule = (function() {
         }
 
         field.getFieldValue = function() {
-            var fieldValue = $.map( $('#'+field.id+ ' input:checked'), function( elm ) {return $('#label'+elm.id).text() }).join(', ');
+            var fieldValue = $.map( $('#Field'+field.id+ ' input:checked'), function( elm ) {return $('#label'+elm.id).text() }).join(', ');
             if ( fieldValue == field.fieldValue.openSelectionName ) {
                 fieldValue = $('#openSelectionTextField'+field.id).attr('value');
             }
@@ -369,6 +405,14 @@ var FieldTypeModule = (function() {
 
     inner.setFieldUpdater = function( fieldUpdater ) {
         updater = fieldUpdater;
+    }
+
+    inner.setFieldRefresher = function( fieldRefresher ) {
+        refresher = fieldRefresher;
+    }
+
+    inner.setAttachmentUpload = function( attachmentUpload ) {
+        upload = attachmentUpload;
     }
 
     return inner;

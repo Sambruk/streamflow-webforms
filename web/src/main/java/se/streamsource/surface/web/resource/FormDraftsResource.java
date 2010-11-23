@@ -22,24 +22,21 @@ import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.dci.restlet.server.CommandQueryResource;
 import se.streamsource.dci.restlet.server.SubResources;
 import se.streamsource.surface.web.context.EndUsersContext;
+import se.streamsource.surface.web.context.FormDraftContext;
 
 import static se.streamsource.dci.api.RoleMap.current;
 
 /**
  * JAVADOC
  */
-public class EndUsersResource
+public class FormDraftsResource
    extends CommandQueryResource
    implements SubResources
 {
-   public EndUsersResource( )
-   {
-      super( EndUsersContext.class );
-   }
 
    public void resource( String segment ) throws ResourceException
    {
       current().set( current().get( CommandQueryClient.class ).getSubClient( segment ));
-      subResource( EndUserResource.class );
+      subResourceContexts( FormDraftContext.class );
    }
 }

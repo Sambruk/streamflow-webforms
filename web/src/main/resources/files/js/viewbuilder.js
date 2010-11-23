@@ -57,15 +57,11 @@ var Builder = (function() {
     	
     	var heading = summarySignatures.find("#form_signatures_heading");
     	var signature_content = summarySignatures.find("#form_signatures_content");
-    	signature_content.hide();
     	var column_1 = summarySignatures.find("#form_signatures_column_1");
     	var column_2 = summarySignatures.find("#form_signatures_column_2");
     	
-    	if ( required.length > 0) {
-            heading.append( $('<h3 />').text( texts.signatures ) );
-            signature_content.show();
-        }
-    	
+        heading.append( $('<h3 />').text( texts.signatures ) );
+
     	$.each( required, function(idx, reqSign ) {
             var signatureLabel;
             var signatureValue;
@@ -86,6 +82,7 @@ var Builder = (function() {
             column_1.append( signatureLabel );
             column_2.append( signatureValue );
         });
+        summarySignatures.show();
     }
 
     function createEidProviderCombobox( signatureId, eIdProviders ){
@@ -135,15 +132,22 @@ var Builder = (function() {
         });
 
         var formOk = (errorString=="");
-        addSignatures( summarySignatures, args.signatures, args.addedSignatures, !formOk, args.eIdProviders );
+        if ( args.signatures ) {
+            var required = args.signatures.required;
+            var added = args.signatures.addedSignatures;
+            var eIdProviders = args.signatures.eIdProviders;
+            addSignatures( summarySignatures, required, added, !formOk, eIdProviders );
 
-        var formCanSubmit = formOk && ( args.signatures.length == args.addedSignatures.length );
+            formOk = formOk && ( required.length == added.length );
+        } else {
 
-        var button = createButton( {image:'submit', name:texts.submit, href:'#submit', disabled:!formCanSubmit });
+        }
+
+        var button = createButton( {image:'submit', name:texts.submit, href:'#submit', disabled:!formOk });
         summaryStatus.append( button );
         summaryStatus.append( createButton( {image:'discard', name:texts.discard, href:'#discard'}) );
 
-        if ( !formOk ) {
+        if ( errorString != "" ) {
             button.aToolTip({ tipContent: errorString });
         }
     }
@@ -153,7 +157,7 @@ var Builder = (function() {
             field: fieldId,
             value: fieldValue
         };
-        var image = $('#'+fieldId+' .fieldwaiting > img').show();
+        var image = $('#Field'+fieldId+' .fieldwaiting > img').show();
         try{
             return fn( fieldDTO );
         } catch( e ) {

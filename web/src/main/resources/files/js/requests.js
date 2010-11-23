@@ -24,8 +24,8 @@ var RequestModule = (function() {
     var error;
 
     var urls = {
-        streamflow: "proxy/accesspoints/",
-	    surface:    "surface/accesspoints/",
+        proxy:      "proxy/",
+        surface:    "surface/",
 	    eid:        "eidproxy/"
     };
 
@@ -51,13 +51,11 @@ var RequestModule = (function() {
 
     inner.updateAccesspoint = function( accesspoint ) {
         if ( !accesspoint ) error( texts.invalidaccesspoint );
-        urls.surface += accesspoint + '/endusers/';
-        urls.streamflow += accesspoint + '/endusers/';
+        urls.accesspoint = 'accesspoints/' + accesspoint + '/endusers/';
     }
 
     inner.createUserUrl = function( user ) {
-        urls.user = urls.streamflow + user + '/';
-
+        urls.user = urls.accesspoint + user + '/';
     }
 
     inner.createCaseUrl = function( caze ) {
@@ -72,57 +70,57 @@ var RequestModule = (function() {
     }
 
     inner.verifyAccessPoint = function() {
-        var parameters = request('GET', urls.streamflow + '.json');
+        var parameters = request('GET', urls.proxy + urls.accesspoint + '.json');
         parameters.error = function() { error( texts.invalidaccesspoint ); };
         $.ajax( parameters );
     }
 
     inner.selectEndUser = function() {
-        var parameters = request('POST', urls.surface + 'selectenduser.json');
+        var parameters = request('POST', urls.surface + urls.accesspoint + 'selectenduser.json');
         parameters.error = function() { error( texts.loginfailed ); };
         $.ajax( parameters );
     }
 
     inner.getUser = function() {
-        var params = request('GET', urls.surface + 'userreference.json');
+        var params = request('GET', urls.surface + urls.accesspoint + 'userreference.json');
         params.error = function() { error( texts.loginfailed ); };
         return getData( params );
     }
 
     inner.getCaseForm = function() {
-        var parameters = request('GET', urls.user + 'findcasewithform.json');
+        var parameters = request('GET', urls.proxy + urls.user + 'findcasewithform.json');
         parameters.error = null;
         return getData( parameters );
     }
 
     inner.getFormDraft = function() {
-        var params = request('GET', urls.draft + 'index.json');
+        var params = request('GET', urls.proxy + urls.draft + 'index.json');
         return getData( params );
     }
 
     inner.createCaseWithForm = function() {
-        var parameters = request('POST', urls.user + 'createcasewithform.json');
+        var parameters = request('POST', urls.proxy + urls.user + 'createcasewithform.json');
         return getData( parameters );
     }
 
     inner.updateField = function( fieldDTO ) {
-        var parameters = request('PUT', urls.draft + 'updatefield.json');
+        var parameters = request('PUT', urls.proxy + urls.draft + 'updatefield.json');
         parameters.data = fieldDTO;
         return getData( parameters );
     }
 
     inner.submitAndSend = function() {
-        var parameters = request('POST', urls.draft + 'summary/submitandsend.json');
+        var parameters = request('POST', urls.proxy + urls.draft + 'summary/submitandsend.json');
         $.ajax( parameters );
     }
 
     inner.discard = function() {
-        var parameters = request('POST', urls.draft + 'discard.json');
+        var parameters = request('POST', urls.proxy + urls.draft + 'discard.json');
         $.ajax( parameters );
     }
 
     inner.getFormSignatures = function() {
-        var parameters = request('GET', urls.draft + 'summary/signatures.json');
+        var parameters = request('GET', urls.proxy + urls.draft + 'summary/signatures.json');
         return getData( parameters ).signatures;
     }
 
@@ -132,7 +130,7 @@ var RequestModule = (function() {
     }
 
     inner.getCaseName = function() {
-        var parameters = request('GET', urls.caze + 'index.json');
+        var parameters = request('GET', urls.proxy + urls.caze + 'index.json');
         return getData( parameters ).caseId;
     }
 
@@ -154,12 +152,25 @@ var RequestModule = (function() {
     }
 
     inner.addSignature = function( signatureDTO ) {
-        var parameters = request('PUT', urls.draft + 'addsignature.json');
+        var parameters = request('PUT', urls.proxy + urls.draft + 'addsignature.json');
         parameters.data = signatureDTO;        
         parameters.error = function(args){
         	alert(""+args);
         };
         $.ajax( parameters );
+    }
+
+    inner.attach = function( attachmentDTO ) {
+        attachmentDTO.error = errorPopup;
+        attachmentDTO.url = urls.surface + urls.draft + 'createattachment';
+        $.ajaxFileUpload( attachmentDTO );
+    }
+
+    inner.refreshField = function( fieldId ) {
+        var parameters = request('GET', urls.proxy + urls.draft + 'fieldvalue.json');
+        parameters.data = { string: fieldId };
+        var fieldDTO = getData( parameters );
+        return fieldDTO.value;
     }
 
     return inner;

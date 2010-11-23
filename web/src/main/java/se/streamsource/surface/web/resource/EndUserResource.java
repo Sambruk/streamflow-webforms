@@ -28,18 +28,14 @@ import static se.streamsource.dci.api.RoleMap.current;
 /**
  * JAVADOC
  */
-public class EndUsersResource
+public class EndUserResource
    extends CommandQueryResource
    implements SubResources
 {
-   public EndUsersResource( )
-   {
-      super( EndUsersContext.class );
-   }
 
    public void resource( String segment ) throws ResourceException
    {
       current().set( current().get( CommandQueryClient.class ).getSubClient( segment ));
-      subResource( EndUserResource.class );
+      subResource( CaseResource.class );
    }
 }

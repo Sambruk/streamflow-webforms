@@ -53,12 +53,12 @@
     <div id="form_pages_summary">
     </div>
 
-    <div id="form_signatures">
+    <div id="form_signatures" style="display: none;">
 		<div id="form_signatures_heading"></div>
 		<div id="form_signatures_content">
 			<div id="form_signatures_column_1"></div>
 			<div id="form_signatures_column_2"></div>
-			<div id="footer" style="clear: both;"/>
+			<div id="footer" style="clear: both;"></div>
 		</div>
     </div>
 
@@ -96,7 +96,11 @@
 <input id="OpenSelectionFieldValue" type="radio" onChange="javascript:selectOpenSelectChanged(name);" />
 <input id="OpenSelectionOption" type="radio" onChange="javascript:selectOpenSelectOption(name);" />
 <input id="OpenSelectionTextField" type="text" onChange="javascript:FieldTypeModule.markDirty(name);" onblur="javascript:FieldTypeModule.updateServer(name);" />
-<input id="AttachmentFieldValue" type="file" onchange="javascript:FieldTypeModule.markDirty(name);FieldTypeModule.updateServer(name);"/>
+<div id="AttachmentFieldValue">
+    <input id="Attachment" type="file" onchange="javascript:FieldTypeModule.markDirty(id);FieldTypeModule.updateServer(id);"/>
+    <label id="attachmentLabel"></label>
+    <img src="static/images/waiting.gif" alt="uploading" id="uploading" style="display: none;"/>
+</div>
 
 <label id="label"></label>
 <div id="CommentFieldValue" class="commentfield"></div>
