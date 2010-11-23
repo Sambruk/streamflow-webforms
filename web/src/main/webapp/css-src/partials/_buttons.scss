@@ -61,3 +61,14 @@
 .bp a.disabledbutton:visited {
    color: #c9c7c7;
 }
+
+.bp a.smallbutton {
+  @include anchor-button;
+  @include button-colors;
+  @include button-hover-colors;
+  @include button-active-colors;
+  cursor: default;
+  margin:0.5em 0.5em 0.5em 0;
+  padding:3px 10px 3px 7px;
+  font-size: 80%;
+}

@@ -45,6 +45,7 @@
 <img id="submit" src="static/images/buttons/tick.png" alt=""/>
 <img id="signed" src="static/images/buttons/signed.png" alt=""/>
 <img id="print"  src="static/images/buttons/printer.png" alt="" />
+<img id="pencil_small"  src="static/images/buttons/pen_blue_small.png" alt="" />
 
 <div id="form_summary_div">
     <h2 id="form_description"></h2>
@@ -53,6 +54,12 @@
     </div>
 
     <div id="form_signatures">
+		<div id="form_signatures_heading"></div>
+		<div id="form_signatures_content">
+			<div id="form_signatures_column_1"></div>
+			<div id="form_signatures_column_2"></div>
+			<div id="footer" style="clear: both;"/>
+		</div>
     </div>
 
     <div id="form_submission_status">
@@ -123,10 +130,10 @@
 <div id="WarningMessage"></div>
 <div id="SuccessMessage"></div>
 
-<div id="form_signing_div">
-</div>
-
-<div id="required_signatures_div">
-</div>
-
 <form id="uploadform" action="POST" enctype="multipart/form-data" ></form>
+
+<div id="signature_label"></div>
+<div id="signature_value_signed"></div>
+<div id="signature_value_unsigned"></div>
+
+<select id="comboBoxEidProviders"></select>

@@ -68,26 +68,26 @@ var Contexts = (function() {
     }
 
     function firstSegment( segments ) {
-        var arguments = {};
+        var providedArguments = {};
         if ( !segments || segments.length == 0 ) {
-            return arguments;
+            return providedArguments;
         } else {
             var segment = segments[0];
             if ( segment.indexOf('?') > 0 ) {
                 var split = segment.split('?');
-                arguments[ 'segment' ] = split[0];
+                providedArguments[ 'segment' ] = split[0];
                 var list = split[1].split('=');
                 if ( list.length % 2 != 0 ) return args;
                 $.each( list, function(idx,val) {
                     if ( idx % 2 == 0) {
-                        arguments[ val ] = list[ idx +1 ];
+                    	providedArguments[ val ] = list[ idx +1 ];
                     }
                 })
             } else {
-                arguments[ 'segment' ] = segment;
+            	providedArguments[ 'segment' ] = segment;
             }
         }
-        return arguments;
+        return providedArguments;
     }
 
     // maps the hash segments to a list of strings

@@ -297,6 +297,54 @@ body.two-col #content {
   color: #c9c7c7;
 }
 
+/* line 65, ../../../webapp/css-src/partials/_buttons.scss */
+.bp a.smallbutton {
+  display: -moz-inline-box;
+  -moz-box-orient: vertical;
+  display: inline-block;
+  vertical-align: middle;
+  *display: inline;
+  *vertical-align: auto;
+  margin: 0.7em 0.5em 0.7em 0;
+  border-width: 1px;
+  border-style: solid;
+  font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+  font-size: 100%;
+  line-height: 130%;
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+  padding: 5px 10px 5px 7px;
+  background-color: #f5f5f5;
+  border-color: #eeeeee #dedede #dedede #eeeeee;
+  color: #565656;
+  cursor: default;
+  margin: 0.5em 0.5em 0.5em 0;
+  padding: 3px 10px 3px 7px;
+  font-size: 80%;
+}
+/* line 76, ../../../../../../../../.gem/ruby/1.8/gems/compass-0.10.5/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
+.bp a.smallbutton img {
+  margin: 0 3px -3px 0 !important;
+  padding: 0;
+  border: none;
+  width: 16px;
+  height: 16px;
+  float: none;
+}
+/* line 62, ../../../../../../../../.gem/ruby/1.8/gems/compass-0.10.5/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
+.bp a.smallbutton:hover {
+  background-color: #dff4ff;
+  border-color: #d2f1ff #c2e1ef #c2e1ef #d2f1ff;
+  color: #336699;
+}
+/* line 47, ../../../../../../../../.gem/ruby/1.8/gems/compass-0.10.5/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
+.bp a.smallbutton:active {
+  background-color: #6299c5;
+  border-color: #72a9d5 #6299c5 #6299c5 #72a9d5;
+  color: white;
+}
+
 /* line 42, ../../../webapp/css-src/screen.scss */
 div.bp {
   line-height: 1.5;
@@ -818,4 +866,54 @@ div.commentfield pre {
   font-style: italic;
   font-weight: bold;
   font-size: 2em;
+}
+
+/* line 198, ../../../webapp/css-src/screen.scss */
+#form_signatures_content {
+  display: block;
+  padding: 14px 5px 12px 35px;
+  margin-bottom: 15px;
+  font-size: 1.2em;
+  border: 1px solid;
+  background-repeat: no-repeat;
+  background-position: 6px 15px;
+  background-color: #d8e4f1;
+  color: black;
+  border-color: #153e7e;
+}
+
+/* line 205, ../../../webapp/css-src/screen.scss */
+#form_signatures_column_1 {
+  float: left;
+  clear: none;
+}
+
+/* line 210, ../../../webapp/css-src/screen.scss */
+#form_signatures_column_2 {
+  float: left;
+  clear: none;
+}
+
+/* line 215, ../../../webapp/css-src/screen.scss */
+#signature_label {
+  font-weight: bold;
+  margin-right: 10px;
+  padding-top: 9px;
+  height: 30px;
+}
+
+/* line 222, ../../../webapp/css-src/screen.scss */
+#signature_value_signed {
+  font-style: italic;
+  clear: none;
+  padding-top: 5px;
+  height: 30px;
+}
+
+/* line 229, ../../../webapp/css-src/screen.scss */
+#signature_value_unsigned {
+  clear: none;
+  padding-top: 4px;
+  padding-bottom: 5px;
+  height: 30px;
 }

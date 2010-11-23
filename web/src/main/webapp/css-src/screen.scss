@@ -194,3 +194,41 @@ div.commentfield pre {
   font-weight: bold;
   font-size: 2em
 }
+
+#form_signatures_content {
+  @include message-box;
+  background-color: $info_background_color;
+  color: $info_color;
+  border-color: $info_border_color;
+}
+
+#form_signatures_column_1 {
+  float: left;
+  clear: none;
+}
+
+#form_signatures_column_2 {
+  float: left;
+  clear: none;
+}
+
+#signature_label {
+  font-weight: bold;
+  margin-right: 10px;
+  padding-top: 9px;
+  height: 30px;
+}
+
+#signature_value_signed {
+  font-style: italic;
+  clear: none;
+  padding-top: 5px;
+  height: 30px;
+}
+
+#signature_value_unsigned {
+  clear: none;
+  padding-top: 4px;
+  padding-bottom: 5px;
+  height: 30px;
+}

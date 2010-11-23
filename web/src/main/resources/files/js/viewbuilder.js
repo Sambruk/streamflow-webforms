@@ -53,35 +53,58 @@ var Builder = (function() {
         });
     }
 
-    inner.providers = function( args ) {
-        args.node.append( $('<h3 />').text( texts.provider ) );
-        $.each( args.eIdProviders, function(idx, link ) {
-            args.node.append( '<br/>');
-            createButton( {name:link.text, href:location.hash+'/'+ link.href } ).appendTo( args.node );
-        });
-    }
-
-    function addSignatures( summarySignatures, required, signatures, disabled ) {
-        var list = $('<ul />');
-
-        $.each( required, function(idx, reqSign ) {
-            var button;
+    function addSignatures( summarySignatures, required, signatures, disabled, eIdProviders ) {
+    	
+    	var heading = summarySignatures.find("#form_signatures_heading");
+    	var signature_content = summarySignatures.find("#form_signatures_content");
+    	signature_content.hide();
+    	var column_1 = summarySignatures.find("#form_signatures_column_1");
+    	var column_2 = summarySignatures.find("#form_signatures_column_2");
+    	
+    	if ( required.length > 0) {
+            heading.append( $('<h3 />').text( texts.signatures ) );
+            signature_content.show();
+        }
+    	
+    	$.each( required, function(idx, reqSign ) {
+            var signatureLabel;
+            var signatureValue;
+        	signatureLabel = $('#signature_label').clone();
+        	signatureLabel.append(reqSign.name + ":");
             var signature = getSignature( reqSign.name, signatures );
             if ( signature ) {
-                button = createButton({image:'signed', name: reqSign.name, disabled:true});
-                button.aToolTip({ tipContent: 'Signed by ' + signature.signerName });
+            	signatureValue = $('#signature_value_signed').clone();
+            	signatureValue.append(signature.signerName);
             } else {
-                button = createButton({name:reqSign.name, href:'#summary/'+idx, disabled:disabled});
+            	signatureValue = $('#signature_value_unsigned').clone();
+            	var button = createSmallButton({image:"pencil_small", name:texts.sign, href:'#summary/'+idx})
+            	var linkId = "link_" + idx;
+            	button.attr({id:linkId});
+            	signatureValue.append( createEidProviderCombobox(idx, eIdProviders));
+            	signatureValue.append( "&nbsp;&nbsp;").append( button);
             }
-            list.append( $('<li />').append( button ) );
+            column_1.append( signatureLabel );
+            column_2.append( signatureValue );
         });
-
-        if ( required.length > 0) {
-            summarySignatures.append( $('<h3 />').text( texts.signatures ) );
-            summarySignatures.append( list );
-        }
     }
 
+    function createEidProviderCombobox( signatureId, eIdProviders ){
+    	var combobox = $('#comboBoxEidProviders').clone();
+    	combobox.attr({name: signatureId, id: "eIdProvider_"+signatureId});
+    	combobox.change(function() {
+    		var value = this.value;
+	    	$("#link_"+this.name).attr('href', function() {
+	    		var list = this.href.split('?provider=');
+	    		return list[0] + "?provider="+value
+	    	});
+    	});
+        combobox.append( $('<option>/').append(texts.provider	) );
+        $.each(eIdProviders, function(idx, link ) {
+         	combobox.append( $('<option />').attr({value: link.provider}).text(link.text) );
+        });
+        return combobox;
+    }
+    
     function getSignature( name, signatures ) {
         var match;
         $.each( signatures, function( idxSign, signature ) {
@@ -112,7 +135,7 @@ var Builder = (function() {
         });
 
         var formOk = (errorString=="");
-        addSignatures( summarySignatures, args.signatures, args.addedSignatures, !formOk );
+        addSignatures( summarySignatures, args.signatures, args.addedSignatures, !formOk, args.eIdProviders );
 
         var formCanSubmit = formOk && ( args.signatures.length == args.addedSignatures.length );
 
@@ -211,6 +234,20 @@ var Builder = (function() {
         }
         if ( !map.disabled ) {
             button = clone('link').attr({'href':map.href,"class":"button positive"});
+        } else {
+            if ( image ) image.fadeTo(0, 0.4);
+            button = clone('disabled');
+        }
+        return button.append( image ).append( map.name );
+    }
+
+    function createSmallButton( map ) {
+        var image, button;
+        if ( map.image ) {
+            image = clone( map.image );
+        }
+        if ( !map.disabled ) {
+            button = clone('link').attr({'href':map.href,"class":"smallbutton positive"});
         } else {
             if ( image ) image.fadeTo(0, 0.4);
             button = clone('disabled');

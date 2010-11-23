@@ -82,7 +82,7 @@ jQuery(document).ready(function()
         var pages = state.formDraft.pages;
         var signatures = state.formSignatures;
         var addedSignatures = state.formDraft.signatures;
-        Builder.show( 'form_summary_div' , Builder.summary, {description: description, pages:pages, signatures:signatures, addedSignatures:addedSignatures});
+        Builder.show( 'form_summary_div' , Builder.summary, {description: description, pages:pages, signatures:signatures, addedSignatures:addedSignatures, eIdProviders:state.eIdProviders.links});
     }
 
     function setupSignatures() {
@@ -93,6 +93,14 @@ jQuery(document).ready(function()
     function setupProviders() {
         if ( state.eIdProviders ) return;
         state.eIdProviders = RequestModule.getProviders();
+        $.each (state.eIdProviders.links, function(idx, provider) {
+        	var list = provider.href.split('=');
+            if ( list.length  != 2 ) {
+                throw { error:"Provider list is incorrect", redirect:'summary' };
+            } else {
+            	provider.provider = list[1];
+            }
+        });
     }
 
     function getFormTBS() {
@@ -180,7 +188,6 @@ jQuery(document).ready(function()
                 RequestModule.addSignature( signatureDTO );
                 state.formDraft = RequestModule.getFormDraft();
             }
-
         } finally {
             $('#app').show();
         }
@@ -196,11 +203,32 @@ jQuery(document).ready(function()
         Builder.runView( Contexts.findView( ));
     }
 
-    function verifyListSignatures() {
+    function verifySigner(args ) {
         if (state.formSignatures.length == 0)
             throw {error:"No Signatures Needed", redirect:'summary'};
 
         formIsFilled( {error:"You must fill in the form before it can be signed", redirect:'summary' } );
+    	Ê Ê Ê 
+        var nr = parseInt( args.segment );
+    	var max = state.formSignatures.length;
+    	if ( isNaN(nr) || nr < 0 || nr >= max ) {
+    		throw {error:"Required signature not valid: "+args.segment, redirect:'summary' };
+ Ê Ê Ê Ê}
+    }
+    
+    function verifyProvider(args ) {
+        var provider = args.provider;
+        
+        var found = false;
+        $.each(state.eIdProviders.links, function(idx, link ) {
+        	if (link.provider == provider) {
+        		found = true;
+        	};
+        });
+        
+        if (!found) {
+        	throw {error:"You have selected an unknown eId provider", redirect:'summary' };
+        }
     }
 
     function formIsFilled( ifError ) {
@@ -234,30 +262,6 @@ jQuery(document).ready(function()
         }
     }
 
-    function needSigning() {
-        if ( state.formSignatures.length == 0 )
-            throw {error:"Form does not require any signatures", redirect:'summary'};
-    }
-
-    function canBeSigned() {
-        formIsFilled( {error:"Fill the form before signing", redirect:'summary'} );
-    }
-
-    function verifySelectedSignature( args ) {
-        var nr = parseInt( args.segment );
-        var max = state.formSignatures.length;
-        if ( isNaN(nr) || nr < 0 || nr >= max ) {
-            throw {error:"Required signature not valid: "+args.segment};
-        }
-
-        //check if the selected signature is already signed
-        var name = state.formSignatures[ nr ].name;
-        $.each( state.formDraft.signatures, function(idx, value) {
-            if ( value.name == name )
-                throw {error: "'"+name+"' has already signed the form", redirect: 'summary'}
-        });
-    }
-
     function verifyPage( args ) {
         var page = parseInt( args.segment );
         var pages = state.formDraft['pages'].length;
@@ -266,14 +270,16 @@ jQuery(document).ready(function()
         }
     }
 
+    String.prototype.endsWith = function(suffix) {
+        return this.indexOf(suffix, this.length - suffix.length) !== -1;
+    };
     
     var contexts = {view:gotoPage,          init: [ setupCaseAndForm ], subContexts: {
         'discard'   : {view:discard},
         'submit'    : {view:submitAndSend,  init: [ verifySubmit ]},
         'idContext' : {view:gotoPage,       init: [ verifyPage, verifyFormEditing ]},
-        'summary'   : {view:gotoSummary,    init: [ setupSignatures ], subContexts: { 
-            'idContext': {view:gotoProviders,  init: [ setupProviders, needSigning, canBeSigned, verifySelectedSignature ], subContexts: {
-                'idContext': {view:performSign}}}}}}};
+        'summary'   : {view:gotoSummary,    init: [ setupSignatures, setupProviders ], subContexts: { 
+           'idContext': {view:performSign,     init:[verifySigner,verifyProvider]}}}}};
 
     var state = {};
 	$('#components').hide().load('static/components.html', function() {

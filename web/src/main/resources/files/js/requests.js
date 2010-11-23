@@ -155,7 +155,10 @@ var RequestModule = (function() {
 
     inner.addSignature = function( signatureDTO ) {
         var parameters = request('PUT', urls.draft + 'addsignature.json');
-        parameters.data = signatureDTO;
+        parameters.data = signatureDTO;        
+        parameters.error = function(args){
+        	alert(""+args);
+        };
         $.ajax( parameters );
     }
 
