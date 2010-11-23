@@ -112,3 +112,7 @@ html > .bp p code {
 .bp a.disabledbutton {
   display: inline-block;
 }
+/* line 24, ../../../webapp/css-src/ie.scss */
+.bp a.smallbutton {
+  display: inline-block;
+}

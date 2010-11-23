@@ -886,15 +886,17 @@ div.commentfield pre {
 #form_signatures_column_1 {
   float: left;
   clear: none;
+  display: inline;
 }
 
-/* line 210, ../../../webapp/css-src/screen.scss */
+/* line 211, ../../../webapp/css-src/screen.scss */
 #form_signatures_column_2 {
   float: left;
   clear: none;
+  display: inline;
 }
 
-/* line 215, ../../../webapp/css-src/screen.scss */
+/* line 217, ../../../webapp/css-src/screen.scss */
 #signature_label {
   font-weight: bold;
   margin-right: 10px;
@@ -902,7 +904,7 @@ div.commentfield pre {
   height: 30px;
 }
 
-/* line 222, ../../../webapp/css-src/screen.scss */
+/* line 224, ../../../webapp/css-src/screen.scss */
 #signature_value_signed {
   font-style: italic;
   clear: none;
@@ -910,7 +912,7 @@ div.commentfield pre {
   height: 30px;
 }
 
-/* line 229, ../../../webapp/css-src/screen.scss */
+/* line 231, ../../../webapp/css-src/screen.scss */
 #signature_value_unsigned {
   clear: none;
   padding-top: 4px;
