@@ -135,7 +135,7 @@ var RequestModule = (function() {
     }
 
     inner.getCaseUrl = function() {
-        return urls.caze;
+        return urls.proxy + urls.caze;
     }
 
     inner.sign = function( signDTO ) {

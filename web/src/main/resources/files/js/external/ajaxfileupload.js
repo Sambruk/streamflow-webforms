@@ -204,13 +204,13 @@ jQuery.extend({
         data = type == "xml" || data ? r.responseXML : r.responseText;
         // If the type is "script", eval it in global context
         if ( type == "script" )
-            jQuery.globalEval( data );
+            //jQuery.globalEval( data );
         // Get the JavaScript object, if JSON is used.
         if ( type == "json" )
-            eval( "data = " + data );
+            //eval( "data = " + data );
         // evaluate scripts within html
         if ( type == "html" )
-            jQuery("<div>").html(data).evalScripts();
+            //jQuery("<div>").html(data).evalScripts();
 			//alert($('param', data).each(function(){alert($(this).attr('value'));}));
         return data;
     }
