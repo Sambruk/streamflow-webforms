@@ -36,15 +36,11 @@ import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 import se.streamsource.dci.api.RoleMap;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
-import se.streamsource.dci.value.LinkValue;
-import se.streamsource.dci.value.LinksValue;
 import se.streamsource.streamflow.domain.form.AttachmentFieldDTO;
 import se.streamsource.surface.web.rest.AttachmentResponseHandler;
 
 import java.io.BufferedInputStream;
 import java.util.List;
-
-import static se.streamsource.streamflow.infrastructure.event.domain.source.helper.Events.withNames;
 
 /**
  */
@@ -58,8 +54,6 @@ public class FormDraftContext
 
    public void createattachment( Response response )
    {
-      deleteOldAttachment();
-
       Request request = response.getRequest();
       Representation representation = request.getEntity();
 
@@ -95,16 +89,6 @@ public class FormDraftContext
          {
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Could not upload file", e );
          }
-      }
-   }
-
-   private void deleteOldAttachment()
-   {
-      CommandQueryClient client = RoleMap.current().get( CommandQueryClient.class ).getClient( "attachments/" );
-      LinksValue attachments = client.query( "index", LinksValue.class );
-      for (LinkValue value : attachments.links().get())
-      {
-         client.getClient( value ).delete();
       }
    }
 }
