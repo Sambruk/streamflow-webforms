@@ -76,13 +76,12 @@ var Contexts = (function() {
             if ( segment.indexOf('?') > 0 ) {
                 var split = segment.split('?');
                 providedArguments[ 'segment' ] = split[0];
-                var list = split[1].split('=');
-                if ( list.length % 2 != 0 ) return args;
-                $.each( list, function(idx,val) {
-                    if ( idx % 2 == 0) {
-                    	providedArguments[ val ] = list[ idx +1 ];
-                    }
-                })
+                var pairs = split[1].split('&');
+                $.each( pairs, function(idx,pair) {
+                    if ( pair.indexOf('=') == -1) return providedArguments;
+                    var p = pair.split('=');
+                    providedArguments[ p[0] ] = p[1];
+                });
             } else {
             	providedArguments[ 'segment' ] = segment;
             }
@@ -92,7 +91,7 @@ var Contexts = (function() {
 
     // maps the hash segments to a list of strings
     function getSegments() {
-        return location.hash.substring(1).split('/');
+        return hash.substring(1).split('/');
     }
 
     function trim(a){
@@ -106,15 +105,16 @@ var Contexts = (function() {
         return a;
     }
 
-    inner.findView = function( ) {
-        if ( hash == location.hash ) return $.noop;
-        hash = location.hash;
+    inner.findView = function( loc ) {
+        if ( !loc || hash == loc ) return $.noop;
+        hash = loc;
         var segments = getSegments();
         return function() { rootContext.runView( segments ); }
     }
 
     inner.init = function( map ) {
         rootContext = build( map );
+        hash = "";
     }
 
     function build( map ) {

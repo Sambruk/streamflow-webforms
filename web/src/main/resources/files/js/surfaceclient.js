@@ -219,7 +219,7 @@ jQuery(document).ready(function()
     }
 
     function setupView() {
-        Builder.runView( Contexts.findView( ));
+        Builder.runView( Contexts.findView( location.hash ));
     }
 
     function verifySigner(args ) {
