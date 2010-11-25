@@ -80,9 +80,8 @@ jQuery(document).ready(function()
         }
     }
 
-    function gotoProviders( args ) {
+    function setupRequiredSignature( args ) {
         state.requiredSignatureName = state.formSignatures[ args.segment ].name;
-        Builder.show('form_signing_div', Builder.providers, { eIdProviders:state.eIdProviders.links });
     }
 
     function gotoSummary() {
@@ -299,7 +298,7 @@ jQuery(document).ready(function()
         'submit'    : {view:submitAndSend,  init: [ verifySubmit ]},
         'idContext' : {view:gotoPage,       init: [ verifyPage, verifyFormEditing ]},
         'summary'   : {view:gotoSummary,    init: [ setupSignatures, setupProviders ], subContexts: { 
-           'idContext': {view:performSign,     init:[verifySigner,verifyProvider]}}}}};
+           'idContext': {view:performSign,     init:[verifySigner,verifyProvider,setupRequiredSignature]}}}}};
 
     var state = {};
 	$('#components').hide().load('static/components.html', function() {
