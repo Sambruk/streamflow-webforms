@@ -26,6 +26,7 @@ import org.restlet.Uniform;
 import org.restlet.data.Reference;
 import se.streamsource.dci.api.RoleMap;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
+import se.streamsource.dci.restlet.client.CommandQueryClientFactory;
 import se.streamsource.dci.restlet.client.NullResponseHandler;
 import se.streamsource.dci.restlet.server.CommandQueryRestlet2;
 import se.streamsource.surface.web.proxy.ProxyService;
@@ -44,8 +45,8 @@ public class SurfaceRestlet
     @Override
     protected Uniform createRoot( Request request, Response response )
     {
-        CommandQueryClient cqc = obf.newObjectBuilder( CommandQueryClient.class )
-            .use( proxyService, new Reference(new Reference(proxyService.configuration().url().get()), new Reference("")), new NullResponseHandler()).newInstance();
+        CommandQueryClient cqc = obf.newObjectBuilder( CommandQueryClientFactory.class )
+            .use( proxyService, new NullResponseHandler()).newInstance().newClient( new Reference(new Reference(proxyService.configuration().url().get()), new Reference("")) );
 
         // Go to the main entrypoint for Surface
         cqc = cqc.getClient( "accesspoints/" );

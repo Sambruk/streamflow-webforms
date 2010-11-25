@@ -28,6 +28,7 @@ import org.qi4j.spi.service.importer.NewObjectImporter;
 import org.restlet.Restlet;
 import se.streamsource.dci.api.InteractionConstraintsService;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
+import se.streamsource.dci.restlet.client.CommandQueryClientFactory;
 import se.streamsource.dci.restlet.client.NullResponseHandler;
 import se.streamsource.dci.value.LinkValue;
 import se.streamsource.dci.value.LinksValue;
@@ -55,7 +56,6 @@ import se.streamsource.surface.web.resource.RootResource;
 import se.streamsource.surface.web.resource.SurfaceRestlet;
 import se.streamsource.surface.web.rest.AttachmentResponseHandler;
 import se.streamsource.surface.web.rest.CookieResponseHandler;
-
 import static org.qi4j.bootstrap.ImportedServiceDeclaration.INSTANCE;
 
 /**
@@ -69,7 +69,7 @@ public class ContextsAssembler
             importedBy( NewObjectImporter.class ).
             visibleIn( Visibility.application );
       module.addObjects( InteractionConstraintsService.class,
-            CommandQueryClient.class, CookieResponseHandler.class, AttachmentResponseHandler.class );
+            CommandQueryClientFactory.class, CommandQueryClient.class, CookieResponseHandler.class, AttachmentResponseHandler.class );
       module.addValues( TransactionDomainEvents.class, DomainEvent.class ).visibleIn( Visibility.application );
 
       module.addServices( ClientEventSourceService.class ).visibleIn( Visibility.application );
