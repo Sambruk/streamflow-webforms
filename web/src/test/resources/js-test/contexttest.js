@@ -4,7 +4,7 @@ ContextsTest = TestCase("Contexts");
 ContextsTest.prototype.setUp = function(){
     //jstestdriver.console.info("Hello World!");
     var contexts = {view: view,       subContexts: {
-       'context' : {view: view,    init: [ verify ], subContexts: {
+       'context' : {view: view,  init: [ verify ], subContexts: {
         'idContext': {view:view, init: [ verify ]}}}}};
 
     str = "";

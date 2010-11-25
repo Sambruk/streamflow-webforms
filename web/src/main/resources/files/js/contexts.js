@@ -15,14 +15,10 @@
  * limitations under the License.
  */
 
-
-
 /**
- * Defines the structure of the application (path after the '#' in the URL)
+ * Maps a string to a function
+ * i.e. name/id -> init(name), init(id), view(id)
  *
- * E.g.
- * #<number> -> page in the form
- * #signatures/0/ -> required signatures, first one
  */
 var Contexts = (function() {
     var inner = {};
@@ -105,6 +101,15 @@ var Contexts = (function() {
         return a;
     }
 
+    function build( map ) {
+        var context = new Context( map.view, map.init );
+        if ( !map.subContexts ) return context;
+        $.each( map.subContexts, function(key, value ) {
+            context.addSubContext( key, build( value ) );
+        })
+        return context;
+    }
+
     inner.findView = function( loc ) {
         if ( !loc || hash == loc ) return $.noop;
         hash = loc;
@@ -115,15 +120,6 @@ var Contexts = (function() {
     inner.init = function( map ) {
         rootContext = build( map );
         hash = "";
-    }
-
-    function build( map ) {
-        var context = new Context( map.view, map.init );
-        if ( !map.subContexts ) return context;
-        $.each( map.subContexts, function(key, value ) {
-            context.addSubContext( key, build( value ) );
-        })
-        return context;
     }
 
     return inner;
