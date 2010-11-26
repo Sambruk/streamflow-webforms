@@ -68,7 +68,7 @@ public class ContextsAssembler
       module.importServices( InteractionConstraintsService.class, NullResponseHandler.class ).
             importedBy( NewObjectImporter.class ).
             visibleIn( Visibility.application );
-      module.addObjects( InteractionConstraintsService.class,
+      module.addObjects( InteractionConstraintsService.class, 
             CommandQueryClientFactory.class, CommandQueryClient.class, CookieResponseHandler.class, AttachmentResponseHandler.class );
       module.addValues( TransactionDomainEvents.class, DomainEvent.class ).visibleIn( Visibility.application );
 

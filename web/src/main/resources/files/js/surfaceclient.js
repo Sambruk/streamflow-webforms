@@ -185,13 +185,25 @@ jQuery(document).ready(function()
             errorUrl: "#failed"
         };
 
-        var htmlSnippet = RequestModule.sign( signDTO );
+        //var theUrl = 'https://localhost:8443/surface/eidproxy/sign/sign.htm?transactionId='+state.formDraft.form+"&tbs=text&provider="+args.provider+"&successUrl=#s"+"&errorUrl=#e";
+        //var theUrl = 'eidproxy/sign/sign.htm?transactionId='+state.formDraft.form+"&tbs=text&provider="+args.provider+"&successUrl=#s"+"&errorUrl=#e";
+        /*var frame = $('<iframe />', {
+            name: 'signFrame',
+            id: 'signFrame',
+            url: theUrl
+        });*/
 
+        //var div = $('<div id="frameDiv"/>');
+
+        //div.appendTo( $('#app') );
+        //document.getElementById('frameDiv').innerHTML = "<iframe width ='100%' height='100' id='signFrame' src='"+theUrl+"'></iframe>";
+
+        var htmlSnippet = RequestModule.sign( signDTO );
         try {
             $('#app').html( htmlSnippet ).hide();
             if ( !doSign() ) {
-                throw { warning:"Signature cancelled: "+retVal, redirect:'summary' };
-                //Builder.setWarning( "Signature cancelled: "+retVal );
+            //if ( !document.getElementById('signFrame').contentWindow.doSign() ) {
+                throw { warning:"Signature cancelled", redirect:'summary' };
             } else {
                 // strip parameters
                 var verifyDTO = {};

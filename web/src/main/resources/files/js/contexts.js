@@ -111,7 +111,7 @@ var Contexts = (function() {
     }
 
     inner.findView = function( loc ) {
-        if ( !loc || hash == loc ) return $.noop;
+        if ( hash == loc ) return $.noop;
         hash = loc;
         var segments = getSegments();
         return function() { rootContext.runView( segments ); }
@@ -119,7 +119,7 @@ var Contexts = (function() {
 
     inner.init = function( map ) {
         rootContext = build( map );
-        hash = "";
+        hash = null;
     }
 
     return inner;

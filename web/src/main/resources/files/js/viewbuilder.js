@@ -65,14 +65,14 @@ var Builder = (function() {
     	$.each( required, function(idx, reqSign ) {
             var signatureLabel;
             var signatureValue;
-        	signatureLabel = $('#signature_label').clone();
+        	signatureLabel = clone('signature_label');
         	signatureLabel.append(reqSign.name + ":");
             var signature = getSignature( reqSign.name, signatures );
             if ( signature ) {
-            	signatureValue = $('#signature_value_signed').clone();
+            	signatureValue = clone('signature_value_signed');
             	signatureValue.append(signature.signerName);
             } else {
-            	signatureValue = $('#signature_value_unsigned').clone();
+            	signatureValue = clone('signature_value_unsigned');
             	var button = createSmallButton({image:"pencil_small", name:texts.sign, href:'#summary/'+idx})
             	var linkId = "link_" + idx;
             	button.attr({id:linkId});
