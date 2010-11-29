@@ -186,6 +186,7 @@ var FieldTypeModule = (function() {
     function CommentFieldValue( field ) {
         field.node = $('#CommentFieldValue').clone().attr("id", "Comment"+field.id).append( '<pre>'+field.field.field.note+'</pre>' );
 
+        field.name = "";
         field.setFieldValue = $.noop;
     }
 
@@ -357,7 +358,11 @@ var FieldTypeModule = (function() {
     }
 
     Field.prototype.getFieldValue = function() {
-        return this.node.attr('value');
+    	var value = this.node.attr('value');
+    	if (value)
+    		return value;
+    	else
+    		return '';
     }
 
     Field.prototype.setFieldValue = function( value ) {
