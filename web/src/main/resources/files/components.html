@@ -36,6 +36,7 @@
 
 <a id="link" href="#"></a>
 <a id="disabled" href="#0" class="disabledbutton" onclick="return false;"></a>
+<a id="disabledsmall" href="#0" class="disabledsmallbutton" onclick="return false;"></a>
 
 <img id="previous" src="static/images/buttons/arrow_left.png" alt=""/>
 <img id="next" src="static/images/buttons/arrow_right.png" alt=""/>
@@ -60,6 +61,7 @@
 			<div id="form_signatures_column_2"></div>
 			<div id="footer" style="clear: both;"></div>
 		</div>
+		<div id="eIdPlugin"></div>
     </div>
 
     <div id="form_submission_status">
@@ -136,8 +138,8 @@
 
 <form id="uploadform" action="POST" enctype="multipart/form-data" ></form>
 
-<div id="signature_label"></div>
-<div id="signature_value_signed"></div>
-<div id="signature_value_unsigned"></div>
+<div id="signature_label" class="signature_label"></div>
+<div id="signature_value_signed" class="signature_value_signed"></div>
+<div id="signature_value_unsigned" class="signature_value_unsigned"></div>
 
 <select id="comboBoxEidProviders"></select>

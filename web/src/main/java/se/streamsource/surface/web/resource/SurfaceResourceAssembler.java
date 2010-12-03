@@ -28,6 +28,7 @@ import se.streamsource.dci.restlet.server.NullCommandResult;
 import se.streamsource.surface.web.rest.AttachmentResponseHandler;
 import se.streamsource.surface.web.rest.CookieResponseHandler;
 import se.streamsource.surface.web.rest.EidProxyRestlet;
+import se.streamsource.surface.web.rest.IndexRestlet;
 import se.streamsource.surface.web.rest.StreamflowProxyRestlet;
 
 import static org.qi4j.bootstrap.ImportedServiceDeclaration.NEW_OBJECT;
@@ -48,6 +49,7 @@ public class SurfaceResourceAssembler
 
       // Resources
       module.addObjects(
+            IndexRestlet.class,
             StreamflowProxyRestlet.class,
             EidProxyRestlet.class
       );

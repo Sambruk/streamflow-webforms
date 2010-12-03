@@ -27,6 +27,8 @@ public class SurfaceComponent extends Component
    {
       getClients().add( Protocol.CLAP );
       getClients().add( Protocol.FILE );
+      getClients().add( Protocol.HTTP);
+      getClients().add( Protocol.HTTPS);
       
       SurfaceRestApplication application;
       try

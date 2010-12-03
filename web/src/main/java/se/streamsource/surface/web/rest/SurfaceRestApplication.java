@@ -82,7 +82,8 @@ public class SurfaceRestApplication
       Restlet cqr = factory.newObjectBuilder( SurfaceRestlet.class ).use( getContext() ).newInstance();
       StreamflowProxyRestlet proxyRestlet = factory.newObject( StreamflowProxyRestlet.class );
       EidProxyRestlet eidProxyRestlet = factory.newObject( EidProxyRestlet.class );
-      surfaceRouter.attachDefault( new IndexRestlet() );
+      IndexRestlet indexRestlet = factory.newObject(IndexRestlet.class);
+      surfaceRouter.attachDefault( indexRestlet );
       surfaceRouter.attach( "/eidproxy", eidProxyRestlet, Template.MODE_STARTS_WITH );
       surfaceRouter.attach( "/proxy", proxyRestlet, Template.MODE_STARTS_WITH );
       surfaceRouter.attach( "/surface", new ExtensionMediaTypeFilter( getContext(), cqr ), Template.MODE_STARTS_WITH );

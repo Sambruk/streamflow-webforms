@@ -53,8 +53,8 @@ var Builder = (function() {
         });
     }
 
-    function addSignatures( summarySignatures, required, signatures, disabled, eIdProviders ) {
-    	
+    function addSignatures( summarySignatures, disabled, signatureArgs ) {
+    	    	
     	var heading = summarySignatures.find("#form_signatures_heading");
     	var signature_content = summarySignatures.find("#form_signatures_content");
     	var column_1 = summarySignatures.find("#form_signatures_column_1");
@@ -62,21 +62,21 @@ var Builder = (function() {
     	
         heading.append( $('<h3 />').text( texts.signatures ) );
 
-    	$.each( required, function(idx, reqSign ) {
+    	$.each( signatureArgs.required, function(idx, reqSign ) {
             var signatureLabel;
             var signatureValue;
         	signatureLabel = clone('signature_label');
         	signatureLabel.append(reqSign.name + ":");
-            var signature = getSignature( reqSign.name, signatures );
+            var signature = getSignature( reqSign.name, signatureArgs.addedSignatures);
             if ( signature ) {
             	signatureValue = clone('signature_value_signed');
             	signatureValue.append(signature.signerName);
             } else {
             	signatureValue = clone('signature_value_unsigned');
-            	var button = createSmallButton({image:"pencil_small", name:texts.sign, href:'#summary/'+idx})
+            	var button = createSmallButton({image:"pencil_small", disabled:true, name:texts.sign, href:'#summary/'+idx})
             	var linkId = "link_" + idx;
             	button.attr({id:linkId});
-            	signatureValue.append( createEidProviderCombobox(idx, eIdProviders));
+            	signatureValue.append( createEidProviderCombobox(idx, signatureArgs));
             	signatureValue.append( "&nbsp;&nbsp;").append( button);
             }
             column_1.append( signatureLabel );
@@ -85,18 +85,30 @@ var Builder = (function() {
         summarySignatures.show();
     }
 
-    function createEidProviderCombobox( signatureId, eIdProviders ){
+    function createEidProviderCombobox( signatureId, signatureArgs ){
     	var combobox = $('#comboBoxEidProviders').clone();
-    	combobox.attr({name: signatureId, id: "eIdProvider_"+signatureId});
+    	combobox.attr({name: signatureId, id: "eIdProvider_" + signatureId});
     	combobox.change(function() {
     		var value = this.value;
 	    	$("#link_"+this.name).attr('href', function() {
 	    		var list = this.href.split('?provider=');
 	    		return list[0] + "?provider="+value
 	    	});
+	    	enableSmallButton("#link_"+this.name);
+	    	
+	    	var signDTO = {
+                transactionId: signatureArgs.transactionId,
+                tbs: signatureArgs.tbs,
+                provider: value,
+                successUrl: "#success",
+                errorUrl: "#failed"
+          	};
+
+            var htmlSnippet = RequestModule.sign( signDTO );
+            $('#eIdPlugin').html( htmlSnippet ).hide();
     	});
         combobox.append( $('<option>/').append(texts.provider	) );
-        $.each(eIdProviders, function(idx, link ) {
+        $.each(signatureArgs.eIdProviders, function(idx, link ) {
          	combobox.append( $('<option />').attr({value: link.provider}).text(link.text) );
         });
         return combobox;
@@ -133,14 +145,9 @@ var Builder = (function() {
 
         var formOk = (errorString=="");
         if ( args.signatures ) {
-            var required = args.signatures.required;
-            var added = args.signatures.addedSignatures;
-            var eIdProviders = args.signatures.eIdProviders;
-            addSignatures( summarySignatures, required, added, !formOk, eIdProviders );
+            addSignatures( summarySignatures, !formOk, args.signatures );
 
-            formOk = formOk && ( required.length == added.length );
-        } else {
-
+            formOk = formOk && ( args.signatures.required.length == args.signatures.addedSignatures.length );
         }
 
         var button = createButton( {image:'submit', name:texts.submit, href:'#submit', disabled:!formOk });
@@ -254,11 +261,17 @@ var Builder = (function() {
             button = clone('link').attr({'href':map.href,"class":"smallbutton positive"});
         } else {
             if ( image ) image.fadeTo(0, 0.4);
-            button = clone('disabled');
+            button = clone('disabledsmall').attr('href',map.href);
         }
         return button.append( image ).append( map.name );
     }
 
+    function enableSmallButton(id){
+    	$(id).attr('class', 'smallbutton positive');
+    	$(id).find('img').removeAttr('style');
+    	$(id).removeAttr("onclick");
+    }
+    
     function lastPage( page, pages ) {
         return ( page == pages.length -1);
     }

@@ -197,34 +197,34 @@ body.two-col #content {
 }
 
 /* line 42, ../../../webapp/css-src/partials/_buttons.scss */
-.bp a.positive, .bp button.positive {
+.bp a.positive, .bp button.positive, .bp smallbutton.positive {
   color: #000066;
 }
 /* line 62, ../../../../../../../../.gem/ruby/1.8/gems/compass-0.10.5/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
-.bp a.positive:hover, .bp button.positive:hover {
+.bp a.positive:hover, .bp button.positive:hover, .bp smallbutton.positive:hover {
   background-color: #e6efc2;
   border-color: #d6e890 #c6d880 #c6d880 #d6e890;
   color: #529214;
 }
 /* line 47, ../../../../../../../../.gem/ruby/1.8/gems/compass-0.10.5/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
-.bp a.positive:active, .bp button.positive:active {
+.bp a.positive:active, .bp button.positive:active, .bp smallbutton.positive:active {
   background-color: #529214;
   border-color: #62a224 #529214 #529214 #62a224;
   color: white;
 }
 
 /* line 47, ../../../webapp/css-src/partials/_buttons.scss */
-.bp a.negative, .bp button.negative {
+.bp a.negative, .bp button.negative, .bp smallbutton.negative {
   color: #d12f19;
 }
 /* line 62, ../../../../../../../../.gem/ruby/1.8/gems/compass-0.10.5/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
-.bp a.negative:hover, .bp button.negative:hover {
+.bp a.negative:hover, .bp button.negative:hover, .bp smallbutton.negative:hover {
   background-color: #fbe3e4;
   border-color: #ffd2d4 #fbc2c4 #fbc2c4 #ffd2d4;
   color: #d12f19;
 }
 /* line 47, ../../../../../../../../.gem/ruby/1.8/gems/compass-0.10.5/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
-.bp a.negative:active, .bp button.negative:active {
+.bp a.negative:active, .bp button.negative:active, .bp smallbutton.negative:active {
   background-color: #d12f19;
   border-color: #e13f29 #d12f19 #d12f19 #e13f29;
   color: white;
@@ -262,25 +262,13 @@ body.two-col #content {
   height: 16px;
   float: none;
 }
-/* line 62, ../../../../../../../../.gem/ruby/1.8/gems/compass-0.10.5/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
-.bp a.disabledbutton:hover {
-  background-color: #f5f5f5;
-  border-color: #eeeeee #dedede #dedede #eeeeee;
-  color: #c9c7c7;
-}
-/* line 47, ../../../../../../../../.gem/ruby/1.8/gems/compass-0.10.5/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
-.bp a.disabledbutton:active {
-  background-color: #f5f5f5;
-  border-color: #eeeeee #dedede #dedede #eeeeee;
-  color: #c9c7c7;
-}
 
-/* line 61, ../../../webapp/css-src/partials/_buttons.scss */
+/* line 59, ../../../webapp/css-src/partials/_buttons.scss */
 .bp a.disabledbutton:visited {
   color: #c9c7c7;
 }
 
-/* line 65, ../../../webapp/css-src/partials/_buttons.scss */
+/* line 63, ../../../webapp/css-src/partials/_buttons.scss */
 .bp a.smallbutton {
   display: -moz-inline-box;
   -moz-box-orient: vertical;
@@ -300,7 +288,7 @@ body.two-col #content {
   padding: 5px 10px 5px 7px;
   background-color: #f5f5f5;
   border-color: #eeeeee #dedede #dedede #eeeeee;
-  color: #565656;
+  color: #000066;
   cursor: default;
   margin: 0.5em 0.5em 0.5em 0;
   padding: 3px 10px 3px 7px;
@@ -315,17 +303,52 @@ body.two-col #content {
   height: 16px;
   float: none;
 }
+
+/* line 72, ../../../webapp/css-src/partials/_buttons.scss */
+.bp a.disabledsmallbutton {
+  display: -moz-inline-box;
+  -moz-box-orient: vertical;
+  display: inline-block;
+  vertical-align: middle;
+  *display: inline;
+  *vertical-align: auto;
+  margin: 0.7em 0.5em 0.7em 0;
+  border-width: 1px;
+  border-style: solid;
+  font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+  font-size: 100%;
+  line-height: 130%;
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+  padding: 5px 10px 5px 7px;
+  background-color: #f5f5f5;
+  border-color: #eeeeee #dedede #dedede #eeeeee;
+  color: #c9c7c7;
+  cursor: default;
+  margin: 0.5em 0.5em 0.5em 0;
+  padding: 3px 10px 3px 7px;
+  font-size: 80%;
+}
+/* line 76, ../../../../../../../../.gem/ruby/1.8/gems/compass-0.10.5/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
+.bp a.disabledsmallbutton img {
+  margin: 0 3px -3px 0 !important;
+  padding: 0;
+  border: none;
+  width: 16px;
+  height: 16px;
+  float: none;
+}
 /* line 62, ../../../../../../../../.gem/ruby/1.8/gems/compass-0.10.5/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
-.bp a.smallbutton:hover {
+.bp a.disabledsmallbutton:hover {
   background-color: #dff4ff;
   border-color: #d2f1ff #c2e1ef #c2e1ef #d2f1ff;
-  color: #336699;
+  color: #c9c7c7;
 }
-/* line 47, ../../../../../../../../.gem/ruby/1.8/gems/compass-0.10.5/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
-.bp a.smallbutton:active {
-  background-color: #6299c5;
-  border-color: #72a9d5 #6299c5 #6299c5 #72a9d5;
-  color: white;
+
+/* line 82, ../../../webapp/css-src/partials/_buttons.scss */
+.bp a.disabledsmallbutton:visited {
+  color: #c9c7c7;
 }
 
 /* line 42, ../../../webapp/css-src/screen.scss */
@@ -880,7 +903,7 @@ div.commentfield pre {
 }
 
 /* line 217, ../../../webapp/css-src/screen.scss */
-#signature_label {
+#form_signatures_content .signature_label {
   font-weight: bold;
   margin-right: 10px;
   padding-top: 9px;
@@ -888,7 +911,7 @@ div.commentfield pre {
 }
 
 /* line 224, ../../../webapp/css-src/screen.scss */
-#signature_value_signed {
+#form_signatures_content .signature_value_signed {
   font-style: italic;
   clear: none;
   padding-top: 9px;
@@ -896,7 +919,7 @@ div.commentfield pre {
 }
 
 /* line 231, ../../../webapp/css-src/screen.scss */
-#signature_value_unsigned {
+#form_signatures_content .signature_value_unsigned {
   clear: none;
   padding-top: 4px;
   padding-bottom: 5px;

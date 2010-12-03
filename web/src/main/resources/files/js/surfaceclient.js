@@ -87,7 +87,7 @@ jQuery(document).ready(function()
     function gotoSummary() {
         var description = state.formDraft.description;
         var pages = state.formDraft.pages;
-        Builder.show( 'form_summary_div' , Builder.summary, {description: description, pages:pages, signatures: signatures() });
+        Builder.show( 'form_summary_div' , Builder.summary, {description: description, pages:pages, signatures: signatures()});
     }
 
     function signatures() {
@@ -95,7 +95,9 @@ jQuery(document).ready(function()
             return {
                 required:  state.formSignatures,
                 addedSignatures: state.formDraft.signatures,
-                eIdProviders:state.eIdProviders.links
+                eIdProviders:state.eIdProviders.links,
+                transactionId:state.formDraft.form,
+                tbs:getFormTBS()
             };
         } else {
             return null;
@@ -122,7 +124,7 @@ jQuery(document).ready(function()
         }
     }
 
-    function getFormTBS() {
+    function getFormTBS(){
         var tbs = "";
         $.each( state.formDraft.pages, function(idx, page) {
             $.each( page.fields, function(fieldIdx, field) {
@@ -176,34 +178,10 @@ jQuery(document).ready(function()
 
     function performSign( args ) {
         var tbs = getFormTBS();
-
-        var signDTO = {
-            transactionId: state.formDraft.form,
-            tbs: tbs,
-            provider: args.provider,
-            successUrl: "#success",
-            errorUrl: "#failed"
-        };
-
-        //var theUrl = 'https://localhost:8443/surface/eidproxy/sign/sign.htm?transactionId='+state.formDraft.form+"&tbs=text&provider="+args.provider+"&successUrl=#s"+"&errorUrl=#e";
-        //var theUrl = 'eidproxy/sign/sign.htm?transactionId='+state.formDraft.form+"&tbs=text&provider="+args.provider+"&successUrl=#s"+"&errorUrl=#e";
-        /*var frame = $('<iframe />', {
-            name: 'signFrame',
-            id: 'signFrame',
-            url: theUrl
-        });*/
-
-        //var div = $('<div id="frameDiv"/>');
-
-        //div.appendTo( $('#app') );
-        //document.getElementById('frameDiv').innerHTML = "<iframe width ='100%' height='100' id='signFrame' src='"+theUrl+"'></iframe>";
-
-        var htmlSnippet = RequestModule.sign( signDTO );
         try {
-            $('#app').html( htmlSnippet ).hide();
-            if ( !doSign() ) {
-            //if ( !document.getElementById('signFrame').contentWindow.doSign() ) {
-                throw { warning:"Signature cancelled", redirect:'summary' };
+        	var retVal = doSign();
+            if ( retVal != 0 ) {
+                throw { warning:"Signature aborted (errorcode: " +retVal + ")", redirect:'summary' };
             } else {
                 // strip parameters
                 var verifyDTO = {};
@@ -222,9 +200,11 @@ jQuery(document).ready(function()
         } finally {
             $('#app').show();
         }
-        throw {info:"Form signed successfully", redirect:'summary'};
-    }
 
+        throw {info:"Form signed successfully", redirect:'summary'};
+    
+    }
+    
     function error( message ) {
         Builder.show('ErrorMessage', function(args){args.node.text(message)}, {});
         throw {error:message};

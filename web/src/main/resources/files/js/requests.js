@@ -105,7 +105,10 @@ var RequestModule = (function() {
 
     inner.updateField = function( fieldDTO ) {
         var parameters = request('PUT', urls.proxy + urls.draft + 'updatefield.json');
-        parameters.data = fieldDTO;
+        parameters.data = fieldDTO;     
+        parameters.error = function(args){
+        	alert(""+args);
+        };
         return getData( parameters );
     }
 
@@ -141,7 +144,10 @@ var RequestModule = (function() {
     inner.sign = function( signDTO ) {
         var parameters = request('GET', urls.eid + 'sign/sign.htm');
         parameters.dataType = null;
-        parameters.data = signDTO;
+        parameters.data = signDTO;        
+        parameters.error = function(args){
+        	alert(""+args);
+        };
         return getData( parameters );
     }
 
@@ -153,10 +159,7 @@ var RequestModule = (function() {
 
     inner.addSignature = function( signatureDTO ) {
         var parameters = request('PUT', urls.proxy + urls.draft + 'addsignature.json');
-        parameters.data = signatureDTO;        
-        parameters.error = function(args){
-        	alert(""+args);
-        };
+        parameters.data = signatureDTO;   
         $.ajax( parameters );
     }
 

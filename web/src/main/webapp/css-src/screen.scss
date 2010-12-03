@@ -214,21 +214,21 @@ div.commentfield pre {
   display: inline;
 }
 
-#signature_label {
+#form_signatures_content .signature_label {
   font-weight: bold;
   margin-right: 10px;
   padding-top: 9px;
   height: 30px;
 }
 
-#signature_value_signed {
+#form_signatures_content .signature_value_signed {
   font-style: italic;
   clear: none;
   padding-top: 9px;
   height: 30px;
 }
 
-#signature_value_unsigned {
+#form_signatures_content .signature_value_unsigned {
   clear: none;
   padding-top: 4px;
   padding-bottom: 5px;
