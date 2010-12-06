@@ -18,11 +18,11 @@
 package se.streamsource.surface.web.rest;
 
 import org.qi4j.api.injection.scope.Service;
+import org.qi4j.api.service.qualifier.Tagged;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
 import se.streamsource.surface.web.proxy.ProxyService;
-import se.streamsource.surface.web.qualifier.IdentifiedBy;
 
 /**
  * Simple Restlet that delegates to the EidProxyService.
@@ -32,7 +32,7 @@ public class EidProxyRestlet
    extends Restlet
 {
    @Service
-   @IdentifiedBy("eidproxy")
+   @Tagged("eid")
    ProxyService proxyService;
 
    @Override

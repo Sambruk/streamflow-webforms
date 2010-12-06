@@ -17,12 +17,8 @@
 
 package se.streamsource.surface.web.rest;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
 import org.qi4j.api.injection.scope.Service;
+import org.qi4j.api.service.qualifier.Tagged;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
@@ -32,9 +28,12 @@ import org.restlet.data.Reference;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
-
 import se.streamsource.surface.web.proxy.ProxyService;
-import se.streamsource.surface.web.qualifier.IdentifiedBy;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  */
@@ -43,7 +42,7 @@ public class IndexRestlet extends Restlet
 {
 
    @Service
-   @IdentifiedBy("eidproxy")
+   @Tagged("eid")
    ProxyService proxyService;
 
    @Override
