@@ -23,9 +23,7 @@ import org.qi4j.bootstrap.*;
 import org.qi4j.entitystore.memory.MemoryEntityStoreService;
 import org.qi4j.entitystore.prefs.PreferencesEntityStoreInfo;
 import org.qi4j.entitystore.prefs.PreferencesEntityStoreService;
-import org.qi4j.library.jmx.ApplicationManagerService;
-import org.qi4j.library.jmx.ConfigurationManagerService;
-import org.qi4j.library.jmx.MBeanServerImporter;
+import org.qi4j.library.jmx.JMXAssembler;
 import org.restlet.Client;
 import se.streamsource.surface.web.context.ContextsAssembler;
 import se.streamsource.surface.web.proxy.ProxyConfiguration;
@@ -33,7 +31,6 @@ import se.streamsource.surface.web.proxy.ProxyService;
 import se.streamsource.surface.web.resource.SurfaceResourceAssembler;
 import se.streamsource.surface.web.rest.SurfaceRestAssembler;
 
-import javax.management.MBeanServer;
 import java.util.prefs.Preferences;
 
 import static org.qi4j.api.service.qualifier.ServiceTags.tags;
@@ -80,11 +77,9 @@ public class SurfaceWebAssembler
 
    private void assembleManagementLayer( LayerAssembly managementLayer ) throws AssemblyException
    {
-      ModuleAssembly module = managementLayer.moduleAssembly( "Management" );
+      ModuleAssembly module = managementLayer.moduleAssembly( "JMX" );
 
-      module.importServices( MBeanServer.class ).importedBy( MBeanServerImporter.class );
-      module.addServices( ApplicationManagerService.class ).instantiateOnStartup();
-      module.addServices( ConfigurationManagerService.class ).instantiateOnStartup();
+      new JMXAssembler().assemble( module );
    }
 
    private void assembleConfigLayer( LayerAssembly configLayer ) throws AssemblyException
