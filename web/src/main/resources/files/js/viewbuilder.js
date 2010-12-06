@@ -100,8 +100,8 @@ var Builder = (function() {
                 transactionId: signatureArgs.transactionId,
                 tbs: signatureArgs.tbs,
                 provider: value,
-                successUrl: "#success",
-                errorUrl: "#failed"
+                successUrl: "verify",
+                errorUrl: "error"
           	};
 
             var htmlSnippet = RequestModule.sign( signDTO );

@@ -145,9 +145,6 @@ var RequestModule = (function() {
         var parameters = request('GET', urls.eid + 'sign/sign.htm');
         parameters.dataType = null;
         parameters.data = signDTO;        
-        parameters.error = function(args){
-        	alert(""+args);
-        };
         return getData( parameters );
     }
 
