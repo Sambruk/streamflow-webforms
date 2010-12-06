@@ -23,13 +23,8 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.restlet.Client;
 import se.streamsource.dci.restlet.server.DCIAssembler;
-import se.streamsource.dci.restlet.server.DefaultResponseWriterFactory;
 import se.streamsource.dci.restlet.server.NullCommandResult;
-import se.streamsource.surface.web.rest.AttachmentResponseHandler;
-import se.streamsource.surface.web.rest.CookieResponseHandler;
-import se.streamsource.surface.web.rest.EidProxyRestlet;
-import se.streamsource.surface.web.rest.IndexRestlet;
-import se.streamsource.surface.web.rest.StreamflowProxyRestlet;
+import se.streamsource.surface.web.rest.*;
 
 import static org.qi4j.bootstrap.ImportedServiceDeclaration.NEW_OBJECT;
 
@@ -41,7 +36,6 @@ public class SurfaceResourceAssembler
    public void assemble( ModuleAssembly module )
          throws AssemblyException
    {
-      module.addObjects( DefaultResponseWriterFactory.class );
       new DCIAssembler().assemble( module );
 
       module.importServices( NullCommandResult.class ).importedBy( NEW_OBJECT );

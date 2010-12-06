@@ -23,8 +23,8 @@ import org.qi4j.api.common.Visibility;
 import org.qi4j.api.value.ValueComposite;
 import org.qi4j.bootstrap.Assembler;
 import org.qi4j.bootstrap.AssemblyException;
+import org.qi4j.bootstrap.ImportedServiceDeclaration;
 import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.spi.service.importer.NewObjectImporter;
 import org.restlet.Restlet;
 import se.streamsource.dci.api.InteractionConstraintsService;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
@@ -45,17 +45,10 @@ import se.streamsource.streamflow.resource.caze.SubmittedFormsListDTO;
 import se.streamsource.streamflow.resource.roles.IntegerDTO;
 import se.streamsource.streamflow.resource.user.NewProxyUserCommand;
 import se.streamsource.surface.web.ClientEventSourceService;
-import se.streamsource.surface.web.resource.AccessPointResource;
-import se.streamsource.surface.web.resource.AccessPointsResource;
-import se.streamsource.surface.web.resource.CaseResource;
-import se.streamsource.surface.web.resource.EndUserResource;
-import se.streamsource.surface.web.resource.EndUsersResource;
-import se.streamsource.surface.web.resource.FormDraftResource;
-import se.streamsource.surface.web.resource.FormDraftsResource;
-import se.streamsource.surface.web.resource.RootResource;
-import se.streamsource.surface.web.resource.SurfaceRestlet;
+import se.streamsource.surface.web.resource.*;
 import se.streamsource.surface.web.rest.AttachmentResponseHandler;
 import se.streamsource.surface.web.rest.CookieResponseHandler;
+
 import static org.qi4j.bootstrap.ImportedServiceDeclaration.INSTANCE;
 
 /**
@@ -66,7 +59,7 @@ public class ContextsAssembler
    public void assemble( ModuleAssembly module ) throws AssemblyException
    {
       module.importServices( InteractionConstraintsService.class, NullResponseHandler.class ).
-            importedBy( NewObjectImporter.class ).
+            importedBy( ImportedServiceDeclaration.NEW_OBJECT ).
             visibleIn( Visibility.application );
       module.addObjects( InteractionConstraintsService.class, 
             CommandQueryClientFactory.class, CommandQueryClient.class, CookieResponseHandler.class, AttachmentResponseHandler.class );

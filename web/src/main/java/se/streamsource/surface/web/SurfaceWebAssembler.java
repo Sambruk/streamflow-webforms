@@ -23,9 +23,10 @@ import org.qi4j.bootstrap.*;
 import org.qi4j.entitystore.memory.MemoryEntityStoreService;
 import org.qi4j.entitystore.prefs.PreferencesEntityStoreInfo;
 import org.qi4j.entitystore.prefs.PreferencesEntityStoreService;
-import org.qi4j.rest.MBeanServerImporter;
+import org.qi4j.library.jmx.ApplicationManagerService;
+import org.qi4j.library.jmx.ConfigurationManagerService;
+import org.qi4j.library.jmx.MBeanServerImporter;
 import org.restlet.Client;
-import se.streamsource.streamflow.infrastructure.ConfigurationManagerService;
 import se.streamsource.surface.web.context.ContextsAssembler;
 import se.streamsource.surface.web.proxy.ProxyConfiguration;
 import se.streamsource.surface.web.proxy.ProxyService;
@@ -50,14 +51,16 @@ public class SurfaceWebAssembler
    public ApplicationAssembly assemble( ApplicationAssemblyFactory applicationFactory ) throws AssemblyException
    {
       ApplicationAssembly assembly = applicationFactory.newApplicationAssembly();
-      assembly.setName( "StreamFlowSurface" );
+      assembly.setName( "Surface" );
       assembly.setVersion( "0.3.20.962" );
       LayerAssembly webLayer = assembly.layerAssembly( "Web" );
       LayerAssembly appLayer = assembly.layerAssembly( "Application" );
+      LayerAssembly managementLayer = assembly.layerAssembly( "Management" );
       LayerAssembly configLayer = assembly.layerAssembly("Configuration" );
 
       webLayer.uses( appLayer );
       appLayer.uses( configLayer );
+      managementLayer.uses(webLayer, appLayer, configLayer);
 
       assembleWebLayer( webLayer );
 
@@ -65,12 +68,23 @@ public class SurfaceWebAssembler
 
       assembleConfigLayer(configLayer);
 
+      assembleManagementLayer(managementLayer);
+
       for (Object serviceObject : serviceObjects)
       {
          assembly.setMetaInfo( serviceObject );
       }
 
       return assembly;
+   }
+
+   private void assembleManagementLayer( LayerAssembly managementLayer ) throws AssemblyException
+   {
+      ModuleAssembly module = managementLayer.moduleAssembly( "Management" );
+
+      module.importServices( MBeanServer.class ).importedBy( MBeanServerImporter.class );
+      module.addServices( ApplicationManagerService.class ).instantiateOnStartup();
+      module.addServices( ConfigurationManagerService.class ).instantiateOnStartup();
    }
 
    private void assembleConfigLayer( LayerAssembly configLayer ) throws AssemblyException
@@ -131,9 +145,5 @@ public class SurfaceWebAssembler
             instantiateOnStartup();
       
       proxyModule.importServices( Client.class ).visibleIn( Visibility.application );
-
-      // TODO This should be in its own module (layer?)
-      proxyModule.importServices( MBeanServer.class ).importedBy( MBeanServerImporter.class );
-      proxyModule.addServices( ConfigurationManagerService.class ).instantiateOnStartup();
    }
 }
