@@ -61,12 +61,12 @@ public class IndexRestlet extends Restlet
             template = template.replace("$accesspoint", accessPointId);
             template = template.replace("$hostname", request.getResourceRef().getHostIdentifier());
 
-            boolean shouldSignForm = false;
+            boolean shouldSignForm = true;
             // get accesspoint
             // get form and check if requires signatures
             if (shouldSignForm)
             {
-               template = template.replace("$signerDiv", getSignerDiv());
+               template = template.replace("$signerDiv", getSignerDiv(request.getClientInfo().getAgent()));
             } else
             {
                template = template.replace("$signerDiv", "");
@@ -96,7 +96,7 @@ public class IndexRestlet extends Restlet
       return template.toString();
    }
 
-   private String getSignerDiv()
+   private String getSignerDiv(String agent)
    {
       StringBuffer buffer = new StringBuffer("<div id=\"signerDiv\">\n");
 
@@ -110,6 +110,8 @@ public class IndexRestlet extends Restlet
             clientResource.setChallengeResponse(ChallengeScheme.HTTP_BASIC, proxyService.configuration().username()
                   .get(), proxyService.configuration().password().get());
 
+            clientResource.getClientInfo().setAgent(agent);
+            
             // Call plugin
             Representation result = clientResource.get();
             buffer.append(result.getText());
