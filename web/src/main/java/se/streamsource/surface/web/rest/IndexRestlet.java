@@ -61,7 +61,9 @@ public class IndexRestlet extends Restlet
             template = template.replace("$accesspoint", accessPointId);
             template = template.replace("$hostname", request.getResourceRef().getHostIdentifier());
 
-            boolean shouldSignForm = true;
+            boolean shouldSignForm = false;
+            // get accesspoint
+            // get form and check if requires signatures
             if (shouldSignForm)
             {
                template = template.replace("$signerDiv", getSignerDiv());
