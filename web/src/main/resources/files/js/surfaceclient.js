@@ -177,7 +177,6 @@ jQuery(document).ready(function()
     }
 
     function performSign( args ) {
-        var tbs = getFormTBS();
         try {
         	var retVal = doSign();
             if ( retVal != 0 ) {
@@ -186,15 +185,13 @@ jQuery(document).ready(function()
                 // strip parameters
                 var verifyDTO = {};
                 $.each( $('#app').find('form > input:hidden'), function(idx, value ) {
-                    verifyDTO[ value.name ] = value.value;
+                    if ( value.name ) {
+                        verifyDTO[ value.name ] = value.value;
+                    }
                 });
-                var signatureDTO = RequestModule.verify( verifyDTO );
-
-                signatureDTO.form = tbs;
-                signatureDTO.encodedForm = verifyDTO.encodedTbs;
-                signatureDTO.provider = args.provider;
-                signatureDTO.name = state.requiredSignatureName;
-                RequestModule.addSignature( signatureDTO );
+                verifyDTO.name = state.requiredSignatureName;
+                verifyDTO.form = getFormTBS();
+                RequestModule.verify( verifyDTO );
                 state.formDraft = RequestModule.getFormDraft();
             }
         } finally {
@@ -202,7 +199,6 @@ jQuery(document).ready(function()
         }
 
         throw {info:"Form signed successfully", redirect:'summary'};
-    
     }
     
     function error( message ) {
@@ -289,7 +285,7 @@ jQuery(document).ready(function()
         'discard'   : {view:discard},
         'submit'    : {view:submitAndSend,  init: [ verifySubmit ]},
         'idContext' : {view:gotoPage,       init: [ verifyPage, verifyFormEditing ]},
-        'summary'   : {view:gotoSummary,    init: [ setupSignatures, setupProviders ], subContexts: { 
+        'summary'   : {view:gotoSummary,    init: [ setupSignatures, setupProviders ], subContexts: {
            'idContext': {view:performSign,     init:[verifySigner,verifyProvider,setupRequiredSignature]}}}}};
 
     var state = {};

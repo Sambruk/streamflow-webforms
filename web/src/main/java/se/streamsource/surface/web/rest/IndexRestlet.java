@@ -45,6 +45,11 @@ public class IndexRestlet extends Restlet
    @Tagged("eid")
    ProxyService proxyService;
 
+
+   @Service
+   @Tagged("streamflow")
+   ProxyService streamflowService;
+
    @Override
    public void handle(Request request, Response response)
    {

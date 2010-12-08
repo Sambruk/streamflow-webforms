@@ -35,26 +35,28 @@ import se.streamsource.surface.web.proxy.ProxyService;
  * JAVADOC
  */
 public class SurfaceRestlet
-    extends CommandQueryRestlet2
+      extends CommandQueryRestlet2
 {
-    @Structure
-    ObjectBuilderFactory obf;
+   @Structure
+   ObjectBuilderFactory obf;
 
-    @Service ProxyService proxyService;
+   @Service ProxyService proxyService;
 
-    @Override
-    protected Uniform createRoot( Request request, Response response )
-    {
-        CommandQueryClient cqc = obf.newObjectBuilder( CommandQueryClientFactory.class )
+   @Override
+   protected Uniform createRoot( Request request, Response response )
+   {
+      CommandQueryClient cqc = obf.newObjectBuilder( CommandQueryClientFactory.class )
             .use( proxyService, new NullResponseHandler()).newInstance().newClient( new Reference(new Reference(proxyService.configuration().url().get()), new Reference("")) );
 
-        // Go to the main entrypoint for Surface
-        cqc = cqc.getClient( "accesspoints/" );
+      // Go to the main entrypoint for Surface
+      cqc = cqc.getClient( "accesspoints/" );
 
-        RoleMap.current().set( cqc );
+      RoleMap.current().set( cqc );
+      //RoleMap.current().set(  );
 
-        return module.objectBuilderFactory().newObjectBuilder( RootResource.class ).newInstance();
-    }
+
+      return module.objectBuilderFactory().newObjectBuilder( RootResource.class ).newInstance();
+   }
 
 /*
    private void initRoleMap( Request request, RoleMap roleMap )

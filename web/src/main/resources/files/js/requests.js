@@ -149,9 +149,12 @@ var RequestModule = (function() {
     }
 
     inner.verify = function( verifyDTO ) {
-        var parameters = request('POST', urls.eid + 'sign/verify.json');
+        //var parameters = request('POST', urls.eid + 'sign/verify.json');
+        //parameters.data = verifyDTO;
+        //return getData( parameters );
+        var parameters = request('POST', urls.surface + urls.draft + 'verify.json');
         parameters.data = verifyDTO;
-        return getData( parameters );
+        $.ajax( parameters );
     }
 
     inner.addSignature = function( signatureDTO ) {
