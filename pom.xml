@@ -291,7 +291,7 @@
                         <exclude>**/docbkx/**</exclude>
                         <exclude>**/javadoc/**</exclude>
                         <exclude>**/site/**</exclude>
-                        <exclude>**/webapp/js/external/**</exclude>
+                        <exclude>**/resources/files/js/external/**</exclude>
                         <exclude>**/webapp/css/external/**</exclude>
                         <exclude>**/index.html</exclude> <!--  IE will screw up if anything is added before the doctype, add license manually instead -->
                     </excludes>
