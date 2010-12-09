@@ -23,6 +23,8 @@ import org.qi4j.api.object.ObjectBuilderFactory;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Uniform;
+import org.restlet.data.Language;
+import org.restlet.data.Preference;
 import org.restlet.data.Reference;
 import se.streamsource.dci.api.RoleMap;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
@@ -30,6 +32,9 @@ import se.streamsource.dci.restlet.client.CommandQueryClientFactory;
 import se.streamsource.dci.restlet.client.NullResponseHandler;
 import se.streamsource.dci.restlet.server.CommandQueryRestlet2;
 import se.streamsource.surface.web.proxy.ProxyService;
+
+import java.util.List;
+import java.util.Locale;
 
 /**
  * JAVADOC
@@ -52,31 +57,15 @@ public class SurfaceRestlet
       cqc = cqc.getClient( "accesspoints/" );
 
       RoleMap.current().set( cqc );
-      //RoleMap.current().set(  );
-
+      initRoleMap( request, RoleMap.current() );
 
       return module.objectBuilderFactory().newObjectBuilder( RootResource.class ).newInstance();
    }
 
-/*
    private void initRoleMap( Request request, RoleMap roleMap )
    {
       roleMap.set( resolveRequestLocale( request ), Locale.class );
 
-      // TODO Should we really store user AND subject in role map?
-      for ( Principal principal : request.getClientInfo().getPrincipals())
-      {
-         roleMap.set( principal );
-
-         String name = principal.getName();
-         UserAuthentication authentication = module.unitOfWorkFactory().currentUnitOfWork().get( UserAuthentication.class, name );
-         roleMap.set( authentication );
-
-         if (authentication instanceof ProxyUser)
-         {
-            roleMap.set( new ProxyUserPrincipal( name ) );
-         }
-      }
    }
 
    protected Locale resolveRequestLocale( Request request )
@@ -107,5 +96,4 @@ public class SurfaceRestlet
       }
       return locale;
    }
-*/
 }
