@@ -150,6 +150,8 @@ var Builder = (function() {
             formOk = formOk && ( args.signatures.required.length == args.signatures.addedSignatures.length );
         }
 
+        appendPageNames( -1, args.pages, args.node.find('#form_pages') );
+
         var button = createButton( {image:'submit', name:texts.submit, href:'#submit', disabled:!formOk });
         summaryStatus.append( button );
         summaryStatus.append( createButton( {image:'discard', name:texts.discard, href:'#discard'}) );
@@ -227,15 +229,27 @@ var Builder = (function() {
     function appendPageNames( current, pages, pagesNode )
     {
         $.each( pages, function(idx, page){
-            var pageElm = $('<li />');
-            if ( current == idx ) {
-                pageElm.attr({"class": "selected"});
-            }
-            pageElm.append(clone('link').attr({'href':'#'+idx, "class":"breadcrumb"}).append(page.title));
-            pagesNode.append( pageElm );
+        	if (idx==current) {
+        		var styleClass = "selected";
+        	}
+            pagesNode.append( createBreadcrumb({styleClass:styleClass, href:"#"+idx, title:page.title}) );
         });
+        var styleClass = "summary";
+        if (current == -1) {
+        	styleClass = "summary_selected"
+        } 
+        pagesNode.append( createBreadcrumb({styleClass:styleClass, href:"#summary", title:texts.summary}) );
     }
 
+    function createBreadcrumb( map){
+    	var pageElm = $('<li />');
+        if ( map.styleClass ) {
+            pageElm.attr({"class": map.styleClass});
+        }
+        pageElm.append(clone('link').attr({'href':map.href, "class":"breadcrumb"}).append(map.title));
+        return pageElm;
+    }
+    
     function createButton( map ) {
         var image, button;
         if ( map.image ) {

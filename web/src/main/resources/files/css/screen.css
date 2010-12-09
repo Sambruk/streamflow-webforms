@@ -683,7 +683,7 @@ fieldset {
 }
 
 /* line 70, ../../../webapp/css-src/screen.scss */
-#inserted_form_filling_div ul {
+#inserted_form_filling_div ul, #inserted_form_summary_div ul#form_pages {
   margin: 0;
   padding: 0;
   border: 0;
@@ -694,7 +694,7 @@ fieldset {
   margin-bottom: 23px;
 }
 /* line 51, ../../../../../../../../.gem/ruby/1.8/gems/compass-0.10.5/frameworks/compass/stylesheets/compass/utilities/lists/_horizontal-list.scss */
-#inserted_form_filling_div ul li {
+#inserted_form_filling_div ul li, #inserted_form_summary_div ul#form_pages li {
   list-style-image: none;
   list-style-type: none;
   margin-left: 0px;
@@ -705,15 +705,15 @@ fieldset {
   padding-right: 4px;
 }
 /* line 43, ../../../../../../../../.gem/ruby/1.8/gems/compass-0.10.5/frameworks/compass/stylesheets/compass/utilities/lists/_horizontal-list.scss */
-#inserted_form_filling_div ul li:first-child, #inserted_form_filling_div ul li.first {
+#inserted_form_filling_div ul li:first-child, #inserted_form_filling_div ul li.first, #inserted_form_summary_div ul#form_pages li:first-child, #inserted_form_summary_div ul#form_pages li.first {
   padding-left: 0px;
 }
 /* line 44, ../../../../../../../../.gem/ruby/1.8/gems/compass-0.10.5/frameworks/compass/stylesheets/compass/utilities/lists/_horizontal-list.scss */
-#inserted_form_filling_div ul li:last-child, #inserted_form_filling_div ul li.last {
+#inserted_form_filling_div ul li:last-child, #inserted_form_filling_div ul li.last, #inserted_form_summary_div ul#form_pages li:last-child, #inserted_form_summary_div ul#form_pages li.last {
   padding-right: 0px;
 }
 /* line 74, ../../../webapp/css-src/screen.scss */
-#inserted_form_filling_div ul li {
+#inserted_form_filling_div ul li, #inserted_form_summary_div ul#form_pages li {
   color: #003358;
   font-size: 1.2em;
   padding: 20px 10px 0 10px;
@@ -722,12 +722,20 @@ fieldset {
   background-position: center top;
 }
 /* line 82, ../../../webapp/css-src/screen.scss */
-#inserted_form_filling_div ul a {
+#inserted_form_filling_div ul a, #inserted_form_summary_div ul#form_pages a {
   text-decoration: none;
 }
 /* line 83, ../../../webapp/css-src/screen.scss */
-#inserted_form_filling_div ul li.selected {
+#inserted_form_filling_div ul li.selected, #inserted_form_summary_div ul#form_pages li.selected {
   background-image: url("../images/breadcrumb_selected.png");
+}
+/* line 84, ../../../webapp/css-src/screen.scss */
+#inserted_form_filling_div ul li.summary, #inserted_form_summary_div ul#form_pages li.summary {
+  background-image: url("../images/breadcrumb_summary.png");
+}
+/* line 85, ../../../webapp/css-src/screen.scss */
+#inserted_form_filling_div ul li.summary_selected, #inserted_form_summary_div ul#form_pages li.summary_selected {
+  background-image: url("../images/breadcrumb_summary_selected.png");
 }
 
 /* line 88, ../../../webapp/css-src/screen.scss */

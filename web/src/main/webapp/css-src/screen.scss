@@ -67,7 +67,7 @@ background-color: $fieldset_background;
 
 }
 
-#inserted_form_filling_div ul {
+#inserted_form_filling_div ul, #inserted_form_summary_div ul#form_pages {
   @include horizontal-list;
   margin-top: 0px;
   margin-bottom: 23px;
@@ -80,9 +80,9 @@ background-color: $fieldset_background;
     background-position:center top;  
   }
   a { text-decoration: none; }
-  li.selected {
-    background-image:url('../images/breadcrumb_selected.png');
-  }
+  li.selected { background-image:url('../images/breadcrumb_selected.png');}
+  li.summary { background-image:url('../images/breadcrumb_summary.png');}
+  li.summary_selected { background-image:url('../images/breadcrumb_summary_selected.png');}
 }
 
 a#inserted_link.breadcrumb {color: $main_color; }
