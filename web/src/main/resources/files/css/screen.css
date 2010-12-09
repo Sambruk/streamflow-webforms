@@ -279,13 +279,19 @@ body.two-col #content {
   height: 16px;
   float: none;
 }
+/* line 62, ../../../../../../../../.gem/ruby/1.8/gems/compass-0.10.5/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
+.bp a.disabledbutton:hover {
+  background-color: #dff4ff;
+  border-color: #d2f1ff #c2e1ef #c2e1ef #d2f1ff;
+  color: #c9c7c7;
+}
 
-/* line 59, ../../../webapp/css-src/partials/_buttons.scss */
+/* line 60, ../../../webapp/css-src/partials/_buttons.scss */
 .bp a.disabledbutton:visited {
   color: #c9c7c7;
 }
 
-/* line 63, ../../../webapp/css-src/partials/_buttons.scss */
+/* line 64, ../../../webapp/css-src/partials/_buttons.scss */
 .bp a.smallbutton {
   display: -moz-inline-box;
   -moz-box-orient: vertical;
@@ -321,7 +327,7 @@ body.two-col #content {
   float: none;
 }
 
-/* line 72, ../../../webapp/css-src/partials/_buttons.scss */
+/* line 73, ../../../webapp/css-src/partials/_buttons.scss */
 .bp a.disabledsmallbutton {
   display: -moz-inline-box;
   -moz-box-orient: vertical;
@@ -363,7 +369,7 @@ body.two-col #content {
   color: #c9c7c7;
 }
 
-/* line 82, ../../../webapp/css-src/partials/_buttons.scss */
+/* line 83, ../../../webapp/css-src/partials/_buttons.scss */
 .bp a.disabledsmallbutton:visited {
   color: #c9c7c7;
 }

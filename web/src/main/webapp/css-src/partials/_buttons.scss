@@ -53,6 +53,7 @@
 .bp a.disabledbutton {
   @include anchor-button;
   @include button-colors(#c9c7c7);
+  @include button-hover-colors(#c9c7c7);
   cursor: default;
 }
 
