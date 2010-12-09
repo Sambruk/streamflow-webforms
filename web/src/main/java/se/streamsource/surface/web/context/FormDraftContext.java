@@ -144,14 +144,17 @@ public class FormDraftContext
 
             Response response = new Response( request );
             proxyService.handle( request, response );
-
+            // TODO handle error!!!
+            if ( response.getStatus().equals( Status.SERVER_ERROR_INTERNAL ))
+            {
+               throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
+            }
 
             value = module.valueBuilderFactory().newValueFromJSON( VerifySignatureResponseValue.class, response.getEntity().getText() );
          } catch (IOException e)
          {
-            e.printStackTrace();
+            throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
          }
-
 
          CommandQueryClient client = RoleMap.current().get( CommandQueryClient.class );
 

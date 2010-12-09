@@ -158,7 +158,12 @@ var RequestModule = (function() {
     inner.verify = function( verifyDTO ) {
         var parameters = request('POST', urls.surface + urls.draft + 'verify.json');
         parameters.data = verifyDTO;
+        var failed = false;
+        parameters.error = function() { failed = true; };
         $.ajax( parameters );
+        if ( failed ) {
+            throw {error:"Signaturen kunde inte veriferas korrekt", redirect:'summary'};
+        }
     }
 
     inner.attach = function( attachmentDTO ) {
