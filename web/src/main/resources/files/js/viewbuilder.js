@@ -156,7 +156,7 @@ var Builder = (function() {
         appendPageNames( -1, args.pages, args.node.find('#form_pages') );
         
         summaryStatus.append( createButton({image:'previous', name:texts.previous, href:'#'+(args.pages.length-1), disabled:false} ) );
-        summaryStatus.append( createButton({image:'next',name:texts.next,href:'#', disabled:disabled } ) );
+        summaryStatus.append( createButton({image:'next',name:texts.next,href:'#', disabled:true } ) );
         summaryStatus.append( createButton({image:'discard',name:texts.discard,href:'#discard'} ) );
         
         var button = createButton( {image:'submit', name:texts.submit, href:'#submit', disabled:!formOk });
