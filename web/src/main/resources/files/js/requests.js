@@ -162,7 +162,7 @@ var RequestModule = (function() {
         parameters.error = function() { failed = true; };
         $.ajax( parameters );
         if ( failed ) {
-            throw {error:"Signaturen kunde inte veriferas korrekt", redirect:'summary'};
+            throw {error: texts.verifyfailed, redirect:'summary'};
         }
     }
 

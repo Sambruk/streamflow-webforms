@@ -116,7 +116,7 @@ jQuery(document).ready(function()
 	        $.each (state.eIdProviders.links, function(idx, provider) {
 	        	var list = provider.href.split('=');
 	            if ( list.length  != 2 ) {
-	                throw { error:"Provider list is incorrect", redirect:'summary' };
+	                throw { error: texts.invalidProviderList, redirect:'summary' };
 	            } else {
 	            	provider.provider = list[1];
 	            }
@@ -180,7 +180,7 @@ jQuery(document).ready(function()
         try {
         	var retVal = doSign();
             if ( retVal != 0 ) {
-                throw { warning:"Signature aborted (errorcode: " +retVal + ")", redirect:'summary' };
+                throw { warning: texts.signatureAborted +retVal, redirect:'summary' };
             } else {
                 // strip parameters
                 var verifyDTO = {};
@@ -198,7 +198,7 @@ jQuery(document).ready(function()
             $('#app').show();
         }
 
-        throw {info:"Form signed successfully", redirect:'summary'};
+        throw {info:texts.formSigned, redirect:'summary'};
     }
     
     function setupView() {
@@ -207,14 +207,14 @@ jQuery(document).ready(function()
 
     function verifySigner(args ) {
         if (state.formSignatures.length == 0)
-            throw {error:"No Signatures Needed", redirect:'summary'};
+            throw {error:texts.noRequiredSignatures, redirect:'summary'};
 
-        formIsFilled( {error:"You must fill in the form before it can be signed", redirect:'summary' } );
+        formIsFilled( {error:texts.fillBeforeSign, redirect:'summary' } );
 
         var nr = parseInt( args.segment );
     	var max = state.formSignatures.length;
     	if ( isNaN(nr) || nr < 0 || nr >= max ) {
-    		throw {error:"Required signature not valid: "+args.segment, redirect:'summary' };
+    		throw {error:texts.requiredSignatureNotValid + args.segment, redirect:'summary' };
         }
     }
     
@@ -229,7 +229,7 @@ jQuery(document).ready(function()
         });
         
         if (!found) {
-        	throw {error:"You have selected an unknown eId provider", redirect:'summary' };
+        	throw {error: texts.unknownEidProvider, redirect:'summary' };
         }
     }
 
@@ -245,13 +245,13 @@ jQuery(document).ready(function()
     }
 
     function verifySubmit() {
-        formIsFilled( {error:"All mandatory filed must be filled before the form can be submitted",
+        formIsFilled( {error: texts.missingMandatoryFields,
             redirect: 'summary'});
 
         if ( state.formSignatures.length > 0 ) {
             //is form signed
             if ( state.formSignatures.length != state.formDraft.signatures.length ) {
-                throw {error:"Form must be signed before it can be submitted",
+                throw {error:texts.signBeforeSubmit,
                     redirect:'summary'};
             }
         }
@@ -260,7 +260,7 @@ jQuery(document).ready(function()
     // If a form is signed it must not be edited
     function verifyFormEditing() {
         if ( state.formDraft.signatures.length > 0) {
-            throw {error: "Form is signed so it cannot be edited", redirect: 'summary' };
+            throw {error: texts.signedFormNotEditable, redirect: 'summary' };
         }
     }
 
@@ -268,7 +268,7 @@ jQuery(document).ready(function()
         var page = parseInt( args.segment );
         var pages = state.formDraft['pages'].length;
         if ( isNaN(page) || page < 0 || page >= pages ) {
-            throw {error:"Page not valid: "+args.segment};
+            throw {error: texts.invalidpage+args.segment};
         }
     }
 
