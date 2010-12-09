@@ -42,9 +42,12 @@ var Builder = (function() {
         var toolbar = args.node.find('#form_buttons_div');
 
         toolbar.append( createButton({image:'previous', name:texts.previous, href:'#'+(args.page-1), disabled:firstPage(args.page)} ) );
-        toolbar.append( createButton({image:'next',name:texts.next,href:'#'+(args.page+1), disabled:lastPage(args.page, args.pages) } ) );
+        var nextPage = args.page+1
+        if (args.page == args.pages.length -1) {
+        	nextPage = "summary";
+        }
+        toolbar.append( createButton({image:'next',name:texts.next,href:'#'+nextPage, disabled:false } ) );
         toolbar.append( createButton({image:'discard',name:texts.discard,href:'#discard'} ) );
-        toolbar.append( createButton({image:'summary',name:texts.summary,href:'#summary'} ) );
 
         appendPageNames( args.page, args.pages, args.node.find('#form_pages') );
         var fieldList = args.node.find('#form_table_body');
@@ -151,10 +154,13 @@ var Builder = (function() {
         }
 
         appendPageNames( -1, args.pages, args.node.find('#form_pages') );
-
+        
+        summaryStatus.append( createButton({image:'previous', name:texts.previous, href:'#'+(args.pages.length-1), disabled:false} ) );
+        summaryStatus.append( createButton({image:'next',name:texts.next,href:'#', disabled:disabled } ) );
+        summaryStatus.append( createButton({image:'discard',name:texts.discard,href:'#discard'} ) );
+        
         var button = createButton( {image:'submit', name:texts.submit, href:'#submit', disabled:!formOk });
         summaryStatus.append( button );
-        summaryStatus.append( createButton( {image:'discard', name:texts.discard, href:'#discard'}) );
 
         if ( errorString != "" ) {
             button.aToolTip({ tipContent: errorString });
@@ -282,10 +288,6 @@ var Builder = (function() {
     	$(id).attr('class', 'smallbutton positive');
     	$(id).find('img').removeAttr('style');
     	$(id).removeAttr("onclick");
-    }
-    
-    function lastPage( page, pages ) {
-        return ( page == pages.length -1);
     }
 
     function firstPage( page ) {
