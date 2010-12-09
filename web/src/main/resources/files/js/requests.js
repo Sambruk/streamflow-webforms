@@ -21,7 +21,6 @@
  */
 var RequestModule = (function() {
     var inner = {};
-    var error;
 
     var urls = {
         proxy:      "proxy/",
@@ -45,12 +44,8 @@ var RequestModule = (function() {
         throw "http call failed";
     }
 
-    inner.setErrorHandler = function( errorHandler ) {
-        error = errorHandler;
-    }
-
     inner.updateAccesspoint = function( accesspoint ) {
-        if ( !accesspoint ) error( texts.invalidaccesspoint );
+        if ( !accesspoint ) throw texts.invalidaccesspoint;
         urls.accesspoint = 'accesspoints/' + accesspoint + '/endusers/';
     }
 
@@ -71,20 +66,35 @@ var RequestModule = (function() {
 
     inner.verifyAccessPoint = function() {
         var parameters = request('GET', urls.proxy + urls.accesspoint + '.json');
-        parameters.error = function() { error( texts.invalidaccesspoint ); };
+        var failed = false;
+        parameters.error = function() { failed = true; };
         $.ajax( parameters );
+        if ( failed ) {
+            // the error function throws an exception
+            // so it cannot execute inside the parameters.error
+            throw texts.invalidaccesspoint;
+        }
     }
 
     inner.selectEndUser = function() {
         var parameters = request('POST', urls.surface + urls.accesspoint + 'selectenduser.json');
-        parameters.error = function() { error( texts.loginfailed ); };
+        var failed = false;
+        parameters.error = function() { failed = true; };
         $.ajax( parameters );
+        if ( failed ) {
+            throw texts.loginfailed;
+        }
     }
 
     inner.getUser = function() {
         var params = request('GET', urls.surface + urls.accesspoint + 'userreference.json');
-        params.error = function() { error( texts.loginfailed ); };
-        return getData( params );
+        var failed = false;
+        params.error = function() { failed = true; };
+        var data = getData( params );
+        if ( failed ) {
+            throw texts.loginfailed;
+        }
+        return data;
     }
 
     inner.getCaseForm = function() {
@@ -106,9 +116,6 @@ var RequestModule = (function() {
     inner.updateField = function( fieldDTO ) {
         var parameters = request('PUT', urls.proxy + urls.draft + 'updatefield.json');
         parameters.data = fieldDTO;     
-        parameters.error = function(args){
-        	alert(""+args);
-        };
         return getData( parameters );
     }
 
@@ -149,17 +156,8 @@ var RequestModule = (function() {
     }
 
     inner.verify = function( verifyDTO ) {
-        //var parameters = request('POST', urls.eid + 'sign/verify.json');
-        //parameters.data = verifyDTO;
-        //return getData( parameters );
         var parameters = request('POST', urls.surface + urls.draft + 'verify.json');
         parameters.data = verifyDTO;
-        $.ajax( parameters );
-    }
-
-    inner.addSignature = function( signatureDTO ) {
-        var parameters = request('PUT', urls.proxy + urls.draft + 'addsignature.json');
-        parameters.data = signatureDTO;   
         $.ajax( parameters );
     }
 

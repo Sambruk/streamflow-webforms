@@ -18,8 +18,8 @@
 
 jQuery(document).ready(function()
 {
-    function login() {
-        RequestModule.setErrorHandler( error );
+    function login( accesspoint ) {
+        RequestModule.updateAccesspoint( accesspoint );
         RequestModule.verifyAccessPoint();
         RequestModule.selectEndUser();
         var data = RequestModule.getUser();
@@ -201,11 +201,6 @@ jQuery(document).ready(function()
         throw {info:"Form signed successfully", redirect:'summary'};
     }
     
-    function error( message ) {
-        Builder.show('ErrorMessage', function(args){args.node.text(message)}, {});
-        throw {error:message};
-    }
-
     function setupView() {
         Builder.runView( Contexts.findView( location.hash ));
     }
@@ -290,8 +285,11 @@ jQuery(document).ready(function()
 
     var state = {};
 	$('#components').hide().load('static/components.html', function() {
-        RequestModule.updateAccesspoint( accesspoint );
-        login();
-        $(window).hashchange( setupView );
+        try {
+            login( accesspoint );
+            $(window).hashchange( setupView );
+        } catch ( e ) {
+            Builder.show('ErrorMessage', function(args){args.node.text(e)}, {});
+        }
 	});
 })
