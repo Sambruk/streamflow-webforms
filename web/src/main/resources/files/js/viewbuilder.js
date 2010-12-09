@@ -227,14 +227,12 @@ var Builder = (function() {
     function appendPageNames( current, pages, pagesNode )
     {
         $.each( pages, function(idx, page){
-            var pageElm = $('<li />').text(page.title );
+            var pageElm = $('<li />');
             if ( current == idx ) {
                 pageElm.attr({"class": "selected"});
             }
+            pageElm.append(clone('link').attr({'href':'#'+idx, "class":"breadcrumb"}).append(page.title));
             pagesNode.append( pageElm );
-            if ( idx < pages.length - 1 ) {
-                pagesNode.append( $('<li />').text('>>') );
-            }
         });
     }
 

@@ -66,20 +66,27 @@ background-color: $fieldset_background;
   *display:inline;
 
 }
+
 #inserted_form_filling_div ul {
-@include horizontal-list;
-margin-top: 23px;
-margin-bottom: 23px;
-li {
-color: $main_color;
-font-size: 1.2em;
+  @include horizontal-list;
+  margin-top: 0px;
+  margin-bottom: 23px;
+  li {
+    color: $main_color;
+    font-size: 1.2em;
+    padding: 20px 10px 0 10px;
+    background-image:url('../images/breadcrumb.png');
+    background-repeat:no-repeat;
+    background-position:center top;  
+  }
+  a { text-decoration: none; }
+  li.selected {
+    background-image:url('../images/breadcrumb_selected.png');
+  }
 }
-a { text-decoration: none; }
-li.selected {
-font-weight: bold;
-text-decoration: underline;
-}
-}
+
+a#inserted_link.breadcrumb {color: $main_color; }
+a#inserted_link.breadcrumb:hover {color: $main_color; }
 
 #form_filling_div  ul {
   display: block;
