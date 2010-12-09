@@ -38,12 +38,11 @@ import se.streamsource.streamflow.domain.attachment.AttachmentValue;
 import se.streamsource.streamflow.domain.form.*;
 import se.streamsource.streamflow.infrastructure.event.domain.DomainEvent;
 import se.streamsource.streamflow.infrastructure.event.domain.TransactionDomainEvents;
+import se.streamsource.streamflow.plugin.eid.api.VerifySignatureResponseValue;
 import se.streamsource.streamflow.resource.caze.EndUserCaseDTO;
 import se.streamsource.streamflow.resource.caze.FieldDTO;
 import se.streamsource.streamflow.resource.caze.SubmittedFormListDTO;
 import se.streamsource.streamflow.resource.caze.SubmittedFormsListDTO;
-import se.streamsource.streamflow.resource.caze.VerifySignatureRequestValue;
-import se.streamsource.streamflow.resource.caze.VerifySignatureResponseValue;
 import se.streamsource.streamflow.resource.roles.IntegerDTO;
 import se.streamsource.streamflow.resource.user.NewProxyUserCommand;
 import se.streamsource.surface.web.ClientEventSourceService;
@@ -106,7 +105,6 @@ public class ContextsAssembler
             FormDraftValue.class,
             IntegerDTO.class,
             VerifyDTO.class,
-            VerifySignatureRequestValue.class,
             VerifySignatureResponseValue.class,
             FormSignatureValue.class,
             FieldDTO.class

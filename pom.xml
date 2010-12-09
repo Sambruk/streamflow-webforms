@@ -12,6 +12,7 @@
         <version.qi4j-core>1.3-SNAPSHOT</version.qi4j-core>
         <version.qi4j-lib>1.3-SNAPSHOT</version.qi4j-lib>
         <version.qi4j-ext>1.3-SNAPSHOT</version.qi4j-ext>
+        <version.eid.plugin>1.0-SNAPSHOT</version.eid.plugin>
         <!--<version.qi4j-core>1.2-SNAPSHOT</version.qi4j-core>
         <version.qi4j-lib>1.2-SNAPSHOT</version.qi4j-lib>
         <version.qi4j-ext>1.2-SNAPSHOT</version.qi4j-ext>-->
@@ -387,6 +388,12 @@
                 <artifactId>streamflow-infrastructure</artifactId>
                 <version>1.2-SNAPSHOT</version>
             </dependency>
+            <dependency>
+                <groupId>se.streamsource.streamflow.plugins</groupId>
+                <artifactId>streamflow-plugin-eid-api</artifactId>
+                <version>${version.eid.plugin}</version>
+            </dependency>
+            
 
             <!-- Qi4j -->
             <dependency>

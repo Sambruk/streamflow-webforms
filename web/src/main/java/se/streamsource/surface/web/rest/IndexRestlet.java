@@ -65,17 +65,8 @@ public class IndexRestlet extends Restlet
 
             template = template.replace("$accesspoint", accessPointId);
             template = template.replace("$hostname", request.getResourceRef().getHostIdentifier());
+            template = template.replace("$signerDiv", getSignerDiv(request.getClientInfo().getAgent()));
 
-            boolean shouldSignForm = true;
-            // get accesspoint
-            // get form and check if requires signatures
-            if (shouldSignForm)
-            {
-               template = template.replace("$signerDiv", getSignerDiv(request.getClientInfo().getAgent()));
-            } else
-            {
-               template = template.replace("$signerDiv", "");
-            }
             response.setEntity(template, MediaType.TEXT_HTML);
          } catch (IOException e)
          {
@@ -101,35 +92,24 @@ public class IndexRestlet extends Restlet
       return template.toString();
    }
 
-   private String getSignerDiv(String agent)
+   private String getSignerDiv(String agent) throws IOException
    {
       StringBuffer buffer = new StringBuffer("<div id=\"signerDiv\">\n");
 
-      try
+      if (proxyService.configuration().enabled().get())
       {
-         if (proxyService.configuration().enabled().get())
-         {
-            ClientResource clientResource = new ClientResource(proxyService.configuration().url().get()
-                  + "sign/header.htm");
-            
-            clientResource.setChallengeResponse(ChallengeScheme.HTTP_BASIC, proxyService.configuration().username()
-                  .get(), proxyService.configuration().password().get());
+         ClientResource clientResource = new ClientResource(proxyService.configuration().url().get()
+               + "sign/header.htm");
 
-            clientResource.getClientInfo().setAgent(agent);
-            
-            // Call plugin
-            Representation result = clientResource.get();
-            buffer.append(result.getText());
+         clientResource.setChallengeResponse(ChallengeScheme.HTTP_BASIC, proxyService.configuration().username()
+               .get(), proxyService.configuration().password().get());
 
-         } else
-         {
-            throw new IllegalStateException("This form requires signatur but the eId service is not available");
-         }
-      } catch (Exception e)
-      {
-         throw new IllegalStateException("This form requires signatur but the eId service is not available");
+         clientResource.getClientInfo().setAgent(agent);
+
+         // Call plugin
+         Representation result = clientResource.get();
+         buffer.append(result.getText());
       }
-
       buffer.append("</div>");
 
       return buffer.toString();
