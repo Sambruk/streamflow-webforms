@@ -96,9 +96,9 @@
 <textarea id="TextAreaFieldValue" cols="" rows="" onChange="javascript:FieldTypeModule.markDirty(id);" onblur="javascript:FieldTypeModule.updateServer(id);"></textarea>
 <input id="DateFieldValue" onChange="javascript:FieldTypeModule.markDirty(name);FieldTypeModule.updateServer(name);" type="text" value=""/>
 <input id="CheckboxesFieldValue" type="checkbox" onChange="javascript:FieldTypeModule.markDirty(name);FieldTypeModule.updateServer(name);" />
-<input id="OptionButtonsFieldValue" type="radio" onChange="javascript:FieldTypeModule.markDirty(name);FieldTypeModule.updateServer(name);" />
-<input id="OpenSelectionFieldValue" type="radio" onChange="javascript:selectOpenSelectChanged(name);" />
-<input id="OpenSelectionOption" type="radio" onChange="javascript:selectOpenSelectOption(name);" />
+<input id="OptionButtonsFieldValue" type="radio" onClick="javascript:FieldTypeModule.markDirty(name);FieldTypeModule.updateServer(name);" />
+<input id="OpenSelectionFieldValue" type="radio" onClick="javascript:selectOpenSelectChanged(name);" />
+<input id="OpenSelectionOption" type="radio" onClick="javascript:selectOpenSelectOption(name);" />
 <input id="OpenSelectionTextField" type="text" onChange="javascript:FieldTypeModule.markDirty(name);" onblur="javascript:FieldTypeModule.updateServer(name);" />
 <div id="AttachmentFieldValue">
     <input id="Attachment" type="file" onchange="javascript:FieldTypeModule.markDirty(id);FieldTypeModule.updateServer(id);"/>
