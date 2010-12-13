@@ -47,7 +47,7 @@ var Builder = (function() {
         	nextPage = "summary";
         }
         toolbar.append( createButton({image:'next',name:texts.next,href:'#'+nextPage, disabled:false } ) );
-        toolbar.append( createButton({image:'discard',name:texts.discard,href:'#discard'} ) );
+        toolbar.append( createButton({image:'discard',name:texts.discard,href:'#discard', confirm:texts.confirmDiscard} ) );
 
         appendPageNames( args.page, args.pages, args.node.find('#form_pages') );
         var fieldList = args.node.find('#form_table_body');
@@ -157,7 +157,7 @@ var Builder = (function() {
         
         summaryStatus.append( createButton({image:'previous', name:texts.previous, href:'#'+(args.pages.length-1), disabled:false} ) );
         summaryStatus.append( createButton({image:'next',name:texts.next,href:'#', disabled:true } ) );
-        summaryStatus.append( createButton({image:'discard',name:texts.discard,href:'#discard'} ) );
+        summaryStatus.append( createButton({image:'discard',name:texts.discard,href:'#discard', confirm:texts.confirmDiscard} ) );
         
         var button = createButton( {image:'submit', name:texts.submit, href:'#submit', disabled:!formOk });
         summaryStatus.append( button );
@@ -263,6 +263,9 @@ var Builder = (function() {
         }
         if ( !map.disabled ) {
             button = clone('link').attr({'href':map.href,"class":"button positive"});
+            if ( map.confirm ) {
+                setConfirm( button, map.confirm );
+            }
         } else {
             if ( image ) image.fadeTo(0, 0.4);
             button = clone('disabled');
@@ -282,6 +285,21 @@ var Builder = (function() {
             button = clone('disabledsmall').attr('href',map.href);
         }
         return button.append( image ).append( map.name );
+    }
+
+    function setConfirm( button, confirmMessage ) {
+        button.attr("onClick", "return false;");
+        button.click( function() {
+            $(this).fastConfirm({
+                position: "right",
+                proceedText: "Ja",
+                cancelText: "Nej",
+                questionText: confirmMessage,
+                onProceed: function(trigger) {
+                    location.hash = button.attr('href');
+                }
+            });
+        });
     }
 
     function enableSmallButton(id){
