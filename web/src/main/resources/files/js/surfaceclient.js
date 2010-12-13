@@ -29,8 +29,19 @@ jQuery(document).ready(function()
         FieldTypeModule.setFieldRefresher( refreshField );
         FieldTypeModule.setAttachmentUpload( RequestModule.attach );
         setupView();
+        setupSignatures();
+        setupEidProviderPlugins();
     }
 
+    function setupEidProviderPlugins() {
+    	if ( state.formSignatures.length > 0 ) {
+	        var header = RequestModule.getHeader();
+	        $('<div id="signerDiv"></div>').appendTo('body');
+	        $("#signerDiv").append(header);
+	        addSigners($("#signerDiv"));
+    	}
+    }
+    
     function setupCaseAndForm() {
         if ( state.formDraft ) return;
         var data = RequestModule.getCaseForm();
@@ -280,7 +291,7 @@ jQuery(document).ready(function()
         'discard'   : {view:discard},
         'submit'    : {view:submitAndSend,  init: [ verifySubmit ]},
         'idContext' : {view:gotoPage,       init: [ verifyPage, verifyFormEditing ]},
-        'summary'   : {view:gotoSummary,    init: [ setupSignatures, setupProviders ], subContexts: {
+        'summary'   : {view:gotoSummary,    init: [ setupProviders ], subContexts: {
            'idContext': {view:performSign,     init:[verifySigner,verifyProvider,setupRequiredSignature]}}}}};
 
     var state = {};
@@ -292,4 +303,8 @@ jQuery(document).ready(function()
             Builder.show('ErrorMessage', function(args){args.node.text(e)}, {});
         }
 	});
+	
+
+
+	
 })

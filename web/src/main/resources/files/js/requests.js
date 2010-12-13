@@ -139,6 +139,18 @@ var RequestModule = (function() {
         return getData( parameters );
     }
 
+    inner.getHeader = function() {
+        var parameters = request('GET', urls.eid + 'sign/header.htm');
+        parameters.dataType = null;
+        var failed = false;
+        parameters.error = function() { failed = true; };
+        var data = getData( parameters );
+        if ( failed ) {
+            throw texts.eidServiceUnavailable;
+        }
+        return data;
+    }
+    
     inner.getCaseName = function() {
         var parameters = request('GET', urls.proxy + urls.caze + 'index.json');
         return getData( parameters ).caseId;

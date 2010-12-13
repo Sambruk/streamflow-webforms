@@ -65,7 +65,6 @@ public class IndexRestlet extends Restlet
 
             template = template.replace("$accesspoint", accessPointId);
             template = template.replace("$hostname", request.getResourceRef().getHostIdentifier());
-            template = template.replace("$signerDiv", getSignerDiv(request.getClientInfo().getAgent()));
 
             response.setEntity(template, MediaType.TEXT_HTML);
          } catch (IOException e)
@@ -92,26 +91,4 @@ public class IndexRestlet extends Restlet
       return template.toString();
    }
 
-   private String getSignerDiv(String agent) throws IOException
-   {
-      StringBuffer buffer = new StringBuffer("<div id=\"signerDiv\">\n");
-
-      if (proxyService.configuration().enabled().get())
-      {
-         ClientResource clientResource = new ClientResource(proxyService.configuration().url().get()
-               + "sign/header.htm");
-
-         clientResource.setChallengeResponse(ChallengeScheme.HTTP_BASIC, proxyService.configuration().username()
-               .get(), proxyService.configuration().password().get());
-
-         clientResource.getClientInfo().setAgent(agent);
-
-         // Call plugin
-         Representation result = clientResource.get();
-         buffer.append(result.getText());
-      }
-      buffer.append("</div>");
-
-      return buffer.toString();
-   }
 }
