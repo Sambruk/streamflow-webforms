@@ -241,3 +241,21 @@ div.commentfield pre {
   padding-bottom: 5px;
   height: 30px;
 }
+
+#inserted_form_page_summary ul {
+  padding-left: 1.33em;
+}
+
+table#fields_table {
+  width: auto;
+}
+
+#inserted_form_page_summary td.field_label {
+  vertical-align: top;
+  font-weight: bold;
+}
+
+#inserted_form_page_summary td.field_value {
+  vertical-align: top;
+  font-style: italic;
+}

@@ -83,21 +83,23 @@ var FieldTypeModule = (function() {
         var fieldType = getFieldType( field.field.fieldValue._type );
         if ( fieldType != "CommentFieldValue")
         {
-            var li = $('#field_summary').clone().attr('id', field.field );
-            li.find('b').text( field.field.description );
-            showMandatory( field, li );
+            var row = $('#field_summary').clone();
+            row.attr('id', field.field.fieldId );
+            row.find('td.field_label').prepend( field.field.description );
+            showMandatory( field, row );
+            var valueCell = row.find('td.field_value');
             if (fieldType == "DateFieldValue") {
-                li.append(formatUTCStringToIsoString(value));
+            	valueCell.append(formatUTCStringToIsoString(value));
             } else if (fieldType =='AttachmentFieldValue') {
                 if ( !value ) {
-                    li.append( "" );
+                	valueCell.append( "" );
                 } else {
-                    li.append( $.parseJSON( value ).name );
+                	valueCell.append( $.parseJSON( value ).name );
                 }
             } else {
-                li.append( value );
+            	valueCell.append( value );
             }
-            target.append( li );
+            target.append( row );
         }
     }
 

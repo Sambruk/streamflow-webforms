@@ -29,11 +29,13 @@ jQuery(document).ready(function()
         FieldTypeModule.setFieldRefresher( refreshField );
         FieldTypeModule.setAttachmentUpload( RequestModule.attach );
         setupView();
-        setupSignatures();
         setupEidProviderPlugins();
     }
 
     function setupEidProviderPlugins() {
+    	if (!state.formSignatures){
+            setupSignatures();
+    	}
     	if ( state.formSignatures.length > 0 ) {
 	        var header = RequestModule.getHeader();
 	        $('<div id="signerDiv"></div>').appendTo('body');
@@ -291,7 +293,7 @@ jQuery(document).ready(function()
         'discard'   : {view:discard},
         'submit'    : {view:submitAndSend,  init: [ verifySubmit ]},
         'idContext' : {view:gotoPage,       init: [ verifyPage, verifyFormEditing ]},
-        'summary'   : {view:gotoSummary,    init: [ setupProviders ], subContexts: {
+        'summary'   : {view:gotoSummary,    init: [ setupSignatures,setupProviders ], subContexts: {
            'idContext': {view:performSign,     init:[verifySigner,verifyProvider,setupRequiredSignature]}}}}};
 
     var state = {};

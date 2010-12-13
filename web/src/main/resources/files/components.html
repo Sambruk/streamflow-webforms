@@ -38,6 +38,7 @@
 <a id="disabled" href="#0" class="disabledbutton" onclick="return false;"></a>
 <a id="disabledsmall" href="#0" class="disabledsmallbutton" onclick="return false;"></a>
 
+<table id="fields_table" class="fields_table"></table>
 <img id="previous" src="static/images/buttons/arrow_left.png" alt=""/>
 <img id="next" src="static/images/buttons/arrow_right.png" alt=""/>
 <img id="discard" src="static/images/buttons/cross.png" alt=""/>
@@ -130,8 +131,9 @@
 <select id="ComboBoxFieldValue" onchange="javascript:FieldTypeModule.markDirty(name);FieldTypeModule.updateServer(name);">
 </select>
 
-
-<li id="field_summary"><b></b><font id="mandatory" color="red">*</font>:</li>
+<table>
+<tr id="field_summary"><td class="field_label">:<font id="mandatory" color="red">*</font></td><td class="field_value"></td></tr>
+</table>
 
 <div id="ErrorMessage"></div>
 <div id="InfoMessage"></div>

@@ -137,12 +137,14 @@ var Builder = (function() {
 
             pageDiv.find('h3').append( clone('link').attr('href','#'+idx).text(page.title) );
             var ul = pageDiv.find('ul');
+            var table = $('#fields_table').clone();
             $.each( page.fields, function( fieldIdx, field ){
-                FieldTypeModule.displayReadOnlyField( field, ul );
+                FieldTypeModule.displayReadOnlyField( field, table );
                 if ( field.field.mandatory && !field.value) {
                     errorString += texts.missingfield + " '"+field.field.description+"' <br>";
                 }
             });
+            ul.append(table);
             summaryPages.append( pageDiv );
         });
 
