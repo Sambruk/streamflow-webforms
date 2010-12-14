@@ -161,7 +161,7 @@ var RequestModule = (function() {
     }
 
     inner.sign = function( signDTO ) {
-        var parameters = request('GET', urls.eid + 'sign/sign.htm');
+        var parameters = request('GET', urls.eid + 'sign/surface.htm');
         parameters.dataType = null;
         parameters.data = signDTO;        
         return getData( parameters );
