@@ -306,7 +306,3 @@ jQuery(document).ready(function()
         }
 	});
 	
-
-
-	
-})

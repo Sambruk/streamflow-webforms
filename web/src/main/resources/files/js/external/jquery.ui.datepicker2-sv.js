@@ -1,19 +1,18 @@
-
 /* Swedish initialisation for the jQuery UI date picker plugin. */
 /* Written by Anders Ekdahl ( anders@nomadiz.se). */
 jQuery(function($){
     $.datepicker.regional['sv'] = {
-		closeText: 'Stï¿½ng',
-        prevText: '&laquo;Fï¿½rra',
-		nextText: 'Nï¿½sta&raquo;',
+		closeText: 'Stäng',
+        prevText: '&laquo;Förra',
+		nextText: 'Nästa&raquo;',
 		currentText: 'Idag',
         monthNames: ['Januari','Februari','Mars','April','Maj','Juni',
         'Juli','Augusti','September','Oktober','November','December'],
         monthNamesShort: ['Jan','Feb','Mar','Apr','Maj','Jun',
         'Jul','Aug','Sep','Okt','Nov','Dec'],
-		dayNamesShort: ['Sï¿½n','Mï¿½n','Tis','Ons','Tor','Fre','Lï¿½r'],
-		dayNames: ['Sï¿½ndag','Mï¿½ndag','Tisdag','Onsdag','Torsdag','Fredag','Lï¿½rdag'],
-		dayNamesMin: ['Sï¿½','Mï¿½','Ti','On','To','Fr','Lï¿½'],
+		dayNamesShort: ['Sön','Mån','Tis','Ons','Tor','Fre','Lör'],
+		dayNames: ['Söndag','Måndag','Tisdag','Onsdag','Torsdag','Fredag','Lördag'],
+		dayNamesMin: ['Sö','Må','Ti','On','To','Fr','Lö'],
 		weekHeader: 'Ve',
         dateFormat: 'yy-mm-dd',
 		firstDay: 1,
