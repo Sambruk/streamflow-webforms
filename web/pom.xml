@@ -17,31 +17,38 @@
         <plugins>
             <!-- Resources -->
             <plugin>
-              <artifactId>maven-resources-plugin</artifactId>
-              <version>2.4.1</version>
-              <executions>
-                <execution>
-                  <id>copy-resources</id>
-                  <!-- here the phase you need -->
-                  <phase>process-resources</phase>
-                  <goals>
-                    <goal>copy-resources</goal>
-                  </goals>
-                  <configuration>
-                    <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/classes</outputDirectory>
-                    <resources>
-                      <resource>
-                        <directory>${basedir}/../web/src/main/resources</directory>
-                          <filtering>true</filtering>
-                          <includes>
-
-                              <include>**/*.html</include>
-                          </includes>
-                      </resource>
-                    </resources>
-                  </configuration>
-                </execution>
-              </executions>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.4.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <!-- here the phase you need -->
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/classes
+                            </outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/../web/src/main/resources</directory>
+                                    <filtering>true</filtering>
+                                    <includes>
+                                        <include>**/*.html</include>
+                                    </includes>
+                                </resource>
+                                <resource>
+                                    <directory>${basedir}/../target/maven-shared-archive-resources</directory>
+                                    <includes>
+                                        <include>LICENSE</include>
+                                        <include>NOTICE</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -51,7 +58,7 @@
                     <warSourceExcludes>**/css-src/**</warSourceExcludes>
                 </configuration>
             </plugin>
-             <plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>wagon-maven-plugin</artifactId>
                 <configuration>
