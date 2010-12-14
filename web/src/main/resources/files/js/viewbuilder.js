@@ -89,7 +89,7 @@ var Builder = (function() {
     }
 
     function createEidProviderCombobox( signatureId, signatureArgs ){
-    	var combobox = $('#comboBoxEidProviders').clone();
+    	var combobox = clone('comboBoxEidProviders');
     	combobox.attr({name: signatureId, id: "eIdProvider_" + signatureId});
     	combobox.change(function() {
     		var value = this.value;
@@ -137,7 +137,7 @@ var Builder = (function() {
 
             pageDiv.find('h3').append( clone('link').attr('href','#'+idx).text(page.title) );
             var ul = pageDiv.find('ul');
-            var table = $('#fields_table').clone();
+            var table = clone('fields_table');
             $.each( page.fields, function( fieldIdx, field ){
                 FieldTypeModule.displayReadOnlyField( field, table );
                 if ( field.field.mandatory && !field.value) {
@@ -194,9 +194,11 @@ var Builder = (function() {
     }
 
     inner.show = function( id, fn, args ) {
+        var app = $('#app');
+        app.empty();
         args.node = clone( id );
         fn( args );
-        $('#app').empty().append( args.node );
+        app.append( args.node );
     }
 
     function redirect( view ) {

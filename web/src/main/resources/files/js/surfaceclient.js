@@ -294,7 +294,7 @@ jQuery(document).ready(function()
         'submit'    : {view:submitAndSend,  init: [ verifySubmit ]},
         'idContext' : {view:gotoPage,       init: [ verifyPage, verifyFormEditing ]},
         'summary'   : {view:gotoSummary,    init: [ setupSignatures,setupProviders ], subContexts: {
-           'idContext': {view:performSign,     init:[verifySigner,verifyProvider,setupRequiredSignature]}}}}};
+           'idContext': {view:performSign,     init:[ verifySigner,verifyProvider,setupRequiredSignature ]}}}}};
 
     var state = {};
 	$('#components').hide().load('static/components.html', function() {
