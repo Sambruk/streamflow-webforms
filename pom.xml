@@ -4,7 +4,7 @@
     <groupId>se.streamsource.streamflow</groupId>
     <artifactId>surface</artifactId>
     <name>StreamFlow Surface (Build POM)</name>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <!-- This POM is ONLY to initiate the modules to be built. -->
@@ -37,8 +37,8 @@
     </modules>
 
     <scm>
-        <connection>scm:svn:https://source.waygroup.se/svn/streamsource/surface/branches/1.2</connection>
-        <developerConnection>scm:svn:https://source.waygroup.se/svn/streamsource/surface/branches/1.2</developerConnection>
+        <connection>scm:svn:https://source.waygroup.se/svn/streamsource/surface/branches/1.1</connection>
+        <developerConnection>scm:svn:https://source.waygroup.se/svn/streamsource/surface/branches/1.1</developerConnection>
     </scm>
 
     <distributionManagement>

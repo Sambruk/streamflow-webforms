@@ -3,11 +3,11 @@
     <parent>
         <groupId>se.streamsource.streamflow</groupId>
         <artifactId>surface</artifactId>
-        <version>1.2-SNAPSHOT</version>
+        <version>1.3-SNAPSHOT</version>
     </parent>
     <artifactId>surface-web</artifactId>
     <groupId>se.streamsource.streamflow</groupId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.3-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>Streamsource Surface web</name>
     <description>Streamsource Surface web application</description>
