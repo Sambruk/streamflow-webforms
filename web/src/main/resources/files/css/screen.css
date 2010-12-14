@@ -959,17 +959,13 @@ div.commentfield pre {
 }
 
 /* line 249, ../../../webapp/css-src/screen.scss */
-table#fields_table {
-  width: auto;
-}
-
-/* line 253, ../../../webapp/css-src/screen.scss */
 #inserted_form_page_summary td.field_label {
   vertical-align: top;
   font-weight: bold;
+  width: 130px;
 }
 
-/* line 258, ../../../webapp/css-src/screen.scss */
+/* line 255, ../../../webapp/css-src/screen.scss */
 #inserted_form_page_summary td.field_value {
   vertical-align: top;
   font-style: italic;
