@@ -54,12 +54,33 @@ var RequestModule = (function() {
         return result;
     }
 
-    inner.updateAccesspoint = function( accesspoint ) {
-        if ( !accesspoint ) throw texts.invalidaccesspoint;
+    inner.init = function( accesspoint ) {
+        setAccessPoint( accesspoint );
+        verifyAccessPoint();
+        selectEndUser();
+        setUserUrl( getUser() );
+    }
+
+    function setAccessPoint( accesspoint ) {
         urls.accesspoint = 'accesspoints/' + accesspoint + '/endusers/';
     }
 
-    inner.createUserUrl = function( user ) {
+    function verifyAccessPoint() {
+        var parameters = request('GET', urls.proxy + urls.accesspoint + '.json');
+        invoke( $.ajax, parameters, texts.invalidaccesspoint );
+    }
+
+    function selectEndUser() {
+        var parameters = request('POST', urls.surface + urls.accesspoint + 'selectenduser.json');
+        invoke( $.ajax, parameters, texts.loginfailed );
+    }
+
+    function getUser() {
+        var parameters = request('GET', urls.surface + urls.accesspoint + 'userreference.json');
+        return invoke( getData, parameters, texts.loginfailed ).entity;
+    }
+
+    function setUserUrl( user ) {
         urls.user = urls.accesspoint + user + '/';
     }
 
@@ -72,21 +93,6 @@ var RequestModule = (function() {
     inner.createFormDraftUrl = function( form ) {
         if ( !urls.caze ) throw "URL to case not defined";
         urls.draft = urls.caze + 'formdrafts/' + form + '/';
-    }
-
-    inner.verifyAccessPoint = function() {
-        var parameters = request('GET', urls.proxy + urls.accesspoint + '.json');
-        invoke( $.ajax, parameters, texts.invalidaccesspoint );
-    }
-
-    inner.selectEndUser = function() {
-        var parameters = request('POST', urls.surface + urls.accesspoint + 'selectenduser.json');
-        invoke( $.ajax, parameters, texts.loginfailed );
-    }
-
-    inner.getUser = function() {
-        var parameters = request('GET', urls.surface + urls.accesspoint + 'userreference.json');
-        return invoke( getData, parameters, texts.loginfailed );
     }
 
     inner.getCaseForm = function() {

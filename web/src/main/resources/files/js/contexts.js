@@ -111,8 +111,8 @@ var Contexts = (function() {
         return function() { rootContext.runView( segments ); }
     }
 
-    inner.findUrl = function( fn ) {
-        var search = buildUrl( rootContext, fn, "");
+    inner.findUrl = function( fn, ids ) {
+        var search = buildUrl( rootContext, fn, ids,  "");
         if ( search.found ) {
             return search.url;
         } else {
@@ -121,11 +121,15 @@ var Contexts = (function() {
     }
 
     // depth first search to find the view function
-    function buildUrl( context, fn, url ) {
+    function buildUrl( context, fn, ids, url ) {
         if ( context.view == fn ) return { url:url, found:true};
         var result = {found:false};
         $.each( context.subContexts, function(key, value) {
-            result = buildUrl( value, fn, url + key + '/');
+            if ( key == 'idContext' && ids) {
+                key = ids[0];
+                ids = ids.slice(1);
+            }
+            result = buildUrl( value, fn, ids,  url + key + '/');
             if ( result.found ) {
                 return false;
             }
