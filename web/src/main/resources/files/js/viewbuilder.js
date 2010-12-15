@@ -17,122 +17,86 @@
 
 
 
-var Builder = (function() {
+var View = (function() {
     var inner = {};
     var messages;
+    var formState;
 
-    inner.formSubmitted = function( args, caseName, formId, caseUrl ) {
+    inner.discard = function( args ) {
+        RequestModule.discard();
+        formState.formDraft = null;
+        formState.formSignatures = null;
+
+        var node = clone( 'thank_you_div' );
+        var message = clone('InfoMessage');
+        message.append(texts.formdiscarded );
+        message.appendTo( node );
+        displayView( node );
+    }
+
+    inner.submit = function( args, caseName, formId, caseUrl ) {
+        RequestModule.submitAndSend();
+        var caseName = RequestModule.getCaseName();
+        var formId = formState.formDraft.form;
+        var caseUrl = RequestModule.getCaseUrl();
+        formState.formDraft = null;
+        formState.formSignatures = null;
+
+        var node = clone( 'thank_you_div' );
         var message = clone('SuccessMessage');
         message.append(texts.formSubmittedThankYou);
-        message.prependTo(args.node);
+        message.prependTo( node );
         
-        if ( typeof( args.caseName )!="undefined") {
-            var caseidmessage = args.node.find('#caseid_message');
+        if ( typeof( caseName )!="undefined") {
+            var caseidmessage = node.find('#caseid_message');
             caseidmessage.text(texts.caseidmessage);
             
-            var caseid = args.node.find('#caseid');
-            caseid.text(args.caseName);
+            var caseid = node.find('#caseid');
+            caseid.text(caseName);
         }
-        var url = args.caseUrl +'submittedforms/'+ args.formId + '/generateformaspdf';
-        createButton({image: 'print', name:texts.print, href:url}).attr('target','_new').appendTo(args.node);
+        var url = caseUrl +'submittedforms/'+ formId + '/generateformaspdf';
+        createButton({image: 'print', name:texts.print, href:url}).attr('target','_new').appendTo( node );
+        displayView( node );
     }
 
     inner.page = function( args ) {
-        args.node.find('#form_description').text( args.description );
-        var toolbar = args.node.find('#form_buttons_div');
+        var page = parseInt( args.segment );
+        var pages = formState.formDraft['pages'];
+        var node = clone( 'form_filling_div' );
 
-        toolbar.append( createButton({image:'previous', name:texts.previous, href:'#'+(args.page-1), disabled:firstPage(args.page)} ) );
-        var nextPage = args.page+1
-        if (args.page == args.pages.length -1) {
+        node.find('#form_description').text( formState.formDraft.description );
+        var toolbar = node.find('#form_buttons_div');
+
+        toolbar.append( createButton({image:'previous', name:texts.previous, href:'#'+(page-1), disabled:firstPage(page)} ) );
+        var nextPage = page+1
+        if (page == pages.length -1) {
         	nextPage = "summary";
         }
         toolbar.append( createButton({image:'next',name:texts.next,href:'#'+nextPage, disabled:false } ) );
         toolbar.append( createButton({image:'discard',name:texts.discard,href:'#discard', confirm:texts.confirmDiscard} ) );
 
-        appendPageNames( args.page, args.pages, args.node.find('#form_pages') );
-        var fieldList = args.node.find('#form_table_body');
-        $.each( args.pages[ args.page ].fields, function(idx, field){
+        appendPageNames( page, pages, node.find('#form_pages') );
+        var fieldList = node.find('#form_table_body');
+        $.each( pages[ page ].fields, function(idx, field){
             FieldTypeModule.render( field, fieldList );
         });
-    }
-
-    function addSignatures( summarySignatures, disabled, signatureArgs ) {
-    	    	
-    	var heading = summarySignatures.find("#form_signatures_heading");
-    	var signature_content = summarySignatures.find("#form_signatures_content");
-    	var column_1 = summarySignatures.find("#form_signatures_column_1");
-    	var column_2 = summarySignatures.find("#form_signatures_column_2");
-    	
-        heading.append( $('<h3 />').text( texts.signatures ) );
-
-    	$.each( signatureArgs.required, function(idx, reqSign ) {
-            var signatureLabel;
-            var signatureValue;
-        	signatureLabel = clone('signature_label');
-        	signatureLabel.append(reqSign.name + ":");
-            var signature = getSignature( reqSign.name, signatureArgs.addedSignatures);
-            if ( signature ) {
-            	signatureValue = clone('signature_value_signed');
-            	signatureValue.append(signature.signerName);
-            } else {
-            	signatureValue = clone('signature_value_unsigned');
-            	var button = createSmallButton({image:"pencil_small", disabled:true, name:texts.sign, href:'#summary/'+idx})
-            	var linkId = "link_" + idx;
-            	button.attr({id:linkId});
-            	signatureValue.append( createEidProviderCombobox(idx, signatureArgs));
-            	signatureValue.append( "&nbsp;&nbsp;").append( button);
-            }
-            column_1.append( signatureLabel );
-            column_2.append( signatureValue );
-        });
-        summarySignatures.show();
-    }
-
-    function createEidProviderCombobox( signatureId, signatureArgs ){
-    	var combobox = clone('comboBoxEidProviders');
-    	combobox.attr({name: signatureId, id: "eIdProvider_" + signatureId});
-    	combobox.change(function() {
-    		var value = this.value;
-	    	$("#link_"+this.name).attr('href', function() {
-	    		var list = this.href.split('?provider=');
-	    		return list[0] + "?provider="+value
-	    	});
-	    	enableSmallButton("#link_"+this.name);
-	    	
-	    	var signDTO = {
-                transactionId: signatureArgs.transactionId,
-                tbs: signatureArgs.tbs,
-                provider: value,
-                successUrl: "verify",
-                errorUrl: "error"
-          	};
-
-            var htmlSnippet = RequestModule.sign( signDTO );
-            $('#eIdPlugin').html( htmlSnippet ).hide();
-    	});
-        combobox.append( $('<option>/').append(texts.provider	) );
-        $.each(signatureArgs.eIdProviders, function(idx, link ) {
-         	combobox.append( $('<option />').attr({value: link.provider}).text(link.text) );
-        });
-        return combobox;
-    }
-    
-    function getSignature( name, signatures ) {
-        var match;
-        $.each( signatures, function( idxSign, signature ) {
-            if ( name == signature.name ) match = signature;
-        });
-        return match;
+        displayView( node );
     }
 
     inner.summary = function( args ) {
-        var errorString = "";
-        args.node.find('#form_description').text( args.description );
-        var summaryPages = args.node.find('#form_pages_summary');
-        var summarySignatures = args.node.find('#form_signatures');
-        var summaryStatus = args.node.find('#form_submission_status');
+        var description = formState.formDraft.description;
+        var pages = formState.formDraft.pages;
+        //View.show( 'form_summary_div' , View.summary, {description: description, pages:pages, signatures: signatures()});
+        var node = clone( 'form_summary_div' );
 
-        $.each( args.pages, function(idx, page){
+        var errorString = "";
+
+        node.find('#form_description').text( args.description );
+        var summaryPages = node.find('#form_pages_summary');
+        var summarySignatures = node.find('#form_signatures');
+        var summaryStatus = node.find('#form_submission_status');
+
+        $.each( pages, function(idx, page){
             var pageDiv = clone('form_page_summary');
 
             pageDiv.find('h3').append( clone('link').attr('href','#'+idx).text(page.title) );
@@ -149,24 +113,126 @@ var Builder = (function() {
         });
 
         var formOk = (errorString=="");
-        if ( args.signatures ) {
-            addSignatures( summarySignatures, !formOk, args.signatures );
+        if ( formState.formSignatures.length > 0 ) {
+            addSignatures( summarySignatures, !formOk );
 
-            formOk = formOk && ( args.signatures.required.length == args.signatures.addedSignatures.length );
+            formOk = formOk && ( formState.formSignatures.length == formState.formDraft.signatures.length );
         }
 
-        appendPageNames( -1, args.pages, args.node.find('#form_pages') );
-        
-        summaryStatus.append( createButton({image:'previous', name:texts.previous, href:'#'+(args.pages.length-1), disabled:false} ) );
+        appendPageNames( -1, pages, node.find('#form_pages') );
+
+        summaryStatus.append( createButton({image:'previous', name:texts.previous, href:'#'+(pages.length-1), disabled:false} ) );
         summaryStatus.append( createButton({image:'next',name:texts.next,href:'#', disabled:true } ) );
         summaryStatus.append( createButton({image:'discard',name:texts.discard,href:'#discard', confirm:texts.confirmDiscard} ) );
-        
+
         var button = createButton( {image:'submit', name:texts.submit, href:'#submit', disabled:!formOk });
         summaryStatus.append( button );
 
         if ( errorString != "" ) {
             button.aToolTip({ tipContent: errorString });
         }
+        displayView( node );
+    }
+
+    inner.sign = function( args ) {
+        var retVal = doSign();
+        if ( retVal != 0 ) {
+            throw { warning: texts.signatureAborted +retVal, redirect:'summary' };
+        } else {
+            // strip parameters
+            var verifyDTO = {};
+            $.each( $('#app').find('form > input:hidden'), function(idx, value ) {
+                if ( value.name ) {
+                    verifyDTO[ value.name ] = value.value;
+                }
+            });
+            verifyDTO.name = formState.requiredSignatureName;
+            verifyDTO.form = getFormTBS();
+            RequestModule.verify( verifyDTO );
+            formState.formDraft = RequestModule.getFormDraft();
+        }
+        // signing success redirect to summary
+        throw {info:texts.formSigned, redirect:'summary'};
+    }
+
+    function addSignatures( summarySignatures, disabled ) {
+    	    	
+    	var heading = summarySignatures.find("#form_signatures_heading");
+    	var signature_content = summarySignatures.find("#form_signatures_content");
+    	var column_1 = summarySignatures.find("#form_signatures_column_1");
+    	var column_2 = summarySignatures.find("#form_signatures_column_2");
+    	
+        heading.append( $('<h3 />').text( texts.signatures ) );
+
+    	$.each( formState.formSignatures, function(idx, reqSign ) {
+            var signatureLabel;
+            var signatureValue;
+        	signatureLabel = clone('signature_label');
+        	signatureLabel.append(reqSign.name + ":");
+            var signature = getSignature( reqSign.name, formState.formDraft.signatures);
+            if ( signature ) {
+            	signatureValue = clone('signature_value_signed');
+            	signatureValue.append(signature.signerName);
+            } else {
+            	signatureValue = clone('signature_value_unsigned');
+            	var button = createSmallButton({image:"pencil_small", disabled:true, name:texts.sign, href:'#summary/'+idx})
+            	var linkId = "link_" + idx;
+            	button.attr({id:linkId});
+            	signatureValue.append( createEidProviderCombobox(idx));
+            	signatureValue.append( "&nbsp;&nbsp;").append( button);
+            }
+            column_1.append( signatureLabel );
+            column_2.append( signatureValue );
+        });
+        summarySignatures.show();
+    }
+
+    function createEidProviderCombobox( signatureId ){
+    	var combobox = clone('comboBoxEidProviders');
+    	combobox.attr({name: signatureId, id: "eIdProvider_" + signatureId});
+    	combobox.change(function() {
+    		var value = this.value;
+	    	$("#link_"+this.name).attr('href', function() {
+	    		var list = this.href.split('?provider=');
+	    		return list[0] + "?provider="+value
+	    	});
+	    	enableSmallButton("#link_"+this.name);
+	    	
+	    	var signDTO = {
+                transactionId: formState.formDraft.form,
+                tbs: getFormTBS(),
+                provider: value,
+                successUrl: "verify",
+                errorUrl: "error"
+          	};
+
+            var htmlSnippet = RequestModule.sign( signDTO );
+            $('#eIdPlugin').html( htmlSnippet ).hide();
+    	});
+        combobox.append( $('<option>/').append(texts.provider	) );
+        $.each(formState.eIdProviders.links, function(idx, link ) {
+         	combobox.append( $('<option />').attr({value: link.provider}).text(link.text) );
+        });
+        return combobox;
+    }
+    
+    function getSignature( name, signatures ) {
+        var match;
+        $.each( signatures, function( idxSign, signature ) {
+            if ( name == signature.name ) match = signature;
+        });
+        return match;
+    }
+
+    function getFormTBS(){
+        var tbs = "";
+        $.each( formState.formDraft.pages, function(idx, page) {
+            $.each( page.fields, function(fieldIdx, field) {
+                // filter fieldtype comment
+                tbs += field.field.description + ' = ' + field.value + '. ';
+            })
+        })
+        return tbs;
     }
 
     inner.updateField = function(fn, fieldId, fieldValue) {
@@ -186,19 +252,12 @@ var Builder = (function() {
         }
     }
 
-
-    inner.discard = function( args ) {
-        var message = clone('InfoMessage');
-        message.append(texts.formdiscarded );
-        message.appendTo(args.node);
+    inner.init = function( state ) {
+        formState = state;
     }
 
-    inner.show = function( id, fn, args ) {
-        var app = $('#app');
-        app.empty();
-        args.node = clone( id );
-        fn( args );
-        app.append( args.node );
+    function displayView( node ) {
+        $('#app').empty().append( node );
     }
 
     function redirect( view ) {
@@ -259,34 +318,30 @@ var Builder = (function() {
         pageElm.append(clone('link').attr({'href':map.href, "class":"breadcrumb"}).append(map.title));
         return pageElm;
     }
-    
+
     function createButton( map ) {
+        return makeButton(map, false);
+    }
+
+    function createSmallButton( map ) {
+        return makeButton(map, true);
+    }
+    
+    function makeButton( map, small ) {
         var image, button;
         if ( map.image ) {
             image = clone( map.image );
         }
         if ( !map.disabled ) {
             button = clone('link').attr({'href':map.href,"class":"button positive"});
+            small? button.attr("class", "smallbutton positive"):button.attr("class","button positive");
             if ( map.confirm ) {
                 setConfirm( button, map.confirm );
             }
         } else {
             if ( image ) image.fadeTo(0, 0.4);
-            button = clone('disabled');
-        }
-        return button.append( image ).append( map.name );
-    }
-
-    function createSmallButton( map ) {
-        var image, button;
-        if ( map.image ) {
-            image = clone( map.image );
-        }
-        if ( !map.disabled ) {
-            button = clone('link').attr({'href':map.href,"class":"smallbutton positive"});
-        } else {
-            if ( image ) image.fadeTo(0, 0.4);
-            button = clone('disabledsmall').attr('href',map.href);
+            button = (small?clone('disabledsmall'):clone('disabled')).attr('href', map.href);
+            //button = clone('disabled').attr('href', map.href);
         }
         return button.append( image ).append( map.name );
     }

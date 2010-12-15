@@ -44,12 +44,43 @@ var RequestModule = (function() {
         throw "http call failed";
     }
 
-    inner.updateAccesspoint = function( accesspoint ) {
-        if ( !accesspoint ) throw texts.invalidaccesspoint;
+    function invoke( fn, arguments, message ) {
+        var failed = false;
+        arguments.error = function() { failed = true; };
+        var result = fn( arguments );
+        if ( failed ) {
+            throw message;
+        }
+        return result;
+    }
+
+    inner.init = function( accesspoint ) {
+        setAccessPoint( accesspoint );
+        verifyAccessPoint();
+        selectEndUser();
+        setUserUrl( getUser() );
+    }
+
+    function setAccessPoint( accesspoint ) {
         urls.accesspoint = 'accesspoints/' + accesspoint + '/endusers/';
     }
 
-    inner.createUserUrl = function( user ) {
+    function verifyAccessPoint() {
+        var parameters = request('GET', urls.proxy + urls.accesspoint + '.json');
+        invoke( $.ajax, parameters, texts.invalidaccesspoint );
+    }
+
+    function selectEndUser() {
+        var parameters = request('POST', urls.surface + urls.accesspoint + 'selectenduser.json');
+        invoke( $.ajax, parameters, texts.loginfailed );
+    }
+
+    function getUser() {
+        var parameters = request('GET', urls.surface + urls.accesspoint + 'userreference.json');
+        return invoke( getData, parameters, texts.loginfailed ).entity;
+    }
+
+    function setUserUrl( user ) {
         urls.user = urls.accesspoint + user + '/';
     }
 
@@ -62,39 +93,6 @@ var RequestModule = (function() {
     inner.createFormDraftUrl = function( form ) {
         if ( !urls.caze ) throw "URL to case not defined";
         urls.draft = urls.caze + 'formdrafts/' + form + '/';
-    }
-
-    inner.verifyAccessPoint = function() {
-        var parameters = request('GET', urls.proxy + urls.accesspoint + '.json');
-        var failed = false;
-        parameters.error = function() { failed = true; };
-        $.ajax( parameters );
-        if ( failed ) {
-            // the error function throws an exception
-            // so it cannot execute inside the parameters.error
-            throw texts.invalidaccesspoint;
-        }
-    }
-
-    inner.selectEndUser = function() {
-        var parameters = request('POST', urls.surface + urls.accesspoint + 'selectenduser.json');
-        var failed = false;
-        parameters.error = function() { failed = true; };
-        $.ajax( parameters );
-        if ( failed ) {
-            throw texts.loginfailed;
-        }
-    }
-
-    inner.getUser = function() {
-        var params = request('GET', urls.surface + urls.accesspoint + 'userreference.json');
-        var failed = false;
-        params.error = function() { failed = true; };
-        var data = getData( params );
-        if ( failed ) {
-            throw texts.loginfailed;
-        }
-        return data;
     }
 
     inner.getCaseForm = function() {
@@ -142,13 +140,7 @@ var RequestModule = (function() {
     inner.getHeader = function() {
         var parameters = request('GET', urls.eid + 'sign/header.htm');
         parameters.dataType = null;
-        var failed = false;
-        parameters.error = function() { failed = true; };
-        var data = getData( parameters );
-        if ( failed ) {
-            throw texts.eidServiceUnavailable;
-        }
-        return data;
+        return invoke( getData, parameters, texts.eidServiceUnavailable );
     }
     
     inner.getCaseName = function() {
@@ -170,12 +162,7 @@ var RequestModule = (function() {
     inner.verify = function( verifyDTO ) {
         var parameters = request('POST', urls.surface + urls.draft + 'verify.json');
         parameters.data = verifyDTO;
-        var failed = false;
-        parameters.error = function() { failed = true; };
-        $.ajax( parameters );
-        if ( failed ) {
-            throw {error: texts.verifyfailed, redirect:'summary'};
-        }
+        invoke( $.ajax, parameters, {error: texts.verifyfailed, redirect:'summary'} );
     }
 
     inner.attach = function( attachmentDTO ) {
@@ -187,8 +174,7 @@ var RequestModule = (function() {
     inner.refreshField = function( fieldId ) {
         var parameters = request('GET', urls.proxy + urls.draft + 'fieldvalue.json');
         parameters.data = { string: fieldId };
-        var fieldDTO = getData( parameters );
-        return fieldDTO.value;
+        return getData( parameters ).value;
     }
 
     return inner;

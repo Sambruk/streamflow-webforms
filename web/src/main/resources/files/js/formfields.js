@@ -137,7 +137,7 @@ var FieldTypeModule = (function() {
                 success: function() { field.setFieldValue( refresher( attachmentDTO.fileElementId ) ); }
             }
 
-            upload( attachmentDTO );
+            RequestModule.attach( attachmentDTO );
         }
 
         field.setFieldValue = function(value) {
@@ -410,16 +410,9 @@ var FieldTypeModule = (function() {
         fieldMap[ fieldId ].dirty = true;
     }
 
-    inner.setFieldUpdater = function( fieldUpdater ) {
+    inner.init = function( fieldUpdater, fieldRefresher ) {
         updater = fieldUpdater;
-    }
-
-    inner.setFieldRefresher = function( fieldRefresher ) {
         refresher = fieldRefresher;
-    }
-
-    inner.setAttachmentUpload = function( attachmentUpload ) {
-        upload = attachmentUpload;
     }
 
     return inner;
