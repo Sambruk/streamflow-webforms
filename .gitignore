@@ -1,2 +1,6 @@
 *.iml
 *.ipr
+*.iws
+*.log
+*.1
+/web/target/
