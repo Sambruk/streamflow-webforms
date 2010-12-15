@@ -90,17 +90,6 @@ var Contexts = (function() {
         return hash.substring(1).split('/');
     }
 
-    function trim(a){
-        var tmp=new Array();
-        for(j=0;j<a.length;j++)
-            if(a[j]!='')
-                tmp[tmp.length]=a[j];
-        a.length=tmp.length;
-        for(j=0;j<tmp.length;j++)
-            a[j]=tmp[j];
-        return a;
-    }
-
     function build( map ) {
         var context = new Context( map.view, map.init );
         if ( !map.subContexts ) return context;
@@ -110,6 +99,11 @@ var Contexts = (function() {
         return context;
     }
 
+    inner.init = function( map ) {
+        rootContext = build( map );
+        hash = null;
+    }
+
     inner.findView = function( loc ) {
         if ( hash == loc ) return $.noop;
         hash = loc;
@@ -117,9 +111,26 @@ var Contexts = (function() {
         return function() { rootContext.runView( segments ); }
     }
 
-    inner.init = function( map ) {
-        rootContext = build( map );
-        hash = null;
+    inner.findUrl = function( fn ) {
+        var search = buildUrl( rootContext, fn, "");
+        if ( search.found ) {
+            return search.url;
+        } else {
+            throw "function not found";
+        }
+    }
+
+    // depth first search to find the view function
+    function buildUrl( context, fn, url ) {
+        if ( context.view == fn ) return { url:url, found:true};
+        var result = {found:false};
+        $.each( context.subContexts, function(key, value) {
+            result = buildUrl( value, fn, url + key + '/');
+            if ( result.found ) {
+                return false;
+            }
+        });
+        return result;
     }
 
     return inner;

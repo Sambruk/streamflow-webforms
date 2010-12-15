@@ -85,12 +85,13 @@ jQuery(document).ready(function()
     }
 
     function gotoPage( args ) {
-        if ( !args ) {
-            throw { redirect:'0' };
-        } else {
-            var pages = state.formDraft['pages'];
-            Builder.show( 'form_filling_div', Builder.page, {page:parseInt( args.segment ), pages:pages, description: state.formDraft.description});
-        }
+        var pages = state.formDraft['pages'];
+        Builder.show( 'form_filling_div', Builder.page, {page:parseInt( args.segment ), pages:pages, description: state.formDraft.description});
+    }
+
+    function rootView() {
+        // since we have no root view redirect to first page of form
+        throw { redirect:'0'}
     }
 
     function setupRequiredSignature( args ) {
@@ -289,7 +290,7 @@ jQuery(document).ready(function()
         return this.indexOf(suffix, this.length - suffix.length) !== -1;
     };
     
-    var contexts = {view:gotoPage,          init: [ setupCaseAndForm ], subContexts: {
+    var contexts = {view:rootView,          init: [ setupCaseAndForm ], subContexts: {
         'discard'   : {view:discard},
         'submit'    : {view:submitAndSend,  init: [ verifySubmit ]},
         'idContext' : {view:gotoPage,       init: [ verifyPage, verifyFormEditing ]},
