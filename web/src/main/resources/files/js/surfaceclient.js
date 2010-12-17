@@ -21,7 +21,7 @@ jQuery(document).ready(function()
     function login( accesspoint ) {
         RequestModule.init( accesspoint );
         Contexts.init( contexts );
-        FieldTypeModule.init( updateField, refreshField );
+        FieldTypeModule.init( parseEvents, refreshField );
         View.init( state );
 
         setupView();
@@ -36,10 +36,6 @@ jQuery(document).ready(function()
     	}
     }
     
-    function updateField( fieldId, fieldValue ) {
-        return parseEvents( View.updateField( RequestModule.updateField, fieldId, fieldValue ) );
-    }
-
     function refreshField( fieldId ) {
         var value = RequestModule.refreshField( fieldId );
         updateFormDraftField( fieldId, value );
@@ -205,10 +201,10 @@ jQuery(document).ready(function()
 
     var contexts = {view:rootView,          init: [ setupCaseAndForm ], subContexts: {
         'discard'   : {view:View.discard},
-        'submit'    : {view:View.submit,     init: [ verifySubmit ]},
-        'idContext' : {view:View.page,       init: [ verifyPage, verifyFormEditing ]},
+        'idContext' : {view:View.formPage,   init: [ verifyPage, verifyFormEditing ]},
         'summary'   : {view:View.summary,    init: [ setupSignatures, setupProviders ], subContexts: {
-           'idContext': {view:View.sign,     init: [ verifySigner, verifyProvider, setupRequiredSignature ]}}}}};
+           'submit'    : {view:View.submit,   init: [ verifySubmit ]},
+           'idContext' : {view:View.sign,     init: [ verifySigner, verifyProvider, setupRequiredSignature ]}}}}};
 
     var state = {};
 	$('#components').hide().load('static/components.html', function() {
@@ -216,7 +212,7 @@ jQuery(document).ready(function()
             login( accesspoint );
             $(window).hashchange( setupView );
         } catch ( e ) {
-            View.show('ErrorMessage', function(args){args.node.text(e)}, {});
+            View.error( e );
         }
 	});
 	

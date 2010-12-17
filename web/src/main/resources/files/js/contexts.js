@@ -114,6 +114,9 @@ var Contexts = (function() {
     inner.findUrl = function( fn, ids ) {
         var search = buildUrl( rootContext, fn, ids,  "");
         if ( search.found ) {
+            if ( search.url.match(/\/$/) ) {
+                return search.url.substring(0, search.url.length-1);
+            }
             return search.url;
         } else {
             throw "function not found";
@@ -125,11 +128,12 @@ var Contexts = (function() {
         if ( context.view == fn ) return { url:url, found:true};
         var result = {found:false};
         $.each( context.subContexts, function(key, value) {
+            var subId = ids;
             if ( key == 'idContext' && ids) {
                 key = ids[0];
-                ids = ids.slice(1);
+                subId = ids.slice(1);
             }
-            result = buildUrl( value, fn, ids,  url + key + '/');
+            result = buildUrl( value, fn, subId,  url + key + '/');
             if ( result.found ) {
                 return false;
             }
