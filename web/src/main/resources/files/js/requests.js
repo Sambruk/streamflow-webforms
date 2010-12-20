@@ -177,5 +177,9 @@ var RequestModule = (function() {
         return getData( parameters ).value;
     }
 
+    inner.getPrintUrl = function( formId ) {
+        return inner.getCaseUrl() +'submittedforms/'+ formId + '/generateformaspdf';
+    }
+
     return inner;
 }());

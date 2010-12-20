@@ -47,9 +47,12 @@ listBoxArrow = function(id, toBox) {
 var FieldTypeModule = (function() {
     var inner = {};
     var fieldMap = {};
-    var updater;
+    var resultHandler;
     var refresher;
-    var uploader;
+
+    function update(id, value) {
+        return resultHandler( View.updateField( id, value ) );
+    }
 
     // internal function to display the field using the field template
     // and taking the fieldComponent.node as the input widget
@@ -243,7 +246,7 @@ var FieldTypeModule = (function() {
             var textfield = $('#numberField'+field.id);
             var enteredValue = field.getFieldValue();
 
-            var updated = updater( field.id, enteredValue );
+            var updated = update( field.id, enteredValue );
             var updatedValue = field.getFieldValue();
             if ( !updated || updatedValue != enteredValue )
             {
@@ -337,7 +340,7 @@ var FieldTypeModule = (function() {
 
         field.updateServer = function() {
             var value = field.getFieldValue();
-            var updated = updater(field.id, value );
+            var updated = update(field.id, value );
             var newValue = field.getFieldValue();
             if ( !updated || newValue != value )
             {
@@ -377,9 +380,9 @@ var FieldTypeModule = (function() {
 
     Field.prototype.updateServer = function() {
         if ( this.serverFormatter ) {
-            updater( this.id, this.serverFormatter( this.getFieldValue() ) );
+            update( this.id, this.serverFormatter( this.getFieldValue() ) );
         } else {
-            updater( this.id, this.getFieldValue() );
+            update( this.id, this.getFieldValue() );
         }
     }
 
@@ -410,8 +413,8 @@ var FieldTypeModule = (function() {
         fieldMap[ fieldId ].dirty = true;
     }
 
-    inner.init = function( fieldUpdater, fieldRefresher ) {
-        updater = fieldUpdater;
+    inner.init = function( handler, fieldRefresher ) {
+        resultHandler = handler;
         refresher = fieldRefresher;
     }
 

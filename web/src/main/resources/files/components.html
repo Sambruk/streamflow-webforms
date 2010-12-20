@@ -26,17 +26,19 @@
     </div>
 </div>
 
-<div id="form_filling_div">
+<div id="form_header">
     <h2 id="form_description"></h2>
-
     <ul id="form_pages"></ul>
-    <div id="form_table_body"></div>
-    <div id="form_buttons_div"></div>
+</div>
+
+<div id="form_footer">
+</div>
+
+<div id="form_filling_div">
 </div>
 
 <a id="link" href="#"></a>
-<a id="disabled" href="#0" class="disabledbutton" onclick="return false;"></a>
-<a id="disabledsmall" href="#0" class="disabledsmallbutton" onclick="return false;"></a>
+<a id="button" href="#" class="button positive"></a>
 
 <table id="fields_table" class="fields_table"></table>
 <img id="previous" src="static/images/buttons/arrow_left.png" alt=""/>
@@ -50,10 +52,7 @@
 <img id="pencil_small"  src="static/images/buttons/pen_blue_small.png" alt="" />
 
 <div id="form_summary_div">
-    <h2 id="form_description"></h2>
 
-    <ul id="form_pages"></ul>
-    
     <div id="form_pages_summary">
     </div>
 
@@ -65,9 +64,6 @@
 			<div id="footer" style="clear: both;"></div>
 		</div>
 		<div id="eIdPlugin"></div>
-    </div>
-
-    <div id="form_submission_status">
     </div>
 </div>
 
@@ -143,7 +139,6 @@
 <form id="uploadform" action="POST" enctype="multipart/form-data" ></form>
 
 <div id="signature_label" class="signature_label"></div>
-<div id="signature_value_signed" class="signature_value_signed"></div>
-<div id="signature_value_unsigned" class="signature_value_unsigned"></div>
+<div id="signature" class="signature_value_signed"></div>
 
-<select id="comboBoxEidProviders"></select>
+<select id="eidProviders"></select>

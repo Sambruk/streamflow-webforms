@@ -21,25 +21,20 @@ jQuery(document).ready(function()
     function login( accesspoint ) {
         RequestModule.init( accesspoint );
         Contexts.init( contexts );
-        FieldTypeModule.init( updateField, refreshField );
+        FieldTypeModule.init( parseEvents, refreshField );
         View.init( state );
 
         setupView();
-        setupEidProviderPlugins();
+        loadEidPlugins();
     }
 
-    function setupEidProviderPlugins() {
-        setupSignatures();
+    function loadEidPlugins() {
     	if ( state.formSignatures.length > 0 ) {
 	        $("#signerDiv").append( RequestModule.getHeader() );
 	        addSigners($("#signerDiv"));
     	}
     }
     
-    function updateField( fieldId, fieldValue ) {
-        return parseEvents( View.updateField( RequestModule.updateField, fieldId, fieldValue ) );
-    }
-
     function refreshField( fieldId ) {
         var value = RequestModule.refreshField( fieldId );
         updateFormDraftField( fieldId, value );
@@ -200,15 +195,15 @@ jQuery(document).ready(function()
 
     function rootView() {
         // since we have no root view redirect to first page of form
-        throw { redirect:'0'}
+        throw { redirect: Contexts.findUrl( View.formPage, ['0'] ) }
     }
 
-    var contexts = {view:rootView,          init: [ setupCaseAndForm ], subContexts: {
+    var contexts = {view:rootView,          init: [ setupCaseAndForm, setupSignatures ], subContexts: {
         'discard'   : {view:View.discard},
-        'submit'    : {view:View.submit,     init: [ verifySubmit ]},
-        'idContext' : {view:View.page,       init: [ verifyPage, verifyFormEditing ]},
-        'summary'   : {view:View.summary,    init: [ setupSignatures, setupProviders ], subContexts: {
-           'idContext': {view:View.sign,     init: [ verifySigner, verifyProvider, setupRequiredSignature ]}}}}};
+        'idContext' : {view:View.formPage,   init: [ verifyPage, verifyFormEditing ]},
+        'summary'   : {view:View.summary,    init: [ setupProviders ], subContexts: {
+           'submit'    : {view:View.submit,   init: [ verifySubmit ]},
+           'idContext' : {view:View.sign,     init: [ verifySigner, verifyProvider, setupRequiredSignature ]}}}}};
 
     var state = {};
 	$('#components').hide().load('static/components.html', function() {
@@ -216,7 +211,7 @@ jQuery(document).ready(function()
             login( accesspoint );
             $(window).hashchange( setupView );
         } catch ( e ) {
-            View.show('ErrorMessage', function(args){args.node.text(e)}, {});
+            View.error( e );
         }
 	});
 	
