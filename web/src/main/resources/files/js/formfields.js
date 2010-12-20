@@ -118,7 +118,18 @@ var FieldTypeModule = (function() {
 
     function AttachmentFieldValue( field ) {
         field.node = $('#AttachmentFieldValue').clone();
+        field.node.find('#Attachment').bind('change', function(){
+        	FieldTypeModule.markDirty(field.id);
+        	field.node.find("#uploadButton").attr('class', 'smallbutton positive');
+        	field.node.find("#uploadButton").find('img').removeAttr('style');
+        });
         field.node.find('#Attachment').attr({id:field.id, name:field.id});
+        var image = $('#document_up').clone();
+        field.node.find("#uploadButton").append(image).append(texts.upload);
+        field.node.find("#uploadButton").bind('click', function() {
+        	FieldTypeModule.updateServer(field.id); 
+        	return false;
+        });
 
         field.updateServer = function() {
             $("#uploading")
@@ -127,6 +138,12 @@ var FieldTypeModule = (function() {
             })
             .ajaxComplete(function(){
                 $(this).hide();
+            });
+
+            $("#uploadButton")
+            .ajaxComplete(function(){
+                $(this).attr('class', 'disabledsmallbutton');
+                $(this).find('img').fadeTo(0, 0.4);
             });
 
             var attachmentDTO = {
@@ -138,6 +155,7 @@ var FieldTypeModule = (function() {
             }
 
             RequestModule.attach( attachmentDTO );
+            
         }
 
         field.setFieldValue = function(value) {

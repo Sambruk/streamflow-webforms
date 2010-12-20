@@ -48,6 +48,7 @@
 <img id="signed" src="static/images/buttons/signed.png" alt=""/>
 <img id="print"  src="static/images/buttons/printer.png" alt="" />
 <img id="pencil_small"  src="static/images/buttons/pen_blue_small.png" alt="" />
+<img id="document_up"  src="static/images/buttons/document_up.png" alt="" />
 
 <div id="form_summary_div">
     <h2 id="form_description"></h2>
@@ -102,7 +103,8 @@
 <input id="OpenSelectionOption" type="radio" onClick="javascript:selectOpenSelectOption(name);" />
 <input id="OpenSelectionTextField" type="text" onChange="javascript:FieldTypeModule.markDirty(name);" onblur="javascript:FieldTypeModule.updateServer(name);" />
 <div id="AttachmentFieldValue">
-    <input id="Attachment" type="file" onchange="javascript:FieldTypeModule.markDirty(id);FieldTypeModule.updateServer(id);"/>
+    <input id="Attachment" type="file"/>
+    <a id="uploadButton" href="#" class="disabledsmallbutton"></a>
     <label id="attachmentLabel"></label>
     <img src="static/images/waiting.gif" alt="uploading" id="uploading" style="display: none;"/>
 </div>
