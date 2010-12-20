@@ -25,11 +25,10 @@ jQuery(document).ready(function()
         View.init( state );
 
         setupView();
-        setupEidProviderPlugins();
+        loadEidPlugins();
     }
 
-    function setupEidProviderPlugins() {
-        setupSignatures();
+    function loadEidPlugins() {
     	if ( state.formSignatures.length > 0 ) {
 	        $("#signerDiv").append( RequestModule.getHeader() );
 	        addSigners($("#signerDiv"));
@@ -196,13 +195,13 @@ jQuery(document).ready(function()
 
     function rootView() {
         // since we have no root view redirect to first page of form
-        throw { redirect:'0'}
+        throw { redirect: Contexts.findUrl( View.formPage, ['0'] ) }
     }
 
-    var contexts = {view:rootView,          init: [ setupCaseAndForm ], subContexts: {
+    var contexts = {view:rootView,          init: [ setupCaseAndForm, setupSignatures ], subContexts: {
         'discard'   : {view:View.discard},
         'idContext' : {view:View.formPage,   init: [ verifyPage, verifyFormEditing ]},
-        'summary'   : {view:View.summary,    init: [ setupSignatures, setupProviders ], subContexts: {
+        'summary'   : {view:View.summary,    init: [ setupProviders ], subContexts: {
            'submit'    : {view:View.submit,   init: [ verifySubmit ]},
            'idContext' : {view:View.sign,     init: [ verifySigner, verifyProvider, setupRequiredSignature ]}}}}};
 
