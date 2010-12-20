@@ -59,7 +59,7 @@ var View = (function() {
             caseid.text(caseName);
         }
         var url = RequestModule.getPrintUrl( formId );
-        new Button( node ).image('print').name(texts.print).href(url).attr('target','_new');
+        new inner.Button( node ).image('print').name(texts.print).href(url).attr('target','_new');
         displayView( node );
     }
 
@@ -174,9 +174,9 @@ var View = (function() {
 
     function addFooter( node, page ) {
         var footer = clone('form_footer');
-	    new Button( footer ).image('previous').name(texts.previous).href( getPrevious( page ) ).enable( page!=0 );
-	    new Button( footer ).image('next').name(texts.next).href(getNext( page ) ).enable( page!='summary' );
-	    new Button( footer ).image('discard').name(texts.discard).href(getDiscard()).confirm(texts.confirmDiscard);
+	    new inner.Button( footer ).image('previous').name(texts.previous).href( getPrevious( page ) ).enable( page!=0 );
+	    new inner.Button( footer ).image('next').name(texts.next).href(getNext( page ) ).enable( page!='summary' );
+	    new inner.Button( footer ).image('discard').name(texts.discard).href(getDiscard()).confirm(texts.confirmDiscard);
         node.append( footer );
         return footer;
     }
@@ -231,7 +231,7 @@ var View = (function() {
     }
     
     function addSubmit( footer, formOk, errorString ) {
-        var button = new Button( footer ).image('submit').name(texts.submit).href(getSubmit()).enable(formOk);
+        var button = new inner.Button( footer ).image('submit').name(texts.submit).href(getSubmit()).enable(formOk);
 
         if ( errorString != "" ) {
             button.elm.aToolTip({ tipContent: errorString });
@@ -253,7 +253,7 @@ var View = (function() {
             	signatureValue.append(signature.signerName);
             } else {
             	signatureValue.attr("class", "signature_value_unsigned").append( eidProviders(idx) ).append( "&nbsp;&nbsp;");
-            	new Button( signatureValue )
+            	new inner.Button( signatureValue )
             	    .image('pencil_small')
             	    .name(texts.sign)
             	    .href(getSign(idx))
@@ -345,7 +345,7 @@ var View = (function() {
         	styleClass = idx==current ? "selected" : "";
             pagesNode.append( createBreadcrumb(styleClass, getPage(idx), page.title) );
         });
-        styleClass = current==-1 ? "selected" : "";
+        styleClass = current==-1 ? "summary_selected" : "summary";
         pagesNode.append( createBreadcrumb(styleClass, getSummary(), texts.summary) );
     }
 
@@ -355,13 +355,13 @@ var View = (function() {
         return pageElm;
     }
 
-    function Button( placeholder ) {
+    inner.Button = function( placeholder ) {
         this.elm = clone('button');
         placeholder.append( this.elm );
         return this;
     }
 
-    Button.prototype.confirm = function( message ) {
+    inner.Button.prototype.confirm = function( message ) {
         var button = this.elm;
         button.attr("onClick", "return false;");
         button.click( function() {
@@ -377,32 +377,32 @@ var View = (function() {
         });
     }
 
-    Button.prototype.small = function() {
+    inner.Button.prototype.small = function() {
         this.elm.addClass('small');
         return this;
     }
 
-    Button.prototype.attr = function(key, value) {
+    inner.Button.prototype.attr = function(key, value) {
         this.elm.attr(key, value);
         return this;
     }
 
-    Button.prototype.image = function( id ) {
+    inner.Button.prototype.image = function( id ) {
         this.elm.prepend( clone( id ) );
         return this;
     }
 
-    Button.prototype.name = function( title ) {
+    inner.Button.prototype.name = function( title ) {
         this.elm.append( title );
         return this;
     }
 
-    Button.prototype.href = function( href ) {
+    inner.Button.prototype.href = function( href ) {
         this.elm.attr('href', href);
         return this;
     }
 
-    Button.prototype.enable = function( _enable ) {
+    inner.Button.prototype.enable = function( _enable ) {
         enable( this.elm, _enable );
         return this;
     }

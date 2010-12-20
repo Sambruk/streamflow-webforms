@@ -39,7 +39,7 @@
   @include button-active-colors; }
 
 // We can change the colors for buttons of certain classes, etc.
-.bp a.positive, .bp button.positive, .bp smallbutton.positive{
+.bp a.positive, .bp button.positive {
   color: #000066;
   @include button-hover-colors(#529214, #e6efc2, #c6d880);
   @include button-active-colors(white, #529214, #529214); }
@@ -49,37 +49,19 @@
   @include button-hover-colors(#d12f19, #fbe3e4, #fbc2c4);
   @include button-active-colors(white, #d12f19, #d12f19); }
 
-// Added disabled buttons
-.bp a.disabledbutton {
-  @include anchor-button;
+// Disabled buttons
+.bp a.disabled {
   @include button-colors(#c9c7c7);
   @include button-hover-colors(#c9c7c7);
   cursor: default;
 }
 
-.bp a.disabledbutton:visited {
+.bp a.disabled:visited {
    color: #c9c7c7;
 }
 
-.bp a.smallbutton {
-  @include anchor-button;
-  @include button-colors(#000066);
-  cursor: default;
+.bp a.small {
   margin:0.5em 0.5em 0.5em 0;
   padding:3px 10px 3px 7px;
-  font-size: 80%;
-}
-
-.bp a.disabledsmallbutton {
-  @include anchor-button;
-  @include button-colors(#c9c7c7);
-  @include button-hover-colors(#c9c7c7);
-  cursor: default;
-  margin:0.5em 0.5em 0.5em 0;
-  padding:3px 10px 3px 7px;
-  font-size: 80%;
-}
-
-.bp a.disabledsmallbutton:visited {
-   color: #c9c7c7;
+  font-size: 85%;
 }

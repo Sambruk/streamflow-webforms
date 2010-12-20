@@ -123,7 +123,7 @@ var FieldTypeModule = (function() {
         field.node = $('#AttachmentFieldValue').clone();
         field.node.find('#Attachment').bind('change', function(){
         	FieldTypeModule.markDirty(field.id);
-        	field.node.find("#uploadButton").attr('class', 'smallbutton positive');
+        	field.node.find("#uploadButton").attr('class', 'button small positive');
         	field.node.find("#uploadButton").find('img').removeAttr('style');
         });
         field.node.find('#Attachment').attr({id:field.id, name:field.id});
@@ -145,7 +145,7 @@ var FieldTypeModule = (function() {
 
             $("#uploadButton")
             .ajaxComplete(function(){
-                $(this).attr('class', 'disabledsmallbutton');
+                $(this).attr('class', 'disabled small button');
                 $(this).find('img').fadeTo(0, 0.4);
             });
 
