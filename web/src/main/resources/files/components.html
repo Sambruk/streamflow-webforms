@@ -88,45 +88,40 @@
     <div class="fielddescription"></div>
 </div>
 
-<fieldset id="FieldSet"></fieldset>
-<input id="TextFieldValue" type="text" size="" onChange="javascript:FieldTypeModule.markDirty(id);" onblur="javascript:FieldTypeModule.updateServer(id);" value=""/>
-<input id="NumberFieldValue" type="text" size="10" onChange="javascript:FieldTypeModule.markDirty(name);" onblur="javascript:FieldTypeModule.updateServer(name);"/>
-<textarea id="TextAreaFieldValue" cols="" rows="" onChange="javascript:FieldTypeModule.markDirty(id);" onblur="javascript:FieldTypeModule.updateServer(id);"></textarea>
-<input id="DateFieldValue" onChange="javascript:FieldTypeModule.markDirty(name);FieldTypeModule.updateServer(name);" type="text" value=""/>
-<input id="CheckboxesFieldValue" type="checkbox" onChange="javascript:FieldTypeModule.markDirty(name);FieldTypeModule.updateServer(name);" />
-<input id="OptionButtonsFieldValue" type="radio" onClick="javascript:FieldTypeModule.markDirty(name);FieldTypeModule.updateServer(name);" />
-<input id="OpenSelectionFieldValue" type="radio" onClick="javascript:selectOpenSelectChanged(name);" />
-<input id="OpenSelectionOption" type="radio" onClick="javascript:selectOpenSelectOption(name);" />
-<input id="OpenSelectionTextField" type="text" onChange="javascript:FieldTypeModule.markDirty(name);" onblur="javascript:FieldTypeModule.updateServer(name);" />
+
+<div id="CommentFieldValue" class="commentfield"></div>
+<fieldset id="CheckboxesFieldValue"></fieldset>
+<fieldset id="OptionButtonsFieldValue"></fieldset>
+<fieldset id="OpenSelectionFieldValue"></fieldset>
+<input id="TextFieldValue" type="text"/>
+<input id="NumberFieldValue" type="text"/>
+<textarea id="TextAreaFieldValue" cols="" rows=""></textarea>
+<input id="DateFieldValue" type="text" value=""/>
+
+
+<input id="checkbox" type="checkbox" />
+<input id="radio" type="radio" />
+<label id="label"></label>
+
+<input id="OpenSelectionTextField" type="text" />
 <div id="AttachmentFieldValue">
+    <label id="attachmentLabel"></label><br/>
     <input id="Attachment" type="file"/>
-    <a id="uploadButton" href="#" class="disabled small button"></a>
-    <label id="attachmentLabel"></label>
-    <img src="static/images/waiting.gif" alt="uploading" id="uploading" style="display: none;"/>
 </div>
 
-<label id="label"></label>
-<div id="CommentFieldValue" class="commentfield"></div>
+
+
 <div id="ListBoxFieldValue" class="listbox">
     <div class="listbox">
-        <select id="possiblevalues" multiple="multiple" style="height:200px;width:100px;">
-        </select><br/>
+        <select id="possiblevalues" multiple="multiple" style="height:200px;width:100px;"></select><br/>
     </div>
-    <div class="listboxbuttons" style="margin: 65px 5px 0px 10px;">
-        <div>
-            <button id="move_right" type="button" onclick="javascript:listBoxArrow(id, name);">&nbsp;<img src="static/images/buttons/arrow_right.png"alt=""/></button>
-        </div>
-        <br/>
-        <div>
-            <button id="move_left" type="button" onclick="javascript:listBoxArrow(id, name);">&nbsp;<img src="static/images/buttons/arrow_left.png" alt=""/></button>
-        </div>
+    <div id="listboxbuttons" class="listboxbuttons" style="margin: 65px 5px 0px 10px;">
      </div>
      <div class="listbox">
-        <select id="selectedvalues" multiple="multiple" style="height:200px;width:100px;">
-        </select><br/>
+        <select id="selectedvalues" multiple="multiple" style="height:200px;width:100px;"></select><br/>
     </div>
 </div>
-<select id="ComboBoxFieldValue" onchange="javascript:FieldTypeModule.markDirty(name);FieldTypeModule.updateServer(name);">
+<select id="ComboBoxFieldValue" >
 </select>
 
 <table>

@@ -65,14 +65,14 @@ var View = (function() {
 
     inner.formPage = function( args ) {
         var node = clone( 'form_filling_div' );
-        addHeader( node, args.segment );
-
         var page = parseInt( args.segment );
+        addHeader( node, page );
+
         $.each( formState.formDraft.pages[ page ].fields, function(idx, field){
             FieldTypeModule.render( field, node );
         });
 
-        addFooter( node, args.segment );
+        addFooter( node, page );
         displayView( node );
     }
 
@@ -404,6 +404,11 @@ var View = (function() {
 
     inner.Button.prototype.enable = function( _enable ) {
         enable( this.elm, _enable );
+        return this;
+    }
+
+    inner.Button.prototype.click = function( fn ) {
+        this.elm.click( fn );
         return this;
     }
 
