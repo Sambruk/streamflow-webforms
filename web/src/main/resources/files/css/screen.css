@@ -52,12 +52,12 @@ div.bp #app textarea:focus, div.bp #app select:focus {
 }
 /* line 48, ../../../../../../../../.gem/ruby/1.8/gems/compass-0.10.5/frameworks/blueprint/stylesheets/blueprint/_form.scss */
 div.bp #app input.text, div.bp #app input.title, div.bp #app input[type=email], div.bp #app input[type=text], div.bp #app input[type=password] {
-  width: 300px;
+  /*width: 300px;*/
 }
 /* line 50, ../../../../../../../../.gem/ruby/1.8/gems/compass-0.10.5/frameworks/blueprint/stylesheets/blueprint/_form.scss */
 div.bp #app textarea {
-  width: 390px;
-  height: 250px;
+  /*width: 390px;
+  height: 250px;*/
 }
 
 /* line 25, ../../../webapp/css-src/partials/_two_col.scss */

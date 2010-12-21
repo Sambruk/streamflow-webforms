@@ -166,7 +166,6 @@ var RequestModule = (function() {
     }
 
     inner.attach = function( attachmentDTO ) {
-        attachmentDTO.error = errorPopup;
         attachmentDTO.url = urls.surface + urls.draft + 'createattachment';
         $.ajaxFileUpload( attachmentDTO );
     }

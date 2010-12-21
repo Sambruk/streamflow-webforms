@@ -19,6 +19,7 @@ package se.streamsource.surface.web.context;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.FileUploadException;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Structure;
@@ -53,9 +54,12 @@ import se.streamsource.surface.web.rest.AttachmentResponseHandler;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  */
@@ -72,6 +76,15 @@ public class FormDraftContext
    @Service
    FileItemFactory factory;
 
+   private static final Set<MediaType> acceptedTypes = new HashSet<MediaType>();
+
+   static
+   {
+      acceptedTypes.add( MediaType.APPLICATION_PDF );
+      acceptedTypes.add( MediaType.IMAGE_PNG);
+      acceptedTypes.add( MediaType.IMAGE_JPEG );
+   }
+
    public void createattachment( Response response )
    {
       Request request = response.getRequest();
@@ -86,6 +99,10 @@ public class FormDraftContext
             List items = upload.parseRequest( request );
             if ( items.size() != 1 ) return; // handle only one attachment
             final FileItem fi = (FileItem) items.get( 0 );
+            if ( !acceptedTypes.contains( MediaType.valueOf( fi.getContentType() ) ) )
+            {
+               throw new ResourceException( Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE, "Could not upload file" );
+            }
 
             Representation input = new InputRepresentation(new BufferedInputStream(fi.getInputStream()));
             Form disposition = new Form();
@@ -105,7 +122,10 @@ public class FormDraftContext
             builder.prototype().name().set( fi.getName() );
 
             client.postCommand( "updateattachmentfield", builder.newInstance() );
-         } catch (Exception e)
+         } catch (FileUploadException e)
+         {
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Could not upload file", e );
+         } catch ( IOException e)
          {
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Could not upload file", e );
          }
