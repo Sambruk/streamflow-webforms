@@ -23,10 +23,8 @@ import org.qi4j.api.unitofwork.UnitOfWorkFactory;
 import org.qi4j.bootstrap.Energy4Java;
 import org.qi4j.spi.structure.ApplicationSPI;
 import org.restlet.Application;
-import org.restlet.Client;
 import org.restlet.Restlet;
 import org.restlet.data.MediaType;
-import org.restlet.data.Protocol;
 import org.restlet.resource.Directory;
 import org.restlet.routing.Router;
 import org.restlet.routing.Template;
@@ -101,12 +99,9 @@ public class SurfaceRestApplication
    {
       try
       {
-         Client client = new Client( Protocol.HTTP );
-         client.start();
-
-// Start Qi4j
+         // Start Qi4j
          Energy4Java is = new Energy4Java();
-         app = is.newApplication( new SurfaceWebAssembler( this, client, getMetadataService() ) );
+         app = is.newApplication( new SurfaceWebAssembler( this, getMetadataService() ) );
 
          app.activate();
 

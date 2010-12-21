@@ -17,9 +17,18 @@
 
 package se.streamsource.surface.web;
 
+import org.apache.http.conn.params.ConnManagerParams;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.structure.Application;
-import org.qi4j.bootstrap.*;
+import org.qi4j.bootstrap.ApplicationAssembler;
+import org.qi4j.bootstrap.ApplicationAssembly;
+import org.qi4j.bootstrap.ApplicationAssemblyFactory;
+import org.qi4j.bootstrap.AssemblyException;
+import org.qi4j.bootstrap.LayerAssembly;
+import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.entitystore.memory.MemoryEntityStoreService;
 import org.qi4j.entitystore.prefs.PreferencesEntityStoreInfo;
 import org.qi4j.entitystore.prefs.PreferencesEntityStoreService;
@@ -29,11 +38,14 @@ import se.streamsource.surface.web.context.ContextsAssembler;
 import se.streamsource.surface.web.proxy.ProxyConfiguration;
 import se.streamsource.surface.web.proxy.ProxyService;
 import se.streamsource.surface.web.resource.SurfaceResourceAssembler;
+import se.streamsource.surface.web.rest.ClientConfiguration;
+import se.streamsource.surface.web.rest.ClientService;
+import se.streamsource.surface.web.rest.ServiceInstanceImporter;
 import se.streamsource.surface.web.rest.SurfaceRestAssembler;
 
 import java.util.prefs.Preferences;
 
-import static org.qi4j.api.service.qualifier.ServiceTags.tags;
+import static org.qi4j.api.service.qualifier.ServiceTags.*;
 
 public class SurfaceWebAssembler
    implements ApplicationAssembler
@@ -86,7 +98,7 @@ public class SurfaceWebAssembler
    {
       ModuleAssembly module = configLayer.moduleAssembly( "Configurations" );
 
-      module.addEntities( ProxyConfiguration.class ).visibleIn( Visibility.application );
+      module.addEntities( ClientConfiguration.class, ProxyConfiguration.class ).visibleIn( Visibility.application );
 
       // Configuration store
       Application.Mode mode = module.layerAssembly().applicationAssembly().mode();
@@ -139,6 +151,13 @@ public class SurfaceWebAssembler
             setMetaInfo( tags("eid" )).
             instantiateOnStartup();
       
-      proxyModule.importServices( Client.class ).visibleIn( Visibility.application );
+      proxyModule.importServices( Client.class ).importedBy( ServiceInstanceImporter.class ).identifiedBy( "client" ).setMetaInfo( "clientimporter" ).visibleIn( Visibility.application );
+      proxyModule.addServices( ClientService.class ).identifiedBy( "clientimporter" );
+
+      HttpParams params = new BasicHttpParams();
+      HttpConnectionParams.setSoTimeout(params, 2000);
+      HttpConnectionParams.setConnectionTimeout( params, 2000 );
+      ConnManagerParams.setTimeout( params, 2000 );
+
    }
 }
