@@ -20,6 +20,7 @@ package se.streamsource.surface.web.resource;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.object.ObjectBuilderFactory;
+import org.qi4j.api.service.qualifier.Tagged;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Uniform;
@@ -31,7 +32,6 @@ import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.dci.restlet.client.CommandQueryClientFactory;
 import se.streamsource.dci.restlet.client.NullResponseHandler;
 import se.streamsource.dci.restlet.server.CommandQueryRestlet2;
-import se.streamsource.surface.web.proxy.ProxyService;
 
 import java.util.List;
 import java.util.Locale;
@@ -45,13 +45,15 @@ public class SurfaceRestlet
    @Structure
    ObjectBuilderFactory obf;
 
-   @Service ProxyService proxyService;
+   @Service
+   @Tagged("streamflow")
+   Uniform proxyService;
 
    @Override
    protected Uniform createRoot( Request request, Response response )
    {
       CommandQueryClient cqc = obf.newObjectBuilder( CommandQueryClientFactory.class )
-            .use( proxyService, new NullResponseHandler()).newInstance().newClient( new Reference(new Reference(proxyService.configuration().url().get()), new Reference("")) );
+            .use( proxyService, new NullResponseHandler()).newInstance().newClient( new Reference(new Reference("http://localhost/")) );
 
       // Go to the main entrypoint for Surface
       cqc = cqc.getClient( "accesspoints/" );

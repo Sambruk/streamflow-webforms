@@ -17,92 +17,44 @@
 
 package se.streamsource.surface.web.rest;
 
-import org.qi4j.api.composite.PropertyMapper;
 import org.qi4j.api.configuration.Configuration;
-import org.qi4j.api.entity.EntityBuilder;
-import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.service.Activatable;
-import org.qi4j.api.service.ImportedServiceDescriptor;
+import org.qi4j.api.service.Availability;
 import org.qi4j.api.service.ServiceComposite;
-import org.qi4j.api.service.ServiceImporter;
-import org.qi4j.api.service.ServiceImporterException;
-import org.qi4j.api.unitofwork.NoSuchEntityException;
-import org.qi4j.api.unitofwork.UnitOfWork;
-import org.qi4j.api.unitofwork.UnitOfWorkFactory;
-import org.qi4j.api.usecase.UsecaseBuilder;
 import org.restlet.Client;
 import org.restlet.Context;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.Uniform;
 import org.restlet.data.Protocol;
-import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
 
 /**
- * ServiceImporter for the Restlet Client. Handles instantiation, configuration and activation.
- * Configure using ClientConfiguration.
+ * Service that exposes the Uniform interface and is backed by a Restlet Client that is configurable.
  */
 @Mixins(ClientService.Mixin.class)
 public interface ClientService
-   extends ServiceComposite, ServiceImporter, Activatable
+   extends ServiceComposite, Uniform, Activatable, Configuration<ClientConfiguration>, Availability
 {
    class Mixin
-      implements ServiceImporter, Activatable
+      implements Uniform, Activatable, Availability
    {
-      Map<String, Client> clients = new HashMap<String, Client>( );
-      Map<String, ClientConfiguration> configs = new HashMap<String, ClientConfiguration>( );
-
-      @Structure
-      UnitOfWorkFactory uowf;
+      Client client;
 
       @This
       Configuration<ClientConfiguration> config;
 
       public void activate() throws Exception
       {
-      }
-
-      public void passivate() throws Exception
-      {
-         for (Client client : clients.values())
+         if (config.configuration().enabled().get())
          {
-            try
-            {
-               client.stop();
-            } catch (Exception e)
-            {
-               LoggerFactory.getLogger( getClass() ).warn( "Could not stop Client", e );
-            }
-         }
-      }
+            client = new Client( Arrays.asList( Protocol.HTTP, Protocol.HTTPS ));
 
-      public Object importService( ImportedServiceDescriptor importedServiceDescriptor ) throws ServiceImporterException
-      {
-         Client client = clients.get(importedServiceDescriptor.identity() );
-
-         if (client == null)
-         {
-            client = new Client( Protocol.HTTP);
-         } else
-         {
-            try
-            {
-               // This is a restart of the service
-               client.stop();
-            } catch (Exception e)
-            {
-               throw new ServiceImporterException( e );
-            }
-         }
-
-         // Configure client
-         try
-         {
-            ClientConfiguration conf = getConfiguration(importedServiceDescriptor.identity());
+            // Configure client
+            ClientConfiguration conf = config.configuration();
 
             client.setConnectTimeout( conf.connectTimeout().get() );
             Context context = new Context();
@@ -124,66 +76,23 @@ public interface ClientService
             client.setContext( context );
 
             client.start();
-
-            clients.put( importedServiceDescriptor.identity(), client );
-         } catch (Exception e)
-         {
-            throw new ServiceImporterException( "Could not start Client", e );
          }
-
-         return client;
       }
 
-      public boolean isActive( Object o )
+      public void passivate() throws Exception
       {
-         return ((Client)o).isStarted();
+         client.stop();
       }
 
-      public boolean isAvailable( Object o )
+      public boolean isAvailable()
       {
-         return ((Client)o).isAvailable();
+         return client != null;
       }
 
-      public synchronized ClientConfiguration getConfiguration( String identity ) throws InstantiationException
+      public void handle( Request request, Response response )
       {
-         ClientConfiguration config = configs.get( identity );
-         if (config == null)
-         {
-            UnitOfWork uow = uowf.newUnitOfWork( UsecaseBuilder.newUsecase( "Create Client configuration" ));
-
-            try
-            {
-               config = uow.get( ClientConfiguration.class, identity );
-            } catch (NoSuchEntityException e)
-            {
-               EntityBuilder<ClientConfiguration> configBuilder = uow.newEntityBuilder( ClientConfiguration.class, identity );
-
-               // Check for defaults
-               String s = identity + ".properties";
-               InputStream asStream = ClientConfiguration.class.getResourceAsStream( s );
-               if( asStream != null )
-               {
-                   try
-                   {
-                       PropertyMapper.map( asStream, configBuilder.instance() );
-                   }
-                   catch( IOException e1 )
-                   {
-                       uow.discard();
-                       InstantiationException exception = new InstantiationException( "Could not read underlying Properties file." );
-                       exception.initCause( e1 );
-                       throw exception;
-                   }
-               }
-
-               config = configBuilder.newInstance();
-            }
-            uow.pause();
-
-            configs.put( identity, config );
-         }
-
-         return config;
+         if (client != null)
+            client.handle( request, response );
       }
    }
 }

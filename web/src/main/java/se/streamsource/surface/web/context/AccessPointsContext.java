@@ -20,6 +20,7 @@ package se.streamsource.surface.web.context;
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.structure.Module;
 import org.qi4j.api.value.ValueBuilder;
+import org.slf4j.LoggerFactory;
 import se.streamsource.dci.api.IndexContext;
 import se.streamsource.dci.api.RoleMap;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
@@ -39,10 +40,10 @@ public class AccessPointsContext
    {
       CommandQueryClient client = RoleMap.current().get( CommandQueryClient.class );
 
+      LinksBuilder builder = new LinksBuilder( module.valueBuilderFactory() );
       try
       {
          LinksValue linksValue = client.query( "index", LinksValue.class );
-         LinksBuilder builder = new LinksBuilder( module.valueBuilderFactory() );
          ValueBuilder<LinkValue> linkBuilder = module.valueBuilderFactory().newValueBuilder( LinkValue.class );
 
          for (LinkValue linkValue : linksValue.links().get())
@@ -52,11 +53,10 @@ public class AccessPointsContext
             builder.addLink( linkBuilder.newInstance() );
          }
 
-         return builder.newLinks();
       } catch (Throwable e)
       {
-         e.printStackTrace();
+         LoggerFactory.getLogger( getClass() ).warn( "Could not get list of accesspoints", e );
       }
-      return null;
+      return builder.newLinks();
    }
 }

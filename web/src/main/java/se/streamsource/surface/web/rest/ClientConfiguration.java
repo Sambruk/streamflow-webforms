@@ -18,14 +18,16 @@
 package se.streamsource.surface.web.rest;
 
 import org.qi4j.api.common.Optional;
+import org.qi4j.api.common.UseDefaults;
 import org.qi4j.api.configuration.ConfigurationComposite;
+import org.qi4j.api.configuration.Enabled;
 import org.qi4j.api.property.Property;
 
 /**
- * JAVADOC
+ * Configuration of a Apache HttpClient
  */
 public interface ClientConfiguration
-   extends ConfigurationComposite
+   extends ConfigurationComposite, Enabled
 {
    Property<Integer> connectTimeout();
    Property<Integer> idleCheckInterval();
@@ -34,7 +36,11 @@ public interface ClientConfiguration
    Property<Integer> maxTotalConnections();
    Property<Integer> socketTimeout();
    Property<Integer> stopIdleTimeout();
+
+   @UseDefaults
    Property<Boolean> tcpNoDelay();
+
+   @UseDefaults
    Property<Boolean> followRedirects();
 
    @Optional

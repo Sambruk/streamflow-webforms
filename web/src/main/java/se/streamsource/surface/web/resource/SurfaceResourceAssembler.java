@@ -49,7 +49,5 @@ public class SurfaceResourceAssembler
       );
 
       module.addObjects( CookieResponseHandler.class, AttachmentResponseHandler.class ).visibleIn( Visibility.layer );
-
-      module.importServices( Client.class ).visibleIn( Visibility.layer );
    }
 }
