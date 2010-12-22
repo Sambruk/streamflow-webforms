@@ -82,6 +82,7 @@ public interface ClientService
       public void passivate() throws Exception
       {
          client.stop();
+         client = null;
       }
 
       public boolean isAvailable()
