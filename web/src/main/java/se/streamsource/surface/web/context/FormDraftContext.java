@@ -25,6 +25,7 @@ import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.service.ServiceReference;
 import org.qi4j.api.service.qualifier.IdentifiedBy;
+import org.qi4j.api.service.qualifier.Tagged;
 import org.qi4j.api.structure.Module;
 import org.qi4j.api.value.ValueBuilder;
 import org.restlet.Request;
@@ -50,6 +51,7 @@ import se.streamsource.streamflow.domain.form.AttachmentFieldDTO;
 import se.streamsource.streamflow.domain.form.FormSignatureValue;
 import se.streamsource.streamflow.plugin.eid.api.VerifySignatureResponseValue;
 import se.streamsource.surface.web.dto.VerifyDTO;
+import se.streamsource.surface.web.proxy.ProxyService;
 import se.streamsource.surface.web.rest.AttachmentResponseHandler;
 
 import java.io.BufferedInputStream;
@@ -66,9 +68,14 @@ import java.util.Set;
  */
 public class FormDraftContext
 {
-   @Service
+   /*@Service
    @IdentifiedBy("client")
    ServiceReference<Uniform> proxyService;
+*/
+
+   @Service
+   @Tagged("eid")
+   ProxyService proxyService;
 
 
    @Structure
@@ -146,7 +153,7 @@ public class FormDraftContext
             param.append( "signature=").append( URLEncoder.encode( verify.signature().get(), "UTF-8") ).append( "&" );
             param.append( "nonce=").append( URLEncoder.encode( verify.nonce().get(), "UTF-8"));
 
-            Reference ref = new Reference( "sign/verify.json" );
+            Reference ref = new Reference( "/sign/verify.json" );
             Request request = new Request( Method.POST, ref, new StringRepresentation( param, MediaType.APPLICATION_WWW_FORM ) );
             ClientInfo info = new ClientInfo();
             info.setAcceptedMediaTypes( Collections.singletonList( new Preference<MediaType>( MediaType.APPLICATION_JSON ) ) );
@@ -154,7 +161,8 @@ public class FormDraftContext
             request.setClientInfo( info );
 
             Response response = new Response( request );
-            proxyService.get().handle( request, response );
+            //proxyService.get().handle( request, response );
+            proxyService.handle( request, response );
             // TODO handle error!!!
             if ( response.getStatus().equals( Status.SERVER_ERROR_INTERNAL ))
             {

@@ -18,29 +18,19 @@
 -->
 
 <!-- Components goes here-->
-<div id="login_div">
-    <div id="login_enduser">
-        <a class="button" href="#" id="login_enduser_operation">
-            <img src="static/images/buttons/door_in.png" alt=""/>
-        </a>
-    </div>
-</div>
-
 <div id="form_header">
     <h2 id="form_description"></h2>
     <ul id="form_pages"></ul>
 </div>
 
-<div id="form_footer">
-</div>
+<div id="form_footer"></div>
 
-<div id="form_filling_div">
-</div>
+<div id="form_filling_div"></div>
 
 <a id="link" href="#"></a>
 <a id="button" href="#" class="button positive"></a>
 
-<table id="fields_table" class="fields_table"></table>
+
 <img id="previous" src="static/images/buttons/arrow_left.png" alt=""/>
 <img id="next" src="static/images/buttons/arrow_right.png" alt=""/>
 <img id="discard" src="static/images/buttons/cross.png" alt=""/>
@@ -51,11 +41,11 @@
 <img id="print"  src="static/images/buttons/printer.png" alt="" />
 <img id="pencil_small"  src="static/images/buttons/pen_blue_small.png" alt="" />
 <img id="document_up"  src="static/images/buttons/document_up.png" alt="" />
+<img id="tooltip" src="static/images/unknown.png" alt="" />
 
 <div id="form_summary_div">
 
-    <div id="form_pages_summary">
-    </div>
+    <div id="form_pages_summary"></div>
 
     <div id="form_signatures" style="display: none;">
 		<div id="form_signatures_heading"></div>
@@ -76,40 +66,35 @@
 
 <div id="form_page_summary">
     <h3></h3>
-    <ul></ul>
+	<table id="fields_table" class="fields_table">
+    	<tr id="field_summary"></tr>
+	</table>
 </div>
 
+<font id="mandatory" color="red">*</font>
+<font id="hint" class="alt"></font>
+
 <div id="FormField" class="formfield">
-    <div class="fieldname"><label></label><font id="hint" class="alt"></font><font id="mandatory">&nbsp;*</font>&nbsp;<img src="static/images/unknown.png" alt="note" style="display: none"/></div>
+    <div class="fieldname"></div>
     <div class="fieldvalue"></div>
     <div class="fieldwaiting">
         <img src="static/images/waiting.gif" alt="waiting" style="display: none;"/>
     </div>
-    <div class="fielddescription"></div>
 </div>
 
-
 <div id="CommentFieldValue" class="commentfield"></div>
-<fieldset id="CheckboxesFieldValue"></fieldset>
-<fieldset id="OptionButtonsFieldValue"></fieldset>
-<fieldset id="OpenSelectionFieldValue"></fieldset>
-<input id="TextFieldValue" type="text"/>
-<input id="NumberFieldValue" type="text"/>
+<select id="ComboBoxFieldValue" ></select>
 <textarea id="TextAreaFieldValue" cols="" rows=""></textarea>
-<input id="DateFieldValue" type="text" value=""/>
-
-
+<fieldset id="fieldset"></fieldset>
+<input id="textfield" type="text" />
 <input id="checkbox" type="checkbox" />
 <input id="radio" type="radio" />
 <label id="label"></label>
 
-<input id="OpenSelectionTextField" type="text" />
 <div id="AttachmentFieldValue">
     <label id="attachmentLabel"></label><br/>
     <input id="Attachment" type="file"/>
 </div>
-
-
 
 <div id="ListBoxFieldValue" class="listbox">
     <div class="listbox">
@@ -121,12 +106,7 @@
         <select id="selectedvalues" multiple="multiple" style="height:200px;width:100px;"></select><br/>
     </div>
 </div>
-<select id="ComboBoxFieldValue" >
-</select>
 
-<table>
-<tr id="field_summary"><td class="field_label">:<font id="mandatory" color="red">*</font></td><td class="field_value"></td></tr>
-</table>
 
 <div id="ErrorMessage"></div>
 <div id="InfoMessage"></div>
