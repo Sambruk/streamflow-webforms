@@ -22,7 +22,7 @@ import org.qi4j.api.service.qualifier.Tagged;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
-import se.streamsource.surface.web.proxy.ProxyService;
+import org.restlet.Uniform;
 
 /**
  * Simple Restlet that delegates to the ProxyService.
@@ -33,7 +33,7 @@ public class StreamflowProxyRestlet
 {
    @Service
    @Tagged("streamflow")
-   ProxyService proxyService;
+   Uniform proxyService;
 
    @Override
    public void handle( Request request, Response response )

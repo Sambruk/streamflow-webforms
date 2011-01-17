@@ -22,13 +22,10 @@ import org.qi4j.api.service.qualifier.Tagged;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
-import org.restlet.data.ChallengeScheme;
+import org.restlet.Uniform;
 import org.restlet.data.MediaType;
 import org.restlet.data.Reference;
 import org.restlet.data.Status;
-import org.restlet.representation.Representation;
-import org.restlet.resource.ClientResource;
-import se.streamsource.surface.web.proxy.ProxyService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -38,17 +35,14 @@ import java.io.InputStreamReader;
 /**
  */
 public class IndexRestlet extends Restlet
-
 {
-
    @Service
    @Tagged("eid")
-   ProxyService proxyService;
-
+   Uniform proxyService;
 
    @Service
    @Tagged("streamflow")
-   ProxyService streamflowService;
+   Uniform streamflowService;
 
    @Override
    public void handle(Request request, Response response)

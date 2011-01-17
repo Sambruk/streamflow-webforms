@@ -22,12 +22,6 @@
 var RequestModule = (function() {
     var inner = {};
 
-    var urls = {
-        proxy:      "proxy/",
-        surface:    "surface/",
-	    eid:        "eidproxy/"
-    };
-
     function request(type, url) {
         return {type:type, url:url, async:false, cache:false, error:errorPopup, dataType:'json'};
     }
@@ -46,7 +40,7 @@ var RequestModule = (function() {
 
     function invoke( fn, arguments, message ) {
         var failed = false;
-        arguments.error = function() { failed = true; };
+        arguments.error = function() {  failed = true; };
         var result = fn( arguments );
         if ( failed ) {
             throw message;
@@ -55,130 +49,102 @@ var RequestModule = (function() {
     }
 
     inner.init = function( accesspoint ) {
-        setAccessPoint( accesspoint );
+        UrlModule.setAccessPoint( accesspoint );
         verifyAccessPoint();
         selectEndUser();
-        setUserUrl( getUser() );
-    }
-
-    function setAccessPoint( accesspoint ) {
-        urls.accesspoint = 'accesspoints/' + accesspoint + '/endusers/';
+        UrlModule.setUserUrl( getUser() );
     }
 
     function verifyAccessPoint() {
-        var parameters = request('GET', urls.proxy + urls.accesspoint + '.json');
+        var parameters = request('GET', UrlModule.verifyAccessPoint() );
         invoke( $.ajax, parameters, texts.invalidaccesspoint );
     }
 
     function selectEndUser() {
-        var parameters = request('POST', urls.surface + urls.accesspoint + 'selectenduser.json');
+        var parameters = request('POST', UrlModule.selectEndUser() );
         invoke( $.ajax, parameters, texts.loginfailed );
     }
 
     function getUser() {
-        var parameters = request('GET', urls.surface + urls.accesspoint + 'userreference.json');
+        var parameters = request('GET', UrlModule.getUser() );
         return invoke( getData, parameters, texts.loginfailed ).entity;
     }
 
-    function setUserUrl( user ) {
-        urls.user = urls.accesspoint + user + '/';
-    }
-
-    inner.createCaseUrl = function( caze ) {
-        if ( !urls.user ) throw "URL to user not defined";
-        urls.caze = urls.user + caze + '/';
-        urls.draft = null;
-    }
-
-    inner.createFormDraftUrl = function( form ) {
-        if ( !urls.caze ) throw "URL to case not defined";
-        urls.draft = urls.caze + 'formdrafts/' + form + '/';
-    }
-
     inner.getCaseForm = function() {
-        var parameters = request('GET', urls.proxy + urls.user + 'findcasewithform.json');
+        var parameters = request('GET', UrlModule.getCaseForm() );
         parameters.error = null;
         return getData( parameters );
     }
 
     inner.getFormDraft = function() {
-        var params = request('GET', urls.proxy + urls.draft + 'index.json');
+        var params = request('GET', UrlModule.getFormDraft() );
         return getData( params );
     }
 
     inner.createCaseWithForm = function() {
-        var parameters = request('POST', urls.proxy + urls.user + 'createcasewithform.json');
+        var parameters = request('POST', UrlModule.createCaseWithForm() );
         return getData( parameters );
     }
 
     inner.updateField = function( fieldDTO ) {
-        var parameters = request('PUT', urls.proxy + urls.draft + 'updatefield.json');
+        var parameters = request('PUT', UrlModule.updateField() );
         parameters.data = fieldDTO;     
         return getData( parameters );
     }
 
     inner.submitAndSend = function() {
-        var parameters = request('POST', urls.proxy + urls.draft + 'summary/submitandsend.json');
+        var parameters = request('POST', UrlModule.submitAndSend() );
         $.ajax( parameters );
     }
 
     inner.discard = function() {
-        var parameters = request('POST', urls.proxy + urls.draft + 'discard.json');
+        var parameters = request('POST', UrlModule.discard() );
         $.ajax( parameters );
     }
 
     inner.getFormSignatures = function() {
-        var parameters = request('GET', urls.proxy + urls.draft + 'summary/signatures.json');
+        var parameters = request('GET', UrlModule.getFormSignatures() );
         return getData( parameters ).signatures;
     }
 
     inner.getProviders = function() {
-        var parameters = request('GET', urls.eid + 'sign/providers.json');
+        var parameters = request('GET', UrlModule.getProviders() );
         return getData( parameters );
     }
 
     inner.getHeader = function() {
-        var parameters = request('GET', urls.eid + 'sign/header.htm');
+        var parameters = request('GET', UrlModule.getHeader() );
         parameters.dataType = null;
         return invoke( getData, parameters, texts.eidServiceUnavailable );
     }
     
     inner.getCaseName = function() {
-        var parameters = request('GET', urls.proxy + urls.caze + 'index.json');
+        var parameters = request('GET', UrlModule.getCaseName() );
         return getData( parameters ).caseId;
     }
 
-    inner.getCaseUrl = function() {
-        return urls.proxy + urls.caze;
-    }
-
     inner.sign = function( signDTO ) {
-        var parameters = request('GET', urls.eid + 'sign/surface.htm');
+        var parameters = request('GET', UrlModule.sign() );
         parameters.dataType = null;
         parameters.data = signDTO;        
         return getData( parameters );
     }
 
     inner.verify = function( verifyDTO ) {
-        var parameters = request('POST', urls.surface + urls.draft + 'verify.json');
+        var parameters = request('POST', UrlModule.verify() );
         parameters.data = verifyDTO;
         invoke( $.ajax, parameters, {error: texts.verifyfailed, redirect:'summary'} );
     }
 
     inner.attach = function( attachmentDTO ) {
-        attachmentDTO.error = errorPopup;
-        attachmentDTO.url = urls.surface + urls.draft + 'createattachment';
+        attachmentDTO.url = UrlModule.attach();
         $.ajaxFileUpload( attachmentDTO );
     }
 
     inner.refreshField = function( fieldId ) {
-        var parameters = request('GET', urls.proxy + urls.draft + 'fieldvalue.json');
+        var parameters = request('GET', UrlModule.refreshField() );
         parameters.data = { string: fieldId };
         return getData( parameters ).value;
-    }
-
-    inner.getPrintUrl = function( formId ) {
-        return inner.getCaseUrl() +'submittedforms/'+ formId + '/generateformaspdf';
     }
 
     return inner;
