@@ -4,3 +4,4 @@
 *.log
 *.1
 /web/target/
+.sass-cache
