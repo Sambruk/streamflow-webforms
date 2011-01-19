@@ -232,11 +232,11 @@ var FieldTypeModule = (function() {
 
         field.refreshUI = function() {
             var selected = field.node.find('#' + field.id + safeIdString(this.value)).attr('checked', 'checked');
-            if (selected.size()!=0) {
-                field.node.find('#TextField' + field.id).attr({disabled: true, value: ""});
-            } else if ( this.value ) {
+            if (selected.size() == 0 &&  this.value ) {
                 field.node.find('#openSelectionOption' + field.id).attr('checked', 'checked');
                 field.node.find('#TextField' + field.id).attr("value", this.value);
+            } else {
+                field.node.find('#TextField' + field.id).attr({disabled: true, value: ""});
             }
         }
 
