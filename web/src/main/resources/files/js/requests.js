@@ -55,7 +55,7 @@ var RequestModule = (function() {
 
     inner.createCaseUrl = function( caze ) {
         if ( !urls.user ) throw "URL to user not defined";
-        urls.caze = urls.user + caze + '/';
+        urls.caze = urls.user + 'drafts/' + caze + '/';
         urls.draft = null;
     }
 
@@ -98,7 +98,7 @@ var RequestModule = (function() {
     }
 
     inner.getCaseForm = function() {
-        var parameters = request('GET', urls.proxy + urls.user + 'findcasewithform.json');
+        var parameters = request('GET', urls.proxy + urls.user + 'drafts/findcasewithform.json');
         parameters.error = null;
         return getData( parameters );
     }

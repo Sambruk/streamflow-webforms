@@ -17,13 +17,20 @@
 
 package se.streamsource.surface.web.context;
 
+import org.qi4j.api.entity.Entity;
+import org.qi4j.api.entity.Identity;
+import org.qi4j.api.entity.IdentityGenerator;
+import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.structure.Module;
 import org.qi4j.api.value.ValueBuilder;
 import org.restlet.Response;
+import org.restlet.data.CharacterSet;
 import org.restlet.data.Cookie;
+import org.restlet.data.Form;
 import org.restlet.data.Status;
 import org.restlet.representation.EmptyRepresentation;
+import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ResourceException;
 import org.restlet.util.Series;
 import se.streamsource.dci.api.RoleMap;
@@ -41,6 +48,9 @@ public class EndUsersContext
    @Structure
    Module module;
 
+   @Service
+   IdentityGenerator identityGenerator;
+
    public void selectenduser( Response response )
          throws ResourceException
    {
@@ -56,7 +66,9 @@ public class EndUsersContext
             CookieResponseHandler responseHandler = module.objectBuilderFactory()
                   .newObjectBuilder( CookieResponseHandler.class )
                   .newInstance();
-            client.postCommand( "createenduser", new EmptyRepresentation(), responseHandler );
+            Form form = new Form();
+            form.set("string", identityGenerator.generate(Identity.class));
+            client.postCommand( "create", form.getWebRepresentation(CharacterSet.UTF_8), responseHandler );
 
             response.getCookieSettings().add( responseHandler.getCookieSetting() );
          }

@@ -25,6 +25,7 @@ import org.qi4j.bootstrap.Assembler;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ImportedServiceDeclaration;
 import org.qi4j.bootstrap.ModuleAssembly;
+import org.qi4j.spi.uuid.UuidIdentityGeneratorService;
 import org.restlet.Restlet;
 import se.streamsource.dci.api.InteractionConstraintsService;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
@@ -67,7 +68,7 @@ public class ContextsAssembler
             CommandQueryClientFactory.class, CommandQueryClient.class, CookieResponseHandler.class, AttachmentResponseHandler.class );
       module.addValues( TransactionDomainEvents.class, DomainEvent.class ).visibleIn( Visibility.application );
 
-      module.addServices( ClientEventSourceService.class ).visibleIn( Visibility.application );
+      module.addServices( ClientEventSourceService.class, UuidIdentityGeneratorService.class ).visibleIn( Visibility.application );
 
       // Import file handling service for file uploads
       DiskFileItemFactory factory = new DiskFileItemFactory();
