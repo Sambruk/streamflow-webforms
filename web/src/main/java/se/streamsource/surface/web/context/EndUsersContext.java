@@ -29,7 +29,7 @@ import org.restlet.util.Series;
 import se.streamsource.dci.api.RoleMap;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.dci.value.EntityValue;
-import se.streamsource.dci.value.LinkValue;
+import se.streamsource.dci.value.link.LinkValue;
 import se.streamsource.surface.web.rest.CookieResponseHandler;
 
 /**
@@ -54,7 +54,7 @@ public class EndUsersContext
          {
             CommandQueryClient client = RoleMap.current().get( CommandQueryClient.class );
             CookieResponseHandler responseHandler = module.objectBuilderFactory()
-                  .newObjectBuilder( CookieResponseHandler.class )
+                  .newObjectBuilder(CookieResponseHandler.class)
                   .newInstance();
             client.postCommand( "createenduser", new EmptyRepresentation(), responseHandler );
 
@@ -107,7 +107,7 @@ public class EndUsersContext
       }
 
       ValueBuilder<EntityValue> builder = module.valueBuilderFactory()
-            .newValueBuilder( EntityValue.class );
+            .newValueBuilder(EntityValue.class);
       builder.prototype().entity().set( cookie.getValue() );
       return builder.newInstance();
    }

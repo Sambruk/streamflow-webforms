@@ -29,7 +29,7 @@ public class SurfaceRestAssembler
 {
    public void assemble( ModuleAssembly module ) throws AssemblyException
    {
-      module.addObjects( SurfaceRestApplication.class,
+      module.objects( SurfaceRestApplication.class,
             ResourceFinder.class);
    }
 }

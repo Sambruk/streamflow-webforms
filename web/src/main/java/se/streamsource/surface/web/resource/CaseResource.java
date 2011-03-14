@@ -19,7 +19,7 @@ package se.streamsource.surface.web.resource;
 
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.dci.restlet.server.CommandQueryResource;
-import se.streamsource.dci.restlet.server.SubResource;
+import se.streamsource.dci.restlet.server.api.SubResource;
 import se.streamsource.surface.web.context.EndUsersContext;
 
 import static se.streamsource.dci.api.RoleMap.current;

@@ -21,7 +21,6 @@ import org.qi4j.api.common.Visibility;
 import org.qi4j.bootstrap.Assembler;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
-import org.restlet.Client;
 import se.streamsource.dci.restlet.server.DCIAssembler;
 import se.streamsource.dci.restlet.server.NullCommandResult;
 import se.streamsource.surface.web.rest.*;
@@ -38,16 +37,16 @@ public class SurfaceResourceAssembler
    {
       new DCIAssembler().assemble( module );
 
-      module.importServices( NullCommandResult.class ).importedBy( NEW_OBJECT );
-      module.addObjects( NullCommandResult.class ).visibleIn( Visibility.layer );
+      module.importedServices(NullCommandResult.class).importedBy( NEW_OBJECT );
+      module.objects(NullCommandResult.class).visibleIn( Visibility.layer );
 
       // Resources
-      module.addObjects(
-            IndexRestlet.class,
-            StreamflowProxyRestlet.class,
-            EidProxyRestlet.class
+      module.objects(
+              IndexRestlet.class,
+              StreamflowProxyRestlet.class,
+              EidProxyRestlet.class
       );
 
-      module.addObjects( CookieResponseHandler.class, AttachmentResponseHandler.class ).visibleIn( Visibility.layer );
+      module.objects(CookieResponseHandler.class, AttachmentResponseHandler.class).visibleIn( Visibility.layer );
    }
 }

@@ -30,10 +30,10 @@ import se.streamsource.dci.api.InteractionConstraintsService;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.dci.restlet.client.CommandQueryClientFactory;
 import se.streamsource.dci.restlet.client.NullResponseHandler;
-import se.streamsource.dci.value.LinkValue;
-import se.streamsource.dci.value.LinksValue;
 import se.streamsource.dci.value.StringValue;
-import se.streamsource.dci.value.TitledLinksValue;
+import se.streamsource.dci.value.link.LinkValue;
+import se.streamsource.dci.value.link.LinksValue;
+import se.streamsource.dci.value.link.TitledLinksValue;
 import se.streamsource.streamflow.domain.attachment.AttachmentValue;
 import se.streamsource.streamflow.domain.form.*;
 import se.streamsource.streamflow.infrastructure.event.domain.DomainEvent;
@@ -60,72 +60,72 @@ public class ContextsAssembler
 {
    public void assemble( ModuleAssembly module ) throws AssemblyException
    {
-      module.importServices( InteractionConstraintsService.class, NullResponseHandler.class ).
+      module.importedServices(InteractionConstraintsService.class, NullResponseHandler.class).
             importedBy( ImportedServiceDeclaration.NEW_OBJECT ).
             visibleIn( Visibility.application );
-      module.addObjects( InteractionConstraintsService.class, 
-            CommandQueryClientFactory.class, CommandQueryClient.class, CookieResponseHandler.class, AttachmentResponseHandler.class );
-      module.addValues( TransactionDomainEvents.class, DomainEvent.class ).visibleIn( Visibility.application );
+      module.objects(InteractionConstraintsService.class,
+              CommandQueryClientFactory.class, CommandQueryClient.class, CookieResponseHandler.class, AttachmentResponseHandler.class);
+      module.values(TransactionDomainEvents.class, DomainEvent.class).visibleIn( Visibility.application );
 
-      module.addServices( ClientEventSourceService.class ).visibleIn( Visibility.application );
+      module.services(ClientEventSourceService.class).visibleIn( Visibility.application );
 
       // Import file handling service for file uploads
       DiskFileItemFactory factory = new DiskFileItemFactory();
       factory.setSizeThreshold( 1024 * 1000 * 30 ); // 30 Mb threshold TODO Make this into real service and make this number configurable
-      module.importServices( FileItemFactory.class ).importedBy( INSTANCE ).setMetaInfo( factory );
+      module.importedServices(FileItemFactory.class).importedBy( INSTANCE ).setMetaInfo( factory );
 
-      module.addValues(
-            LinksValue.class,
-            LinkValue.class,
-            StringValue.class,
-            TitledLinksValue.class,
-            NewProxyUserCommand.class,
-            AttachmentValue.class,
-            AttachmentFieldDTO.class,
-            EndUserCaseDTO.class,
-            SubmittedFormsListDTO.class,
-            SubmittedFormListDTO.class,
-            PageSubmissionValue.class,
-            FieldSubmissionValue.class,
-            FieldDefinitionValue.class,
-            FieldValue.class,
-            AttachmentFieldValue.class,
-            CheckboxesFieldValue.class,
-            ComboBoxFieldValue.class,
-            CommentFieldValue.class,
-            DateFieldValue.class,
-            ListBoxFieldValue.class,
-            NumberFieldValue.class,
-            OpenSelectionFieldValue.class,
-            OptionButtonsFieldValue.class,
-            SelectionFieldValue.class,
-            TextAreaFieldValue.class,
-            TextFieldValue.class,
-            ValueComposite.class,
-            FormDraftValue.class,
-            IntegerDTO.class,
-            VerifyDTO.class,
-            VerifySignatureResponseValue.class,
-            FormSignatureValue.class,
-            FieldDTO.class
+      module.values(
+              LinksValue.class,
+              LinkValue.class,
+              StringValue.class,
+              TitledLinksValue.class,
+              NewProxyUserCommand.class,
+              AttachmentValue.class,
+              AttachmentFieldDTO.class,
+              EndUserCaseDTO.class,
+              SubmittedFormsListDTO.class,
+              SubmittedFormListDTO.class,
+              PageSubmissionValue.class,
+              FieldSubmissionValue.class,
+              FieldDefinitionValue.class,
+              FieldValue.class,
+              AttachmentFieldValue.class,
+              CheckboxesFieldValue.class,
+              ComboBoxFieldValue.class,
+              CommentFieldValue.class,
+              DateFieldValue.class,
+              ListBoxFieldValue.class,
+              NumberFieldValue.class,
+              OpenSelectionFieldValue.class,
+              OptionButtonsFieldValue.class,
+              SelectionFieldValue.class,
+              TextAreaFieldValue.class,
+              TextFieldValue.class,
+              ValueComposite.class,
+              FormDraftValue.class,
+              IntegerDTO.class,
+              VerifyDTO.class,
+              VerifySignatureResponseValue.class,
+              FormSignatureValue.class,
+              FieldDTO.class
       ).visibleIn( Visibility.application );
 
       // Resources
-      module.addObjects(
-            SurfaceRestlet.class,
-            RootResource.class,
-            AccessPointsResource.class,
-            AccessPointResource.class,
-            EndUsersResource.class,
-            EndUserResource.class,
-            CaseResource.class,
-            FormDraftsResource.class,
-            FormDraftResource.class,
+      module.objects(
+              SurfaceRestlet.class,
+              RootResource.class,
+              AccessPointsResource.class,
+              AccessPointResource.class,
+              EndUsersResource.class,
+              EndUserResource.class,
+              CaseResource.class,
+              FormDraftsResource.class,
+              FormDraftResource.class,
 
-            AccessPointsContext.class,
-            EndUsersContext.class,
-            FormDraftContext.class
+              AccessPointsContext.class,
+              EndUsersContext.class,
+              FormDraftContext.class
       );
 
-      module.importServices( Restlet.class ).visibleIn( Visibility.application );
+      module.importedServices(Restlet.class).visibleIn( Visibility.application );
    }}

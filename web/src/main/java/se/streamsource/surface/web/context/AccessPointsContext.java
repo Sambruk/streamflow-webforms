@@ -24,8 +24,8 @@ import org.slf4j.LoggerFactory;
 import se.streamsource.dci.api.IndexContext;
 import se.streamsource.dci.api.RoleMap;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
-import se.streamsource.dci.value.LinkValue;
-import se.streamsource.dci.value.LinksValue;
+import se.streamsource.dci.value.link.LinkValue;
+import se.streamsource.dci.value.link.LinksValue;
 import se.streamsource.streamflow.infrastructure.application.LinksBuilder;
 
 /**

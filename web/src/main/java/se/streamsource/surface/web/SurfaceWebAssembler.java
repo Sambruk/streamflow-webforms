@@ -56,10 +56,10 @@ public class SurfaceWebAssembler
       ApplicationAssembly assembly = applicationFactory.newApplicationAssembly();
       assembly.setName( "Surface" );
       assembly.setVersion( "0.3.20.962" );
-      LayerAssembly webLayer = assembly.layerAssembly( "Web" );
-      LayerAssembly appLayer = assembly.layerAssembly( "Application" );
-      LayerAssembly managementLayer = assembly.layerAssembly( "Management" );
-      LayerAssembly configLayer = assembly.layerAssembly("Configuration" );
+      LayerAssembly webLayer = assembly.layer( "Web" );
+      LayerAssembly appLayer = assembly.layer( "Application" );
+      LayerAssembly managementLayer = assembly.layer( "Management" );
+      LayerAssembly configLayer = assembly.layer("Configuration" );
 
       webLayer.uses( appLayer );
       appLayer.uses( configLayer );
@@ -83,27 +83,27 @@ public class SurfaceWebAssembler
 
    private void assembleManagementLayer( LayerAssembly managementLayer ) throws AssemblyException
    {
-      ModuleAssembly module = managementLayer.moduleAssembly( "JMX" );
+      ModuleAssembly module = managementLayer.module( "JMX" );
 
       new JMXAssembler().assemble( module );
    }
 
    private void assembleConfigLayer( LayerAssembly configLayer ) throws AssemblyException
    {
-      ModuleAssembly module = configLayer.moduleAssembly( "Configurations" );
+      ModuleAssembly module = configLayer.module( "Configurations" );
 
-      module.addEntities( ClientConfiguration.class, ProxyConfiguration.class ).visibleIn( Visibility.application );
+      module.entities( ClientConfiguration.class, ProxyConfiguration.class ).visibleIn( Visibility.application );
 
       // Configuration store
-      Application.Mode mode = module.layerAssembly().applicationAssembly().mode();
+      Application.Mode mode = module.layer().application().mode();
       if (mode.equals( Application.Mode.development ))
       {
          // In-memory store
-         module.addServices( MemoryEntityStoreService.class ).visibleIn( Visibility.layer );
+         module.services( MemoryEntityStoreService.class ).visibleIn( Visibility.layer );
       } else if (mode.equals( Application.Mode.test ))
       {
          // In-memory store
-         module.addServices( MemoryEntityStoreService.class ).visibleIn( Visibility.layer );
+         module.services( MemoryEntityStoreService.class ).visibleIn( Visibility.layer );
       } else if (mode.equals( Application.Mode.production ))
       {
          // Preferences storage
@@ -118,13 +118,13 @@ public class SurfaceWebAssembler
             Thread.currentThread().setContextClassLoader( cl );
          }
 
-         module.addServices( PreferencesEntityStoreService.class ).setMetaInfo( new PreferencesEntityStoreInfo( node ) ).visibleIn( Visibility.layer );
+         module.services( PreferencesEntityStoreService.class ).setMetaInfo( new PreferencesEntityStoreInfo( node ) ).visibleIn( Visibility.layer );
       }
    }
 
    protected void assembleWebLayer( LayerAssembly webLayer ) throws AssemblyException
    {
-      ModuleAssembly restModule = webLayer.moduleAssembly( "REST" );
+      ModuleAssembly restModule = webLayer.module( "REST" );
       new SurfaceRestAssembler().assemble( restModule );
       new SurfaceResourceAssembler().assemble( restModule );
       new ContextsAssembler().assemble( restModule );
@@ -132,20 +132,20 @@ public class SurfaceWebAssembler
 
    private void assembleAppLayer( LayerAssembly appLayer ) throws AssemblyException
    {
-      ModuleAssembly proxyModule = appLayer.moduleAssembly( "Proxy" );
+      ModuleAssembly proxyModule = appLayer.module( "Proxy" );
 
-      proxyModule.addServices( ProxyService.class ).
+      proxyModule.services( ProxyService.class ).
             visibleIn( Visibility.application ).
             identifiedBy( "streamflowproxy" ).
             setMetaInfo(tags("streamflow")).
             instantiateOnStartup();
-      proxyModule.addServices( ProxyService.class ).
+      proxyModule.services( ProxyService.class ).
             visibleIn( Visibility.application ).
             identifiedBy( "eidproxy" ).
             setMetaInfo( tags("eid" )).
             instantiateOnStartup();
       
-      proxyModule.addServices( ClientService.class ).
+      proxyModule.services( ClientService.class ).
             identifiedBy( "client" ).
             instantiateOnStartup().
             visibleIn( Visibility.application );
