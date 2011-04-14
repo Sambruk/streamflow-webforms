@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
-package se.streamsource.surface.web.rest;
+package se.streamsource.surface.web.assembler;
 
 import org.qi4j.bootstrap.Assembler;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import se.streamsource.dci.restlet.server.ResourceFinder;
+import se.streamsource.surface.web.rest.SurfaceRestApplication;
 
 /**
  */

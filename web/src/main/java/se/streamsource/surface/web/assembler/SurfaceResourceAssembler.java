@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package se.streamsource.surface.web.resource;
+package se.streamsource.surface.web.assembler;
 
 import org.qi4j.api.common.Visibility;
 import org.qi4j.bootstrap.Assembler;

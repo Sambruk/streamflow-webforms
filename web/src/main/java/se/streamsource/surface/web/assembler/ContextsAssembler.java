@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package se.streamsource.surface.web.context;
+package se.streamsource.surface.web.assembler;
 
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -34,18 +34,13 @@ import se.streamsource.dci.value.StringValue;
 import se.streamsource.dci.value.link.LinkValue;
 import se.streamsource.dci.value.link.LinksValue;
 import se.streamsource.dci.value.link.TitledLinksValue;
-import se.streamsource.streamflow.domain.attachment.AttachmentValue;
-import se.streamsource.streamflow.domain.form.*;
 import se.streamsource.streamflow.infrastructure.event.domain.DomainEvent;
 import se.streamsource.streamflow.infrastructure.event.domain.TransactionDomainEvents;
 import se.streamsource.streamflow.plugin.eid.api.VerifySignatureResponseValue;
-import se.streamsource.streamflow.resource.caze.EndUserCaseDTO;
-import se.streamsource.streamflow.resource.caze.FieldDTO;
-import se.streamsource.streamflow.resource.caze.SubmittedFormListDTO;
-import se.streamsource.streamflow.resource.caze.SubmittedFormsListDTO;
-import se.streamsource.streamflow.resource.roles.IntegerDTO;
-import se.streamsource.streamflow.resource.user.NewProxyUserCommand;
 import se.streamsource.surface.web.ClientEventSourceService;
+import se.streamsource.surface.web.context.AccessPointsContext;
+import se.streamsource.surface.web.context.EndUsersContext;
+import se.streamsource.surface.web.context.FormDraftContext;
 import se.streamsource.surface.web.dto.VerifyDTO;
 import se.streamsource.surface.web.resource.*;
 import se.streamsource.surface.web.rest.AttachmentResponseHandler;
@@ -79,35 +74,9 @@ public class ContextsAssembler
               LinkValue.class,
               StringValue.class,
               TitledLinksValue.class,
-              NewProxyUserCommand.class,
-              AttachmentValue.class,
-              AttachmentFieldDTO.class,
-              EndUserCaseDTO.class,
-              SubmittedFormsListDTO.class,
-              SubmittedFormListDTO.class,
-              PageSubmissionValue.class,
-              FieldSubmissionValue.class,
-              FieldDefinitionValue.class,
-              FieldValue.class,
-              AttachmentFieldValue.class,
-              CheckboxesFieldValue.class,
-              ComboBoxFieldValue.class,
-              CommentFieldValue.class,
-              DateFieldValue.class,
-              ListBoxFieldValue.class,
-              NumberFieldValue.class,
-              OpenSelectionFieldValue.class,
-              OptionButtonsFieldValue.class,
-              SelectionFieldValue.class,
-              TextAreaFieldValue.class,
-              TextFieldValue.class,
               ValueComposite.class,
-              FormDraftValue.class,
-              IntegerDTO.class,
               VerifyDTO.class,
-              VerifySignatureResponseValue.class,
-              FormSignatureValue.class,
-              FieldDTO.class
+              VerifySignatureResponseValue.class
       ).visibleIn( Visibility.application );
 
       // Resources

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package se.streamsource.surface.web;
+package se.streamsource.surface.web.assembler;
 
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.structure.Application;
@@ -24,13 +24,10 @@ import org.qi4j.entitystore.memory.MemoryEntityStoreService;
 import org.qi4j.entitystore.prefs.PreferencesEntityStoreInfo;
 import org.qi4j.entitystore.prefs.PreferencesEntityStoreService;
 import org.qi4j.library.jmx.JMXAssembler;
-import se.streamsource.surface.web.context.ContextsAssembler;
 import se.streamsource.surface.web.proxy.ProxyConfiguration;
 import se.streamsource.surface.web.proxy.ProxyService;
-import se.streamsource.surface.web.resource.SurfaceResourceAssembler;
 import se.streamsource.surface.web.rest.ClientConfiguration;
 import se.streamsource.surface.web.rest.ClientService;
-import se.streamsource.surface.web.rest.SurfaceRestAssembler;
 
 import java.util.prefs.Preferences;
 

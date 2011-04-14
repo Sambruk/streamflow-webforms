@@ -21,7 +21,7 @@
         <version.eid.plugin>1.2-SNAPSHOT</version.eid.plugin>
         <version.qi4j-tools>1.0</version.qi4j-tools>
         <version.restlet>2.0.3</version.restlet>
-        <version.streamflow>1.3-SNAPSHOT</version.streamflow>
+        <version.streamflow>1.4-SNAPSHOT</version.streamflow>
     </properties>
     
     <repositories>
@@ -378,6 +378,11 @@
             <dependency>
                 <groupId>se.streamsource.streamflow</groupId>
                 <artifactId>streamflow-common</artifactId>
+                <version>${version.streamflow}</version>
+            </dependency>
+            <dependency>
+                <groupId>se.streamsource.streamflow</groupId>
+                <artifactId>streamflow-surface-api</artifactId>
                 <version>${version.streamflow}</version>
             </dependency>
             <dependency>

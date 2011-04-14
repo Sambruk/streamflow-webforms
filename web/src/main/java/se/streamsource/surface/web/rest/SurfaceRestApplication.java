@@ -29,7 +29,7 @@ import org.restlet.resource.Directory;
 import org.restlet.routing.Router;
 import org.restlet.routing.Template;
 import se.streamsource.dci.restlet.server.ExtensionMediaTypeFilter;
-import se.streamsource.surface.web.SurfaceWebAssembler;
+import se.streamsource.surface.web.assembler.SurfaceWebAssembler;
 import se.streamsource.surface.web.resource.SurfaceRestlet;
 
 import java.util.logging.Logger;

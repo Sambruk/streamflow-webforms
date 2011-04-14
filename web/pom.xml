@@ -98,6 +98,10 @@
         <!-- Domain -->
         <dependency>
             <groupId>se.streamsource.streamflow</groupId>
+            <artifactId>streamflow-surface-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>se.streamsource.streamflow</groupId>
             <artifactId>streamflow-common</artifactId>
         </dependency>
         <dependency>

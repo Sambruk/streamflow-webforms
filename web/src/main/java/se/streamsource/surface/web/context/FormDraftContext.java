@@ -23,14 +23,11 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Structure;
-import org.qi4j.api.service.ServiceReference;
-import org.qi4j.api.service.qualifier.IdentifiedBy;
 import org.qi4j.api.service.qualifier.Tagged;
 import org.qi4j.api.structure.Module;
 import org.qi4j.api.value.ValueBuilder;
 import org.restlet.Request;
 import org.restlet.Response;
-import org.restlet.Uniform;
 import org.restlet.data.ClientInfo;
 import org.restlet.data.Disposition;
 import org.restlet.data.Form;
@@ -47,9 +44,9 @@ import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ResourceException;
 import se.streamsource.dci.api.RoleMap;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
-import se.streamsource.streamflow.domain.form.AttachmentFieldDTO;
-import se.streamsource.streamflow.domain.form.FormSignatureValue;
 import se.streamsource.streamflow.plugin.eid.api.VerifySignatureResponseValue;
+import se.streamsource.streamflow.surface.api.AttachmentFieldDTO;
+import se.streamsource.streamflow.surface.api.FormSignatureDTO;
 import se.streamsource.surface.web.dto.VerifyDTO;
 import se.streamsource.surface.web.proxy.ProxyService;
 import se.streamsource.surface.web.rest.AttachmentResponseHandler;
@@ -57,7 +54,6 @@ import se.streamsource.surface.web.rest.AttachmentResponseHandler;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -177,7 +173,7 @@ public class FormDraftContext
 
          CommandQueryClient client = RoleMap.current().get( CommandQueryClient.class );
 
-         ValueBuilder<FormSignatureValue> valueBuilder = module.valueBuilderFactory().newValueBuilder( FormSignatureValue.class );
+         ValueBuilder<FormSignatureDTO> valueBuilder = module.valueBuilderFactory().newValueBuilder( FormSignatureDTO.class );
 
          valueBuilder.prototype().encodedForm().set( verify.encodedTbs().get() );
          valueBuilder.prototype().form().set( verify.form().get() );
