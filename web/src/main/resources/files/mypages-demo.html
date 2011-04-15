@@ -1,0 +1,92 @@
+<!--
+
+
+    Copyright 2009-2010 Streamsource AB
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Streamflow&#8482; My Pages</title>
+    <meta name="author" content="Streamsource">
+    
+    <link rel="stylesheet" type="text/css" href="css/master.css" />
+         
+    <script type="text/javascript" src="js/external/jquery-1.5.1.min.js"></script>
+    <script type="text/javascript" src="js/external/jquery-ui.min-1.8.2.js"></script>
+    
+    <style> 
+        div#content {
+            margin: 1em 1em auto 5em; 
+        }
+        div#demo-nav ul{
+            padding: 0;
+            list-style: none;
+        }
+        div#demo-nav ul>li{
+            font-size: large;
+            float: left;
+            margin-right: 2em;
+            margin-bottom: 3em;
+        }
+        div#demo-nav ul>li>a{
+            text-decoration: none;
+        }
+        div#demo-nav ul>li>a.selected{
+            text-decoration: underline;
+        }                        
+                                
+        iframe {
+            border: none;            
+        }
+    </style>
+    
+    <script type="text/javascript">
+    $(function() {
+	    $("#demo-nav li>a").bind('click', function(event){
+	    	
+	    	$("#demo-nav li>a").removeClass('selected');
+	    	$(this).addClass('selected');
+	    	
+	    	src = $(this).attr('href');
+	    	$("iframe").attr('src', src);
+	    	
+	    	event.preventDefault();
+	    });
+	    $("iframe").attr('src', "../cases#open");
+    });
+    </script>
+    
+</head>
+<body>
+
+<div id="content">
+<div id="demo-nav">
+    <ul>
+        <li><a href="../cases#open" class="selected">&Ouml;ppna &auml;renden</a></li>
+        <li><a href="../cases#closed">Avslutade &auml;renden</a></li>
+        <li><a href="../profile">Min profil</a></li>
+    </ul>
+</div>
+
+<div id="demo-content">
+<iframe height="100%" width="100%" src="profile.html" scrolling="no">
+</iframe>
+</div>
+</div>
+
+</body>
+</html>
