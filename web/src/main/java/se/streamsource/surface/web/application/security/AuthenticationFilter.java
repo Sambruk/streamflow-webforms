@@ -33,9 +33,8 @@ import org.restlet.data.Status;
 import org.restlet.routing.Filter;
 import org.restlet.util.Series;
 
-import se.streamsource.surface.web.dto.UserInfoDTO;
-import se.streamsource.streamflow.resource.organization.search.DateSearchKeyword;
 import se.streamsource.streamflow.util.Strings;
+import se.streamsource.surface.web.dto.UserInfoDTO;
 
 public class AuthenticationFilter extends Filter
 {
@@ -59,7 +58,7 @@ public class AuthenticationFilter extends Filter
       if ( cookies != null && cookies.size() > 0)
          cookieValue = cookies.get( 0 ).getValue();
 
-      if (Strings.notEmpty( cookieValue ))
+      if (Strings.empty( cookieValue ))
       {
          try
          {

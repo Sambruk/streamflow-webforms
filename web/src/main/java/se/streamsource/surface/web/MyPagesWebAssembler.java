@@ -27,6 +27,7 @@ import org.qi4j.bootstrap.ApplicationAssemblyFactory;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.LayerAssembly;
 import org.qi4j.bootstrap.ModuleAssembly;
+import org.qi4j.bootstrap.ServiceDeclaration;
 import org.qi4j.entitystore.memory.MemoryEntityStoreService;
 import org.qi4j.entitystore.prefs.PreferencesEntityStoreInfo;
 import org.qi4j.entitystore.prefs.PreferencesEntityStoreService;
@@ -38,7 +39,6 @@ import se.streamsource.surface.web.rest.ClientConfiguration;
 import se.streamsource.surface.web.rest.ClientService;
 import se.streamsource.surface.web.rest.MyPagesRestAssembler;
 
-import static org.qi4j.api.service.qualifier.ServiceTags.*;
 
 public class MyPagesWebAssembler
    implements ApplicationAssembler
@@ -55,10 +55,10 @@ public class MyPagesWebAssembler
       ApplicationAssembly assembly = applicationFactory.newApplicationAssembly();
       assembly.setName( "MyPages" );
       assembly.setVersion( "0.0.0.001" );
-      LayerAssembly webLayer = assembly.layerAssembly( "Web" );
-      LayerAssembly appLayer = assembly.layerAssembly( "Application" );
-      LayerAssembly managementLayer = assembly.layerAssembly( "Management" );
-      LayerAssembly configLayer = assembly.layerAssembly("Configuration" );
+      LayerAssembly webLayer = assembly.layer( "Web" );
+      LayerAssembly appLayer = assembly.layer( "Application" );
+      LayerAssembly managementLayer = assembly.layer( "Management" );
+      LayerAssembly configLayer = assembly.layer("Configuration" );
 
       webLayer.uses( appLayer );
       appLayer.uses( configLayer );
@@ -82,19 +82,19 @@ public class MyPagesWebAssembler
 
    private void assembleManagementLayer( LayerAssembly managementLayer ) throws AssemblyException
    {
-      ModuleAssembly module = managementLayer.moduleAssembly( "JMX" );
+      ModuleAssembly module = managementLayer.module( "JMX" );
 
       new JMXAssembler().assemble( module );
    }
 
    private void assembleConfigLayer( LayerAssembly configLayer ) throws AssemblyException
    {
-      ModuleAssembly module = configLayer.moduleAssembly( "Configurations" );
+      ModuleAssembly module = configLayer.module( "Configurations" );
 
       module.addEntities( ClientConfiguration.class, ProxyConfiguration.class ).visibleIn( Visibility.application );
 
       // Configuration store
-      Application.Mode mode = module.layerAssembly().applicationAssembly().mode();
+      Application.Mode mode = module.layer().application().mode();
       if (mode.equals( Application.Mode.development ))
       {
          // In-memory store
@@ -123,23 +123,23 @@ public class MyPagesWebAssembler
 
    protected void assembleWebLayer( LayerAssembly webLayer ) throws AssemblyException
    {
-      ModuleAssembly restModule = webLayer.moduleAssembly( "REST" );
+      ModuleAssembly restModule = webLayer.module( "REST" );
       new MyPagesRestAssembler().assemble( restModule );
    }
 
    private void assembleAppLayer( LayerAssembly appLayer ) throws AssemblyException
    {
-      ModuleAssembly proxyModule = appLayer.moduleAssembly( "Proxy" );
+      ModuleAssembly proxyModule = appLayer.module( "Proxy" );
 
       proxyModule.addServices( ProxyService.class ).
             visibleIn( Visibility.application ).
             identifiedBy( "streamflowproxy" ).
-            setMetaInfo(tags("streamflow")).
+            taggedWith("streamflow").
             instantiateOnStartup();
       proxyModule.addServices( ProxyService.class ).
             visibleIn( Visibility.application ).
             identifiedBy( "eidproxy" ).
-            setMetaInfo( tags("eid" )).
+            taggedWith("eid" ).
             instantiateOnStartup();
       
       proxyModule.addServices( ClientService.class ).
