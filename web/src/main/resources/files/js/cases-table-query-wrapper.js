@@ -50,7 +50,7 @@
  *         sortColumn {number} set according to the given sort.
  * @constructor
  */
-var TableQueryWrapper = function(table, query, options, selectionHandler, formatColumnsAction) {
+var TableQueryWrapper = function(table, query, options, selectionHandler, formatColumnsAction, pagingAction) {
 
 //  this.table = new google.visualization.Table(container);
   this.table = table;
@@ -63,7 +63,7 @@ var TableQueryWrapper = function(table, query, options, selectionHandler, format
 
   var self = this;
   var addListener = google.visualization.events.addListener;
-  addListener(this.table, 'page', function(e) {self.handlePage(e, selectionHandler);});
+  addListener(this.table, 'page', function(e) {self.handlePage(e, selectionHandler, pagingAction);});
   addListener(this.table, 'sort', function(e) {self.handleSort(e, selectionHandler);});
   addListener(this.table, 'select', function(e) {self.handleSelect(selectionHandler);});
   
@@ -147,7 +147,7 @@ TableQueryWrapper.prototype.handleSort = function(properties, selectionHandler) 
 
 
 /** Handles a page event with the given properties. */
-TableQueryWrapper.prototype.handlePage = function(properties, selectionHandler) {
+TableQueryWrapper.prototype.handlePage = function(properties, selectionHandler, pagingAction) {
   var localTableNewPage = properties['page']; // 1, -1 or 0
   var newPage = 0;
   if (localTableNewPage != 0) {
@@ -158,6 +158,9 @@ TableQueryWrapper.prototype.handlePage = function(properties, selectionHandler) 
     
     // Handle unselections.
     selectionHandler();
+    
+    // Handle paging
+    pagingAction(this.pageSize, newPage);
   }
 };
 

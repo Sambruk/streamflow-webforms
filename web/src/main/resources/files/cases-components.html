@@ -24,13 +24,13 @@
 	<form action="" class="cases-paging">
 		<label id="number-of-cases-label">#Show number of cases:</label>
 		<select onChange="View.setOption('pageSize', parseInt(this.value, 10))">
-			<option class="1" value="1">1</option>
 			<option class="5" value="5">5</option>
 			<option class="10" value="10">10</option>
 			<option class="25" value="25">25</option>
 		</select>
 	</form>
 	<div id="open-cases-table" class="ui-widget"></div>
+	<div id="pagination"><label id="pagination-info">#Showing 1 to 5 of 10 cases</label></div>
 </div>
 	
 <div id="closed-cases" class="cases-view"> 
@@ -44,6 +44,7 @@
 		</select>
 	</form>
 	<div id="closed-cases-table" class="ui-widget"></div>
+	<div id="pagination"><label id="pagination-info">#Showing 1 to 5 of 10 cases</label></div>
 </div>
 	
 <div id="open-case" class="case-details ui-widget">

@@ -30,6 +30,7 @@ var UrlModule = (function () {
     var openCasesQuery = "select href,caseid,description,created,project,status";
     var closedCasesQuery = "select href,caseid,description,created,project,closed,resolution";
     var caseHistoryQuery = "select sender,message,created order by created";
+    var casesTotalQuery = "select description";
     var casesQuery = {};
 
     inner.setUserId = function (userid) {
@@ -77,11 +78,11 @@ var UrlModule = (function () {
 	};
 	
 	inner.getOpenCasesTotal = function () {
-		return urls.enduser + 'open/totalcases.json';
+		return this.casesDataSource + '?tq=' + casesTotalQuery;
 	};
 
 	inner.getClosedCasesTotal = function () {
-		return urls.enduser + 'closed/totalcases.json';
+		return this.casesDataSource + '?tq=' + casesTotalQuery;
 	};
 
     inner.getCaseDataSource = function () {

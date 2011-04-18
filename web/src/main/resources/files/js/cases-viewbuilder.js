@@ -21,15 +21,22 @@ var View = (function() {
 	var casesNodeId = {};
 	var caseNodeId = {};
 	var formatColumnsAction = {};
+	var pagingAction = {};
 	var store = {};
+	var casesTotal;
 
-	var casesPageSize = PersistModule.getCasesPageSize() ? PersistModule.getCasesPageSize() : 10;
+	var casesPageSize = PersistModule.getCasesPageSize() ? PersistModule.getCasesPageSize() : 5;
 
+	// Adding support for jQuery UI and the portlet standard
 	var casesCssClasses = {
-		'headerRow' : 'ui-widget-header',
+		'headerRow' : 'ui-widget-header portlet-table-header',
+		'headerCell' : 'portlet-table-subheader',
+		'oddTableRow' : 'portlet-table-alternate',
 		'tableRow' : 'ui-widget-content',
-		'selectedTableRow' : 'ui-state-active',
-		'hoverTableRow' : 'ui-state-hover'
+		'tableCell' : 'portlet-table-body',
+		'selectedTableRow' : 'ui-state-active portlet-table-selected',
+		'hoverTableRow' : 'ui-state-hover',
+		'rowNumberCell' : ''
 	};
 
 	var casesOptions = {
@@ -40,9 +47,14 @@ var View = (function() {
 		'hideColumns' : [ 0,3,4,5 ]
 	};
 
+	// Adding support for jQuery UI and the portlet standard
 	var caseHistoryCssClasses = {
-		'headerRow' : 'ui-widget-header',
-		'tableRow' : 'ui-widget-content'
+		'headerRow' : 'ui-widget-header portlet-table-header',
+		'headerCell' : 'portlet-table-subheader',
+		'oddTableRow' : 'portlet-table-alternate',
+		'tableRow' : 'ui-widget-content',
+		'tableCell' : 'portlet-table-body',
+		'rowNumberCell' : ''
 //		'selectedTableRow' : 'ui-state-active',
 //		'hoverTableRow' : 'ui-state-hover'
 	};
@@ -70,17 +82,30 @@ var View = (function() {
 		removeCaseDetails();
 		removeCaseHistory();
 	};
+	
+	function setupCasesTotal(casesTotalJson) {
+		casesTotal = casesTotalJson.table.rows.length;
+		return casesTotal;
+	}
 
 	inner.openCases = function() {
-		var openCasesTotal = RequestModule.getOpenCasesTotal();
-		if (openCasesTotal){
-			$('#open-cases-header').text(texts.opencasesheader + ' (' + openCasesTotal.index.total + ')');
-		} else {
-			$('#open-cases-header').text(texts.opencasesheader);
-		}
 		caseNodeId = 'open-case';
 		var node = clone('open-cases');
 		displayView(node);
+		var openCasesTotal = setupCasesTotal(RequestModule.getOpenCasesTotal());
+		pagingAction = function (pageSize, pageIndex, callback) {
+			var from = parseInt(pageSize)*(parseInt(pageIndex))+1;
+			var to = from+parseInt(pageSize)-1;
+			if (casesTotal){
+				to = casesTotal<to ? casesTotal : to;
+				$('#open-cases-header').text(texts.opencasesheader + ' (' + openCasesTotal + texts.totalcasespiecesheader + ')');
+				$('#pagination-info').text(replacePlaceholdersInTranslatedString(texts.labelpaginationinfo, from, to, casesTotal));
+			} else {
+				$('#open-cases-header').text(texts.opencasesheader);
+				$('#pagination-info').text('');
+			}
+		} 
+		pagingAction(casesOptions['pageSize'], 0);
 		casesNodeId = node.find('#open-cases-table').attr('id');
 		formatColumnsAction = function(dataTable) {
 			$.each(dataTable.D, function(index, value) {
@@ -103,15 +128,23 @@ var View = (function() {
 	};
 
 	inner.closedCases = function() {
-		var closedCasesTotal = RequestModule.getClosedCasesTotal();
-		if (closedCasesTotal){
-			$('#closed-cases-header').text(texts.closedcasesheader + ' (' + closedCasesTotal.index.total + ')');
-		} else {
-			$('#closed-cases-header').text(texts.closedcasesheader);
-		}
 		caseNodeId = 'closed-case';
 		var node = clone('closed-cases');
 		displayView(node);
+		var closedCasesTotal = setupCasesTotal(RequestModule.getClosedCasesTotal());
+		pagingAction = function (pageSize, pageIndex, callback) {
+			var from = parseInt(pageSize)*(parseInt(pageIndex))+1;
+			var to = from+parseInt(pageSize)-1;
+			if (casesTotal){
+				to = casesTotal<to ? casesTotal : to;
+				$('#closed-cases-header').text(texts.closedcasesheader + ' (' + closedCasesTotal + texts.totalcasespiecesheader + ')');
+				$('#pagination-info').text(replacePlaceholdersInTranslatedString(texts.labelpaginationinfo, from, to, casesTotal));
+			} else {
+				$('#closed-cases-header').text(texts.closedcasesheader);
+				$('#pagination-info').text('');
+			}
+		} 
+		pagingAction(casesOptions['pageSize'], 0);
 		casesNodeId = node.find('#closed-cases-table').attr('id');
 		formatColumnsAction = function(dataTable) {
 			$.each(dataTable.D, function (index, value) {
@@ -137,6 +170,16 @@ var View = (function() {
 		};
 		google.load('visualization', '1', {'callback' : buildCases, 'packages' : ['table']});
 	};
+	
+	/*
+	 * Replaces the '{#}' placeholders in a translation string
+	 * with the submitted arguments in order. */
+	function replacePlaceholdersInTranslatedString(targetString) {
+		$.each(arguments, function(index, value) {
+			targetString = targetString.replace('{' + index + '}', value);
+		});
+		return targetString;
+	}
 	
 	function selectionHandler(row, dataTable) {
 		if (row === undefined) {
@@ -171,7 +214,7 @@ var View = (function() {
 		var query = new google.visualization.Query(UrlModule
 				.getCasesDataSource());
 		var tableQueryWrapper = new TableQueryWrapper(table, query, casesOptions,
-				selectionHandler, formatColumnsAction);
+				selectionHandler, formatColumnsAction, pagingAction);
 		tableQueryWrapper.sendAndDraw();
 	}
 

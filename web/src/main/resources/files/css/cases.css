@@ -18,8 +18,12 @@
 /* Cases view */
 form.cases-paging { margin-bottom: 2px; }
 .cases-view { margin-bottom: 10px; }
+.ui-widget div div.google-visualization-table-div-page { float: left; }
+div#pagination { float: left; margin-top: 7px; margin-left: 10px; margin-bottom: 15px; }
 
 /* Case details */
+.case-details { clear: both; }
+
 label.detail-label { float: left; padding-right: 10px; color: #aaaaaa; width: 15%; }
 	label.detail-label.first { clear: both; }
 	label.detail-label.single {	width: 100%; clear: both; margin-top: 15px; }
