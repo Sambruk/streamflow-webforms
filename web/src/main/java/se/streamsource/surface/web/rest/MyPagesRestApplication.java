@@ -32,8 +32,8 @@ import org.restlet.routing.Filter;
 import org.restlet.routing.Router;
 import org.restlet.routing.Template;
 
-import se.streamsource.surface.web.MyPagesWebAssembler;
 import se.streamsource.surface.web.application.security.AuthenticationFilter;
+import se.streamsource.surface.web.assembler.MyPagesWebAssembler;
 import se.streamsource.surface.web.rest.TextsRestlet;
 
 /**

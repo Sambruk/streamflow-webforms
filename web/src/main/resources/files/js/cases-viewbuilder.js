@@ -85,14 +85,15 @@ var View = (function() {
 	
 	function setupCasesTotal(casesTotalJson) {
 		casesTotal = casesTotalJson.table.rows.length;
+		casesOptions['rowsTotal'] = casesTotal;
 		return casesTotal;
 	}
 
 	inner.openCases = function() {
+		var openCasesTotal = setupCasesTotal(RequestModule.getOpenCasesTotal());
 		caseNodeId = 'open-case';
 		var node = clone('open-cases');
 		displayView(node);
-		var openCasesTotal = setupCasesTotal(RequestModule.getOpenCasesTotal());
 		pagingAction = function (pageSize, pageIndex, callback) {
 			var from = parseInt(pageSize)*(parseInt(pageIndex))+1;
 			var to = from+parseInt(pageSize)-1;
@@ -196,7 +197,7 @@ var View = (function() {
 		// Call PersistModule
 		PersistModule.getCasesPageSize(function(ok, val) {
 			if (ok) {
-				casesOptions['pageSize'] = val;
+				casesOptions['pageSize'] = parseInt(val);
 				// $('.cases-paging select').find('*').removeAttr('selected');
 				$('.cases-paging select option.' + val).attr('selected',
 						'selected');

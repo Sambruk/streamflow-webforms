@@ -34,53 +34,58 @@
  * http://code.google.com/apis/visualization/documentation/reference.html#Query
  */
 
-
 /**
- * Constructs a new table query wrapper for the specified query, container
- * and tableOptions.
- *
+ * Constructs a new table query wrapper for the specified query, container and
+ * tableOptions.
+ * 
  * Note: The wrapper clones the options object to adjust some of its properties.
- * In particular:
- *         sort {string} set to 'event'.
- *         page {string} set to 'event'.
- *         pageSize {Number} If number <= 0 set to 10.
- *         showRowNumber {boolean} set to true.
- *         firstRowNumber {number} set according to the current page.
- *         sortAscending {boolean} set according to the current sort.
- *         sortColumn {number} set according to the given sort.
+ * In particular: sort {string} set to 'event'. page {string} set to 'event'.
+ * pageSize {Number} If number <= 0 set to 10. showRowNumber {boolean} set to
+ * true. firstRowNumber {number} set according to the current page.
+ * sortAscending {boolean} set according to the current sort. sortColumn
+ * {number} set according to the given sort.
+ * 
  * @constructor
  */
-var TableQueryWrapper = function(table, query, options, selectionHandler, formatColumnsAction, pagingAction) {
+var TableQueryWrapper = function(table, query, options, selectionHandler,
+		formatColumnsAction, pagingAction) {
 
-//  this.table = new google.visualization.Table(container);
-  this.table = table;
-  this.query = query;
-  this.selectQueryClause = options['selectClause'];
-  this.sortQueryClause = '';
-  this.pageQueryClause = '';
-  this.currentDataTable = null;
-  this.formatColumnsAction = formatColumnsAction;
+	// this.table = new google.visualization.Table(container);
+	this.table = table;
+	this.query = query;
+	this.selectQueryClause = options['selectClause'];
+	this.sortQueryClause = '';
+	this.pageQueryClause = '';
+	this.currentDataTable = null;
+	this.formatColumnsAction = formatColumnsAction;
 
-  var self = this;
-  var addListener = google.visualization.events.addListener;
-  addListener(this.table, 'page', function(e) {self.handlePage(e, selectionHandler, pagingAction);});
-  addListener(this.table, 'sort', function(e) {self.handleSort(e, selectionHandler);});
-  addListener(this.table, 'select', function(e) {self.handleSelect(selectionHandler);});
-  
-  options = options || {};
-  options = TableQueryWrapper.clone(options);
+	var self = this;
+	var addListener = google.visualization.events.addListener;
+	addListener(this.table, 'page', function(e) {
+		self.handlePage(e, selectionHandler, pagingAction);
+	});
+	addListener(this.table, 'sort', function(e) {
+		self.handleSort(e, selectionHandler);
+	});
+	addListener(this.table, 'select', function(e) {
+		self.handleSelect(selectionHandler);
+	});
 
-  options['sort'] = 'event';
-  options['page'] = 'event';
-  options['showRowNumber'] = true;
-  var buttonConfig = 'pagingButtonsConfiguration';
-  options[buttonConfig] = options[buttonConfig] || 'both';
-  options['pageSize'] = (options['pageSize'] > 0) ? options['pageSize'] : 5;
-  this.pageSize = options['pageSize'];
-  this.hideColumns = options['hideColumns'];
-  this.tableOptions = options;
-  this.currentPageIndex = 0;
-  this.setPageQueryClause(0);
+	options = options || {};
+	options = TableQueryWrapper.clone(options);
+
+	options['sort'] = 'event';
+	options['page'] = 'event';
+	options['showRowNumber'] = true;
+	var buttonConfig = 'pagingButtonsConfiguration';
+	options[buttonConfig] = options[buttonConfig] || 'both';
+	options['pageSize'] = (options['pageSize'] > 0) ? options['pageSize'] : 5;
+	this.pageSize = options['pageSize'];
+	this.rowsTotal = options['rowsTotal'];
+	this.hideColumns = options['hideColumns'];
+	this.tableOptions = options;
+	this.currentPageIndex = 0;
+	this.setPageQueryClause(0);
 };
 
 /**
@@ -89,37 +94,41 @@ var TableQueryWrapper = function(table, query, options, selectionHandler, format
  * be redrawn upon each refresh.
  */
 TableQueryWrapper.prototype.sendAndDraw = function() {
-  this.query.abort();
-  var queryClause = this.selectQueryClause + ' ' + this.sortQueryClause + ' ' + this.pageQueryClause;
-  this.query.setQuery(queryClause);
-  this.table.setSelection([]);
-  var self = this;
-  this.query.send(function(response) {self.handleResponse(response);});
+	this.query.abort();
+	var queryClause = this.selectQueryClause + ' ' + this.sortQueryClause + ' '
+			+ this.pageQueryClause;
+	this.query.setQuery(queryClause);
+	this.table.setSelection([]);
+	var self = this;
+	this.query.send(function(response) {
+		self.handleResponse(response);
+	});
 };
 
-TableQueryWrapper.prototype.getDataTable = function () {
+TableQueryWrapper.prototype.getDataTable = function() {
 	return this.currentDataTable;
 };
 
 /** Handles the query response after a send returned by the data source. */
 TableQueryWrapper.prototype.handleResponse = function(response) {
-  this.currentDataTable = null;
-  if (response.isError()) {
-//    google.visualization.errors.addError(this.container, response.getMessage(),
-//        response.getDetailedMessage(), {'showInTooltip': false});
-  } else {
-    this.currentDataTable = response.getDataTable();
-    var view = new google.visualization.DataView(this.currentDataTable);
-    view.hideColumns(this.hideColumns);
-    this.formatColumnsAction(this.currentDataTable);
-    this.table.draw(view, this.tableOptions);
-  }
+	this.currentDataTable = null;
+	if (response.isError()) {
+		// google.visualization.errors.addError(this.container,
+		// response.getMessage(),
+		// response.getDetailedMessage(), {'showInTooltip': false});
+	} else {
+		this.currentDataTable = response.getDataTable();
+		var view = new google.visualization.DataView(this.currentDataTable);
+		view.hideColumns(this.hideColumns);
+		this.formatColumnsAction(this.currentDataTable);
+		this.table.draw(view, this.tableOptions);
+	}
 };
 
 /** Handles a selection event and forwards the handling to external function. */
-TableQueryWrapper.prototype.handleSelect = function (selectionHandler) {
+TableQueryWrapper.prototype.handleSelect = function(selectionHandler) {
 	var selection = this.table.getSelection();
-	for (var i = 0; i < selection.length; i++) {
+	for ( var i = 0; i < selection.length; i++) {
 		var item = selection[i];
 		if (item.row != null) {
 			var value = this.currentDataTable.getValue(item.row, 1);
@@ -127,77 +136,80 @@ TableQueryWrapper.prototype.handleSelect = function (selectionHandler) {
 		}
 	}
 	// Handle unselections
-	if (selection.length <=0) {
+	if (selection.length <= 0) {
 		selectionHandler();
 	}
 };
 
 /** Handles a sort event with the given properties. Will page to page=0. */
 TableQueryWrapper.prototype.handleSort = function(properties, selectionHandler) {
-  var columnIndex = properties['column'];
-  var isAscending = properties['ascending'];
-  this.tableOptions['sortColumn'] = columnIndex;
-  this.tableOptions['sortAscending'] = isAscending;
-  // dataTable exists since the user clicked the table.
-  var colID = this.currentDataTable.getColumnId(columnIndex);
-  this.sortQueryClause = 'order by ' + colID + (!isAscending ? ' desc' : '');
-  // Calls sendAndDraw internally.
-  this.handlePage({'page': 0}, selectionHandler);
+	var columnIndex = properties['column'];
+	var isAscending = properties['ascending'];
+	this.tableOptions['sortColumn'] = columnIndex;
+	this.tableOptions['sortAscending'] = isAscending;
+	// dataTable exists since the user clicked the table.
+	var colID = this.currentDataTable.getColumnId(columnIndex);
+	this.sortQueryClause = 'order by ' + colID + (!isAscending ? ' desc' : '');
+	// Calls sendAndDraw internally.
+	this.handlePage({
+		'page' : 0
+	}, selectionHandler);
 };
 
-
 /** Handles a page event with the given properties. */
-TableQueryWrapper.prototype.handlePage = function(properties, selectionHandler, pagingAction) {
-  var localTableNewPage = properties['page']; // 1, -1 or 0
-  var newPage = 0;
-  if (localTableNewPage != 0) {
-    newPage = this.currentPageIndex + localTableNewPage;
-  }
-  if (this.setPageQueryClause(newPage)) {
-    this.sendAndDraw();
-    
-    // Handle unselections.
-    selectionHandler();
-    
-    // Handle paging
-    pagingAction(this.pageSize, newPage);
-  }
+TableQueryWrapper.prototype.handlePage = function(properties, selectionHandler,
+		pagingAction) {
+	var localTableNewPage = properties['page']; // 1, -1 or 0
+	var newPage = 0;
+	if (localTableNewPage != 0) {
+		newPage = this.currentPageIndex + localTableNewPage;
+	}
+	if (this.setPageQueryClause(newPage)) {
+		this.sendAndDraw();
+
+		// Handle unselections.
+		selectionHandler();
+
+		// Handle paging
+		pagingAction(this.pageSize, newPage);
+	}
 };
 
 /**
- * Sets the pageQueryClause and table options for a new page request.
- * In case the next page is requested - checks that another page exists
- * based on the previous request.
- * Returns true if a new page query clause was set, false otherwise.
+ * Sets the pageQueryClause and table options for a new page request. In case
+ * the next page is requested - checks that another page exists based on the
+ * previous request. Returns true if a new page query clause was set, false
+ * otherwise.
  */
 TableQueryWrapper.prototype.setPageQueryClause = function(pageIndex) {
-  var pageSize = this.pageSize;
+	var pageSize = this.pageSize;
 
-  if (pageIndex < 0) {
-    return false;
-  }
-  var dataTable = this.currentDataTable;
-  if ((pageIndex == this.currentPageIndex + 1) && dataTable) {
-	  var numRows = dataTable.getNumberOfRows(); 
-    if (numRows <= pageSize) {
-      return false;
-    }
-  }
-  this.currentPageIndex = pageIndex;
-  var newStartRow = this.currentPageIndex * pageSize;
-  // Get the pageSize + 1 so that we can know when the last page is reached.
-  this.pageQueryClause = 'limit ' + (pageSize + 1) + ' offset ' + newStartRow;
-  // Note: row numbers are 1-based yet dataTable rows are 0-based.
-  this.tableOptions['firstRowNumber'] = newStartRow + 1;
-  return true;
+	if (pageIndex < 0) {
+		return false;
+	}
+	var dataTable = this.currentDataTable;
+	if ((pageIndex == this.currentPageIndex + 1) && dataTable) {
+		var numRows = dataTable.getNumberOfRows();
+//		if (numRows <= pageSize) {
+		if (this.rowsTotal <= pageSize) {
+			return false;
+		}
+	}
+	this.currentPageIndex = pageIndex;
+	var newStartRow = this.currentPageIndex * pageSize;
+	// Get the pageSize + 1 so that we can know when the last page is reached.
+//	this.pageQueryClause = 'limit ' + (pageSize + 1) + ' offset ' + newStartRow;
+	this.pageQueryClause = 'limit ' + pageSize + ' offset ' + newStartRow;
+	// Note: row numbers are 1-based yet dataTable rows are 0-based.
+	this.tableOptions['firstRowNumber'] = newStartRow + 1;
+	return true;
 };
-
 
 /** Performs a shallow clone of the given object. */
 TableQueryWrapper.clone = function(obj) {
-  var newObj = {};
-  for (var key in obj) {
-    newObj[key] = obj[key];
-  }
-  return newObj;
+	var newObj = {};
+	for ( var key in obj) {
+		newObj[key] = obj[key];
+	}
+	return newObj;
 };

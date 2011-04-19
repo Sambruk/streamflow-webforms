@@ -129,11 +129,12 @@ public class SurfaceWebAssembler
               identifiedBy("streamflowproxy").
               taggedWith("streamflow").
               instantiateOnStartup();
-      proxyModule.services(ProxyService.class).
-              visibleIn(Visibility.application).
-              identifiedBy("eidproxy").
-              taggedWith("eid").
-              instantiateOnStartup();
+
+//      proxyModule.services(ProxyService.class).
+//              visibleIn(Visibility.application).
+//              identifiedBy("eidproxy").
+//              taggedWith("eid").
+//              instantiateOnStartup();
 
       proxyModule.services(ClientService.class).
               identifiedBy("client").

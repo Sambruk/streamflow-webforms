@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package se.streamsource.surface.web;
+package se.streamsource.surface.web.assembler;
 
 import java.util.prefs.Preferences;
 
