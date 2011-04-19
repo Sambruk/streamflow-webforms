@@ -22,25 +22,25 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
-    <servlet>
-        <servlet-name>MyPagesServlet</servlet-name>
-        <servlet-class>org.restlet.ext.servlet.ServerServlet</servlet-class>
-        <init-param>
-            <param-name>org.restlet.component</param-name>
-            <param-value>se.streamsource.surface.web.rest.MyPagesComponent</param-value>
-        </init-param>
-        <load-on-startup>2</load-on-startup>
-    </servlet>
+<!--     <servlet> -->
+<!--         <servlet-name>MyPagesServlet</servlet-name> -->
+<!--         <servlet-class>org.restlet.ext.servlet.ServerServlet</servlet-class> -->
+<!--         <init-param> -->
+<!--             <param-name>org.restlet.component</param-name> -->
+<!--             <param-value>se.streamsource.surface.web.rest.MyPagesComponent</param-value> -->
+<!--         </init-param> -->
+<!--         <load-on-startup>2</load-on-startup> -->
+<!--     </servlet> -->
 
 	<servlet-mapping>
 		<servlet-name>SurfaceServlet</servlet-name>
 		<url-pattern>/*</url-pattern>
 	</servlet-mapping>
 
-    <servlet-mapping>
-        <servlet-name>MyPagesServlet</servlet-name>
-        <url-pattern>/mypages/*</url-pattern>
-    </servlet-mapping>
+<!--     <servlet-mapping> -->
+<!--         <servlet-name>MyPagesServlet</servlet-name> -->
+<!--         <url-pattern>/mypages/*</url-pattern> -->
+<!--     </servlet-mapping> -->
 
 	<session-config>
 		<session-timeout>30</session-timeout>

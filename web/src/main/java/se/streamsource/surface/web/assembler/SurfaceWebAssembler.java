@@ -124,19 +124,19 @@ public class SurfaceWebAssembler
    {
       ModuleAssembly proxyModule = appLayer.module("Proxy");
 
-      proxyModule.services(ProxyService.class).
+      proxyModule.addServices(ProxyService.class).
               visibleIn(Visibility.application).
               identifiedBy("streamflowproxy").
               taggedWith("streamflow").
               instantiateOnStartup();
 
-//      proxyModule.services(ProxyService.class).
-//              visibleIn(Visibility.application).
-//              identifiedBy("eidproxy").
-//              taggedWith("eid").
-//              instantiateOnStartup();
+      proxyModule.addServices(ProxyService.class).
+              visibleIn(Visibility.application).
+              identifiedBy("eidproxy").
+              taggedWith("eid").
+              instantiateOnStartup();
 
-      proxyModule.services(ClientService.class).
+      proxyModule.addServices(ClientService.class).
               identifiedBy("client").
               instantiateOnStartup().
               visibleIn(Visibility.application);

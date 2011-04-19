@@ -44,7 +44,12 @@ public class SurfaceResourceAssembler
       module.objects(
               IndexRestlet.class,
               StreamflowProxyRestlet.class,
-              EidProxyRestlet.class
+              EidProxyRestlet.class,
+              CasesRestlet.class,
+              LoginRestlet.class,
+              ProfileRestlet.class,
+              TextsRestlet.class,
+              FakeRestlet.class
       );
 
       module.objects(CookieResponseHandler.class, AttachmentResponseHandler.class).visibleIn( Visibility.layer );

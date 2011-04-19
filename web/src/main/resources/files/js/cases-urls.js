@@ -22,7 +22,7 @@ var UrlModule = (function () {
    
     var urls = {
     	proxy: 		"proxy/",
-        mypages:    "surface/mypages/",
+        mypages:    "surface/",
 	    eid:        "eidproxy/"
     };
 

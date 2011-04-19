@@ -34,11 +34,11 @@ import se.streamsource.surface.web.resource.SurfaceRestlet;
 
 import java.util.logging.Logger;
 
-public class SurfaceRestApplication
-   extends Application
+public class SurfaceRestApplication extends Application
 {
 
-   public static final MediaType APPLICATION_SPARQL_JSON = new MediaType( "application/sparql-results+json", "SPARQL JSON" );
+   public static final MediaType APPLICATION_SPARQL_JSON = new MediaType( "application/sparql-results+json",
+         "SPARQL JSON" );
 
    @Structure
    ObjectBuilderFactory factory;
@@ -53,7 +53,6 @@ public class SurfaceRestApplication
       getMetadataService().addExtension( "srj", APPLICATION_SPARQL_JSON );
 
    }
-
 
    Thread shutdownHook = new Thread()
    {
@@ -80,19 +79,22 @@ public class SurfaceRestApplication
       Restlet cqr = factory.newObjectBuilder( SurfaceRestlet.class ).use( getContext() ).newInstance();
       StreamflowProxyRestlet proxyRestlet = factory.newObject( StreamflowProxyRestlet.class );
       EidProxyRestlet eidProxyRestlet = factory.newObject( EidProxyRestlet.class );
-      IndexRestlet indexRestlet = factory.newObject(IndexRestlet.class);
+      IndexRestlet indexRestlet = factory.newObject( IndexRestlet.class );
       surfaceRouter.attachDefault( indexRestlet );
       surfaceRouter.attach( "/eidproxy", eidProxyRestlet, Template.MODE_STARTS_WITH );
       surfaceRouter.attach( "/proxy", proxyRestlet, Template.MODE_STARTS_WITH );
       surfaceRouter.attach( "/surface", new ExtensionMediaTypeFilter( getContext(), cqr ), Template.MODE_STARTS_WITH );
-      surfaceRouter.attach( "/texts", new TextsRestlet());
+      surfaceRouter.attach( "/texts", new TextsRestlet() );
       surfaceRouter.attach( "/static", new Directory( getContext(), "clap://thread/files/" ) );
+      surfaceRouter.attach( "/login", factory.newObject( LoginRestlet.class ), Template.MODE_STARTS_WITH );
+      surfaceRouter.attach( "/cases", new CasesRestlet(), Template.MODE_EQUALS );
+      surfaceRouter.attach( "/profile", new ProfileRestlet(), Template.MODE_STARTS_WITH );
+      surfaceRouter.attach( "/fake", new FakeRestlet(), Template.MODE_EQUALS );
 
-      getTunnelService().setLanguageParameter("locale");
+      getTunnelService().setLanguageParameter( "locale" );
 
       return surfaceRouter;
    }
-
 
    @Override
    public void start() throws Exception
@@ -105,7 +107,8 @@ public class SurfaceRestApplication
 
          app.activate();
 
-         app.findModule( "Web", "REST" ).objectBuilderFactory().newObjectBuilder( SurfaceRestApplication.class ).injectTo( this );
+         app.findModule( "Web", "REST" ).objectBuilderFactory().newObjectBuilder( SurfaceRestApplication.class )
+               .injectTo( this );
 
          Runtime.getRuntime().addShutdownHook( shutdownHook );
 
@@ -127,6 +130,5 @@ public class SurfaceRestApplication
 
       Runtime.getRuntime().removeShutdownHook( shutdownHook );
    }
-
 
 }
