@@ -63,9 +63,8 @@ var View = (function() {
 		'showRowNumber' : true,
 		'allowHtml' : true,
 		'cssClassNames' : caseHistoryCssClasses, 
-		'sortColumn': 2,
-		'sortAscending': false,
-		'hideColumns' : [ 0 ]
+		'sortColumn': 1,
+		'sortAscending': false
 	};
 
 	inner.error = function(message) {
@@ -296,16 +295,15 @@ var View = (function() {
 		var historyFormatColumnsAction = function(dataTable) {
 			$.each(dataTable.D, function(index, value) {
 				// Date formatting
-				dataTable.setFormattedValue(index, 2,
-						formatDate(utcStringToDate(value.c[2].v)));
+				dataTable.setFormattedValue(index, 1,
+						formatDate(utcStringToDate(value.c[1].v)));
 
 				// Case status translation
-				dataTable.setFormattedValue(index, 1, translateHistoryMessage(value.c[1].v));
+				dataTable.setFormattedValue(index, 0, translateHistoryMessage(value.c[0].v));
 			});
 			// Table Column Translations
-			dataTable.setColumnLabel(0, texts.columnlabelsender);
-			dataTable.setColumnLabel(1, texts.columnlabelmessage);
-			dataTable.setColumnLabel(2, texts.columnlabelcreated);
+			dataTable.setColumnLabel(0, texts.columnlabelmessage);
+			dataTable.setColumnLabel(1, texts.columnlabelcreated);
 		};
 
 		// Create the history data table.
