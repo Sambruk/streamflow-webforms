@@ -27,7 +27,7 @@ div#pagination { float: left; margin-top: 7px; margin-left: 10px; margin-bottom:
 label.detail-label { float: left; padding-right: 10px; color: #aaaaaa; width: 15%; }
 	label.detail-label.first { clear: both; }
 	label.detail-label.single {	width: 100%; clear: both; margin-top: 15px; }
-	label.detail-value.single { margin-top: none; }
+	label.detail-value.single { margin-top: 0px; }
 	label#history-label { margin-top: 15px; }
 	label#description-label.detail-label { float: left; clear: both; margin-top: 10px; width: 100%; color: #aaaaaa; }
 	

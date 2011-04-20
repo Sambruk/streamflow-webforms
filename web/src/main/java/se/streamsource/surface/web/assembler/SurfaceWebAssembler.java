@@ -24,6 +24,8 @@ import org.qi4j.entitystore.memory.MemoryEntityStoreService;
 import org.qi4j.entitystore.prefs.PreferencesEntityStoreInfo;
 import org.qi4j.entitystore.prefs.PreferencesEntityStoreService;
 import org.qi4j.library.jmx.JMXAssembler;
+
+import se.streamsource.dci.restlet.client.ClientAssembler;
 import se.streamsource.surface.web.proxy.ProxyConfiguration;
 import se.streamsource.surface.web.proxy.ProxyService;
 import se.streamsource.surface.web.rest.ClientConfiguration;
@@ -118,6 +120,8 @@ public class SurfaceWebAssembler
       new SurfaceRestAssembler().assemble(restModule);
       new SurfaceResourceAssembler().assemble(restModule);
       new ContextsAssembler().assemble(restModule);
+      new ClientAssembler().assemble( restModule );
+
    }
 
    private void assembleAppLayer(LayerAssembly appLayer) throws AssemblyException
