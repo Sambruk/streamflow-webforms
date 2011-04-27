@@ -60,7 +60,7 @@ var View = (function() {
 	};
 
 	var caseHistoryOptions = {
-		'showRowNumber' : true,
+		'showRowNumber' : false,
 		'allowHtml' : true,
 		'cssClassNames' : caseHistoryCssClasses, 
 		'sortColumn': 1,

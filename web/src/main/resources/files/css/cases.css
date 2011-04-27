@@ -34,6 +34,7 @@ label.detail-label { float: left; padding-right: 10px; color: #aaaaaa; width: 15
 label.detail-value { float: left; padding-right: 10px; width: 15%; }
 	label.detail-value.first { clear: both; }
 	label#description-value.detail-value { clear: both; float: left; width: 100%; }
+	label#project-value.detail-value { width: 50%; }
 	
 #case-history { clear: both; }
 #case-history-table { clear: both; }

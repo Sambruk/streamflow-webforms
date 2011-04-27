@@ -112,7 +112,7 @@ streamsource.mypages.profile.Form = (function() {
 		
 		legendElm = phoneFieldset.getElementsByTagName('legend');
 		if ( legendElm ) {
-			legendElm[0].innerHTML = texts.labelphonenumbers;
+			legendElm[0].innerHTML = texts.labelphones;
 		}
 		
 		createTextInput('phone', texts.labelphone, phonenumber.phoneNumber, phoneFieldset);
@@ -199,7 +199,7 @@ streamsource.mypages.profile.Form = (function() {
 		
 //		$('button', formElement).html('Uppdatera').bind('click', buttonClicked);				
 		containerElement.appendChild(formElement);
-		
+		$('#profile-header').text(texts.labelprofileheader);
 		$('#profile_submit submit_text').text(texts.labelupdate);
 		$('#profile_submit').click(buttonClicked);	
 	}

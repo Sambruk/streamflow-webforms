@@ -191,7 +191,7 @@ TableQueryWrapper.prototype.setPageQueryClause = function(pageIndex) {
 	if ((pageIndex == this.currentPageIndex + 1) && dataTable) {
 		var numRows = dataTable.getNumberOfRows();
 //		if (numRows <= pageSize) {
-		if (this.rowsTotal <= pageSize) {
+		if (this.rowsTotal <= pageSize*pageIndex) {
 			return false;
 		}
 	}
