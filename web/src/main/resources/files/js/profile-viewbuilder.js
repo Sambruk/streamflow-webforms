@@ -21,6 +21,7 @@ streamsource.mypages.profile.Form = (function() {
 	var inner = {};
 	var TEMPLATE_ELEMENT_ID = 'components';
 	var PROFILE_FORM_CLASS = 'mypages_profile_form';
+	var PROFILE_FORM_ID = 'profile_form';
 	
 	function getRequest() {
 		return streamsource.mypages.profile.Request;
@@ -150,7 +151,7 @@ streamsource.mypages.profile.Form = (function() {
 		}
 		
 		createTextInput('address', texts.labeladdress, address.address, addressFieldset);
-		createTextInput('zipcode', texts.labelzipcode, address.zipCode, addressFieldset);
+		createTextInput('zipCode', texts.labelzipcode, address.zipCode, addressFieldset);
 		createTextInput('city', texts.labelcity, address.city,addressFieldset);				
 		createTextInput('region', texts.labelregion, address.region, addressFieldset);				
 		createTextInput('country', texts.labelcountry, address.country, addressFieldset);
@@ -178,6 +179,7 @@ streamsource.mypages.profile.Form = (function() {
 		
 		selector = "form." + PROFILE_FORM_CLASS; 
 		formElement = cloneElement(sourceElement, selector);
+		formElement.id = PROFILE_FORM_ID;
 		
 		fieldSet = formElement.getElementsByTagName('fieldset');
 		for( i = 0; i < fieldSet.length; i++ ) {
@@ -212,20 +214,37 @@ streamsource.mypages.profile.Form = (function() {
 			event.preventDefault();
 		}
 		
-		emailJSON = extractEmails()[0];
-		getRequest().update(emailJSON, function(response, status) {
+//		profileJSON = buildProfileJSON();
+//		$(.mypages_profile_form).serialize()
+		getRequest().update($("#profile_form").serialize(), function (response, status) {
+			// Notify user of successful save! (or error)
 			;
 		});
+	}
+
+	function buildProfileJSON() {
+		emailJSON = extractEmails()[0];
+//		getRequest().update(emailJSON, function(response, status) {
+//			;
+//		});
 		
 		phoneJSON = extractPhonenumbers()[0];
-		getRequest().update(phoneJSON, function(response, status){
-			;
-		});
+//		getRequest().update(phoneJSON, function(response, status){
+//			;
+//		});
 						
 		addressJSON = extractAddresses()[0];
-		getRequest().update(addressJSON, function(response, status){
-			;
-		});				
+//		getRequest().update(addressJSON, function(response, status){
+//			;
+//		});		
+		
+		profileJSON = getRequest().profileJSON();
+		profileJSON.emailAddresses[0] = emailJSON = extractEmails()[0];
+		profileJSON.phoneNumbers[0] = emailJSON = extractPhonenumbers()[0];
+		profileJSON.addresses[0] = emailJSON = extractAddresses()[0];
+		
+		return profileJSON;
+		
 	}
 	
 	// Data extraction functions
@@ -258,7 +277,7 @@ streamsource.mypages.profile.Form = (function() {
 	function extractAddresses() {
 		result = getRequest().addressJSON();
 		result.address = $("#address").attr('value');
-		result.zipCode = $("#zipcode").attr('value');
+		result.zipCode = $("#zipCode").attr('value');
 		result.city = $("#city").attr("value");
 		result.region = $("#region").attr("value");
 		result.country = $("#country").attr("value");

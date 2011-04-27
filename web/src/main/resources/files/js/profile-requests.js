@@ -27,7 +27,25 @@ streamsource.mypages.profile.Request = (function() {
 	}
 	
 	/*
-	 * Creates and return an empty email JSON structure
+	 *  Creates and returns an empty profile JSON structure.
+	 */
+	inner.profileJSON = function () {
+		result = {
+				"addresses":[],
+				"company":null,
+				"contactId":_userId,
+				"emailAddresses":[],
+				"isCompany":false, 
+				"name":null,
+				"note":null,
+				"phoneNumbers":[],
+				"picture":null
+		};
+		return result;
+	}
+	
+	/*
+	 * Creates and returns an empty email JSON structure.
 	 */
 	inner.emailJSON = function() {
 		result = {
@@ -38,7 +56,7 @@ streamsource.mypages.profile.Request = (function() {
 	}
 	
 	/*
-	 * Create and returns an empty phone number JSON structure
+	 * Create and returns an empty phone number JSON structure.
 	 */
 	inner.phonenumberJSON = function() {
 		result = {
@@ -49,7 +67,7 @@ streamsource.mypages.profile.Request = (function() {
 	}
 	
 	/*
-	 * Create and returns an emtpy address JSON structure
+	 * Create and returns an emtpy address JSON structure.
 	 */
 	inner.addressJSON = function() {
 		result = {
@@ -73,7 +91,7 @@ streamsource.mypages.profile.Request = (function() {
 	/*
 	 * Retrieves the profile data for the specified
 	 * user id and calls the specified callback with 
-	 * the retrieved data, i.e. user profile JSON structure
+	 * the retrieved data, i.e. user profile JSON structure.
 	 */
 	inner.get = function(callback) {
 		url = streamsource.mypages.profile.Url.profileUrl(_userId, '/index.json');
@@ -82,22 +100,10 @@ streamsource.mypages.profile.Request = (function() {
 	
 	
 	/*
-	 * Updates the profile for the current user
+	 * Updates the profile for the current user.
 	 */
 	inner.update = function(profileData, callback) {
-		// Depending on what we find in the json dict
-		// select an endpoint/command
-		command = null;
-		if ( profileData ) {
-			if ( 'emailAddress' in profileData )
-				command = 'changeemailaddress';
-			else if ( 'phoneNumber' in profileData )
-				command = 'changephonenumber';
-			else if ( 'zipCode' in profileData )
-				command = 'changeaddress';
-		}
-		
-		url = streamsource.mypages.profile.Url.profileUrl(_userId, '/'+command);				
+		url = streamsource.mypages.profile.Url.profileUrl(_userId, '/' + 'update');				
 		$.post(url, profileData, callback);
 	}						
 	return inner;

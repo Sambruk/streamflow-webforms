@@ -23,7 +23,7 @@ streamsource.mypages.profile.Url = (function() {
 	var inner = {};
 	
 	var urls = {
-			proxy: '/surface/mypages/proxy'					
+			proxy: '/surface/proxy'					
 	};
 		
 	inner.profileUrl = function(userId, resource) {

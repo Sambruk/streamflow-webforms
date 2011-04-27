@@ -49,7 +49,6 @@ public class CasesRestlet extends Restlet
    {
       super.handle(request, response);
 
-//      String accessPointId = request.getResourceRef().getQueryAsForm().getFirstValue("ap");
       String contactId = "197507212475"; //TODO: FIX!
 
       if (contactId != null)
@@ -67,8 +66,7 @@ public class CasesRestlet extends Restlet
          }
       } else
       {
-         response.setLocationRef(new Reference(request.getResourceRef(), "/surface/surface/accesspoints/index"));
-         response.setStatus(Status.REDIRECTION_TEMPORARY);
+         // What to do? 
       }
    }
 

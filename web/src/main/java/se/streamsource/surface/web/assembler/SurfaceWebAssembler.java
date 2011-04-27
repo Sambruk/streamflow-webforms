@@ -17,21 +17,29 @@
 
 package se.streamsource.surface.web.assembler;
 
+import java.util.prefs.Preferences;
+
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.structure.Application;
-import org.qi4j.bootstrap.*;
+import org.qi4j.bootstrap.ApplicationAssembler;
+import org.qi4j.bootstrap.ApplicationAssembly;
+import org.qi4j.bootstrap.ApplicationAssemblyFactory;
+import org.qi4j.bootstrap.AssemblyException;
+import org.qi4j.bootstrap.LayerAssembly;
+import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.entitystore.memory.MemoryEntityStoreService;
 import org.qi4j.entitystore.prefs.PreferencesEntityStoreInfo;
 import org.qi4j.entitystore.prefs.PreferencesEntityStoreService;
 import org.qi4j.library.jmx.JMXAssembler;
 
 import se.streamsource.dci.restlet.client.ClientAssembler;
+import se.streamsource.surface.web.mypages.MyPagesConfiguration;
+import se.streamsource.surface.web.mypages.MyPagesFilter;
+import se.streamsource.surface.web.mypages.MyPagesFilterService;
 import se.streamsource.surface.web.proxy.ProxyConfiguration;
 import se.streamsource.surface.web.proxy.ProxyService;
 import se.streamsource.surface.web.rest.ClientConfiguration;
 import se.streamsource.surface.web.rest.ClientService;
-
-import java.util.prefs.Preferences;
 
 public class SurfaceWebAssembler
         implements ApplicationAssembler
@@ -84,7 +92,7 @@ public class SurfaceWebAssembler
    {
       ModuleAssembly module = configLayer.module("Configurations");
 
-      module.entities(ClientConfiguration.class, ProxyConfiguration.class).visibleIn(Visibility.application);
+      module.entities(ClientConfiguration.class, ProxyConfiguration.class, MyPagesConfiguration.class).visibleIn(Visibility.application);
 
       // Configuration store
       Application.Mode mode = module.layer().application().mode();
@@ -144,5 +152,13 @@ public class SurfaceWebAssembler
               identifiedBy("client").
               instantiateOnStartup().
               visibleIn(Visibility.application);
+
+      ModuleAssembly myPages = appLayer.module("My Pages");
+      
+      myPages.addServices( MyPagesFilterService.class ).
+              visibleIn(Visibility.application).
+              identifiedBy( "mypagesfilter" ).
+              taggedWith( "mypages" ).
+              instantiateOnStartup();
    }
 }

@@ -34,7 +34,7 @@ jQuery(document).ready(function()
 	}
 	
 	function setupUser() {
-		streamsource.mypages.profile.Request.setUser('197507212475');
+		streamsource.mypages.profile.Request.setUser(contactid);
 	}
 			
 //	$(window).hashchange( setupView );
