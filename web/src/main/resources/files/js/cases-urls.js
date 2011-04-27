@@ -27,9 +27,9 @@ var UrlModule = (function () {
     };
 
 //    var openCasesQuery = "select label caseid €rendeId,description,created,project,status,href";
-    var openCasesQuery = "select href,caseid,description,created,project,status";
-    var closedCasesQuery = "select href,caseid,description,created,project,closed,resolution";
-    var caseHistoryQuery = "select message,created order by created";
+    var openCasesQuery = "select href,caseid,description,created,project,status,lastupdated,lastmessage order by lastupdated desc";
+    var closedCasesQuery = "select href,caseid,description,created,project,closed,resolution order by closed desc";
+    var caseHistoryQuery = "select message,created order by created desc";
     var casesTotalQuery = "select description";
     var casesQuery = {};
 

@@ -40,12 +40,12 @@ var View = (function() {
 	};
 
 	var casesOptions = {
-		'showRowNumber' : true,
-		'allowHtml' : true,
-		'cssClassNames' : casesCssClasses,
-		'pageSize' : casesPageSize,
-		'hideColumns' : [ 0,3,4,5 ]
-	};
+			'showRowNumber' : true,
+			'allowHtml' : true,
+			'cssClassNames' : casesCssClasses,
+			'pageSize' : casesPageSize,
+			'sort' : 'disable'
+		};
 
 	// Adding support for jQuery UI and the portlet standard
 	var caseHistoryCssClasses = {
@@ -89,6 +89,7 @@ var View = (function() {
 	}
 
 	inner.openCases = function() {
+		casesOptions['hideColumns'] = [ 0,3,4,5 ];
 		var openCasesTotal = setupCasesTotal(RequestModule.getOpenCasesTotal());
 		caseNodeId = 'open-case';
 		var node = clone('open-cases');
@@ -112,9 +113,12 @@ var View = (function() {
 				// Date formatting
 				dataTable.setFormattedValue(index, 3,
 						formatDate(utcStringToDate(value.c[3].v)));
+				dataTable.setFormattedValue(index, 6,
+						formatDate(utcStringToDate(value.c[6].v)));
 
 				// Case status translation
 				dataTable.setFormattedValue(index, 5, translateCaseStatus(value.c[5].v));
+				dataTable.setFormattedValue(index, 7, translateHistoryMessage(value.c[7].v));
 			});
 			// Table Column Translations
 			dataTable.setColumnLabel(0, texts.columnlabelhref);
@@ -123,11 +127,14 @@ var View = (function() {
 			dataTable.setColumnLabel(3, texts.columnlabelcreated);
 			dataTable.setColumnLabel(4, texts.columnlabelproject);
 			dataTable.setColumnLabel(5, texts.columnlabelstatus);
+			dataTable.setColumnLabel(6, texts.columnlabellastupdated);
+			dataTable.setColumnLabel(7, texts.columnlabellastmessage);
 		};
 		google.load('visualization', '1', {'callback' : buildCases, 'packages' : ['table']});
 	};
 
 	inner.closedCases = function() {
+		casesOptions['hideColumns'] = [ 0,3,4 ];
 		caseNodeId = 'closed-case';
 		var node = clone('closed-cases');
 		displayView(node);
