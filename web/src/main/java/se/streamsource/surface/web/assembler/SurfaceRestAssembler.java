@@ -17,10 +17,17 @@
 
 package se.streamsource.surface.web.assembler;
 
+import org.qi4j.api.common.Visibility;
 import org.qi4j.bootstrap.Assembler;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
+
 import se.streamsource.dci.restlet.server.ResourceFinder;
+import se.streamsource.surface.web.application.security.HashService;
+import se.streamsource.surface.web.dto.UserInfoDTO;
+import se.streamsource.surface.web.mypages.MyPagesConfiguration;
+import se.streamsource.surface.web.mypages.MyPagesFilter;
+import se.streamsource.surface.web.mypages.MyPagesFilterService;
 import se.streamsource.surface.web.rest.SurfaceRestApplication;
 
 /**
@@ -30,7 +37,10 @@ public class SurfaceRestAssembler
 {
    public void assemble( ModuleAssembly module ) throws AssemblyException
    {
-      module.objects( SurfaceRestApplication.class,
-            ResourceFinder.class);
+      module.services( HashService.class );
+      module.objects( SurfaceRestApplication.class, 
+            ResourceFinder.class, MyPagesFilter.class);
+
+      module.values( UserInfoDTO.class );
    }
 }
