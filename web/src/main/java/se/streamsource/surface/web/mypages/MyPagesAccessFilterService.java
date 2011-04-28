@@ -32,15 +32,15 @@ import org.restlet.routing.Filter;
  * Proxy service that is used to stop calls to My Pages if My Pages is
  * configured to be disabled. Otherwise continue the filter chain.
  */
-@Mixins(MyPagesFilterService.Mixin.class)
-public interface MyPagesFilterService extends ServiceComposite, Activatable, Configuration<MyPagesConfiguration>, Availability
+@Mixins(MyPagesAccessFilterService.Mixin.class)
+public interface MyPagesAccessFilterService extends ServiceComposite, Activatable, Configuration<MyPagesAccessConfiguration>, Availability
 {
    public int beforeHandle(Request request, Response response);
 
-   abstract class Mixin implements Activatable, Availability, MyPagesFilterService
+   abstract class Mixin implements Activatable, Availability, MyPagesAccessFilterService
    {
       @This
-      Configuration<MyPagesConfiguration> config;
+      Configuration<MyPagesAccessConfiguration> config;
 
       public void activate() throws Exception
       {

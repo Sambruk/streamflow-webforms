@@ -28,12 +28,12 @@ import org.restlet.routing.Filter;
 /**
  * Interrupts the request if My Pages isn't enabled.
  */
-public class MyPagesFilter extends Filter
+public class MyPagesAccessFilter extends Filter
 {
    @Service
-   MyPagesFilterService filterService;
+   MyPagesAccessFilterService filterService;
   
-   public MyPagesFilter(@Uses Context context, @Uses Restlet next, @Uses MyPagesFilterService filterService)
+   public MyPagesAccessFilter(@Uses Context context, @Uses Restlet next, @Uses MyPagesAccessFilterService filterService)
    {
       super(context, next);
       this.filterService = filterService;

@@ -35,8 +35,8 @@ import org.restlet.routing.Template;
 
 import se.streamsource.dci.restlet.server.ExtensionMediaTypeFilter;
 import se.streamsource.surface.web.assembler.SurfaceWebAssembler;
-import se.streamsource.surface.web.mypages.MyPagesFilter;
-import se.streamsource.surface.web.mypages.MyPagesFilterService;
+import se.streamsource.surface.web.mypages.MyPagesAccessFilter;
+import se.streamsource.surface.web.mypages.MyPagesAccessFilterService;
 import se.streamsource.surface.web.resource.SurfaceRestlet;
 
 public class SurfaceRestApplication extends Application
@@ -45,7 +45,7 @@ public class SurfaceRestApplication extends Application
    public static final MediaType APPLICATION_SPARQL_JSON = new MediaType( "application/sparql-results+json",
          "SPARQL JSON" );
    @Service 
-   MyPagesFilterService filterService;
+   MyPagesAccessFilterService filterService;
    
    @Structure
    ObjectBuilderFactory factory;
@@ -96,7 +96,7 @@ public class SurfaceRestApplication extends Application
       surfaceRouter.attach( "/texts", new TextsRestlet() );
       surfaceRouter.attach( "/static", new Directory( getContext(), "clap://thread/files/" ) );
       
-      Filter mypagesFilter = factory.newObjectBuilder( MyPagesFilter.class ).use( getContext(), mypagesRouter, filterService ).newInstance(); 
+      Filter mypagesFilter = factory.newObjectBuilder( MyPagesAccessFilter.class ).use( getContext(), mypagesRouter, filterService ).newInstance(); 
 
       surfaceRouter.attach( "/mypages", mypagesFilter, Template.MODE_STARTS_WITH);
       mypagesRouter.attach( "/static", new Directory( getContext(), "clap://thread/files/" ) );

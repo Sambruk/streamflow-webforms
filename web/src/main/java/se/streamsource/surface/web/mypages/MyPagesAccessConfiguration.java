@@ -23,7 +23,7 @@ import org.qi4j.api.configuration.Enabled;
 /**
  * Configuration for my pages service
  */
-public interface MyPagesConfiguration
+public interface MyPagesAccessConfiguration
    extends ConfigurationComposite, Enabled
 { 
 }
