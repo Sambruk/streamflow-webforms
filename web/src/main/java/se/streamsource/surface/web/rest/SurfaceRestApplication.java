@@ -34,6 +34,7 @@ import org.restlet.routing.Router;
 import org.restlet.routing.Template;
 
 import se.streamsource.dci.restlet.server.ExtensionMediaTypeFilter;
+import se.streamsource.surface.web.application.security.AuthenticationFilter;
 import se.streamsource.surface.web.assembler.SurfaceWebAssembler;
 import se.streamsource.surface.web.mypages.MyPagesAccessFilter;
 import se.streamsource.surface.web.mypages.MyPagesAccessFilterService;
@@ -96,8 +97,9 @@ public class SurfaceRestApplication extends Application
       surfaceRouter.attach( "/texts", new TextsRestlet() );
       surfaceRouter.attach( "/static", new Directory( getContext(), "clap://thread/files/" ) );
       
-      Filter mypagesFilter = factory.newObjectBuilder( MyPagesAccessFilter.class ).use( getContext(), mypagesRouter, filterService ).newInstance(); 
-
+      Filter authenticationFilter = factory.newObjectBuilder( AuthenticationFilter.class ).use( getContext(), mypagesRouter ).newInstance(); 
+      Filter mypagesFilter = factory.newObjectBuilder( MyPagesAccessFilter.class ).use( getContext(), authenticationFilter , filterService ).newInstance(); 
+      
       surfaceRouter.attach( "/mypages", mypagesFilter, Template.MODE_STARTS_WITH);
       mypagesRouter.attach( "/static", new Directory( getContext(), "clap://thread/files/" ) );
       mypagesRouter.attach( "/texts", new TextsRestlet() );

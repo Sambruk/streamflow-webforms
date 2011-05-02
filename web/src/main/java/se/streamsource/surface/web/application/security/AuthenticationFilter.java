@@ -58,7 +58,7 @@ public class AuthenticationFilter extends Filter
       if ( cookies != null && cookies.size() > 0)
          cookieValue = cookies.get( 0 ).getValue();
 
-      if (Strings.empty( cookieValue ))
+      if (!Strings.empty( cookieValue ))
       {
          try
          {

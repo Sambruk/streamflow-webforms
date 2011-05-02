@@ -21,6 +21,7 @@ import org.qi4j.bootstrap.Assembler;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import se.streamsource.dci.restlet.server.ResourceFinder;
+import se.streamsource.surface.web.application.security.AuthenticationFilter;
 import se.streamsource.surface.web.application.security.HashService;
 import se.streamsource.surface.web.dto.UserInfoDTO;
 import se.streamsource.surface.web.mypages.MyPagesAccessFilter;
@@ -35,7 +36,7 @@ public class SurfaceRestAssembler
    {
       module.services(HashService.class);
       module.objects(SurfaceRestApplication.class,
-            ResourceFinder.class, MyPagesAccessFilter.class);
+            ResourceFinder.class, MyPagesAccessFilter.class, AuthenticationFilter.class);
 
       module.values(UserInfoDTO.class);
    }

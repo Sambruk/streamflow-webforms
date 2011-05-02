@@ -20,20 +20,18 @@
 <!-- Components goes here-->
 <h2 id="current_user"></h2>
 <div id="dialog-login" title="Login">
-	<p class="validateTips">All form fields are required.</p>
-	
-	<form>
-	<fieldset>
-		<label for="username">Username</label>
-		<input type="text" name="username" id="username" class="text ui-widget-content ui-corner-all" />
-		<label for="password">Password</label>
-		<input type="password" name="password" id="password" value="" class="text ui-widget-content ui-corner-all" />
-	</fieldset>
+	<p>You are required to login. Please select eId provider</p>
+	<form method="POST" id="LogonForm" name="LogonForm" action="validatebankidauthentication">
+		<input type="HIDDEN" name="signature" value="">
+		<input type="HIDDEN" name="action" value="login">
 	</form>
 </div>
+
 <div id="dialog-message" title="Unauthorized">
 	<p>
 		<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 50px 0;"></span>
 		Invalid credentials, pleas try again
 	</p>
 </div>
+
+<a href="#" id="eid_provider_link" class="eid_provder"></a>
