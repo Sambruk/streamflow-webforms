@@ -9,6 +9,8 @@ import org.restlet.Uniform;
 import org.restlet.data.Form;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
+import org.restlet.data.Status;
+import org.restlet.resource.ResourceException;
 
 /**
  * TODO
@@ -25,6 +27,12 @@ public class AuthenticateRestlet
    {
       super.handle(request, response);
 
+      Form query = request.getResourceRef().getQueryAsForm();
+      String provider = query.getFirstValue("provider");
+
+      if (provider == null)
+         throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Missing provider query parameter");
+
       Form headers = (Form) request.getAttributes().get("org.restlet.http.headers");
 
       String cert = headers.getFirstValue("SSL_CLIENT_CERT");
@@ -33,7 +41,7 @@ public class AuthenticateRestlet
 
       Form certForm = new Form();
       certForm.set("certificate", cert);
-      certForm.set("provider", "netmaker-netid_4");
+      certForm.set("provider", provider);
       Request certRequest = new Request(Method.POST, new Reference("/authentication/verify"), certForm.getWebRepresentation());
       proxyService.handle(certRequest, response);
    }
