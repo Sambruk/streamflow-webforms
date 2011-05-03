@@ -39,7 +39,7 @@ jQuery(document).ready(function()
 			
 //	$(window).hashchange( setupView );
 	
-	$("#components").load("static/profile-components.html", function() {
+	$("#components").load("/surface/mypages/static/profile-components.html", function() {
 		try {
 			Contexts.init(contexts);
 			setupView();

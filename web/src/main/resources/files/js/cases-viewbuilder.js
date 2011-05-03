@@ -426,9 +426,10 @@ var View = (function() {
 
 			if (e.redirect) {
 				redirect(e.redirect);
-			} else {
-				redirect(getSummary());
-			}
+			} 
+//			else {
+//				redirect(getSummary());
+//			}
 		}
 	};
 
