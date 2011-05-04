@@ -310,7 +310,7 @@ var View = (function() {
 			});
 			// Table Column Translations
 			dataTable.setColumnLabel(0, texts.columnlabelmessage);
-			dataTable.setColumnLabel(1, texts.columnlabelcreated);
+			dataTable.setColumnLabel(1, texts.columnlabelchanged);
 		};
 
 		// Create the history data table.

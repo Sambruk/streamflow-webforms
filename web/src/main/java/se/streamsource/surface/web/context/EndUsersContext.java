@@ -17,15 +17,20 @@
 
 package se.streamsource.surface.web.context;
 
+import org.qi4j.api.entity.Identity;
+import org.qi4j.api.entity.IdentityGenerator;
+import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.structure.Module;
 import org.qi4j.api.value.ValueBuilder;
 import org.restlet.Response;
 import org.restlet.data.Cookie;
+import org.restlet.data.MediaType;
 import org.restlet.data.Status;
-import org.restlet.representation.EmptyRepresentation;
+import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ResourceException;
 import org.restlet.util.Series;
+
 import se.streamsource.dci.api.RoleMap;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.dci.value.EntityValue;
@@ -38,6 +43,9 @@ public class EndUsersContext
 {
    public static final String COOKIE_NAME = "ANONYMOUS_USER";
 
+   @Service
+   IdentityGenerator idGen;
+   
    @Structure
    Module module;
 
@@ -56,7 +64,10 @@ public class EndUsersContext
             CookieResponseHandler responseHandler = module.objectBuilderFactory()
                   .newObjectBuilder(CookieResponseHandler.class)
                   .newInstance();
-            client.postCommand( "createenduser", new EmptyRepresentation(), responseHandler );
+            ValueBuilder<se.streamsource.dci.value.StringValue> builder = module.valueBuilderFactory().newValueBuilder( se.streamsource.dci.value.StringValue.class );
+            builder.prototype().string().set( idGen.generate( Identity.class ) );
+//            client.postCommand( "createenduser", new EmptyRepresentation(), responseHandler );
+            client.postCommand( "create", new StringRepresentation(builder.newInstance().toString(), MediaType.APPLICATION_JSON), responseHandler);
 
             response.getCookieSettings().add( responseHandler.getCookieSetting() );
          }

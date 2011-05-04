@@ -22,11 +22,7 @@ jQuery(document).ready(function() {
         'open'   	: {view:View.openCases,	  init: [ setupOpenCases ]},
         'closed' 	: {view:View.closedCases, init: [ setupClosedCases ]}}};
 
-    var url1 = 'static/cases-components.html';
-    var url2 = '/static/cases-components.html';
-    var url3 = $("#mypages").attr('href') + '/static/cases-components.html';
     var url = '/surface/mypages/static/cases-components.html';
-    var url4 = 'http://test.sf.streamsource.se/surface/mypages/static/cases-components.html';
 	$('#components').hide().load(url, function() {
         try {
             Contexts.init( contexts );
