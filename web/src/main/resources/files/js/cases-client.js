@@ -17,18 +17,25 @@
 
 jQuery(document).ready(function() {
 //google.setOnLoadCallback(function () {
+    
 	var store = {};
     var contexts = {view:rootView,            init: [ setupUser ], subContexts: {
         'open'   	: {view:View.openCases,	  init: [ setupOpenCases ]},
         'closed' 	: {view:View.closedCases, init: [ setupClosedCases ]}}};
 
 	$('#components').hide().load('static/cases-components.html', function() {
-        try {
-            Contexts.init( contexts );
-            setupView();
-        } catch ( e ) {
-            View.error( e );
-        }
+		$('#login').load('static/login-components.html', function(){
+    		$('#dialog-login').hide();
+    		$('#dialog-message').hide();
+    		
+    		try {
+    			Contexts.init( contexts );
+    			LoginModule.init();
+    			setupView();
+    		} catch ( e ) {
+    			View.error( e );
+    		}
+		});
 	});
 	
     $(window).hashchange( setupView );

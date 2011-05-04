@@ -23,7 +23,7 @@ var UrlModule = (function () {
     var urls = {
     	proxy: 		"proxy/",
         mypages:    "surface/",
-	    eid:        "eidproxy/"
+	    eid:        "../eidproxy/"
     };
 
 //    var openCasesQuery = "select label caseid €rendeId,description,created,project,status,href";
@@ -117,5 +117,19 @@ var UrlModule = (function () {
     	return urls.enduser + 'closed/cases.json' + '?tq=' + casesQuery;
     };
     
+
+    // ======= Eid functions ========= //
+
+    inner.getHeader = function() {
+        return urls.eid + 'authenticate/header.htm';
+    }
+
+    inner.getChallenge = function() {
+        return urls.eid + 'authenticate/challenge';
+    }
+
+    inner.verify = function() {
+        return urls.eid + 'authenticate/verify';
+    }
     return inner;
 }());

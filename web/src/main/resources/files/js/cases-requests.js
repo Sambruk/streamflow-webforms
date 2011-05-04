@@ -29,6 +29,16 @@ var RequestModule = (function() {
     function getData( parameters ) {
         var data;
         parameters.success = function(arg) { data = arg; };
+        parameters.error = function(xhr) { 
+			if (xhr.status == "401"){
+				LoginModule.login(function () {
+					$.ajax(parameters);
+				});
+			} else
+			{
+		        errorPopup();
+			}
+		};
         $.ajax(parameters);
         return data;
     }
@@ -119,5 +129,29 @@ var RequestModule = (function() {
     	return getData( parameters );
     };
 
+    // ======= Eid functions ========= //
+
+    inner.getHeader = function() {
+        var parameters = request('GET', UrlModule.getHeader() );
+        parameters.dataType = null;
+        return invoke( getData, parameters, texts.eidServiceUnavailable );
+    }
+    
+    inner.getChallenge = function( challengeDTO ) {
+        var parameters = request('GET', UrlModule.getChallenge() );
+        parameters.data = challengeDTO;
+        return invoke( getData, parameters, texts.eidServiceUnavailable );
+    }
+    
+    inner.verify = function( verifyDTO, successfunction) {
+    	var parameters = request('GET', UrlModule.verify() );
+    	parameters.data = verifyDTO;
+    	parameters.success = successfunction;
+    	parameters.error = function(message) {
+    		alert(message);
+    	}
+        $.ajax(parameters);
+    };
+    
     return inner;
 }());

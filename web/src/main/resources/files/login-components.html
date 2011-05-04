@@ -20,7 +20,8 @@
 <!-- Components goes here-->
 <h2 id="current_user"></h2>
 <div id="dialog-login" title="Login">
-	<p>You are required to login. Please select eId provider</p>
+	<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 50px 0;"></span><span id="login-message" ></span>
+	<br/><br/>
 	<form method="POST" id="LogonForm" name="LogonForm" action="validatebankidauthentication">
 		<input type="HIDDEN" name="signature" value="">
 		<input type="HIDDEN" name="action" value="login">

@@ -86,6 +86,9 @@ public class SurfaceRestApplication extends Application
       Router surfaceRouter = new Router();
       Router mypagesRouter = new Router();
 
+      AuthenticationFilter authenticationFilter = factory.newObjectBuilder( AuthenticationFilter.class ).use( getContext(), surfaceRouter ).newInstance(); 
+      authenticationFilter.addProtectedUrls( "proxy/endusers/" );
+      
       Restlet cqr = factory.newObjectBuilder( SurfaceRestlet.class ).use( getContext() ).newInstance();
       StreamflowProxyRestlet proxyRestlet = factory.newObject( StreamflowProxyRestlet.class );
       EidProxyRestlet eidProxyRestlet = factory.newObject( EidProxyRestlet.class );
@@ -97,8 +100,7 @@ public class SurfaceRestApplication extends Application
       surfaceRouter.attach( "/texts", new TextsRestlet() );
       surfaceRouter.attach( "/static", new Directory( getContext(), "clap://thread/files/" ) );
       
-      Filter authenticationFilter = factory.newObjectBuilder( AuthenticationFilter.class ).use( getContext(), mypagesRouter ).newInstance(); 
-      Filter mypagesFilter = factory.newObjectBuilder( MyPagesAccessFilter.class ).use( getContext(), authenticationFilter , filterService ).newInstance(); 
+      Filter mypagesFilter = factory.newObjectBuilder( MyPagesAccessFilter.class ).use( getContext(), mypagesRouter , filterService ).newInstance(); 
       
       surfaceRouter.attach( "/mypages", mypagesFilter, Template.MODE_STARTS_WITH);
       mypagesRouter.attach( "/static", new Directory( getContext(), "clap://thread/files/" ) );
@@ -110,7 +112,7 @@ public class SurfaceRestApplication extends Application
 
       getTunnelService().setLanguageParameter( "locale" );
 
-      return surfaceRouter;
+      return authenticationFilter;
    }
 
    @Override
