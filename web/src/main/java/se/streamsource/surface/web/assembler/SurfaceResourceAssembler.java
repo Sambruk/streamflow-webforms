@@ -49,7 +49,8 @@ public class SurfaceResourceAssembler
               LoginRestlet.class,
               ProfileRestlet.class,
               TextsRestlet.class,
-              FakeRestlet.class
+              FakeRestlet.class,
+              AuthenticateRestlet.class
       );
 
       module.objects(CookieResponseHandler.class, AttachmentResponseHandler.class).visibleIn( Visibility.layer );

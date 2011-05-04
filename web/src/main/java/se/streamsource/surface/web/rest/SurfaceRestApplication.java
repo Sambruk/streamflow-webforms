@@ -109,6 +109,7 @@ public class SurfaceRestApplication extends Application
       mypagesRouter.attach( "/profile", new ProfileRestlet(), Template.MODE_STARTS_WITH );
       mypagesRouter.attach( "/fake", new FakeRestlet(), Template.MODE_EQUALS );
       mypagesRouter.attach( "/login", factory.newObject( LoginRestlet.class ), Template.MODE_STARTS_WITH );
+      mypagesRouter.attach( "/authenticate", factory.newObject( AuthenticateRestlet.class ), Template.MODE_STARTS_WITH );
 
       getTunnelService().setLanguageParameter( "locale" );
 
