@@ -106,6 +106,10 @@
         </dependency>
         <dependency>
             <groupId>se.streamsource.streamflow</groupId>
+            <artifactId>streamflow-client-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>se.streamsource.streamflow</groupId>
             <artifactId>streamflow-dci</artifactId>
             <exclusions>
                 <exclusion>

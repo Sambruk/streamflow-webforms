@@ -27,6 +27,7 @@ import org.qi4j.bootstrap.ModuleAssembly;
 import se.streamsource.dci.restlet.server.DCIAssembler;
 import se.streamsource.dci.restlet.server.NullCommandResult;
 import se.streamsource.dci.value.ValueAssembler;
+import se.streamsource.streamflow.api.assembler.ClientAPIAssembler;
 import se.streamsource.surface.web.rest.AttachmentResponseHandler;
 import se.streamsource.surface.web.rest.CasesRestlet;
 import se.streamsource.surface.web.rest.CookieResponseHandler;

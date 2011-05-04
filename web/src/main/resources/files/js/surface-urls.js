@@ -59,7 +59,7 @@ var UrlModule = (function() {
     }
 
     inner.getCaseForm = function() {
-        return urls.proxy + urls.user + 'findcasewithform.json';
+        return urls.proxy + urls.user + 'drafts/findcasewithform.json';
     }
 
     inner.getFormDraft = function() {
@@ -67,7 +67,7 @@ var UrlModule = (function() {
     }
 
     inner.createCaseWithForm = function() {
-        return urls.proxy + urls.user + 'createcasewithform.json';
+        return urls.proxy + urls.user + 'drafts/createcasewithform.json';
     }
 
     inner.updateField = function( ) {

@@ -21,10 +21,15 @@ import org.qi4j.api.entity.Identity;
 import org.qi4j.api.entity.IdentityGenerator;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Structure;
+import org.qi4j.api.service.ServiceReference;
+import org.qi4j.api.specification.Specification;
 import org.qi4j.api.structure.Module;
+import org.qi4j.api.util.Iterables;
 import org.qi4j.api.value.ValueBuilder;
+import org.qi4j.bootstrap.ServiceDeclaration;
 import org.restlet.Response;
 import org.restlet.data.Cookie;
+import org.restlet.data.CookieSetting;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.StringRepresentation;
@@ -35,6 +40,7 @@ import se.streamsource.dci.api.RoleMap;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.dci.value.EntityValue;
 import se.streamsource.dci.value.link.LinkValue;
+import se.streamsource.surface.web.proxy.ProxyService;
 import se.streamsource.surface.web.rest.CookieResponseHandler;
 
 /**
@@ -61,15 +67,29 @@ public class EndUsersContext
          try
          {
             CommandQueryClient client = RoleMap.current().get( CommandQueryClient.class );
-            CookieResponseHandler responseHandler = module.objectBuilderFactory()
-                  .newObjectBuilder(CookieResponseHandler.class)
-                  .newInstance();
             ValueBuilder<se.streamsource.dci.value.StringValue> builder = module.valueBuilderFactory().newValueBuilder( se.streamsource.dci.value.StringValue.class );
             builder.prototype().string().set( idGen.generate( Identity.class ) );
 //            client.postCommand( "createenduser", new EmptyRepresentation(), responseHandler );
-            client.postCommand( "create", new StringRepresentation(builder.newInstance().toString(), MediaType.APPLICATION_JSON), responseHandler);
+//            client.postCommand( "create", new StringRepresentation(builder.newInstance().toString(), MediaType.APPLICATION_JSON), responseHandler);
+            se.streamsource.dci.value.StringValue userId = builder.newInstance();
+            client.postCommand( "create", new StringRepresentation(userId.toString(), MediaType.APPLICATION_JSON));
+            
+            Iterable<ServiceReference<ProxyService>> services = module.serviceFinder().findServices( ProxyService.class );
+            
+            ServiceReference<ProxyService> proxy = Iterables.first( Iterables.filter( new Specification<ServiceReference>() {
 
-            response.getCookieSettings().add( responseHandler.getCookieSetting() );
+               public boolean satisfiedBy( ServiceReference item )
+               {
+                  return "streamflowproxy".equals( item.identity() );
+               }
+            }, services) );
+
+//            CookieSetting cookieSetting = new CookieSetting( EndUsersContext.COOKIE_NAME, proxy.get().configuration().username().get() + "/" + userId.string().get() );
+            CookieSetting cookieSetting = new CookieSetting( EndUsersContext.COOKIE_NAME, userId.string().get() );
+            // two weeks
+            cookieSetting.setMaxAge( 60 * 60 * 24 * 14 );
+            
+            response.getCookieSettings().add( cookieSetting );
          }
          catch (Throwable e)
          {
