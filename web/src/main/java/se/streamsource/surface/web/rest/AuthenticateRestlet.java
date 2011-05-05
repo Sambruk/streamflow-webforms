@@ -68,7 +68,7 @@ public class AuthenticateRestlet extends Restlet
 
          Form headers = (Form) request.getAttributes().get( "org.restlet.http.headers" );
 
-         String cert = headers.getFirstValue( "SSL_CLIENT_CERT" );
+         String cert = headers.getFirstValue( "ssl_client_cert" );
 
          cert = cert.substring( "-----BEGIN CERTIFICATE----- ".length(),
                cert.length() - " -----END CERTIFICATE-----".length() );
