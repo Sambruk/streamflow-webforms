@@ -94,14 +94,13 @@ var View = (function() {
 		caseNodeId = 'open-case';
 		var node = clone('open-cases');
 		displayView(node);
+		drawUserInfo();
 		pagingAction = function (pageSize, pageIndex, callback) {
 			var from = parseInt(pageSize)*(parseInt(pageIndex))+1;
 			var to = from+parseInt(pageSize)-1;
 			if (casesTotal){
 				to = casesTotal<to ? casesTotal : to;
-				var userObj = LoginModule.currentUser();
 				$('#open-cases-header').text(texts.opencasesheader + ' (' + openCasesTotal + texts.totalcasespiecesheader + ')');
-				$('#user-info').text(userObj.name + ' - ' + userObj.contactId);
 				$('#pagination-info').text(replacePlaceholdersInTranslatedString(texts.labelpaginationinfo, from, to, casesTotal));
 			} else {
 				$('#open-cases-header').text(texts.opencasesheader);
@@ -140,6 +139,7 @@ var View = (function() {
 		caseNodeId = 'closed-case';
 		var node = clone('closed-cases');
 		displayView(node);
+		drawUserInfo();
 		var closedCasesTotal = setupCasesTotal(RequestModule.getClosedCasesTotal());
 		pagingAction = function (pageSize, pageIndex, callback) {
 			var from = parseInt(pageSize)*(parseInt(pageIndex))+1;
@@ -181,6 +181,11 @@ var View = (function() {
 		};
 		google.load('visualization', '1', {'callback' : buildCases, 'packages' : ['table']});
 	};
+	
+	function drawUserInfo() {
+		var userObj = LoginModule.currentUser();
+		$('#user-info').text(userObj.name + ' - ' + userObj.contactId);
+	}
 	
 	/*
 	 * Replaces the '{#}' placeholders in a translation string
