@@ -1,4 +1,4 @@
-/*
+/**
  *
  * Copyright 2009-2010 Streamsource AB
  *
@@ -15,20 +15,15 @@
  * limitations under the License.
  */
 
+package se.streamsource.surface.web.mypages;
 
+import org.qi4j.api.configuration.ConfigurationComposite;
+import org.qi4j.api.configuration.Enabled;
 
-var UrlModule = ( function () {
-    var inner = {};
-
-    var urls = {
-        proxy:      "proxy/",
-        mypages:    "mypages/",
-	    eid:        "eidproxy/"
-    };
-
-    inner.getFake = function () {
-    	return "/" + urls.mypages + "fake";
-    };
-    
-    return inner;
-}());
+/**
+ * Configuration for my pages service
+ */
+public interface MyPagesAccessConfiguration
+   extends ConfigurationComposite, Enabled
+{ 
+}

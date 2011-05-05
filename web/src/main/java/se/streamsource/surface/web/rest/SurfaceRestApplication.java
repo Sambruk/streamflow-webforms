@@ -34,9 +34,10 @@ import org.restlet.routing.Router;
 import org.restlet.routing.Template;
 
 import se.streamsource.dci.restlet.server.ExtensionMediaTypeFilter;
+import se.streamsource.surface.web.application.security.AuthenticationFilter;
 import se.streamsource.surface.web.assembler.SurfaceWebAssembler;
-import se.streamsource.surface.web.mypages.MyPagesFilter;
-import se.streamsource.surface.web.mypages.MyPagesFilterService;
+import se.streamsource.surface.web.mypages.MyPagesAccessFilter;
+import se.streamsource.surface.web.mypages.MyPagesAccessFilterService;
 import se.streamsource.surface.web.resource.SurfaceRestlet;
 
 public class SurfaceRestApplication extends Application
@@ -45,7 +46,7 @@ public class SurfaceRestApplication extends Application
    public static final MediaType APPLICATION_SPARQL_JSON = new MediaType( "application/sparql-results+json",
          "SPARQL JSON" );
    @Service 
-   MyPagesFilterService filterService;
+   MyPagesAccessFilterService filterService;
    
    @Structure
    ObjectBuilderFactory factory;
@@ -85,6 +86,9 @@ public class SurfaceRestApplication extends Application
       Router surfaceRouter = new Router();
       Router mypagesRouter = new Router();
 
+      AuthenticationFilter authenticationFilter = factory.newObjectBuilder( AuthenticationFilter.class ).use( getContext(), surfaceRouter ).newInstance(); 
+      authenticationFilter.addProtectedUrls( "proxy/endusers/" );
+      
       Restlet cqr = factory.newObjectBuilder( SurfaceRestlet.class ).use( getContext() ).newInstance();
       StreamflowProxyRestlet proxyRestlet = factory.newObject( StreamflowProxyRestlet.class );
       EidProxyRestlet eidProxyRestlet = factory.newObject( EidProxyRestlet.class );
@@ -96,19 +100,20 @@ public class SurfaceRestApplication extends Application
       surfaceRouter.attach( "/texts", new TextsRestlet() );
       surfaceRouter.attach( "/static", new Directory( getContext(), "clap://thread/files/" ) );
       
-      Filter mypagesFilter = factory.newObjectBuilder( MyPagesFilter.class ).use( getContext(), mypagesRouter, filterService ).newInstance(); 
-
+      Filter mypagesFilter = factory.newObjectBuilder( MyPagesAccessFilter.class ).use( getContext(), mypagesRouter , filterService ).newInstance(); 
+      
       surfaceRouter.attach( "/mypages", mypagesFilter, Template.MODE_STARTS_WITH);
       mypagesRouter.attach( "/static", new Directory( getContext(), "clap://thread/files/" ) );
       mypagesRouter.attach( "/texts", new TextsRestlet() );
-      mypagesRouter.attach( "/cases", new CasesRestlet(), Template.MODE_EQUALS );
-      mypagesRouter.attach( "/profile", new ProfileRestlet(), Template.MODE_STARTS_WITH );
-      mypagesRouter.attach( "/fake", new FakeRestlet(), Template.MODE_EQUALS );
-      mypagesRouter.attach( "/login", factory.newObject( LoginRestlet.class ), Template.MODE_STARTS_WITH );
+      mypagesRouter.attach( "/opencases", new StaticFileRestlet("opencases.html"), Template.MODE_EQUALS );
+      mypagesRouter.attach( "/closedcases", new StaticFileRestlet("closedcases.html"), Template.MODE_EQUALS );
+      mypagesRouter.attach( "/profile", new StaticFileRestlet("profile.html"), Template.MODE_STARTS_WITH );
+      mypagesRouter.attach( "/logout", new StaticFileRestlet("logout.html"), Template.MODE_EQUALS );
+      mypagesRouter.attach( "/authenticate", factory.newObject( AuthenticateRestlet.class ), Template.MODE_STARTS_WITH );
 
       getTunnelService().setLanguageParameter( "locale" );
 
-      return surfaceRouter;
+      return authenticationFilter;
    }
 
    @Override

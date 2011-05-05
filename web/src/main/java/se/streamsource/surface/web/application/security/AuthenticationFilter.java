@@ -19,6 +19,8 @@ package se.streamsource.surface.web.application.security;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Structure;
@@ -41,44 +43,96 @@ public class AuthenticationFilter extends Filter
 
    @Service
    HashService hashService;
-   
+
    @Structure
    ValueBuilderFactory vbf;
-   
+
+   List<String> protectedUrls = new ArrayList<String>();
+   List<String> exceptionUrls = new ArrayList<String>();
+
    public AuthenticationFilter(@Uses Context context, @Uses Restlet next)
    {
-      super(context, next);
+      super( context, next );
    }
-   
+
    @Override
    protected int beforeHandle(Request request, Response response)
    {
-      Series<Cookie> cookies = request.getCookies();
-      String cookieValue = null;
-      if ( cookies != null && cookies.size() > 0)
-         cookieValue = cookies.get( 0 ).getValue();
-
-      if (Strings.empty( cookieValue ))
+      
+      if (shouldApplyFilter(request.getResourceRef().getRelativeRef().toString( false, false )))
       {
-         try
-         {
-            String decodedString = URLDecoder.decode( cookieValue, "UTF-8" );
-            UserInfoDTO userInfo = vbf.newValueFromJSON( UserInfoDTO.class, decodedString );
-            String newHash = hashService.hash( userInfo );
-            // Verify the hashvalue and that the session isn't older than one hour (eId...)
-            if (newHash.equals( userInfo.hash().get() ) &&
-                  (System.currentTimeMillis() - userInfo.createdOn().get().getTime()) < (60 * 60 * 1000) )
-            {
-               return Filter.CONTINUE;
-            }
-         } catch (UnsupportedEncodingException e)
-         {
-            e.printStackTrace();
-         }
-         
-      }
+         Series<Cookie> cookies = request.getCookies();
+         String cookieValue = null;
+         if (cookies != null && cookies.size() > 0)
+            cookieValue = cookies.get( 0 ).getValue();
 
-      response.setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
-      return Filter.STOP;
+         if (!Strings.empty( cookieValue ))
+         {
+            try
+            {
+               String decodedString = URLDecoder.decode( cookieValue, "UTF-8" );
+               UserInfoDTO userInfo = vbf.newValueFromJSON( UserInfoDTO.class, decodedString );
+               String newHash = hashService.hash( userInfo );
+               // Verify the hashvalue and that the session isn't older than one
+               // hour (eId...)
+               if (newHash.equals( userInfo.hash().get() )
+                     && (System.currentTimeMillis() - userInfo.createdOn().get().getTime()) < (60 * 60 * 1000))
+               {
+                  return Filter.CONTINUE;
+               }
+            } catch (UnsupportedEncodingException e)
+            {
+               e.printStackTrace();
+            }
+
+         }
+
+         response.setStatus( Status.CLIENT_ERROR_UNAUTHORIZED );
+         return Filter.STOP;
+      }
+      return Filter.CONTINUE;
+   }
+
+   private boolean shouldApplyFilter(String relativeUrl)
+   {
+      boolean applyFilter = false;
+      if (protectedUrls != null)
+      {
+         for (String protectedUrl : protectedUrls)
+         {
+            if (relativeUrl.startsWith( protectedUrl )) {
+               applyFilter = true;
+               break;
+            }
+         }
+      }
+      
+      if (applyFilter && exceptionUrls != null)
+      {
+         for (String exceptionUrl : exceptionUrls)
+         {
+            if (relativeUrl.startsWith( exceptionUrl )) {
+               applyFilter = false;
+               break;
+            }
+         }
+      }
+      return applyFilter;
+   }
+
+   public void addProtectedUrls(String... urls)
+   {
+      for (String url : urls)
+      {
+         protectedUrls.add( url );
+      }
+   }
+
+   public void addExceptionUrls(String... urls)
+   {
+      for (String url : urls)
+      {
+         exceptionUrls.add( url );
+      }
    }
 }

@@ -17,15 +17,25 @@
 
 package se.streamsource.surface.web.assembler;
 
+import static org.qi4j.bootstrap.ImportedServiceDeclaration.NEW_OBJECT;
+
 import org.qi4j.api.common.Visibility;
 import org.qi4j.bootstrap.Assembler;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
+
 import se.streamsource.dci.restlet.server.DCIAssembler;
 import se.streamsource.dci.restlet.server.NullCommandResult;
-import se.streamsource.surface.web.rest.*;
-
-import static org.qi4j.bootstrap.ImportedServiceDeclaration.NEW_OBJECT;
+import se.streamsource.dci.value.ValueAssembler;
+import se.streamsource.streamflow.surface.api.assembler.SurfaceAPIAssembler;
+import se.streamsource.surface.web.rest.AttachmentResponseHandler;
+import se.streamsource.surface.web.rest.AuthenticateRestlet;
+import se.streamsource.surface.web.rest.CookieResponseHandler;
+import se.streamsource.surface.web.rest.EidProxyRestlet;
+import se.streamsource.surface.web.rest.IndexRestlet;
+import se.streamsource.surface.web.rest.ProfileRestlet;
+import se.streamsource.surface.web.rest.StreamflowProxyRestlet;
+import se.streamsource.surface.web.rest.TextsRestlet;
 
 /**
  */
@@ -35,7 +45,9 @@ public class SurfaceResourceAssembler
    public void assemble( ModuleAssembly module )
          throws AssemblyException
    {
+      new ValueAssembler().assemble( module );
       new DCIAssembler().assemble( module );
+      new SurfaceAPIAssembler().assemble( module );
 
       module.importedServices(NullCommandResult.class).importedBy( NEW_OBJECT );
       module.objects(NullCommandResult.class).visibleIn( Visibility.layer );
@@ -45,11 +57,9 @@ public class SurfaceResourceAssembler
               IndexRestlet.class,
               StreamflowProxyRestlet.class,
               EidProxyRestlet.class,
-              CasesRestlet.class,
-              LoginRestlet.class,
               ProfileRestlet.class,
               TextsRestlet.class,
-              FakeRestlet.class
+              AuthenticateRestlet.class
       );
 
       module.objects(CookieResponseHandler.class, AttachmentResponseHandler.class).visibleIn( Visibility.layer );

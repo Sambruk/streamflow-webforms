@@ -99,7 +99,9 @@ var View = (function() {
 			var to = from+parseInt(pageSize)-1;
 			if (casesTotal){
 				to = casesTotal<to ? casesTotal : to;
+				var userObj = LoginModule.currentUser();
 				$('#open-cases-header').text(texts.opencasesheader + ' (' + openCasesTotal + texts.totalcasespiecesheader + ')');
+				$('#user-info').text(userObj.name + ' - ' + userObj.contactId);
 				$('#pagination-info').text(replacePlaceholdersInTranslatedString(texts.labelpaginationinfo, from, to, casesTotal));
 			} else {
 				$('#open-cases-header').text(texts.opencasesheader);
@@ -144,7 +146,9 @@ var View = (function() {
 			var to = from+parseInt(pageSize)-1;
 			if (casesTotal){
 				to = casesTotal<to ? casesTotal : to;
+				var userObj = LoginModule.currentUser();
 				$('#closed-cases-header').text(texts.closedcasesheader + ' (' + closedCasesTotal + texts.totalcasespiecesheader + ')');
+				$('#user-info').text(userObj.name + ' - ' + userObj.contactId);
 				$('#pagination-info').text(replacePlaceholdersInTranslatedString(texts.labelpaginationinfo, from, to, casesTotal));
 			} else {
 				$('#closed-cases-header').text(texts.closedcasesheader);
@@ -310,7 +314,7 @@ var View = (function() {
 			});
 			// Table Column Translations
 			dataTable.setColumnLabel(0, texts.columnlabelmessage);
-			dataTable.setColumnLabel(1, texts.columnlabelcreated);
+			dataTable.setColumnLabel(1, texts.columnlabelchanged);
 		};
 
 		// Create the history data table.
@@ -407,31 +411,6 @@ var View = (function() {
 		messages = {};
 	}
 
-	inner.runView = function(view) {
-		try {
-			view();
-			showMessages();
-			$(window).scrollTop(0);
-		} catch (e) {
-			messages = {};
-			if (e.info)
-				messages.info = e.info;
-			else if (e.warning)
-				messages.warning = e.warning;
-			else if (e.error)
-				messages.error = e.error;
-			else if (e.message)
-				messages.error = e.message + ', ' + e.fileName + '('
-						+ e.lineNumber + ')';
-
-			if (e.redirect) {
-				redirect(e.redirect);
-			} else {
-				redirect(getSummary());
-			}
-		}
-	};
-
 	function clone(id, newId) {
 		if (!newId)
 			return $('#' + id).clone().attr('id', 'inserted_' + id);
@@ -497,7 +476,5 @@ var View = (function() {
 		return dateFormat(dateValue, mask);
 	}
 	
-	/* Persistent Storage handling */
-
 	return inner;
 }());

@@ -70,6 +70,8 @@ margin: 0 5px 0 0;
     zoom: 1;
 }
 
+fieldset#emails { clear: both; }
+
 /* jQuery UI Themeroller customizations */
 .ui-widget { font-size: 1.0em; }
 tr.ui-state-hover { font-weight: normal; }

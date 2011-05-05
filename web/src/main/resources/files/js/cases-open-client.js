@@ -15,43 +15,47 @@
  * limitations under the License.
  */
 
-jQuery(document).ready(function()
-{
+jQuery(document).ready(function() {
+    
 	var contactId;
-		
-	$("#components").hide().load("static/profile-components.html", function() {
+	
+	$('#components').hide().load('static/cases-components.html', function() {
 		$('#login').load('static/login-components.html', function(){
     		$('#dialog-login').hide();
     		$('#dialog-message').hide();
     		
-			try {
-				LoginModule.init();
-				setupView();
-			} catch (e) {
-				alert(e);
-			}
+    		try {
+    			LoginModule.init();
+    			setupView();
+    		} catch ( e ) {
+    			View.error( e );
+    		}
 		});
 	});
 	
-	function setupView() {
-		if (!contactId) 
+    function setupView() {
+    	var success = function() {
+			RequestModule.setupUser( contactId );
+			UrlModule.setupOpenCasesQuery();
+			UrlModule.setupOpenCasesDataSource();
+			View.openCases();
+    	}
+    	if (!contactId) 
 		{
 			var currentUser = LoginModule.currentUser();
 			if (! currentUser)
 			{
 				LoginModule.login( function() {
 					contactId = LoginModule.currentUser().contactId;
-					streamsource.mypages.profile.Request.setUser( contactId );
-					streamsource.mypages.profile.Form.profile();
+					success();
 				});
 			} else {
-				streamsource.mypages.profile.Request.setUser( currentUser.contactId );
-				streamsource.mypages.profile.Form.profile();
+				contactId = currentUser.contactId;
+				success();
 			}
 		} else {
-			streamsource.mypages.profile.Request.setUser( contactId );
-			streamsource.mypages.profile.Form.profile();
+			success();
 		}
-	}
- 
+    }
+
 });

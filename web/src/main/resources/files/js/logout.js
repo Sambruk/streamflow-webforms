@@ -1,4 +1,4 @@
-/**
+/*
  *
  * Copyright 2009-2010 Streamsource AB
  *
@@ -15,23 +15,8 @@
  * limitations under the License.
  */
 
-package se.streamsource.surface.web.rest;
+jQuery(document).ready(function() {
+    
+	$.cookie('SF_MYPAGES_USER', null, {path: '/'});
 
-import org.restlet.Request;
-import org.restlet.Response;
-import org.restlet.Restlet;
-import org.restlet.data.MediaType;
-import org.restlet.data.Status;
-
-public class FakeRestlet extends Restlet
-{
-
-   @Override
-   public void handle(Request request, Response response)
-   {
-      super.handle( request, response );
-      
-      response.setEntity( "{\"message\":\"Hello fake\"}" , MediaType.APPLICATION_JSON);
-      response.setStatus( Status.SUCCESS_OK );
-   }
-}
+});

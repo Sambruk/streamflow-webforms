@@ -17,57 +17,41 @@
 
 package se.streamsource.surface.web.rest;
 
-import org.qi4j.api.injection.scope.Service;
-import org.qi4j.api.service.qualifier.Tagged;
-import org.restlet.Request;
-import org.restlet.Response;
-import org.restlet.Restlet;
-import org.restlet.Uniform;
-import org.restlet.data.MediaType;
-import org.restlet.data.Reference;
-import org.restlet.data.Status;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.Restlet;
+import org.restlet.data.MediaType;
+
 /**
  */
-public class CasesRestlet extends Restlet
+public class StaticFileRestlet extends Restlet
 {
-//   @Service
-//   @Tagged("eid")
-//   Uniform proxyService;
-//
-//   @Service
-//   @Tagged("streamflow")
-//   Uniform streamflowService;
+
+   private final String filename;
+
+   public StaticFileRestlet(String filename)
+   {
+      this.filename = filename;
+   }
 
    @Override
    public void handle(Request request, Response response)
    {
       super.handle(request, response);
 
-      String contactId = "197507212475"; //TODO: FIX!
-
-      if (contactId != null)
-      {
-         try
+      try
          {
-            String template = getTemplate("cases.html", getClass());
-            template = template.replace("$contactid", contactId);
-//            template = template.replace("$hostname", request.getResourceRef().getHostIdentifier());
-
+            String template = getTemplate(filename, getClass());
             response.setEntity(template, MediaType.TEXT_HTML);
          } catch (IOException e)
          {
             e.printStackTrace();
          }
-      } else
-      {
-         // What to do? 
-      }
    }
 
    public static String getTemplate(String resourceName, Class resourceClass) throws IOException
