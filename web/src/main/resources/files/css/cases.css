@@ -16,7 +16,7 @@
  */
 
 /* Cases view */
-form.cases-paging { margin-bottom: 2px; font-size: 8pt; }
+form.cases-paging { clear: both; margin-bottom: 2px; font-size: 8pt; }
 .cases-view { margin-bottom: 10px; }
 .ui-widget div div.google-visualization-table-div-page { float: left; }
 div#pagination { float: left; margin-top: 7px; margin-left: 10px; margin-bottom: 15px; font-size: 8pt; }

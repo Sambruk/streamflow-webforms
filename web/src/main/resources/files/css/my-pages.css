@@ -22,7 +22,8 @@ body .bp { font-family: Lucida Grande,Lucida Sans,Arial,sans-serif; font-size: 1
 
 .bp span.copy { float: right; font-size: 8pt; }
 
-.bp h1.page-header { font-size: 1.5em; }
+.bp h1.page-header { float: left; font-size: 1.5em; }
+.bp h2#user-info { float: right; font-size: 1em; padding: 8px; }
  
 .bp .mypages_profile_form .ui-widget-content input { 
 	border: 1px solid #A6C9E2; width: 200px;

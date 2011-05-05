@@ -206,7 +206,9 @@ streamsource.mypages.profile.Form = (function() {
 		
 //		$('button', formElement).html('Uppdatera').bind('click', buttonClicked);				
 		containerElement.appendChild(formElement);
+		var userObj = LoginModule.currentUser();
 		$('#profile-header').text(texts.labelprofileheader);
+		$('#user-info').text(userObj.name + ' - ' + userObj.contactId);
 		$('#profile_submit submit_text').text(texts.labelupdate);
 		$('#profile_submit').click(buttonClicked);	
 	}
