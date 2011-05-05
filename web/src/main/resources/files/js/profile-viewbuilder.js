@@ -288,11 +288,7 @@ streamsource.mypages.profile.Form = (function() {
 	/*
 	 * Public function that will setup and render the form
 	 */
-	inner.runView = function(view) {
-		
-		if ( view ) {
-			view();
-		}		
+	inner.profile = function() {
 		
 		containerElement = document.getElementById('app');		
 		if ( !containerElement ) {
@@ -306,10 +302,6 @@ streamsource.mypages.profile.Form = (function() {
 		};
 		
 		getRequest().get(callback);		
-	};
-
-	inner.profile = function() {
-		inner.runView();
 	};
 		
 	return inner;

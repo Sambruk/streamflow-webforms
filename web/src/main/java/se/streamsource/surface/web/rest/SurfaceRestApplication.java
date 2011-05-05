@@ -105,10 +105,10 @@ public class SurfaceRestApplication extends Application
       surfaceRouter.attach( "/mypages", mypagesFilter, Template.MODE_STARTS_WITH);
       mypagesRouter.attach( "/static", new Directory( getContext(), "clap://thread/files/" ) );
       mypagesRouter.attach( "/texts", new TextsRestlet() );
-      mypagesRouter.attach( "/cases", new CasesRestlet(), Template.MODE_EQUALS );
-      mypagesRouter.attach( "/profile", new ProfileRestlet(), Template.MODE_STARTS_WITH );
-      mypagesRouter.attach( "/fake", new FakeRestlet(), Template.MODE_EQUALS );
-      mypagesRouter.attach( "/login", factory.newObject( LoginRestlet.class ), Template.MODE_STARTS_WITH );
+      mypagesRouter.attach( "/opencases", new StaticFileRestlet("opencases.html"), Template.MODE_EQUALS );
+      mypagesRouter.attach( "/closedcases", new StaticFileRestlet("closedcases.html"), Template.MODE_EQUALS );
+      mypagesRouter.attach( "/profile", new StaticFileRestlet("profile.html"), Template.MODE_STARTS_WITH );
+      mypagesRouter.attach( "/logout", new StaticFileRestlet("logout.html"), Template.MODE_EQUALS );
       mypagesRouter.attach( "/authenticate", factory.newObject( AuthenticateRestlet.class ), Template.MODE_STARTS_WITH );
 
       getTunnelService().setLanguageParameter( "locale" );

@@ -18,25 +18,10 @@ var LoginModule = (function() {
     var inner = {};
 	
 	function loadEidPlugin() {
-    	$("#authenticationDiv").append( RequestModule.getHeader() );
+		var header = getHeader();
+    	$("#authenticationDiv").append( header );
 	    addAuthenticatePlugins($("#authenticationDiv"));
     }
-	
-	function getUrlParams(){
-	    var vars = [], param;
-	    var params = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
-	    for(var i = 0; i < params.length; i++)
-	    {
-	      param = params[i].split('=');
-	      vars.push(param[0]);
-	      vars[param[0]] = param[1];
-	    }
-	    return vars;
-	 }
-	  
-	function getUrlParam(name){
-	    return getUrlParams()[name];
-	}
 	
 	inner.logout = function() {
 		$.cookie('SF_MYPAGES_USER', null, {path: '/'});
@@ -52,11 +37,7 @@ var LoginModule = (function() {
 	inner.currentUser = function() {
 		var cookieValue = $.cookie("SF_MYPAGES_USER");
 		var currentUser = JSON.parse(cookieValue);
-		var currentUser = JSON.parse(currentUser);
-		if (currentUser)
-			return currentUser.name;
-		else 
-			return "Not logged in";
+		return currentUser;
 	}
 	
 	inner.init = function() {
@@ -112,7 +93,7 @@ var LoginModule = (function() {
 		var challengeDTO = {
 			provider: "nexus-personal_4X"
 	    };
-		var data = RequestModule.getChallenge( challengeDTO );
+		var data = getChallenge( challengeDTO );
 		
 		retVal = authenticate.SetParam('Challenge', data.challenge);
 		if (0 != retVal) {
@@ -127,23 +108,58 @@ var LoginModule = (function() {
 		retVal = authenticate.PerformAction('Authenticate');
 
 		if (retVal == 0) {
-			document.LogonForm.signature.value = authenticate
-					.GetParam('Signature');
+			var verifyDTO = {
+				challenge : data.challenge,
+				servertime : data.servertime,
+				provider : "nexus-personal_4X",
+				signature : authenticate.GetParam('Signature')
+			};
+			
+			verify( verifyDTO , function( data) {
+				var strValue = JSON.stringify(data);
+				$.cookie('SF_MYPAGES_USER', JSON.stringify(data), {expires: 1, path: '/'});
+				$( "#dialog-login" ).dialog( "close" );
+				$( "#user_info" ).text(LoginModule.currentUser());
+			});
 		} else {
 			alert('Failed to create signature! retVal = ' + retVal);
 			return false;
 		}
-
-		var verifyDTO = {
-			challenge : data.challenge,
-			servertime : data.servertime,
-			//signature : document.LogonForm.signature.value
-		};
-		
-		RequestModule.verify( verifyDTO , function() {
-			  $( "#dialog-login" ).dialog( "close" );
-			  $( "#user_info" ).text(LoginModule.currentUser());
-		});
 	}
+	
+	// ======= Eid requests ========= //
+
+    function invoke( parameters ) {
+    	var failed = false;
+    	parameters.async = false; 
+    	parameters.cache = false;
+    	parameters.error = function(){
+    		failed = true;
+    	};
+        $.ajax(parameters);
+        if ( failed ) {
+            throw parameters.message;
+        }
+    }
+    
+    function getHeader() {
+    	var result;
+    	var parameters = { type: 'GET', url:'../eidproxy/authentication/header.htm', dataType:null, success:function(data){ result = data;}, message:texts.eidServiceUnavailable};
+    	invoke(parameters);
+    	return result;
+    }
+    
+    function getChallenge( challengeDTO ) {
+    	var result;
+    	var parameters = { type: 'GET', url:'../eidproxy/authentication/challenge.json', data:challengeDTO, success:function(data){ result = data;}, message:texts.eidServiceUnavailable};
+    	invoke(parameters);
+    	return result;
+    }
+    
+    function verify( verifyDTO, successfunction) {
+    	var parameters = { type: 'POST', url:'authenticate/verify.json', data:verifyDTO, success:successfunction, message:texts.eidServiceUnavailable};
+    	invoke(parameters);
+    };
+    
 	return inner;
 }());

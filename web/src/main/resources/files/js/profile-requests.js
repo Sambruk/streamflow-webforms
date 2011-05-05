@@ -88,14 +88,51 @@ streamsource.mypages.profile.Request = (function() {
 		_userId = userId;
 	}
 	
+	function request(type, url) {
+        return {type:type, url:url, async:false, cache:false, error:errorPopup, dataType:'json'};
+    }
+	
+	function getData( parameters ) {
+        parameters.error = function(xhr) { 
+			if (xhr.status == "401"){
+				LoginModule.login(function () {
+					$.ajax(parameters);
+				});
+			} else
+			{
+		        errorPopup();
+			}
+		};
+        $.ajax(parameters);
+    }
+	
+	function invoke( fn, arguments, message ) {
+        var failed = false;
+        if( !arguments.error ) {
+        	arguments.error = function() {  failed = true; };
+        }
+        var result = fn( arguments );
+        if ( failed ) {
+            throw message;
+        }
+        return result;
+    }
+	
+	function errorPopup() {
+		throw "http call failed";
+	}
+	
 	/*
 	 * Retrieves the profile data for the specified
 	 * user id and calls the specified callback with 
 	 * the retrieved data, i.e. user profile JSON structure.
 	 */
 	inner.get = function(callback) {
-		url = streamsource.mypages.profile.Url.profileUrl(_userId, '/index.json');
-		$.get(url, callback);				
+		//url = streamsource.mypages.profile.Url.profileUrl(_userId, '/index.json');
+		//$.get(url, callback);	
+		var parameters = request('GET', streamsource.mypages.profile.Url.profileUrl(_userId, '/index.json') );
+		parameters.success = callback;
+        return invoke( getData, parameters, texts.eidServiceUnavailable );
 	}
 	
 	
@@ -103,8 +140,13 @@ streamsource.mypages.profile.Request = (function() {
 	 * Updates the profile for the current user.
 	 */
 	inner.update = function(profileData, callback) {
-		url = streamsource.mypages.profile.Url.profileUrl(_userId, '/' + 'update');				
-		$.post(url, profileData, callback);
-	}						
+		//url = streamsource.mypages.profile.Url.profileUrl(_userId, '/' + 'update');				
+		//$.post(url, profileData, callback);
+		var parameters = request('POST', streamsource.mypages.profile.Url.profileUrl(_userId, '/update') );
+		parameters.data = profileData;
+		parameters.success = callback;
+        return invoke( getData, parameters, texts.eidServiceUnavailable );
+	}				
+	
 	return inner;
 }());

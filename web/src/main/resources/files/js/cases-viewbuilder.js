@@ -407,31 +407,6 @@ var View = (function() {
 		messages = {};
 	}
 
-	inner.runView = function(view) {
-		try {
-			view();
-			showMessages();
-			$(window).scrollTop(0);
-		} catch (e) {
-			messages = {};
-			if (e.info)
-				messages.info = e.info;
-			else if (e.warning)
-				messages.warning = e.warning;
-			else if (e.error)
-				messages.error = e.error;
-			else if (e.message)
-				messages.error = e.message + ', ' + e.fileName + '('
-						+ e.lineNumber + ')';
-
-			if (e.redirect) {
-				redirect(e.redirect);
-			} else {
-				redirect(getSummary());
-			}
-		}
-	};
-
 	function clone(id, newId) {
 		if (!newId)
 			return $('#' + id).clone().attr('id', 'inserted_' + id);

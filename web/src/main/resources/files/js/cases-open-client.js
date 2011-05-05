@@ -16,20 +16,15 @@
  */
 
 jQuery(document).ready(function() {
-//google.setOnLoadCallback(function () {
     
-	var store = {};
-    var contexts = {view:rootView,            init: [ setupUser ], subContexts: {
-        'open'   	: {view:View.openCases,	  init: [ setupOpenCases ]},
-        'closed' 	: {view:View.closedCases, init: [ setupClosedCases ]}}};
-
+	var contactId;
+	
 	$('#components').hide().load('static/cases-components.html', function() {
 		$('#login').load('static/login-components.html', function(){
     		$('#dialog-login').hide();
     		$('#dialog-message').hide();
     		
     		try {
-    			Contexts.init( contexts );
     			LoginModule.init();
     			setupView();
     		} catch ( e ) {
@@ -38,33 +33,29 @@ jQuery(document).ready(function() {
 		});
 	});
 	
-    $(window).hashchange( setupView );
-
     function setupView() {
-        View.runView( Contexts.findView( location.hash ));
+    	var success = function() {
+			RequestModule.setupUser( contactId );
+			UrlModule.setupOpenCasesQuery();
+			UrlModule.setupOpenCasesDataSource();
+			View.openCases();
+    	}
+    	if (!contactId) 
+		{
+			var currentUser = LoginModule.currentUser();
+			if (! currentUser)
+			{
+				LoginModule.login( function() {
+					contactId = LoginModule.currentUser().contactId;
+					success();
+				});
+			} else {
+				contactId = currentUser.contactId;
+				success();
+			}
+		} else {
+			success();
+		}
     }
-
-    function rootView() {
-        // Since we have no root view redirect to open cases.
-        throw { redirect: Contexts.findUrl( View.openCases, ['0'] ) };
-    }
-
-	function setupUser() {
-		RequestModule.setupUser( contactid );
-	}
-	
-	function setupOpenCases() {
-		UrlModule.setupOpenCasesQuery();
-		UrlModule.setupOpenCasesDataSource();
-	}
-
-	function setupClosedCases() {
-		UrlModule.setupClosedCasesQuery();
-		UrlModule.setupClosedCasesDataSource();
-	}
-	
-	function setupPersist() {
-		PersistModule.setup();
-	}
 
 });

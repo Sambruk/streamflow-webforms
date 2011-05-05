@@ -45,11 +45,8 @@ public class SurfaceResourceAssembler
               IndexRestlet.class,
               StreamflowProxyRestlet.class,
               EidProxyRestlet.class,
-              CasesRestlet.class,
-              LoginRestlet.class,
               ProfileRestlet.class,
               TextsRestlet.class,
-              FakeRestlet.class,
               AuthenticateRestlet.class
       );
 

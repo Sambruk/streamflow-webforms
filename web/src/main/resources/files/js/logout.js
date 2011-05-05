@@ -15,20 +15,8 @@
  * limitations under the License.
  */
 
-
-
-var UrlModule = ( function () {
-    var inner = {};
-
-    var urls = {
-        proxy:      "proxy/",
-        mypages:    "mypages/",
-	    eid:        "eidproxy/"
-    };
-
-    inner.getFake = function () {
-    	return "/" + urls.mypages + "fake";
-    };
+jQuery(document).ready(function() {
     
-    return inner;
-}());
+	$.cookie('SF_MYPAGES_USER', null, {path: '/'});
+
+});

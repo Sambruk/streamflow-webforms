@@ -28,24 +28,23 @@
 
     <!-- TODO Add some stylesheet relation links here -->
     <link rel="stylesheet" type="text/css" href="static/css/external/redmond/jquery-ui-1.8.10.custom.css" />
-<!--     <link rel="stylesheet" type="text/css" href="static/css/screen.css"/> -->
     <link rel="stylesheet" type="text/css" href="static/css/my-pages.css" />
     <link rel="stylesheet" type="text/css" href="static/css/profile.css" />
     
     <!-- TODO Add more script elements here -->
     <script type="text/javascript" src="static/js/external/jquery-1.5.1.min.js"></script>
-    <script type="text/javascript" src="static/js/external/jquery.hashchange-1.0.0.js"></script>    
+    <script type="text/javascript" src="static/js/external/jquery-ui.min-1.8.2.js"></script>
+    <script type="text/javascript" src="static/js/external/jquery.hashchange-1.0.0.js"></script> 
+    <script type="text/javascript" src="static/js/external/jquery.cookie.js"></script>   
     
-    <script type="text/javascript" src="static/js/contexts.js"></script>
+    <script type="text/javascript" src="static/js/login.js"></script>
     <script type="text/javascript" src="static/js/profile-urls.js"></script>
     <script type="text/javascript" src="static/js/profile-requests.js"></script>
     <script type="text/javascript" src="static/js/profile-viewbuilder.js"></script>
     
     <script type="text/javascript" src="static/js/profile-client.js"></script>
     <script type="text/javascript" src="texts?locale=sv"></script>
-    <script type="text/javascript">
-        var contactid = '$contactid';
-    </script>
+    
 
     <!-- TODO L10N ? -->
 
@@ -60,11 +59,14 @@
 
 </head>
 <body>
-    <div class="bp">
-        <div id="app"></div>
-		<span class="copy">Powered by Streamflow&#153;</span>
-    </div>
-    
-    <div id="components"></div>
+<div id="authenticationDiv"></div>
+
+<div class="bp">
+	<div id="app">Loading...</div>
+	<span class="copy">Powered by Streamflow&#153;</span>
+</div>
+
+<div id="login"></div>
+<div id="components">
 </body>
 </html>
