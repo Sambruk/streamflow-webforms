@@ -99,7 +99,9 @@ var View = (function() {
 			var to = from+parseInt(pageSize)-1;
 			if (casesTotal){
 				to = casesTotal<to ? casesTotal : to;
+				var userObj = LoginModule.currentUser();
 				$('#open-cases-header').text(texts.opencasesheader + ' (' + openCasesTotal + texts.totalcasespiecesheader + ')');
+				$('#user-info').text(userObj.name + ' - ' + userObj.contactId);
 				$('#pagination-info').text(replacePlaceholdersInTranslatedString(texts.labelpaginationinfo, from, to, casesTotal));
 			} else {
 				$('#open-cases-header').text(texts.opencasesheader);
@@ -144,7 +146,9 @@ var View = (function() {
 			var to = from+parseInt(pageSize)-1;
 			if (casesTotal){
 				to = casesTotal<to ? casesTotal : to;
+				var userObj = LoginModule.currentUser();
 				$('#closed-cases-header').text(texts.closedcasesheader + ' (' + closedCasesTotal + texts.totalcasespiecesheader + ')');
+				$('#user-info').text(userObj.name + ' - ' + userObj.contactId);
 				$('#pagination-info').text(replacePlaceholdersInTranslatedString(texts.labelpaginationinfo, from, to, casesTotal));
 			} else {
 				$('#closed-cases-header').text(texts.closedcasesheader);
