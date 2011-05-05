@@ -44,7 +44,7 @@ var UrlModule = (function() {
     }
 
     inner.setUserUrl = function( user ) {
-        urls.user = urls.accesspoint + user + '/';
+        urls.user = urls.accesspoint + user + '/drafts/';
     }
 
     inner.createCaseUrl = function( caze ) {
@@ -59,7 +59,7 @@ var UrlModule = (function() {
     }
 
     inner.getCaseForm = function() {
-        return urls.proxy + urls.user + 'drafts/findcasewithform.json';
+        return urls.proxy + urls.user + 'findcasewithform.json';
     }
 
     inner.getFormDraft = function() {
@@ -67,7 +67,7 @@ var UrlModule = (function() {
     }
 
     inner.createCaseWithForm = function() {
-        return urls.proxy + urls.user + 'drafts/createcasewithform.json';
+        return urls.proxy + urls.user + 'createcasewithform.json';
     }
 
     inner.updateField = function( ) {
