@@ -76,7 +76,7 @@ public class AuthenticateRestlet extends Restlet
          Form verifycertForm = new Form();
          verifycertForm.set( "certificate", cert );
          verifycertForm.set( "provider", provider );
-         Request certRequest = new Request( Method.POST, new Reference( "/authentication/verifycert" ),
+         Request certRequest = new Request( Method.POST, new Reference( "/authentication/verifycert.json" ),
                verifycertForm.getWebRepresentation() );
          proxyService.handle( certRequest, response );
 

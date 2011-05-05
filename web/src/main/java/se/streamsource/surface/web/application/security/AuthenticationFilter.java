@@ -58,33 +58,36 @@ public class AuthenticationFilter extends Filter
    @Override
    protected int beforeHandle(Request request, Response response)
    {
-      
-      if (shouldApplyFilter(request.getResourceRef().getRelativeRef().toString( false, false )))
+
+      if (shouldApplyFilter( request.getResourceRef().getRelativeRef().toString( false, false ) ))
       {
          Series<Cookie> cookies = request.getCookies();
-         String cookieValue = null;
          if (cookies != null && cookies.size() > 0)
-            cookieValue = cookies.get( 0 ).getValue();
-
-         if (!Strings.empty( cookieValue ))
          {
-            try
+            for (Cookie cookie : cookies)
             {
-               String decodedString = URLDecoder.decode( cookieValue, "UTF-8" );
-               UserInfoDTO userInfo = vbf.newValueFromJSON( UserInfoDTO.class, decodedString );
-               String newHash = hashService.hash( userInfo );
-               // Verify the hashvalue and that the session isn't older than one
-               // hour (eId...)
-               if (newHash.equals( userInfo.hash().get() )
-                     && (System.currentTimeMillis() - userInfo.createdOn().get().getTime()) < (60 * 60 * 1000))
+               if (cookie.getName().equals( "SF_MYPAGES_USER" ) && !Strings.empty( cookie.getValue() ))
                {
-                  return Filter.CONTINUE;
+                  try
+                  {
+                     String decodedString = URLDecoder.decode( cookie.getValue(), "UTF-8" );
+                     UserInfoDTO userInfo = vbf.newValueFromJSON( UserInfoDTO.class, decodedString );
+                     String newHash = hashService.hash( userInfo );
+                     // Verify the hashvalue and that the session isn't older
+                     // than
+                     // one
+                     // hour (eId...)
+                     if (newHash.equals( userInfo.hash().get() )
+                           && (System.currentTimeMillis() - userInfo.createdOn().get().getTime()) < (60 * 60 * 1000))
+                     {
+                        return Filter.CONTINUE;
+                     }
+                  } catch (UnsupportedEncodingException e)
+                  {
+                     e.printStackTrace();
+                  }
                }
-            } catch (UnsupportedEncodingException e)
-            {
-               e.printStackTrace();
             }
-
          }
 
          response.setStatus( Status.CLIENT_ERROR_UNAUTHORIZED );
@@ -100,18 +103,20 @@ public class AuthenticationFilter extends Filter
       {
          for (String protectedUrl : protectedUrls)
          {
-            if (relativeUrl.startsWith( protectedUrl )) {
+            if (relativeUrl.startsWith( protectedUrl ))
+            {
                applyFilter = true;
                break;
             }
          }
       }
-      
+
       if (applyFilter && exceptionUrls != null)
       {
          for (String exceptionUrl : exceptionUrls)
          {
-            if (relativeUrl.startsWith( exceptionUrl )) {
+            if (relativeUrl.startsWith( exceptionUrl ))
+            {
                applyFilter = false;
                break;
             }
