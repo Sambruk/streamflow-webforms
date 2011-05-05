@@ -33,7 +33,6 @@ jQuery(document).ready(function()
 		});
 	});
 	
-
 	function setupView() {
 		if (!contactId) 
 		{

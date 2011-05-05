@@ -388,6 +388,11 @@
             </dependency>
             <dependency>
                 <groupId>se.streamsource.streamflow</groupId>
+                <artifactId>streamflow-client-api</artifactId>
+                <version>${version.streamflow}</version>
+            </dependency>
+            <dependency>
+                <groupId>se.streamsource.streamflow</groupId>
                 <artifactId>streamflow-dci</artifactId>
                 <version>${version.streamflow}</version>
             </dependency>

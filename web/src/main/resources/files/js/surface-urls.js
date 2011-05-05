@@ -44,7 +44,7 @@ var UrlModule = (function() {
     }
 
     inner.setUserUrl = function( user ) {
-        urls.user = urls.accesspoint + user + '/';
+        urls.user = urls.accesspoint + user + '/drafts/';
     }
 
     inner.createCaseUrl = function( caze ) {

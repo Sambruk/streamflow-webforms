@@ -44,7 +44,7 @@ var RequestModule = (function() {
     }
 
     function errorPopup() {
-//        alert( texts.erroroccurred );
+        alert( texts.erroroccurred );
         throw "http call failed";
     }
 
@@ -68,18 +68,17 @@ var RequestModule = (function() {
     function verifyEndUser() {
         // Check existance of user.
         var parameters = request('GET', UrlModule.verifyEndUser());
-        parameters.error = function (xhr, ajaxOptions, thrownError){
+        parameters.error = function (xhr, ajaxOptions, thrownError) {
         	if (xhr.status === 404) {
             	createUser();
         	}
         };
-    	invoke($.ajax, parameters);
+    	invoke($.ajax, parameters, texts.errorservernocontact);
     }
 
     function createUser() {
     	var parameters = request('POST', UrlModule.createUser() );
-//        invoke( $.ajax, parameters, texts.createuserfailed );
-        invoke( $.ajax, parameters, 'Could not create user' );
+        invoke( $.ajax, parameters, texts.errorservernocontact );
     };
     
     inner.getOpenCases = function () {
@@ -120,6 +119,7 @@ var RequestModule = (function() {
     inner.getOpenCasesTotal = function () {
     	var parameters = request('GET', UrlModule.getOpenCasesTotal() );
     	parameters.error = null;
+//        return invoke( $.ajax, parameters, texts.errorservernocontact ).responseText;
     	return getData( parameters );
     };
 

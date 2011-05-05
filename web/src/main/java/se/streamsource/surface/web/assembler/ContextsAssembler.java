@@ -25,6 +25,7 @@ import org.qi4j.bootstrap.Assembler;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ImportedServiceDeclaration;
 import org.qi4j.bootstrap.ModuleAssembly;
+import org.qi4j.spi.uuid.UuidIdentityGeneratorService;
 import org.restlet.Restlet;
 import se.streamsource.dci.api.InteractionConstraintsService;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
@@ -58,6 +59,7 @@ public class ContextsAssembler
       module.importedServices(InteractionConstraintsService.class, NullResponseHandler.class).
             importedBy( ImportedServiceDeclaration.NEW_OBJECT ).
             visibleIn( Visibility.application );
+      module.services(UuidIdentityGeneratorService.class).visibleIn(Visibility.layer);
       module.objects(InteractionConstraintsService.class,
               CommandQueryClientFactory.class, CommandQueryClient.class, CookieResponseHandler.class, AttachmentResponseHandler.class);
       module.values(TransactionDomainEvents.class, DomainEvent.class).visibleIn( Visibility.application );

@@ -15,20 +15,78 @@
  * limitations under the License.
  */
 
-body { font-family: Lucida Grande,Lucida Sans,Arial,sans-serif; font-size: 0.8em; }
+/*body .bp { font-family: Lucida Grande,Lucida Sans,Arial,sans-serif; font-size: 0.8em; }*/
+body .bp { font-family: Lucida Grande,Lucida Sans,Arial,sans-serif; font-size: 10pt; }
 
-#app { margin-bottom: 10px; }
+.bp { padding-bottom: 10px; }
 
-span.copy { float: right; }
+.bp span.copy { float: right; font-size: 8pt; }
 
-h1.page-header { font-size: 1.5em; }
+.bp h1.page-header { font-size: 1.5em; }
  
-.mypages_profile_form .ui-widget-content input { 
+.bp .mypages_profile_form .ui-widget-content input { 
 	border: 1px solid #A6C9E2; width: 200px;
 	background: url("images/ui-bg_inset-hard_100_f5f8f9_1x100.png") repeat-x scroll 50% 50% #F5F8F9;
 	color: #000; 
 }
 
-.profile_label { color: #aaa; margin-top: 5px; }
+.bp .profile_label { color: #aaa; margin-top: 5px; }
 
-fieldset { margin: 10px 0; }
+.bp fieldset { margin: 10px 0; }
+
+#inserted_ErrorMessage {
+  display: block;
+  padding: 14px 5px 12px 35px;
+  margin-bottom: 15px;
+  font-size: 1.2em;
+  border: 1px solid;
+  background-repeat: no-repeat;
+  background-position: 6px 15px;
+  background-color: #ffcccc;
+  color: black;
+  border-color: red;
+  background-image: url("../images/forbidden.png");
+}
+
+#inserted_WarningMessage {
+  display: block;
+  padding: 14px 5px 12px 35px;
+  margin-bottom: 15px;
+  font-size: 1.2em;
+  border: 1px solid;
+  background-repeat: no-repeat;
+  background-position: 6px 15px;
+  background-color: #ffffce;
+  color: black;
+  border-color: #eac117;
+  background-image: url("../images/warning.png");
+}
+
+#inserted_InfoMessage {
+  display: block;
+  padding: 14px 5px 12px 35px;
+  margin-bottom: 15px;
+  font-size: 1.2em;
+  border: 1px solid;
+  background-repeat: no-repeat;
+  background-position: 6px 15px;
+  background-color: #d8e4f1;
+  color: black;
+  border-color: #153e7e;
+  background-image: url("../images/information.png");
+}
+
+#inserted_SuccessMessage {
+  display: block;
+  padding: 14px 5px 12px 35px;
+  margin-bottom: 15px;
+  font-size: 1.2em;
+  border: 1px solid;
+  background-repeat: no-repeat;
+  background-position: 6px 15px;
+  background-color: #ddffdd;
+  color: black;
+  border-color: #347235;
+  background-image: url("../images/check.png");
+}
+

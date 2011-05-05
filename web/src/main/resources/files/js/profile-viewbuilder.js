@@ -19,6 +19,7 @@
 streamsource.mypages.profile.Form = (function() {
 	
 	var inner = {};
+    var messages = {};
 	var TEMPLATE_ELEMENT_ID = 'components';
 	var PROFILE_FORM_CLASS = 'mypages_profile_form';
 	var PROFILE_FORM_ID = 'profile_form';
@@ -171,6 +172,12 @@ streamsource.mypages.profile.Form = (function() {
 		return result.get(0);
 	}
 	
+	function clone(id, newId) {
+		if (!newId)
+			return $('#' + id).clone().attr('id', 'inserted_' + id);
+		return $('#' + id).clone().attr('id', newId);
+	}
+
 	/*
 	 * Build the form and populate it with the specified data.
 	 */
@@ -216,10 +223,16 @@ streamsource.mypages.profile.Form = (function() {
 		
 //		profileJSON = buildProfileJSON();
 //		$(.mypages_profile_form).serialize()
-		getRequest().update($("#profile_form").serialize(), function (response, status) {
-			// Notify user of successful save! (or error)
-			;
-		});
+		try {
+			getRequest().update($("#profile_form").serialize(), function (response, status) {
+				// Notify user of successful save! (or error)
+				messages = { info: texts.profilesuccessfulupdate };
+	            showMessages();
+			});
+		} catch ( e ) {
+            messages = { error: e.info };
+            showMessages();
+		}
 	}
 
 	function buildProfileJSON() {
@@ -284,6 +297,19 @@ streamsource.mypages.profile.Form = (function() {
 		return [result];
 	}
 	
+    function showMessages() {
+        if ( messages && messages.info ) {
+            $('#app').prepend( clone( 'InfoMessage' ).append( messages.info ) );
+        }
+        if ( messages && messages.warning ) {
+            $('#app').prepend( clone( 'WarningMessage' ).append( messages.warning ) );
+        }
+        if ( messages && messages.error ) {
+            $('#app').prepend( clone( 'ErrorMessage' ).append( messages.error ) );
+        }
+        messages = {};
+    }
+
 	
 	/*
 	 * Public function that will setup and render the form
