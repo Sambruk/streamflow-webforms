@@ -42,48 +42,52 @@ var UrlModule = (function() {
     inner.getUser = function() {
         return urls.surface + urls.accesspoint + 'userreference.json';
     }
-
+    
     inner.setUserUrl = function( user ) {
-        urls.user = urls.accesspoint + user + '/drafts/';
+        urls.user = urls.accesspoint + user + '/';
+        urls.proxyuser = urls.accesspoint + user + '/drafts/';
     }
 
     inner.createCaseUrl = function( caze ) {
-        if ( !urls.user ) throw "URL to user not defined";
+        if ( !urls.proxyuser && !urls.user) throw "URL to user not defined";
         urls.caze = urls.user + caze + '/';
         urls.draft = null;
+        urls.proxycaze = urls.proxyuser + caze + '/';
+        urls.proxydraft = null;
     }
 
     inner.createFormDraftUrl = function( form ) {
-        if ( !urls.caze ) throw "URL to case not defined";
+        if ( !urls.caze && !urls.proxycaze ) throw "URL to case not defined";
         urls.draft = urls.caze + 'formdrafts/' + form + '/';
+        urls.proxydraft = urls.proxycaze + 'formdrafts/' + form + '/';
     }
 
     inner.getCaseForm = function() {
-        return urls.proxy + urls.user + 'findcasewithform.json';
+        return urls.proxy + urls.proxyuser + 'findcasewithform.json';
     }
 
     inner.getFormDraft = function() {
-        return urls.proxy + urls.draft + 'index.json';
+        return urls.proxy + urls.proxydraft + 'index.json';
     }
 
     inner.createCaseWithForm = function() {
-        return urls.proxy + urls.user + 'createcasewithform.json';
+        return urls.proxy + urls.proxyuser + 'createcasewithform.json';
     }
 
     inner.updateField = function( ) {
-        return urls.proxy + urls.draft + 'updatefield.json';
+        return urls.proxy + urls.proxydraft + 'updatefield.json';
     }
 
     inner.submitAndSend = function() {
-        return urls.proxy + urls.draft + 'summary/submitandsend.json';
+        return urls.proxy + urls.proxydraft + 'summary/submitandsend.json';
     }
 
     inner.discard = function() {
-        return urls.proxy + urls.draft + 'discard.json';
+        return urls.proxy + urls.proxydraft + 'discard.json';
     }
 
     inner.getFormSignatures = function() {
-        return urls.proxy + urls.draft + 'summary/signatures.json';
+        return urls.proxy + urls.proxydraft + 'summary/signatures.json';
     }
 
     inner.getProviders = function() {
@@ -95,11 +99,11 @@ var UrlModule = (function() {
     }
 
     inner.getCaseName = function() {
-        return urls.proxy + urls.caze + 'index.json';
+        return urls.proxy + urls.proxycaze + 'index.json';
     }
 
     inner.getCaseUrl = function() {
-        return urls.proxy + urls.caze;
+        return urls.proxy + urls.proxycaze;
     }
 
     inner.sign = function() {
@@ -115,7 +119,7 @@ var UrlModule = (function() {
     }
 
     inner.refreshField = function( ) {
-        return urls.proxy + urls.draft + 'fieldvalue.json';
+        return urls.proxy + urls.proxydraft + 'fieldvalue.json';
     }
 
     inner.getPrintUrl = function( formId ) {

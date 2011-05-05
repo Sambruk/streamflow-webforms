@@ -27,6 +27,7 @@ import org.qi4j.bootstrap.ModuleAssembly;
 import se.streamsource.dci.restlet.server.DCIAssembler;
 import se.streamsource.dci.restlet.server.NullCommandResult;
 import se.streamsource.dci.value.ValueAssembler;
+import se.streamsource.streamflow.surface.api.assembler.SurfaceAPIAssembler;
 import se.streamsource.surface.web.rest.AttachmentResponseHandler;
 import se.streamsource.surface.web.rest.AuthenticateRestlet;
 import se.streamsource.surface.web.rest.CookieResponseHandler;
@@ -46,6 +47,7 @@ public class SurfaceResourceAssembler
    {
       new ValueAssembler().assemble( module );
       new DCIAssembler().assemble( module );
+      new SurfaceAPIAssembler().assemble( module );
 
       module.importedServices(NullCommandResult.class).importedBy( NEW_OBJECT );
       module.objects(NullCommandResult.class).visibleIn( Visibility.layer );

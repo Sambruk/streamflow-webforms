@@ -50,28 +50,35 @@ var LoginModule = (function() {
 		bankId.click( function() {
 			doAuthenticate();
 		});
-		$( "#dialog-login" ).append('<div>').append(bankId).append('</div>');
+		var bankIdDiv = $(document.createElement('div'));
+		bankIdDiv.append(bankId);
+		$( "#dialog-login" ).append(bankIdDiv);
 		
 		var nordea = $( "#eid_provider_link").clone().attr('id', "nordea_link");
 		nordea.append( "Nordea");
 		nordea.click( function() {
-			$.ajax( {url: 'https://localhost:8444/login-ajax/login/validateclientcert', success: function(data) {
-				alert("You are logged in...");
-				$( "#dialog-login" ).dialog( "close" );
-				$( "#user_info" ).text(LoginModule.currentUser());
-			}, dataType: "json",
-			error: function(data) {
-				alert(data);
-			}});
+			var verifyDTO = {
+					provider : "nexus-personal_4",
+				};
+
+			verify( verifyDTO, '/surface/mypages/authenticate/verifycert'  );
 		});
-		$( "#dialog-login" ).append('<div>').append(nordea).append('</div>');
+		var nordeaDiv = $(document.createElement('div'));
+		nordeaDiv.append(nordea);
+		$( "#dialog-login" ).append(nordeaDiv);
 		
 		var teliaSonera = $( "#eid_provider_link").clone().attr('id', "teliaSonera_link");
 		teliaSonera.append( "TeliaSonera");
 		teliaSonera.click( function() {
-			alert("You selected TeliaSonera...");
+			var verifyDTO = {
+					provider : "netmaker-netid_4",
+				};
+				
+			verify( verifyDTO, '/surface/mypages/authenticate/verifycert'  );
 		});
-		$( "#dialog-login" ).append('<div>').append(teliaSonera).append('</div>');
+		var teliaSoneraDiv = $(document.createElement('div'));
+		teliaSoneraDiv.append(teliaSonera);
+		$( "#dialog-login" ).append(teliaSoneraDiv);
 		
 		$( "#dialog-login" ).dialog({
 			autoOpen: false,
@@ -115,12 +122,7 @@ var LoginModule = (function() {
 				signature : authenticate.GetParam('Signature')
 			};
 			
-			verify( verifyDTO , function( data) {
-				var strValue = JSON.stringify(data);
-				$.cookie('SF_MYPAGES_USER', JSON.stringify(data), {expires: 1, path: '/'});
-				$( "#dialog-login" ).dialog( "close" );
-				$( "#user_info" ).text(LoginModule.currentUser());
-			});
+			verify( verifyDTO, 'authenticate/verify.json' );
 		} else {
 			alert('Failed to create signature! retVal = ' + retVal);
 			return false;
@@ -156,8 +158,14 @@ var LoginModule = (function() {
     	return result;
     }
     
-    function verify( verifyDTO, successfunction) {
-    	var parameters = { type: 'POST', url:'authenticate/verify.json', data:verifyDTO, success:successfunction, message:texts.eidServiceUnavailable};
+    function verify( verifyDTO, url) {
+    	var parameters = { type: 'POST', url:url, data:verifyDTO, message:texts.eidServiceUnavailable};
+    	parameters.success = successfunction = function( data) {
+			var strValue = JSON.stringify(data);
+			$.cookie('SF_MYPAGES_USER', JSON.stringify(data), {expires: 1, path: '/'});
+			$( "#dialog-login" ).dialog( "close" );
+			$( "#user_info" ).text(LoginModule.currentUser());
+		};
     	invoke(parameters);
     };
     
