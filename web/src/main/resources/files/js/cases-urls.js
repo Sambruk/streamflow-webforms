@@ -23,7 +23,6 @@ var UrlModule = (function () {
     var urls = {
     	proxy: 		"proxy/",
         mypages:    "surface/",
-	    eid:        "../eidproxy/"
     };
 
 //    var openCasesQuery = "select label caseid €rendeId,description,created,project,status,href";

@@ -122,7 +122,7 @@ var LoginModule = (function() {
 				signature : authenticate.GetParam('Signature')
 			};
 			
-			verify( verifyDTO, 'authenticate/verify.json' );
+			verify( verifyDTO, '/surface/mypages/authenticate/verify.json' );
 		} else {
 			alert('Failed to create signature! retVal = ' + retVal);
 			return false;
@@ -146,14 +146,14 @@ var LoginModule = (function() {
     
     function getHeader() {
     	var result;
-    	var parameters = { type: 'GET', url:'../eidproxy/authentication/header.htm', dataType:null, success:function(data){ result = data;}, message:texts.eidServiceUnavailable};
+    	var parameters = { type: 'GET', url:'/surface/eidproxy/authentication/header.htm', dataType:null, success:function(data){ result = data;}, message:texts.eidServiceUnavailable};
     	invoke(parameters);
     	return result;
     }
     
     function getChallenge( challengeDTO ) {
     	var result;
-    	var parameters = { type: 'GET', url:'../eidproxy/authentication/challenge.json', data:challengeDTO, success:function(data){ result = data;}, message:texts.eidServiceUnavailable};
+    	var parameters = { type: 'GET', url:'/surface/eidproxy/authentication/challenge.json', data:challengeDTO, success:function(data){ result = data;}, message:texts.eidServiceUnavailable};
     	invoke(parameters);
     	return result;
     }
