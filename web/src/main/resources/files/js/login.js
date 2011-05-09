@@ -57,9 +57,7 @@ var LoginModule = (function() {
 		var nordea = $( "#eid_provider_link").clone().attr('id', "nordea_link");
 		nordea.append( "Nordea");
 		nordea.click( function() {
-			var verifyDTO = {
-					provider : "nexus-personal_4",
-				};
+			var verifyDTO = { provider : "nexus-personal_4" };
 
 			verify( verifyDTO, '/surface/mypages/authenticate/verifycert'  );
 		});
@@ -70,9 +68,7 @@ var LoginModule = (function() {
 		var teliaSonera = $( "#eid_provider_link").clone().attr('id', "teliaSonera_link");
 		teliaSonera.append( "TeliaSonera");
 		teliaSonera.click( function() {
-			var verifyDTO = {
-					provider : "netmaker-netid_4",
-				};
+			var verifyDTO = { provider : "netmaker-netid_4" };
 				
 			verify( verifyDTO, '/surface/mypages/authenticate/verifycert'  );
 		});
@@ -135,7 +131,7 @@ var LoginModule = (function() {
     	var failed = false;
     	parameters.async = false; 
     	parameters.cache = false;
-    	parameters.error = function(){
+    	parameters.error = function(error){
     		failed = true;
     	};
         $.ajax(parameters);
