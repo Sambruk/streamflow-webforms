@@ -18,7 +18,6 @@
 package se.streamsource.surface.web.resource;
 
 import se.streamsource.dci.restlet.server.CommandQueryResource;
-import se.streamsource.surface.web.context.EndUsersContext;
 import se.streamsource.surface.web.context.FormDraftContext;
 
 /**

@@ -1,0 +1,49 @@
+/**
+ *
+ * Copyright 2009-2010 Streamsource AB
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* Cases view */
+form.cases-paging { clear: both; margin-bottom: 2px; font-size: 8pt; }
+.cases-view { margin-bottom: 10px; }
+.ui-widget div div.google-visualization-table-div-page { float: left; }
+div#pagination { float: left; margin-top: 7px; margin-left: 10px; margin-bottom: 15px; font-size: 8pt; }
+
+/* Case details */
+.case-details { clear: both; }
+
+label.detail-label { float: left; padding-right: 10px; color: #aaaaaa; width: 20%; }
+	label.detail-label.first { clear: both; }
+	label.detail-label.single {	width: 100%; clear: both; margin-top: 15px; }
+	label.detail-value.single { margin-top: 0px; }
+	label#history-label { margin-top: 15px; }
+	label#description-label.detail-label { float: left; clear: both; margin-top: 10px; width: 100%; color: #aaaaaa; }
+	
+label.detail-value { float: left; padding-right: 10px; width: 20%; }
+	label.detail-value.first { clear: both; }
+	label#description-value.detail-value { clear: both; float: left; width: 100%; }
+	label#project-value.detail-value { width: 45%; }
+	div.closed-details label#project-value.detail-value { width: 30%; }
+	
+#case-history { clear: both; }
+#case-history-table { clear: both; }
+div#case-history-table.ui-widget tr.google-visualization-table-tr-sel td.google-visualization-table-td { background-color: #fff; }
+.google-visualization-table-div-page .goog-custom-button-inner-box { padding: 4px 5px; }
+
+/* jQuery UI Themeroller customizations */
+.ui-widget { font-size: 1.0em; }
+tr.ui-state-hover { font-weight: normal; }
+tr.ui-state-active { font-weight: normal; }
+legend label#case-id-value.ui-state-active { border: none; font-weight: normal; background: none; }

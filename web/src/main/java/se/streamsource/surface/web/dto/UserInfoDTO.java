@@ -15,21 +15,26 @@
  * limitations under the License.
  */
 
-package se.streamsource.surface.web.rest;
+package se.streamsource.surface.web.dto;
 
-import org.qi4j.bootstrap.Assembler;
-import org.qi4j.bootstrap.AssemblyException;
-import org.qi4j.bootstrap.ModuleAssembly;
-import se.streamsource.dci.restlet.server.ResourceFinder;
+import java.util.Date;
 
-/**
- */
-public class SurfaceRestAssembler
-      implements Assembler
+import org.qi4j.api.common.UseDefaults;
+import org.qi4j.api.property.Property;
+import org.qi4j.api.value.ValueComposite;
+import org.qi4j.library.constraints.annotation.Matches;
+
+public interface UserInfoDTO extends ValueComposite
 {
-   public void assemble( ModuleAssembly module ) throws AssemblyException
-   {
-      module.addObjects( SurfaceRestApplication.class,
-            ResourceFinder.class);
-   }
+
+   @UseDefaults
+   Property<String> name();
+
+   @UseDefaults
+   @Matches("([\\d]{12})?")
+   Property<String> contactId();
+
+   Property<Date> createdOn();
+
+   Property<String> hash();
 }

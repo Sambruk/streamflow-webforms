@@ -22,24 +22,21 @@ import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.value.ValueBuilder;
 import org.qi4j.api.value.ValueBuilderFactory;
 import org.restlet.Response;
-import org.restlet.data.CookieSetting;
 import org.restlet.data.Method;
 import org.restlet.representation.EmptyRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 import org.slf4j.LoggerFactory;
 import se.streamsource.dci.restlet.client.ResponseHandler;
-import se.streamsource.streamflow.domain.form.AttachmentFieldDTO;
 import se.streamsource.streamflow.infrastructure.event.domain.DomainEvent;
 import se.streamsource.streamflow.infrastructure.event.domain.TransactionDomainEvents;
 import se.streamsource.streamflow.infrastructure.event.domain.source.helper.EventParameters;
-import se.streamsource.streamflow.infrastructure.event.domain.source.helper.Events;
-import se.streamsource.surface.web.context.EndUsersContext;
+import se.streamsource.streamflow.surface.api.AttachmentFieldDTO;
 
 import java.io.IOException;
 
-import static org.qi4j.api.util.Iterables.*;
-import static se.streamsource.streamflow.infrastructure.event.domain.source.helper.Events.*;
+import static org.qi4j.api.util.Iterables.first;
+import static se.streamsource.streamflow.infrastructure.event.domain.source.helper.Events.events;
 
 /**
  */
@@ -67,10 +64,10 @@ public class AttachmentResponseHandler
 
                final TransactionDomainEvents transactionEvents = vbf.newValueFromJSON( TransactionDomainEvents.class, source );
 
-               DomainEvent domainEvent = first( events( transactionEvents ));
+               DomainEvent domainEvent = first( events(transactionEvents));
                if ( domainEvent != null)
                {
-                  String attachmentId = EventParameters.getParameter( domainEvent, "param1" );
+                  String attachmentId = EventParameters.getParameter(domainEvent, "param1");
                   attachmentFieldDTO = vbf.newValueBuilder( AttachmentFieldDTO.class );
                   attachmentFieldDTO.prototype().attachment().set( EntityReference.parseEntityReference( attachmentId ) );
                }

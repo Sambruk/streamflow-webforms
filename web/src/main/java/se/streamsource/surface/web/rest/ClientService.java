@@ -82,6 +82,7 @@ public interface ClientService
       public void passivate() throws Exception
       {
          client.stop();
+         client = null;
       }
 
       public boolean isAvailable()
@@ -92,7 +93,16 @@ public interface ClientService
       public void handle( Request request, Response response )
       {
          if (client != null)
-            client.handle( request, response );
+         {
+            Response oldResponse = Response.getCurrent();
+            try
+            {
+               client.handle( request, response );
+            } finally
+            {
+               Response.setCurrent(oldResponse);
+            }
+         }
       }
    }
 }
