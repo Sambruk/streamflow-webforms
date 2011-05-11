@@ -392,10 +392,6 @@ var View = (function() {
 		$('#app').empty().append(node);
 	}
 
-	function redirect(view) {
-		location.hash = view;
-	}
-
 	function addHeader(node, title) {
 		var header = clone('cases-header');
 		// header.find('#form_description').text( FormModule.title() );

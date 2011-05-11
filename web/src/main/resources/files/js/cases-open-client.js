@@ -19,8 +19,8 @@ jQuery(document).ready(function() {
     
 	var contactId;
 	
-	$('#components').hide().load('static/cases-components.html', function() {
-		$('#login').load('static/login-components.html', function(){
+	$('#components').hide().load('/surface/mypages/static/cases-components.html', function() {
+		$('#login').load('/surface/mypages/static/login-components.html', function(){
     		$('#dialog-login').hide();
     		$('#dialog-message').hide();
     		

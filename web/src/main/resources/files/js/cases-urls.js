@@ -22,9 +22,7 @@ var UrlModule = (function () {
    
     var urls = {
     	proxy: 		"proxy/",
-        mypages:    "surface/",
-	    eid:        "../eidproxy/"
-    };
+        mypages:    "surface/" };
 
 //    var openCasesQuery = "select label caseid €rendeId,description,created,project,status,href";
     var openCasesQuery = "select href,caseid,description,created,project,status,lastupdated,lastmessage order by lastupdated desc";

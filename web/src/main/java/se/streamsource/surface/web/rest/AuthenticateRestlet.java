@@ -68,7 +68,7 @@ public class AuthenticateRestlet extends Restlet
 
          Form headers = (Form) request.getAttributes().get( "org.restlet.http.headers" );
 
-         String cert = headers.getFirstValue( "SSL_CLIENT_CERT" );
+         String cert = headers.getFirstValue( "ssl_client_cert" );
 
          cert = cert.substring( "-----BEGIN CERTIFICATE----- ".length(),
                cert.length() - " -----END CERTIFICATE-----".length() );
@@ -76,7 +76,7 @@ public class AuthenticateRestlet extends Restlet
          Form verifycertForm = new Form();
          verifycertForm.set( "certificate", cert );
          verifycertForm.set( "provider", provider );
-         Request certRequest = new Request( Method.POST, new Reference( "/authentication/verifycert" ),
+         Request certRequest = new Request( Method.POST, new Reference( "/authentication/verifycert.json" ),
                verifycertForm.getWebRepresentation() );
          proxyService.handle( certRequest, response );
 
