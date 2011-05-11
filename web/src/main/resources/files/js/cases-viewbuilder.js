@@ -110,7 +110,7 @@ var View = (function() {
 		pagingAction(casesOptions['pageSize'], 0);
 		casesNodeId = node.find('#open-cases-table').attr('id');
 		formatColumnsAction = function(dataTable) {
-			$.each(dataTable.D, function(index, value) {
+			$.each(dataTable.F, function(index, value) {
 				// Date formatting
 				dataTable.setFormattedValue(index, 3,
 						formatDate(utcStringToDate(value.c[3].v)));
@@ -158,7 +158,7 @@ var View = (function() {
 		pagingAction(casesOptions['pageSize'], 0);
 		casesNodeId = node.find('#closed-cases-table').attr('id');
 		formatColumnsAction = function(dataTable) {
-			$.each(dataTable.D, function (index, value) {
+			$.each(dataTable.F, function (index, value) {
 				// Date formatting
 				dataTable.setFormattedValue(index, 3,
 						formatDate(utcStringToDate(value.c[3].v)));
@@ -309,7 +309,7 @@ var View = (function() {
 	function drawCaseHistoryTable(caseIdentity) {
 		$('#history-label').text(texts.labelcasehistory);
 		var historyFormatColumnsAction = function(dataTable) {
-			$.each(dataTable.D, function(index, value) {
+			$.each(dataTable.F, function(index, value) {
 				// Date formatting
 				dataTable.setFormattedValue(index, 1,
 						formatDate(utcStringToDate(value.c[1].v)));
