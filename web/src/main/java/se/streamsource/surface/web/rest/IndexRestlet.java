@@ -17,6 +17,11 @@
 
 package se.streamsource.surface.web.rest;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.service.qualifier.Tagged;
 import org.restlet.Request;
@@ -26,11 +31,6 @@ import org.restlet.Uniform;
 import org.restlet.data.MediaType;
 import org.restlet.data.Reference;
 import org.restlet.data.Status;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 /**
  */
@@ -57,6 +57,7 @@ public class IndexRestlet extends Restlet
          {
             String template = getTemplate("index.html", getClass());
 
+            template = template.replace("$context-root", "/" + request.getResourceRef().getBaseRef().getSegments().get(0));
             template = template.replace("$accesspoint", accessPointId);
             template = template.replace("$hostname", request.getResourceRef().getHostIdentifier());
 
@@ -67,7 +68,7 @@ public class IndexRestlet extends Restlet
          }
       } else
       {
-         response.setLocationRef(new Reference(request.getResourceRef(), "/surface/surface/accesspoints/index"));
+         response.setLocationRef(new Reference(request.getResourceRef(), "/" + request.getResourceRef().getBaseRef().getSegments().get(0) + "/surface/accesspoints/index"));
          response.setStatus(Status.REDIRECTION_TEMPORARY);
       }
    }

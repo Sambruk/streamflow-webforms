@@ -18,8 +18,8 @@
 
 jQuery(document).ready(function()
 {
-    function login( accesspoint ) {
-        RequestModule.init( accesspoint );
+    function login( contextRoot, accesspoint ) {
+        RequestModule.init( contextRoot, accesspoint );
         Contexts.init( contexts );
         
         setupView();
@@ -146,9 +146,9 @@ jQuery(document).ready(function()
            'submit'    : {view:View.submit,   init: [ verifySubmit ]},
            'idContext' : {view:View.sign,     init: [ verifySigner, verifyProvider, setupRequiredSignature ]}}}}};
 
-	$('#components').hide().load('/surface/mypages/static/surface-components.html', function() {
+	$('#components').hide().load(contextRoot + '/mypages/static/surface-components.html', function() {
         try {
-            login( accesspoint );
+            login( contextRoot, accesspoint );
             $(window).hashchange( setupView );
         } catch ( e ) {
             View.error( e );

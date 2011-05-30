@@ -18,22 +18,24 @@
 var UrlModule = (function () {
     var inner = {};
     var enduserid;
-//    var casesDataSource;
    
     var urls = {
-    	proxy: 		"proxy/",
-        mypages:    "surface/" };
+    	proxy: 		"/proxy/",
+    };
 
-//    var openCasesQuery = "select label caseid €rendeId,description,created,project,status,href";
     var openCasesQuery = "select href,caseid,description,created,project,status,lastupdated,lastmessage order by lastupdated desc";
     var closedCasesQuery = "select href,caseid,description,created,project,closed,resolution order by closed desc";
     var caseHistoryQuery = "select message,created order by created desc";
     var casesTotalQuery = "select description";
     var casesQuery = {};
 
+    inner.init = function(contextRoot){
+    	urls.proxy = contextRoot + urls.proxy;
+    };
+    
     inner.setUserId = function (userid) {
     	this.enduserid = userid;
-    	urls.endusers = '/' + urls.mypages + urls.proxy + 'endusers/';
+    	urls.endusers = urls.proxy + 'endusers/';
     	urls.enduser = urls.endusers + this.enduserid + '/';
     };
     

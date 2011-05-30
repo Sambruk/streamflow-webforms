@@ -21,26 +21,29 @@ var UrlModule = (function() {
     var inner = {};
 
     var urls = {
-        proxy:      "proxy/",
-        surface:    "surface/",
-	    eid:        "/surface/eidproxy/"
+        proxy:      "/proxy/",
+        surface:    "/surface/",
+	    eid:        "/eidproxy/"
     };
 
 
-    inner.setAccessPoint = function( accesspoint ) {
+    inner.init = function( contextRoot, accesspoint ) {
+    	urls.proxy = contextRoot + urls.proxy;
+    	urls.surface = contextRoot + urls.surface;
+    	urls.eid = contextRoot + urls.eid;
         urls.accesspoint = 'accesspoints/' + accesspoint + '/endusers/';
     }
 
     inner.verifyAccessPoint = function() {
-        return '/' + urls.surface + urls.proxy + urls.accesspoint + '.json';
+        return urls.proxy + urls.accesspoint + '.json';
     }
 
     inner.selectEndUser = function() {
-        return '/surface/' + urls.surface + urls.accesspoint + 'selectenduser.json';
+        return urls.surface + urls.accesspoint + 'selectenduser.json';
     }
 
     inner.getUser = function() {
-        return '/surface/' + urls.surface + urls.accesspoint + 'userreference.json';
+        return urls.surface + urls.accesspoint + 'userreference.json';
     }
     
     inner.setUserUrl = function( user ) {
@@ -63,31 +66,31 @@ var UrlModule = (function() {
     }
 
     inner.getCaseForm = function() {
-        return '/' + urls.surface + urls.proxy + urls.proxyuser + 'findcasewithform.json';
+        return urls.proxy + urls.proxyuser + 'findcasewithform.json';
     }
 
     inner.getFormDraft = function() {
-        return '/' + urls.surface + urls.proxy + urls.proxydraft + 'index.json';
+        return urls.proxy + urls.proxydraft + 'index.json';
     }
 
     inner.createCaseWithForm = function() {
-        return '/' + urls.surface + urls.proxy + urls.proxyuser + 'createcasewithform.json';
+        return urls.proxy + urls.proxyuser + 'createcasewithform.json';
     }
 
     inner.updateField = function( ) {
-        return '/' + urls.surface + urls.proxy + urls.proxydraft + 'updatefield.json';
+        return urls.proxy + urls.proxydraft + 'updatefield.json';
     }
 
     inner.submitAndSend = function() {
-        return '/' + urls.surface + urls.proxy + urls.proxydraft + 'summary/submitandsend.json';
+        return urls.proxy + urls.proxydraft + 'summary/submitandsend.json';
     }
 
     inner.discard = function() {
-        return '/' + urls.surface + urls.proxy + urls.proxydraft + 'discard.json';
+        return urls.proxy + urls.proxydraft + 'discard.json';
     }
 
     inner.getFormSignatures = function() {
-        return '/' + urls.surface + urls.proxy + urls.proxydraft + 'summary/signatures.json';
+        return urls.proxy + urls.proxydraft + 'summary/signatures.json';
     }
 
     inner.getProviders = function() {
@@ -99,11 +102,11 @@ var UrlModule = (function() {
     }
 
     inner.getCaseName = function() {
-        return '/' + urls.surface + urls.proxy + urls.proxycaze + 'index.json';
+        return urls.proxy + urls.proxycaze + 'index.json';
     }
 
     inner.getCaseUrl = function() {
-        return '/' + urls.surface + urls.proxy + urls.proxycaze;
+        return urls.proxy + urls.proxycaze;
     }
 
     inner.sign = function() {
@@ -111,15 +114,15 @@ var UrlModule = (function() {
     }
 
     inner.verify = function( ) {
-        return '/surface/' + urls.surface + urls.draft + 'verify.json';
+        return urls.surface + urls.draft + 'verify.json';
     }
 
     inner.attach = function( ) {
-        return '/surface/' + urls.surface + urls.draft + 'createattachment';
+        return urls.surface + urls.draft + 'createattachment';
     }
 
     inner.refreshField = function( ) {
-        return '/' + urls.surface + urls.proxy + urls.proxydraft + 'fieldvalue.json';
+        return urls.proxy + urls.proxydraft + 'fieldvalue.json';
     }
 
     inner.getPrintUrl = function( formId ) {

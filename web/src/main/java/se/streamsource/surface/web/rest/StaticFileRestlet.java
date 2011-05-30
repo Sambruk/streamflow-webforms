@@ -47,6 +47,7 @@ public class StaticFileRestlet extends Restlet
       try
          {
             String template = getTemplate(filename, getClass());
+            template = template.replace("$context-root", "/" + request.getResourceRef().getBaseRef().getSegments().get(0));
             response.setEntity(template, MediaType.TEXT_HTML);
          } catch (IOException e)
          {
