@@ -17,15 +17,12 @@
 
 package se.streamsource.surface.web.rest;
 
-import java.util.Date;
-
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.service.qualifier.Tagged;
+import org.qi4j.api.structure.Module;
 import org.qi4j.api.value.ValueBuilder;
-import org.qi4j.api.value.ValueBuilderFactory;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
@@ -36,9 +33,10 @@ import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
-
 import se.streamsource.surface.web.application.security.HashService;
 import se.streamsource.surface.web.dto.UserInfoDTO;
+
+import java.util.Date;
 
 /**
  * TODO
@@ -50,7 +48,7 @@ public class AuthenticateRestlet extends Restlet
    Uniform proxyService;
 
    @Structure
-   ValueBuilderFactory vbf;
+   Module module;
 
    @Service
    HashService hashService;
@@ -114,7 +112,7 @@ public class AuthenticateRestlet extends Restlet
          String entityAsText = response.getEntityAsText();
 
          JSONObject jsonObject = new JSONObject( entityAsText );
-         ValueBuilder<UserInfoDTO> builder = vbf.newValueBuilder( UserInfoDTO.class );
+         ValueBuilder<UserInfoDTO> builder = module.valueBuilderFactory().newValueBuilder(UserInfoDTO.class);
          builder.prototype().name().set( jsonObject.getString( "name" ) );
          builder.prototype().contactId().set( jsonObject.getString( "contactId" ) );
          builder.prototype().createdOn().set( new Date());

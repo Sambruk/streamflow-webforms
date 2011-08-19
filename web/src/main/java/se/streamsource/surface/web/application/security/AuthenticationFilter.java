@@ -17,15 +17,10 @@
 
 package se.streamsource.surface.web.application.security;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.injection.scope.Uses;
-import org.qi4j.api.value.ValueBuilderFactory;
+import org.qi4j.api.structure.Module;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -34,9 +29,13 @@ import org.restlet.data.Cookie;
 import org.restlet.data.Status;
 import org.restlet.routing.Filter;
 import org.restlet.util.Series;
-
 import se.streamsource.streamflow.util.Strings;
 import se.streamsource.surface.web.dto.UserInfoDTO;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AuthenticationFilter extends Filter
 {
@@ -45,7 +44,7 @@ public class AuthenticationFilter extends Filter
    HashService hashService;
 
    @Structure
-   ValueBuilderFactory vbf;
+   Module module;
 
    List<String> protectedUrls = new ArrayList<String>();
    List<String> exceptionUrls = new ArrayList<String>();
@@ -71,7 +70,7 @@ public class AuthenticationFilter extends Filter
             try
             {
                String decodedString = URLDecoder.decode( cookieValue, "UTF-8" );
-               UserInfoDTO userInfo = vbf.newValueFromJSON( UserInfoDTO.class, decodedString );
+               UserInfoDTO userInfo = module.valueBuilderFactory().newValueFromJSON(UserInfoDTO.class, decodedString);
                String newHash = hashService.hash( userInfo );
                // Verify the hashvalue and that the session isn't older than one
                // hour (eId...)

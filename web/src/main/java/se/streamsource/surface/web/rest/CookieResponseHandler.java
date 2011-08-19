@@ -18,7 +18,7 @@
 package se.streamsource.surface.web.rest;
 
 import org.qi4j.api.injection.scope.Structure;
-import org.qi4j.api.value.ValueBuilderFactory;
+import org.qi4j.api.structure.Module;
 import org.restlet.Response;
 import org.restlet.data.CookieSetting;
 import org.restlet.data.Method;
@@ -43,7 +43,7 @@ public class CookieResponseHandler
       implements ResponseHandler
 {
    @Structure
-   ValueBuilderFactory vbf;
+   Module module;
 
    private CookieSetting cookieSetting;
 
@@ -61,7 +61,7 @@ public class CookieResponseHandler
             {
                String source = entity.getText();
 
-               final TransactionDomainEvents transactionEvents = vbf.newValueFromJSON( TransactionDomainEvents.class, source );
+               final TransactionDomainEvents transactionEvents = module.valueBuilderFactory().newValueFromJSON(TransactionDomainEvents.class, source);
 
                DomainEvent domainEvent = first( events( transactionEvents ));
                if ( domainEvent != null)

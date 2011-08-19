@@ -19,8 +19,8 @@ package se.streamsource.surface.web.rest;
 
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.injection.scope.Structure;
+import org.qi4j.api.structure.Module;
 import org.qi4j.api.value.ValueBuilder;
-import org.qi4j.api.value.ValueBuilderFactory;
 import org.restlet.Response;
 import org.restlet.data.Method;
 import org.restlet.representation.EmptyRepresentation;
@@ -44,7 +44,7 @@ public class AttachmentResponseHandler
       implements ResponseHandler
 {
    @Structure
-   ValueBuilderFactory vbf;
+   Module module;
 
    private ValueBuilder<AttachmentFieldDTO> attachmentFieldDTO;
 
@@ -62,13 +62,13 @@ public class AttachmentResponseHandler
             {
                String source = entity.getText();
 
-               final TransactionDomainEvents transactionEvents = vbf.newValueFromJSON( TransactionDomainEvents.class, source );
+               final TransactionDomainEvents transactionEvents = module.valueBuilderFactory().newValueFromJSON(TransactionDomainEvents.class, source);
 
                DomainEvent domainEvent = first( events(transactionEvents));
                if ( domainEvent != null)
                {
                   String attachmentId = EventParameters.getParameter(domainEvent, "param1");
-                  attachmentFieldDTO = vbf.newValueBuilder( AttachmentFieldDTO.class );
+                  attachmentFieldDTO = module.valueBuilderFactory().newValueBuilder(AttachmentFieldDTO.class);
                   attachmentFieldDTO.prototype().attachment().set( EntityReference.parseEntityReference( attachmentId ) );
                }
 

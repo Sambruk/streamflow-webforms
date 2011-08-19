@@ -17,12 +17,9 @@
 
 package se.streamsource.surface.web.rest;
 
-import java.util.logging.Logger;
-
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Structure;
-import org.qi4j.api.object.ObjectBuilderFactory;
-import org.qi4j.api.unitofwork.UnitOfWorkFactory;
+import org.qi4j.api.structure.Module;
 import org.qi4j.bootstrap.Energy4Java;
 import org.qi4j.spi.structure.ApplicationSPI;
 import org.restlet.Application;
@@ -32,13 +29,14 @@ import org.restlet.resource.Directory;
 import org.restlet.routing.Filter;
 import org.restlet.routing.Router;
 import org.restlet.routing.Template;
-
 import se.streamsource.dci.restlet.server.ExtensionMediaTypeFilter;
 import se.streamsource.surface.web.application.security.AuthenticationFilter;
 import se.streamsource.surface.web.assembler.SurfaceWebAssembler;
 import se.streamsource.surface.web.mypages.MyPagesAccessFilter;
 import se.streamsource.surface.web.mypages.MyPagesAccessFilterService;
 import se.streamsource.surface.web.resource.SurfaceRestlet;
+
+import java.util.logging.Logger;
 
 public class SurfaceRestApplication extends Application
 {
@@ -49,11 +47,8 @@ public class SurfaceRestApplication extends Application
    MyPagesAccessFilterService filterService;
    
    @Structure
-   ObjectBuilderFactory factory;
+   Module module;
    
-   @Structure
-   UnitOfWorkFactory unitOfWorkFactory;
-
    @Structure
    ApplicationSPI app;
 
@@ -86,13 +81,13 @@ public class SurfaceRestApplication extends Application
       Router surfaceRouter = new Router();
       Router mypagesRouter = new Router();
 
-      AuthenticationFilter authenticationFilter = factory.newObjectBuilder( AuthenticationFilter.class ).use( getContext(), surfaceRouter ).newInstance(); 
+      AuthenticationFilter authenticationFilter = module.objectBuilderFactory().newObjectBuilder(AuthenticationFilter.class).use( getContext(), surfaceRouter ).newInstance();
       authenticationFilter.addProtectedUrls( "proxy/endusers/" );
       
-      Restlet cqr = factory.newObjectBuilder( SurfaceRestlet.class ).use( getContext() ).newInstance();
-      StreamflowProxyRestlet proxyRestlet = factory.newObject( StreamflowProxyRestlet.class );
-      EidProxyRestlet eidProxyRestlet = factory.newObject( EidProxyRestlet.class );
-      IndexRestlet indexRestlet = factory.newObject( IndexRestlet.class );
+      Restlet cqr = module.objectBuilderFactory().newObjectBuilder(SurfaceRestlet.class).use( getContext() ).newInstance();
+      StreamflowProxyRestlet proxyRestlet = module.objectBuilderFactory().newObject(StreamflowProxyRestlet.class);
+      EidProxyRestlet eidProxyRestlet = module.objectBuilderFactory().newObject(EidProxyRestlet.class);
+      IndexRestlet indexRestlet = module.objectBuilderFactory().newObject(IndexRestlet.class);
       surfaceRouter.attachDefault( indexRestlet );
       surfaceRouter.attach( "/eidproxy", eidProxyRestlet, Template.MODE_STARTS_WITH );
       surfaceRouter.attach( "/proxy", proxyRestlet, Template.MODE_STARTS_WITH );
@@ -100,7 +95,7 @@ public class SurfaceRestApplication extends Application
       surfaceRouter.attach( "/texts", new TextsRestlet() );
       surfaceRouter.attach( "/static", new Directory( getContext(), "clap://thread/files/" ) );
       
-      Filter mypagesFilter = factory.newObjectBuilder( MyPagesAccessFilter.class ).use( getContext(), mypagesRouter , filterService ).newInstance(); 
+      Filter mypagesFilter = module.objectBuilderFactory().newObjectBuilder(MyPagesAccessFilter.class).use( getContext(), mypagesRouter , filterService ).newInstance();
       
       surfaceRouter.attach( "/mypages", mypagesFilter, Template.MODE_STARTS_WITH);
       mypagesRouter.attach( "/static", new Directory( getContext(), "clap://thread/files/" ) );
@@ -109,7 +104,7 @@ public class SurfaceRestApplication extends Application
       mypagesRouter.attach( "/closedcases", new StaticFileRestlet("closedcases.html"), Template.MODE_EQUALS );
       mypagesRouter.attach( "/profile", new StaticFileRestlet("profile.html"), Template.MODE_STARTS_WITH );
       mypagesRouter.attach( "/logout", new StaticFileRestlet("logout.html"), Template.MODE_EQUALS );
-      mypagesRouter.attach( "/authenticate", factory.newObject( AuthenticateRestlet.class ), Template.MODE_STARTS_WITH );
+      mypagesRouter.attach( "/authenticate", module.objectBuilderFactory().newObject(AuthenticateRestlet.class), Template.MODE_STARTS_WITH );
 
       getTunnelService().setLanguageParameter( "locale" );
 
