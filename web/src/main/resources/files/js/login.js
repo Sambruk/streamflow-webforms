@@ -17,6 +17,64 @@
 var LoginModule = (function() {
     var inner = {};
 	
+    var urls = {
+        mypages:      "/mypages/",
+	    eidproxy:        "/eidproxy/"
+    };
+    
+	inner.init = function( contextRoot ) {
+		
+    	urls.mypages = contextRoot + urls.mypages;
+    	urls.eidproxy = contextRoot + urls.eidproxy;
+		
+		loadEidPlugin();
+		
+		$("#login-message").append(texts.loginmessage);
+		var bankId = $( "#eid_provider_link").clone().attr('id', "bankId_link");
+		bankId.append( "BankId");
+		bankId.click( function() {
+			doAuthenticate();
+		});
+		var bankIdDiv = $(document.createElement('div'));
+		bankIdDiv.append(bankId);
+		$( "#dialog-login" ).append(bankIdDiv);
+		
+		var nordea = $( "#eid_provider_link").clone().attr('id', "nordea_link");
+		nordea.append( "Nordea");
+		nordea.click( function() {
+			var verifyDTO = { provider : "nexus-personal_4" };
+
+			verify( verifyDTO, urls.mypages + 'authenticate/verifycert'  );
+		});
+		var nordeaDiv = $(document.createElement('div'));
+		nordeaDiv.append(nordea);
+		$( "#dialog-login" ).append(nordeaDiv);
+		
+		var teliaSonera = $( "#eid_provider_link").clone().attr('id', "teliaSonera_link");
+		teliaSonera.append( "TeliaSonera");
+		teliaSonera.click( function() {
+			var verifyDTO = { provider : "netmaker-netid_4" };
+				
+			verify( verifyDTO, urls.mypages + 'authenticate/verifycert'  );
+		});
+		var teliaSoneraDiv = $(document.createElement('div'));
+		teliaSoneraDiv.append(teliaSonera);
+		$( "#dialog-login" ).append(teliaSoneraDiv);
+		
+		$( "#dialog-login" ).dialog({
+			autoOpen: false,
+			height: 300,
+			width: 350,
+			modal: true,
+			buttons: {
+				Cancel: function() {
+					$( "#dialog-login" ).unbind( "dialogclose");
+					$( this ).dialog( "close" );
+				}
+			}
+		});
+    }
+		
 	function loadEidPlugin() {
 		var header = getHeader();
     	$("#authenticationDiv").append( header );
@@ -40,60 +98,6 @@ var LoginModule = (function() {
 		return currentUser;
 	}
 	
-	inner.init = function() {
-		
-		loadEidPlugin();
-		
-		$("#login-message").append(texts.loginmessage);
-		var bankId = $( "#eid_provider_link").clone().attr('id', "bankId_link");
-		bankId.append( "BankId");
-		bankId.click( function() {
-			doAuthenticate();
-		});
-		var bankIdDiv = $(document.createElement('div'));
-		bankIdDiv.append(bankId);
-		$( "#dialog-login" ).append(bankIdDiv);
-		
-		var nordea = $( "#eid_provider_link").clone().attr('id', "nordea_link");
-		nordea.append( "Nordea");
-		nordea.click( function() {
-			var verifyDTO = {
-					provider : "nexus-personal_4",
-				};
-
-			verify( verifyDTO, '/surface/mypages/authenticate/verifycert'  );
-		});
-		var nordeaDiv = $(document.createElement('div'));
-		nordeaDiv.append(nordea);
-		$( "#dialog-login" ).append(nordeaDiv);
-		
-		var teliaSonera = $( "#eid_provider_link").clone().attr('id', "teliaSonera_link");
-		teliaSonera.append( "TeliaSonera");
-		teliaSonera.click( function() {
-			var verifyDTO = {
-					provider : "netmaker-netid_4",
-				};
-				
-			verify( verifyDTO, '/surface/mypages/authenticate/verifycert'  );
-		});
-		var teliaSoneraDiv = $(document.createElement('div'));
-		teliaSoneraDiv.append(teliaSonera);
-		$( "#dialog-login" ).append(teliaSoneraDiv);
-		
-		$( "#dialog-login" ).dialog({
-			autoOpen: false,
-			height: 300,
-			width: 350,
-			modal: true,
-			buttons: {
-				Cancel: function() {
-					$( "#dialog-login" ).unbind( "dialogclose");
-					$( this ).dialog( "close" );
-				}
-			}
-		});
-    }
-		
 	function doAuthenticate() {
 		var authenticate = document.auth;
 		
@@ -122,7 +126,7 @@ var LoginModule = (function() {
 				signature : authenticate.GetParam('Signature')
 			};
 			
-			verify( verifyDTO, '/surface/mypages/authenticate/verify.json' );
+			verify( verifyDTO, urls.mypages + 'authenticate/verify.json' );
 		} else {
 			alert('Failed to create signature! retVal = ' + retVal);
 			return false;
@@ -135,7 +139,7 @@ var LoginModule = (function() {
     	var failed = false;
     	parameters.async = false; 
     	parameters.cache = false;
-    	parameters.error = function(){
+    	parameters.error = function(error){
     		failed = true;
     	};
         $.ajax(parameters);
@@ -146,14 +150,14 @@ var LoginModule = (function() {
     
     function getHeader() {
     	var result;
-    	var parameters = { type: 'GET', url:'/surface/eidproxy/authentication/header.htm', dataType:null, success:function(data){ result = data;}, message:texts.eidServiceUnavailable};
+    	var parameters = { type: 'GET', url:urls.eidproxy + 'authentication/header.htm', dataType:null, success:function(data){ result = data;}, message:texts.eidServiceUnavailable};
     	invoke(parameters);
     	return result;
     }
     
     function getChallenge( challengeDTO ) {
     	var result;
-    	var parameters = { type: 'GET', url:'/surface/eidproxy/authentication/challenge.json', data:challengeDTO, success:function(data){ result = data;}, message:texts.eidServiceUnavailable};
+    	var parameters = { type: 'GET', url:urls.eidproxy + 'authentication/challenge.json', data:challengeDTO, success:function(data){ result = data;}, message:texts.eidServiceUnavailable};
     	invoke(parameters);
     	return result;
     }

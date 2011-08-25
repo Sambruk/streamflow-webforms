@@ -19,13 +19,14 @@ jQuery(document).ready(function()
 {
 	var contactId;
 		
-	$("#components").hide().load("/surface/mypages/static/profile-components.html", function() {
-		$('#login').load('/surface/mypages/static/login-components.html', function(){
+	$("#components").hide().load( contextRoot + "/mypages/static/profile-components.html", function() {
+		$('#login').load( contextRoot + '/mypages/static/login-components.html', function(){
     		$('#dialog-login').hide();
     		$('#dialog-message').hide();
     		
 			try {
-				LoginModule.init();
+				LoginModule.init(contextRoot);
+				streamsource.mypages.profile.Url.init(contextRoot);
 				setupView();
 			} catch (e) {
 				alert(e);

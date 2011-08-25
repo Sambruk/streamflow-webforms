@@ -22,12 +22,14 @@ streamsource.mypages.profile = {};
 streamsource.mypages.profile.Url = (function() {
 	var inner = {};
 	
-	var urls = {
-			proxy: '/surface/proxy'					
+	var url = "";
+	
+	inner.init = function( contextRoot ){
+		url = contextRoot + '/proxy/endusers/';
 	};
-		
+	
 	inner.profileUrl = function(userId, resource) {
-		result = urls.proxy + '/endusers/' + userId + '/profile';
+		result = url + userId + '/profile';
 		if ( resource ) {
 			return result + resource;
 		}

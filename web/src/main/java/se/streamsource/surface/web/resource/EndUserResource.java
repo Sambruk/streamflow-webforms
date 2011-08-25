@@ -34,7 +34,8 @@ public class EndUserResource
 
    public void resource( String segment ) throws ResourceException
    {
-      current().set( current().get( CommandQueryClient.class ).getSubClient( segment ));
+
+      current().set( current().get( CommandQueryClient.class ).getSubClient( "drafts" ).getSubClient( segment ));
       subResource( CaseResource.class );
    }
 }

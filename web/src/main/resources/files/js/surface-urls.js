@@ -21,13 +21,16 @@ var UrlModule = (function() {
     var inner = {};
 
     var urls = {
-        proxy:      "proxy/",
-        surface:    "surface/",
-	    eid:        "eidproxy/"
+        proxy:      "/proxy/",
+        surface:    "/surface/",
+	    eid:        "/eidproxy/"
     };
 
 
-    inner.setAccessPoint = function( accesspoint ) {
+    inner.init = function( contextRoot, accesspoint ) {
+    	urls.proxy = contextRoot + urls.proxy;
+    	urls.surface = contextRoot + urls.surface;
+    	urls.eid = contextRoot + urls.eid;
         urls.accesspoint = 'accesspoints/' + accesspoint + '/endusers/';
     }
 

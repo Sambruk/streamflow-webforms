@@ -48,8 +48,8 @@ var RequestModule = (function() {
         return result;
     }
 
-    inner.init = function( accesspoint ) {
-        UrlModule.setAccessPoint( accesspoint );
+    inner.init = function( contextRoot, accesspoint ) {
+        UrlModule.init( contextRoot, accesspoint );
         verifyAccessPoint();
         selectEndUser();
         UrlModule.setUserUrl( getUser() );
