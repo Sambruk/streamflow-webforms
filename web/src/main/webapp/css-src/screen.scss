@@ -74,19 +74,33 @@ background-color: $fieldset_background;
   li {
     color: $main_color;
     font-size: 100%;
-    padding: 20px 10px 0 10px;
-    background-image:url('../images/breadcrumb.png');
+    padding: 0px 10px 0 10px;
     background-repeat:no-repeat;
-    background-position:center top;  
+    background-position:center top;
+    &.progress_first {
+    	background-image:url('../images/progress_bg_first.png');
+	}
+	&.progress {
+    	background-image:url('../images/progress_bg.png');
+	}   
+    &.progress_last {
+    	background-image:url('../images/progress_bg_last.png');
+	}
   }
+  
   a { text-decoration: none; }
-  li.selected { background-image:url('../images/breadcrumb_selected.png');}
-  li.summary { background-image:url('../images/breadcrumb_summary.png');}
-  li.summary_selected { background-image:url('../images/breadcrumb_summary_selected.png');}
 }
 
-a#inserted_link.breadcrumb {color: $main_color; }
-a#inserted_link.breadcrumb:hover {color: $main_color; }
+a#inserted_link.progress {
+	color: $main_color;
+	text-align: center;
+	img {
+		display: block;
+    	margin-left: auto;
+    	margin-right: auto;
+	} 
+}
+a#inserted_link.progress:hover {color: $main_color; }
 
 #form_filling_div  ul {
   display: block;

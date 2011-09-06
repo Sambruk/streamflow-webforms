@@ -31,7 +31,7 @@ import se.streamsource.dci.api.RoleMap;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.dci.restlet.client.CommandQueryClientFactory;
 import se.streamsource.dci.restlet.client.NullResponseHandler;
-import se.streamsource.dci.restlet.server.CommandQueryRestlet2;
+import se.streamsource.dci.restlet.server.CommandQueryRestlet;
 
 import java.util.List;
 import java.util.Locale;
@@ -40,7 +40,7 @@ import java.util.Locale;
  * JAVADOC
  */
 public class SurfaceRestlet
-      extends CommandQueryRestlet2
+      extends CommandQueryRestlet
 {
    @Structure
    ObjectBuilderFactory obf;
