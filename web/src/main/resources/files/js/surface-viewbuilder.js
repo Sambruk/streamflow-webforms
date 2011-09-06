@@ -254,7 +254,7 @@ var View = (function() {
     }
     
     function addSubmit( footer ) {
-        var button = new inner.Button( footer ).image('submit').name(texts.submit).href(getSubmit()).enable( FormModule.canSubmit() );
+    	var button = new inner.Button( footer ).image('submit').name(texts.submit).href(getSubmit()).enable( FormModule.canSubmit() );
         addError( button );
     }
 
@@ -349,18 +349,23 @@ var View = (function() {
     }
 
     function appendPageNames( current, pages, pagesNode ) {
-        var styleClass;
+        var listStyle = "progress_first";
         $.each( pages, function(idx, page){
-        	styleClass = idx==current ? "selected" : "";
-            pagesNode.append( createBreadcrumb(styleClass, getPage(idx), page.title) );
+            pagesNode.append( createBreadcrumb(listStyle, idx==current, getPage(idx), page.title) );
+            listStyle = "progress";
         });
-        styleClass = current==-1 ? "summary_selected" : "summary";
-        pagesNode.append( createBreadcrumb(styleClass, getSummary(), texts.summary) );
+        pagesNode.append( createBreadcrumb("progress_last", current==-1, getSummary(), texts.summary) );
     }
 
-    function createBreadcrumb( style, href, title ){
-    	var pageElm = $('<li />').attr("class", style);
-        pageElm.append(clone('link').attr({'href':href, "class":"breadcrumb"}).append(title));
+    function createBreadcrumb( listStyle, selected, href, title ){
+    	var pageElm = clone('progress');
+    	pageElm.attr('class', listStyle);
+    	if ( selected) {
+    		pageElm.find('#progress_image').append(clone('link').attr({'href':href, "class":"progress"}).append(clone('progress_icon_selected')));
+    	} else {
+    		pageElm.find('#progress_image').append(clone('link').attr({'href':href, "class":"progress"}).append(clone('progress_icon')));
+    	}
+    	pageElm.find('#progress_text').append(clone('link').attr({'href':href, "class":"progress"}).append(title));
         return pageElm;
     }
 
