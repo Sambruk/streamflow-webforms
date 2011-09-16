@@ -143,7 +143,8 @@ var View = (function() {
     inner.sign = function( args ) {
         var retVal = doSign();
         if ( retVal != 0 ) {
-            throw { warning: texts.signatureAborted +retVal, redirect:getSummary() };
+			var errorKey = "eid-" + retVal; 
+            throw { warning: texts.eiderrormessage + ": " + texts[errorKey], redirect:getSummary() };
         } else {
             // strip parameters
             var verifyDTO = {};
