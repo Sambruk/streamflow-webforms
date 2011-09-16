@@ -251,18 +251,20 @@ var FieldTypeModule = (function() {
 
     function TextAreaFieldValue( field ) {
     	field.node = clone( field.fieldType, field.id );
-    	field.node.attr({
-            cols: field.fieldValue.cols,
-            rows: field.fieldValue.rows-1
-        });
-        field.node.change( function() { field.changed(); } );
+    	var maxWidth = $('#app').width();
+    	var cssWidth = field.fieldValue.cols * 7.3;
+    	field.node.css("width", cssWidth < maxWidth ? cssWidth : maxWidth )
+    	field.node.css("height", field.fieldValue.rows * 13);
+    	field.node.change( function() { field.changed(); } );
         field.node.blur( function() { field.update(); } );
     }
 
 
     function TextFieldValue( field ) {
     	field.node = clone( "textfield", field.id );
-    	field.node.attr('size', field.fieldValue.width );
+    	var maxWidth = $('#app').width();
+    	var cssWidth = field.fieldValue.width * 7.3;
+    	field.node.css("width", cssWidth < maxWidth ? cssWidth : maxWidth )
         field.node.change( function() { field.changed(); });
         field.node.blur( function() {
             if ( !field.dirty ) return;
