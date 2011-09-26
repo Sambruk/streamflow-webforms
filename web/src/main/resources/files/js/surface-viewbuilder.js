@@ -71,11 +71,16 @@ var View = (function() {
         FieldTypeModule.createFieldUI( field );
 
         var fieldNode = clone( 'FormField', 'Field' + field.id ).appendTo( node );
-        var fieldHeader = fieldNode.find('div.fieldname');
-        clone('label').append(field.name).appendTo( fieldHeader );
-        hint( fieldHeader, field );
-        mandatory( fieldHeader, field );
-        toolTip( fieldHeader, field );
+       
+        if ( field.fieldType == "CommentFieldValue" ) {
+        	fieldNode.find('div.fieldname').remove();
+        } else {
+        	var fieldHeader = fieldNode.find('div.fieldname');
+	        clone('label').append(field.name).appendTo( fieldHeader );
+	        hint( fieldHeader, field );
+	        mandatory( fieldHeader, field );
+	        toolTip( fieldHeader, field );
+        }
         fieldNode.find('div.fieldvalue').append( field.node );
         field.refreshUI();
     };
@@ -138,7 +143,8 @@ var View = (function() {
     inner.sign = function( args ) {
         var retVal = doSign();
         if ( retVal != 0 ) {
-            throw { warning: texts.signatureAborted +retVal, redirect:getSummary() };
+			var errorKey = "eid-" + retVal; 
+            throw { warning: texts.eiderrormessage + ": " + texts[errorKey], redirect:getSummary() };
         } else {
             // strip parameters
             var verifyDTO = {};

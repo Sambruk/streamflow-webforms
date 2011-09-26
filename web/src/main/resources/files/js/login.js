@@ -128,7 +128,8 @@ var LoginModule = (function() {
 			
 			verify( verifyDTO, urls.mypages + 'authenticate/verify.json' );
 		} else {
-			alert('Failed to create signature! retVal = ' + retVal);
+			var errorKey = "eid-" + retVal; 
+			alert(texts.eiderrormessage + ": " + texts[errorKey]);
 			return false;
 		}
 	}
