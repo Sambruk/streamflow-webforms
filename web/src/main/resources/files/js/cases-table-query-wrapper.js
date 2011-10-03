@@ -48,7 +48,7 @@
  * @constructor
  */
 var TableQueryWrapper = function(table, query, options, selectionHandler,
-		formatColumnsAction, pagingAction) {
+		formatViewAction, pagingAction) {
 
 	// this.table = new google.visualization.Table(container);
 	this.table = table;
@@ -57,7 +57,7 @@ var TableQueryWrapper = function(table, query, options, selectionHandler,
 	this.sortQueryClause = '';
 	this.pageQueryClause = '';
 	this.currentDataTable = null;
-	this.formatColumnsAction = formatColumnsAction;
+	this.formatViewAction = formatViewAction;
 
 	var self = this;
 	var addListener = google.visualization.events.addListener;
@@ -119,8 +119,10 @@ TableQueryWrapper.prototype.handleResponse = function(response) {
 	} else {
 		this.currentDataTable = response.getDataTable();
 		var view = new google.visualization.DataView(this.currentDataTable);
-		view.hideColumns(this.hideColumns);
-		this.formatColumnsAction(this.currentDataTable);
+		this.formatViewAction(this.currentDataTable, view);
+		if (this.hideColumns) {
+			view.hideColumns(this.hideColumns);
+		}
 		this.table.draw(view, this.tableOptions);
 	}
 };
