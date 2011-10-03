@@ -20,7 +20,7 @@ var View = (function() {
 	var messages = {};
 	var casesNodeId = {};
 	var caseNodeId = {};
-	var formatColumnsAction = {};
+	var formatViewAction = {};
 	var pagingAction = {};
 	var store = {};
 	var casesTotal;
@@ -89,7 +89,6 @@ var View = (function() {
 	}
 
 	inner.openCases = function() {
-		casesOptions['hideColumns'] = [ 0,3,4,5 ];
 		var openCasesTotal = setupCasesTotal(RequestModule.getOpenCasesTotal());
 		caseNodeId = 'open-case';
 		var node = clone('open-cases');
@@ -109,33 +108,42 @@ var View = (function() {
 		} 
 		pagingAction(casesOptions['pageSize'], 0);
 		casesNodeId = node.find('#open-cases-table').attr('id');
-		formatColumnsAction = function(dataTable) {
-			$.each(dataTable.F, function(index, value) {
-				// Date formatting
-				dataTable.setFormattedValue(index, 3,
-						formatDate(utcStringToDate(value.c[3].v)));
-				dataTable.setFormattedValue(index, 6,
-						formatDate(utcStringToDate(value.c[6].v)));
+		formatViewAction = function(dataTable, dataView) {
+			
+			dataView.setColumns([1,
+			                     2,
+			                     {calc:cellFormatCreated, type:"string", label:texts.columnlabelcreated},
+			                     {calc:cellTranslateCaseStatus, type:"string", label:texts.columnlabelstatus},
+			                     {calc:cellFormatLastUpdated, type:"string", label:texts.columnlabellastupdated},
+			                     {calc:cellTranslateHistoryMessage, type:"string", label:texts.columnlabellastmessage}]);
+			
+			function cellFormatCreated(dataTable, rowNum){
+				return formatDate(utcStringToDate(dataTable.getValue(rowNum, 3)));
+			}
 
-				// Case status translation
-				dataTable.setFormattedValue(index, 5, translateCaseStatus(value.c[5].v));
-				dataTable.setFormattedValue(index, 7, translateHistoryMessage(value.c[7].v));
-			});
+			function cellTranslateCaseStatus(dataTable, rowNum){
+				return translateCaseStatus(dataTable.getValue(rowNum, 5));
+			}
+
+			function cellFormatLastUpdated(dataTable, rowNum){
+				return formatDate(utcStringToDate(dataTable.getValue(rowNum, 6)));
+			}
+			
+			function cellTranslateHistoryMessage(dataTable, rowNum){
+				return translateHistoryMessage(dataTable.getValue(rowNum, 7));
+			}
+			
 			// Table Column Translations
 			dataTable.setColumnLabel(0, texts.columnlabelhref);
 			dataTable.setColumnLabel(1, texts.columnlabelcaseid);
 			dataTable.setColumnLabel(2, texts.columnlabeldescription);
-			dataTable.setColumnLabel(3, texts.columnlabelcreated);
 			dataTable.setColumnLabel(4, texts.columnlabelproject);
-			dataTable.setColumnLabel(5, texts.columnlabelstatus);
-			dataTable.setColumnLabel(6, texts.columnlabellastupdated);
-			dataTable.setColumnLabel(7, texts.columnlabellastmessage);
+			
 		};
 		google.load('visualization', '1', {'callback' : buildCases, 'packages' : ['table']});
 	};
 
 	inner.closedCases = function() {
-		casesOptions['hideColumns'] = [ 0,3,4 ];
 		caseNodeId = 'closed-case';
 		var node = clone('closed-cases');
 		displayView(node);
@@ -157,25 +165,25 @@ var View = (function() {
 		} 
 		pagingAction(casesOptions['pageSize'], 0);
 		casesNodeId = node.find('#closed-cases-table').attr('id');
-		formatColumnsAction = function(dataTable) {
-			$.each(dataTable.F, function (index, value) {
-				// Date formatting
-				dataTable.setFormattedValue(index, 3,
-						formatDate(utcStringToDate(value.c[3].v)));
-				dataTable.setFormattedValue(index, 5,
-						formatDate(utcStringToDate(value.c[5].v)));
+		formatViewAction = function(dataTable, dataView) {
+			
+			dataView.setColumns([1,
+			                     2,
+			                     {calc:cellFormatCreated, type:"string", label:texts.columnlabelcreated},
+			                     {calc:cellFormatClosed, type:"string", label:texts.columnlabelclosed},
+			                     6]);
+			
+			function cellFormatCreated(dataTable, rowNum){
+				return formatDate(utcStringToDate(dataTable.getValue(rowNum, 3)));
+			}
 
-				// Case status translation
-				dataTable.setFormattedValue(index, 5, translateCaseStatus(value.c[5].v));
-			});			
-
+			function cellFormatClosed(dataTable, rowNum){
+				return formatDate(utcStringToDate(dataTable.getValue(rowNum, 5)));
+			}
+			
 			// Table Column Translations
-			dataTable.setColumnLabel(0, texts.columnlabelhref);
 			dataTable.setColumnLabel(1, texts.columnlabelcaseid);
 			dataTable.setColumnLabel(2, texts.columnlabeldescription);
-			dataTable.setColumnLabel(3, texts.columnlabelcreated);
-			dataTable.setColumnLabel(4, texts.columnlabelproject);
-			dataTable.setColumnLabel(5, texts.columnlabelclosed);
 			dataTable.setColumnLabel(6, texts.columnlabelresolution);
 			
 		};
@@ -230,7 +238,7 @@ var View = (function() {
 		var query = new google.visualization.Query(UrlModule
 				.getCasesDataSource());
 		var tableQueryWrapper = new TableQueryWrapper(table, query, casesOptions,
-				selectionHandler, formatColumnsAction, pagingAction);
+				selectionHandler, formatViewAction, pagingAction);
 		tableQueryWrapper.sendAndDraw();
 	}
 
