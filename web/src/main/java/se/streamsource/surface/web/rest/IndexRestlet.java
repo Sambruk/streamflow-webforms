@@ -32,6 +32,8 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Reference;
 import org.restlet.data.Status;
 
+import se.streamsource.streamflow.util.Strings;
+
 /**
  */
 public class IndexRestlet extends Restlet
@@ -60,7 +62,10 @@ public class IndexRestlet extends Restlet
             template = template.replace("$context-root", "/" + request.getResourceRef().getBaseRef().getSegments().get(0));
             template = template.replace("$accesspoint", accessPointId);
             template = template.replace("$hostname", request.getResourceRef().getHostIdentifier());
-
+            if (!Strings.empty( cssConfig.configuration().cssUrl().get())) {
+               template = template.replace( "$externalcss", "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + cssConfig.configuration().cssUrl().get() + "\" />" );
+            }
+            
             response.setEntity(template, MediaType.TEXT_HTML);
          } catch (IOException e)
          {
