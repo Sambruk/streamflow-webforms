@@ -26,7 +26,6 @@ import org.qi4j.api.specification.Specification;
 import org.qi4j.api.structure.Module;
 import org.qi4j.api.util.Iterables;
 import org.qi4j.api.value.ValueBuilder;
-import org.qi4j.bootstrap.ServiceDeclaration;
 import org.restlet.Response;
 import org.restlet.data.Cookie;
 import org.restlet.data.CookieSetting;
@@ -35,13 +34,11 @@ import org.restlet.data.Status;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ResourceException;
 import org.restlet.util.Series;
-
 import se.streamsource.dci.api.RoleMap;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.dci.value.EntityValue;
 import se.streamsource.dci.value.link.LinkValue;
 import se.streamsource.surface.web.proxy.ProxyService;
-import se.streamsource.surface.web.rest.CookieResponseHandler;
 
 /**
  */
