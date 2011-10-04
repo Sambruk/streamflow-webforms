@@ -15,26 +15,17 @@
  * limitations under the License.
  */
 
-package se.streamsource.surface.web.rest;
+package se.streamsource.surface.web.config;
 
-import org.qi4j.api.injection.scope.Service;
-import org.restlet.Request;
-import org.restlet.Response;
-import org.restlet.Restlet;
+import org.qi4j.api.configuration.ConfigurationComposite;
+import org.qi4j.api.configuration.Enabled;
+import org.qi4j.api.property.Property;
 
 /**
+ * Configuration for external Css file
  */
-public class IndexRestlet extends Restlet
+public interface ExternalCssConfiguration
+   extends ConfigurationComposite, Enabled
 {
-   @Service
-   IndexRestletService indexRestletService;
-   
-   @Override
-   public void handle(Request request, Response response)
-   {
-      super.handle(request, response);
-
-      indexRestletService.handle( request, response );
-   }
-
+   Property<String> cssUrl();
 }

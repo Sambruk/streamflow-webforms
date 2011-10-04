@@ -33,13 +33,14 @@ import org.qi4j.entitystore.prefs.PreferencesEntityStoreService;
 import org.qi4j.library.jmx.JMXAssembler;
 
 import se.streamsource.dci.restlet.client.ClientAssembler;
+import se.streamsource.surface.web.config.ExternalCssConfiguration;
 import se.streamsource.surface.web.mypages.MyPagesAccessConfiguration;
-import se.streamsource.surface.web.mypages.MyPagesAccessFilter;
 import se.streamsource.surface.web.mypages.MyPagesAccessFilterService;
 import se.streamsource.surface.web.proxy.ProxyConfiguration;
 import se.streamsource.surface.web.proxy.ProxyService;
 import se.streamsource.surface.web.rest.ClientConfiguration;
 import se.streamsource.surface.web.rest.ClientService;
+import se.streamsource.surface.web.rest.IndexRestletService;
 
 public class SurfaceWebAssembler
         implements ApplicationAssembler
@@ -92,7 +93,7 @@ public class SurfaceWebAssembler
    {
       ModuleAssembly module = configLayer.module("Configurations");
 
-      module.entities(ClientConfiguration.class, ProxyConfiguration.class, MyPagesAccessConfiguration.class).visibleIn(Visibility.application);
+      module.entities(ClientConfiguration.class, ProxyConfiguration.class, MyPagesAccessConfiguration.class, ExternalCssConfiguration.class).visibleIn(Visibility.application);
 
       // Configuration store
       Application.Mode mode = module.layer().application().mode();
@@ -134,6 +135,13 @@ public class SurfaceWebAssembler
 
    private void assembleAppLayer(LayerAssembly appLayer) throws AssemblyException
    {
+      ModuleAssembly indexModule = appLayer.module( "Index" );
+      indexModule.addServices( IndexRestletService.class ).
+            visibleIn(Visibility.application).
+            identifiedBy( "indexrestlet" ).
+            taggedWith( "index" ).
+            instantiateOnStartup();
+      
       ModuleAssembly proxyModule = appLayer.module("Proxy");
 
       proxyModule.addServices(ProxyService.class).
