@@ -32,8 +32,9 @@
     </modules>
 
     <scm>
-        <connection>scm:svn:https://source.waygroup.se/svn/streamsource/surface/branches/1.1</connection>
-        <developerConnection>scm:svn:https://source.waygroup.se/svn/streamsource/surface/branches/1.1</developerConnection>
+        <connection>scm:git:ssh://gerrit.jayway.com/projects/streamflow-surface.git</connection>
+        <developerConnection>scm:git:ssh://gerrit.jayway.com/projects/streamflow-surface.git
+        </developerConnection>
     </scm>
 
     <distributionManagement>
