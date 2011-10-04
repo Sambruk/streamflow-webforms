@@ -74,9 +74,12 @@ public interface IndexRestletService extends ServiceComposite, Configuration<Ext
                      + request.getResourceRef().getBaseRef().getSegments().get( 0 ) );
                template = template.replace( "$accesspoint", accessPointId );
                template = template.replace( "$hostname", request.getResourceRef().getHostIdentifier() );
+               String externalCssReplaceString = "";
                if (!Strings.empty( cssConfig.configuration().cssUrl().get())) {
-                  template = template.replace( "$externalcss", "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + cssConfig.configuration().cssUrl().get() + "\" />" );
+                  externalCssReplaceString = "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + cssConfig.configuration().cssUrl().get() + "\" />"; 
                }
+               template = template.replace( "$externalcss", externalCssReplaceString);
+               
                response.setEntity( template, MediaType.TEXT_HTML );
             } catch (IOException e)
             {
