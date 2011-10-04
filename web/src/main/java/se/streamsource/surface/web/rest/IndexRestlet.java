@@ -18,77 +18,23 @@
 package se.streamsource.surface.web.rest;
 
 import org.qi4j.api.injection.scope.Service;
-import org.qi4j.api.service.qualifier.Tagged;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
-import org.restlet.data.ChallengeScheme;
-import org.restlet.data.MediaType;
-import org.restlet.data.Reference;
-import org.restlet.data.Status;
-import org.restlet.representation.Representation;
-import org.restlet.resource.ClientResource;
-import se.streamsource.surface.web.proxy.ProxyService;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 /**
  */
 public class IndexRestlet extends Restlet
-
 {
-
    @Service
-   @Tagged("eid")
-   ProxyService proxyService;
-
-
-   @Service
-   @Tagged("streamflow")
-   ProxyService streamflowService;
-
+   IndexRestletService indexRestletService;
+   
    @Override
    public void handle(Request request, Response response)
    {
       super.handle(request, response);
 
-      String accessPointId = request.getResourceRef().getQueryAsForm().getFirstValue("ap");
-
-      if (accessPointId != null)
-      {
-         try
-         {
-            String template = getTemplate("index.html", getClass());
-
-            template = template.replace("$accesspoint", accessPointId);
-            template = template.replace("$hostname", request.getResourceRef().getHostIdentifier());
-
-            response.setEntity(template, MediaType.TEXT_HTML);
-         } catch (IOException e)
-         {
-            e.printStackTrace();
-         }
-      } else
-      {
-         response.setLocationRef(new Reference(request.getResourceRef(), "/surface/surface/accesspoints/index"));
-         response.setStatus(Status.REDIRECTION_TEMPORARY);
-      }
-   }
-
-   public static String getTemplate(String resourceName, Class resourceClass) throws IOException
-   {
-      StringBuilder template = new StringBuilder("");
-      InputStream in = resourceClass.getResourceAsStream(resourceName);
-      BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-      String line;
-      while ((line = reader.readLine()) != null)
-         template.append(line + "\n");
-      reader.close();
-
-      return template.toString();
+      indexRestletService.handle( request, response );
    }
 
 }

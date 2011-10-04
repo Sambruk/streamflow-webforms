@@ -20,8 +20,7 @@ package se.streamsource.surface.web.resource;
 import org.restlet.resource.ResourceException;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.dci.restlet.server.CommandQueryResource;
-import se.streamsource.dci.restlet.server.SubResources;
-import se.streamsource.surface.web.context.EndUsersContext;
+import se.streamsource.dci.restlet.server.api.SubResources;
 
 import static se.streamsource.dci.api.RoleMap.current;
 
@@ -35,7 +34,8 @@ public class EndUserResource
 
    public void resource( String segment ) throws ResourceException
    {
-      current().set( current().get( CommandQueryClient.class ).getSubClient( segment ));
+
+      current().set( current().get( CommandQueryClient.class ).getSubClient( "drafts" ).getSubClient( segment ));
       subResource( CaseResource.class );
    }
 }

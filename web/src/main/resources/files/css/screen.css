@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 /* line 18, ../../../../../../../../.gem/ruby/1.8/gems/compass-0.10.5/frameworks/blueprint/stylesheets/blueprint/_form.scss */
 div.bp #app label {
   font-weight: bold;
@@ -214,17 +213,17 @@ body.two-col #content {
 }
 
 /* line 42, ../../../webapp/css-src/partials/_buttons.scss */
-.bp a.positive, .bp button.positive, .bp smallbutton.positive {
+.bp a.positive, .bp button.positive {
   color: #000066;
 }
 /* line 62, ../../../../../../../../.gem/ruby/1.8/gems/compass-0.10.5/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
-.bp a.positive:hover, .bp button.positive:hover, .bp smallbutton.positive:hover {
+.bp a.positive:hover, .bp button.positive:hover {
   background-color: #e6efc2;
   border-color: #d6e890 #c6d880 #c6d880 #d6e890;
   color: #529214;
 }
 /* line 47, ../../../../../../../../.gem/ruby/1.8/gems/compass-0.10.5/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
-.bp a.positive:active, .bp button.positive:active, .bp smallbutton.positive:active {
+.bp a.positive:active, .bp button.positive:active {
   background-color: #529214;
   border-color: #62a224 #529214 #529214 #62a224;
   color: white;
@@ -248,130 +247,29 @@ body.two-col #content {
 }
 
 /* line 53, ../../../webapp/css-src/partials/_buttons.scss */
-.bp a.disabledbutton {
-  display: -moz-inline-box;
-  -moz-box-orient: vertical;
-  display: inline-block;
-  vertical-align: middle;
-  *display: inline;
-  *vertical-align: auto;
-  margin: 0.7em 0.5em 0.7em 0;
-  border-width: 1px;
-  border-style: solid;
-  font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
-  font-size: 100%;
-  line-height: 130%;
-  font-weight: bold;
-  text-decoration: none;
-  cursor: pointer;
-  padding: 5px 10px 5px 7px;
+.bp a.disabled {
   background-color: #f5f5f5;
   border-color: #eeeeee #dedede #dedede #eeeeee;
   color: #c9c7c7;
   cursor: default;
 }
-/* line 76, ../../../../../../../../.gem/ruby/1.8/gems/compass-0.10.5/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
-.bp a.disabledbutton img {
-  margin: 0 3px -3px 0 !important;
-  padding: 0;
-  border: none;
-  width: 16px;
-  height: 16px;
-  float: none;
-}
 /* line 62, ../../../../../../../../.gem/ruby/1.8/gems/compass-0.10.5/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
-.bp a.disabledbutton:hover {
+.bp a.disabled:hover {
   background-color: #dff4ff;
   border-color: #d2f1ff #c2e1ef #c2e1ef #d2f1ff;
   color: #c9c7c7;
 }
 
-/* line 60, ../../../webapp/css-src/partials/_buttons.scss */
-.bp a.disabledbutton:visited {
+/* line 59, ../../../webapp/css-src/partials/_buttons.scss */
+.bp a.disabled:visited {
   color: #c9c7c7;
 }
 
-/* line 64, ../../../webapp/css-src/partials/_buttons.scss */
-.bp a.smallbutton {
-  display: -moz-inline-box;
-  -moz-box-orient: vertical;
-  display: inline-block;
-  vertical-align: middle;
-  *display: inline;
-  *vertical-align: auto;
-  margin: 0.7em 0.5em 0.7em 0;
-  border-width: 1px;
-  border-style: solid;
-  font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
-  font-size: 100%;
-  line-height: 130%;
-  font-weight: bold;
-  text-decoration: none;
-  cursor: pointer;
-  padding: 5px 10px 5px 7px;
-  background-color: #f5f5f5;
-  border-color: #eeeeee #dedede #dedede #eeeeee;
-  color: #000066;
-  cursor: default;
+/* line 63, ../../../webapp/css-src/partials/_buttons.scss */
+.bp a.small {
   margin: 0.5em 0.5em 0.5em 0;
   padding: 3px 10px 3px 7px;
-  font-size: 80%;
-}
-/* line 76, ../../../../../../../../.gem/ruby/1.8/gems/compass-0.10.5/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
-.bp a.smallbutton img {
-  margin: 0 3px -3px 0 !important;
-  padding: 0;
-  border: none;
-  width: 16px;
-  height: 16px;
-  float: none;
-}
-
-/* line 73, ../../../webapp/css-src/partials/_buttons.scss */
-.bp a.disabledsmallbutton {
-  display: -moz-inline-box;
-  -moz-box-orient: vertical;
-  display: inline-block;
-  vertical-align: middle;
-  *display: inline;
-  *vertical-align: auto;
-  margin: 0.7em 0.5em 0.7em 0;
-  border-width: 1px;
-  border-style: solid;
-  font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
-  font-size: 100%;
-  line-height: 130%;
-  font-weight: bold;
-  text-decoration: none;
-  cursor: pointer;
-  padding: 5px 10px 5px 7px;
-  background-color: #f5f5f5;
-  border-color: #eeeeee #dedede #dedede #eeeeee;
-  color: #c9c7c7;
-  cursor: default;
-  margin: 0.5em 0.5em 0.5em 0;
-  padding: 3px 10px 3px 7px;
-  font-size: 80%;
-}
-/* line 76, ../../../../../../../../.gem/ruby/1.8/gems/compass-0.10.5/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
-.bp a.disabledsmallbutton img {
-  margin: 0 3px -3px 0 !important;
-  padding: 0;
-  border: none;
-  width: 16px;
-  height: 16px;
-  float: none;
-}
-/* line 62, ../../../../../../../../.gem/ruby/1.8/gems/compass-0.10.5/frameworks/blueprint/stylesheets/blueprint/_buttons.scss */
-.bp a.disabledsmallbutton:hover {
-  background-color: #dff4ff;
-  border-color: #d2f1ff #c2e1ef #c2e1ef #d2f1ff;
-  color: #c9c7c7;
-}
-
-/* line 83, ../../../webapp/css-src/partials/_buttons.scss */
-.bp a.disabledsmallbutton:visited {
-  color: #c9c7c7;
+  font-size: 85%;
 }
 
 /* line 42, ../../../webapp/css-src/screen.scss */
@@ -732,71 +630,77 @@ fieldset {
 /* line 74, ../../../webapp/css-src/screen.scss */
 #inserted_form_filling_div ul li, #inserted_form_summary_div ul#form_pages li {
   color: #003358;
-  font-size: 1.2em;
-  padding: 20px 10px 0 10px;
-  background-image: url("../images/breadcrumb.png");
+  font-size: 100%;
+  padding: 0px 10px 0 10px;
   background-repeat: no-repeat;
   background-position: center top;
 }
-/* line 82, ../../../webapp/css-src/screen.scss */
+/* line 80, ../../../webapp/css-src/screen.scss */
+#inserted_form_filling_div ul li.progress_first, #inserted_form_summary_div ul#form_pages li.progress_first {
+  background-image: url("../images/progress_bg_first.png");
+}
+/* line 83, ../../../webapp/css-src/screen.scss */
+#inserted_form_filling_div ul li.progress, #inserted_form_summary_div ul#form_pages li.progress {
+  background-image: url("../images/progress_bg.png");
+}
+/* line 86, ../../../webapp/css-src/screen.scss */
+#inserted_form_filling_div ul li.progress_last, #inserted_form_summary_div ul#form_pages li.progress_last {
+  background-image: url("../images/progress_bg_last.png");
+}
+/* line 91, ../../../webapp/css-src/screen.scss */
 #inserted_form_filling_div ul a, #inserted_form_summary_div ul#form_pages a {
   text-decoration: none;
 }
-/* line 83, ../../../webapp/css-src/screen.scss */
-#inserted_form_filling_div ul li.selected, #inserted_form_summary_div ul#form_pages li.selected {
-  background-image: url("../images/breadcrumb_selected.png");
+
+/* line 94, ../../../webapp/css-src/screen.scss */
+a#inserted_link.progress {
+  color: #003358;
+  text-align: center;
 }
-/* line 84, ../../../webapp/css-src/screen.scss */
-#inserted_form_filling_div ul li.summary, #inserted_form_summary_div ul#form_pages li.summary {
-  background-image: url("../images/breadcrumb_summary.png");
-}
-/* line 85, ../../../webapp/css-src/screen.scss */
-#inserted_form_filling_div ul li.summary_selected, #inserted_form_summary_div ul#form_pages li.summary_selected {
-  background-image: url("../images/breadcrumb_summary_selected.png");
+/* line 97, ../../../webapp/css-src/screen.scss */
+a#inserted_link.progress img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-/* line 88, ../../../webapp/css-src/screen.scss */
-a#inserted_link.breadcrumb {
+/* line 103, ../../../webapp/css-src/screen.scss */
+a#inserted_link.progress:hover {
   color: #003358;
 }
 
-/* line 89, ../../../webapp/css-src/screen.scss */
-a#inserted_link.breadcrumb:hover {
-  color: #003358;
-}
-
-/* line 91, ../../../webapp/css-src/screen.scss */
+/* line 105, ../../../webapp/css-src/screen.scss */
 #form_filling_div ul {
   display: block;
 }
 
-/* line 95, ../../../webapp/css-src/screen.scss */
+/* line 109, ../../../webapp/css-src/screen.scss */
 .commentField pre {
   margin: 3px 0px;
 }
 
-/* line 99, ../../../webapp/css-src/screen.scss */
+/* line 113, ../../../webapp/css-src/screen.scss */
 .bp div {
   clear: both;
 }
 
-/* line 104, ../../../webapp/css-src/screen.scss */
+/* line 118, ../../../webapp/css-src/screen.scss */
 #inserted_form_filling_div span {
   display: block;
 }
 
-/* line 109, ../../../webapp/css-src/screen.scss */
+/* line 123, ../../../webapp/css-src/screen.scss */
 .ui-datepicker {
   font-size: 62.5%;
 }
 
-/* line 113, ../../../webapp/css-src/screen.scss */
+/* line 127, ../../../webapp/css-src/screen.scss */
 .bp .copy {
   display: block;
   margin-top: 23px;
 }
 
-/* line 119, ../../../webapp/css-src/screen.scss */
+/* line 133, ../../../webapp/css-src/screen.scss */
 #form_page_summary ul {
   list-style: none;
 }
@@ -806,12 +710,12 @@ a#inserted_link.breadcrumb:hover {
   list-style-type: none;
   margin-left: 0px;
 }
-/* line 122, ../../../webapp/css-src/screen.scss */
+/* line 136, ../../../webapp/css-src/screen.scss */
 #form_page_summary li {
   padding: 4px;
 }
 
-/* line 127, ../../../webapp/css-src/screen.scss */
+/* line 141, ../../../webapp/css-src/screen.scss */
 div.commentfield pre {
   margin: 3px 0px;
   white-space: pre-wrap;
@@ -826,26 +730,26 @@ div.commentfield pre {
   /* Internet Explorer 5.5+ */
 }
 
-/* line 136, ../../../webapp/css-src/screen.scss */
+/* line 150, ../../../webapp/css-src/screen.scss */
 .bp .listbox {
   text-align: center;
   float: left;
   clear: none;
 }
 
-/* line 142, ../../../webapp/css-src/screen.scss */
+/* line 156, ../../../webapp/css-src/screen.scss */
 .bp .listboxbuttons {
   text-align: center;
   float: left;
   clear: none;
 }
 
-/* line 148, ../../../webapp/css-src/screen.scss */
+/* line 162, ../../../webapp/css-src/screen.scss */
 #mandatory {
   color: #f00;
 }
 
-/* line 162, ../../../webapp/css-src/screen.scss */
+/* line 176, ../../../webapp/css-src/screen.scss */
 #inserted_ErrorMessage {
   display: block;
   padding: 14px 5px 12px 35px;
@@ -860,7 +764,7 @@ div.commentfield pre {
   background-image: url("../images/forbidden.png");
 }
 
-/* line 170, ../../../webapp/css-src/screen.scss */
+/* line 184, ../../../webapp/css-src/screen.scss */
 #inserted_WarningMessage {
   display: block;
   padding: 14px 5px 12px 35px;
@@ -875,7 +779,7 @@ div.commentfield pre {
   background-image: url("../images/warning.png");
 }
 
-/* line 178, ../../../webapp/css-src/screen.scss */
+/* line 192, ../../../webapp/css-src/screen.scss */
 #inserted_InfoMessage {
   display: block;
   padding: 14px 5px 12px 35px;
@@ -890,7 +794,7 @@ div.commentfield pre {
   background-image: url("../images/information.png");
 }
 
-/* line 186, ../../../webapp/css-src/screen.scss */
+/* line 200, ../../../webapp/css-src/screen.scss */
 #inserted_SuccessMessage {
   display: block;
   padding: 14px 5px 12px 35px;
@@ -905,12 +809,12 @@ div.commentfield pre {
   background-image: url("../images/check.png");
 }
 
-/* line 194, ../../../webapp/css-src/screen.scss */
+/* line 208, ../../../webapp/css-src/screen.scss */
 #caseid_message {
   font-size: 1.2em;
 }
 
-/* line 198, ../../../webapp/css-src/screen.scss */
+/* line 212, ../../../webapp/css-src/screen.scss */
 #caseid {
   font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
   font-style: italic;
@@ -918,7 +822,7 @@ div.commentfield pre {
   font-size: 2em;
 }
 
-/* line 205, ../../../webapp/css-src/screen.scss */
+/* line 219, ../../../webapp/css-src/screen.scss */
 #form_signatures_content {
   display: block;
   padding: 14px 5px 12px 35px;
@@ -932,21 +836,21 @@ div.commentfield pre {
   border-color: #153e7e;
 }
 
-/* line 212, ../../../webapp/css-src/screen.scss */
+/* line 226, ../../../webapp/css-src/screen.scss */
 #form_signatures_column_1 {
   float: left;
   clear: none;
   display: inline;
 }
 
-/* line 218, ../../../webapp/css-src/screen.scss */
+/* line 232, ../../../webapp/css-src/screen.scss */
 #form_signatures_column_2 {
   float: left;
   clear: none;
   display: inline;
 }
 
-/* line 224, ../../../webapp/css-src/screen.scss */
+/* line 238, ../../../webapp/css-src/screen.scss */
 #form_signatures_content .signature_label {
   font-weight: bold;
   margin-right: 10px;
@@ -954,7 +858,7 @@ div.commentfield pre {
   height: 30px;
 }
 
-/* line 231, ../../../webapp/css-src/screen.scss */
+/* line 245, ../../../webapp/css-src/screen.scss */
 #form_signatures_content .signature_value_signed {
   font-style: italic;
   clear: none;
@@ -962,7 +866,7 @@ div.commentfield pre {
   height: 30px;
 }
 
-/* line 238, ../../../webapp/css-src/screen.scss */
+/* line 252, ../../../webapp/css-src/screen.scss */
 #form_signatures_content .signature_value_unsigned {
   clear: none;
   padding-top: 4px;
@@ -970,19 +874,19 @@ div.commentfield pre {
   height: 30px;
 }
 
-/* line 245, ../../../webapp/css-src/screen.scss */
+/* line 259, ../../../webapp/css-src/screen.scss */
 #inserted_form_page_summary ul {
   padding-left: 1.33em;
 }
 
-/* line 249, ../../../webapp/css-src/screen.scss */
+/* line 263, ../../../webapp/css-src/screen.scss */
 #inserted_form_page_summary td.field_label {
   vertical-align: top;
   font-weight: bold;
   width: 130px;
 }
 
-/* line 255, ../../../webapp/css-src/screen.scss */
+/* line 269, ../../../webapp/css-src/screen.scss */
 #inserted_form_page_summary td.field_value {
   vertical-align: top;
   font-style: italic;
