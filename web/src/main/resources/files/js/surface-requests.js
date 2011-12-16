@@ -87,7 +87,7 @@ var RequestModule = (function() {
     }
 
     inner.updateField = function( fieldDTO ) {
-        var parameters = request('PUT', UrlModule.updateField() );
+        var parameters = request('POST', UrlModule.updateField() );
         parameters.data = fieldDTO;     
         return getData( parameters );
     }

@@ -1,19 +1,3 @@
-/**
- *
- * Copyright 2009-2010 Streamsource AB
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 /* line 18, ../../../../../../../../.gem/ruby/1.8/gems/compass-0.10.5/frameworks/blueprint/stylesheets/blueprint/_form.scss */
 div.bp #app label {
   font-weight: bold;
@@ -698,9 +682,10 @@ a#inserted_link.progress:hover {
 .bp .copy {
   display: block;
   margin-top: 23px;
+  font-size: 62.5%;
 }
 
-/* line 133, ../../../webapp/css-src/screen.scss */
+/* line 134, ../../../webapp/css-src/screen.scss */
 #form_page_summary ul {
   list-style: none;
 }
@@ -710,12 +695,12 @@ a#inserted_link.progress:hover {
   list-style-type: none;
   margin-left: 0px;
 }
-/* line 136, ../../../webapp/css-src/screen.scss */
+/* line 137, ../../../webapp/css-src/screen.scss */
 #form_page_summary li {
   padding: 4px;
 }
 
-/* line 141, ../../../webapp/css-src/screen.scss */
+/* line 142, ../../../webapp/css-src/screen.scss */
 div.commentfield pre {
   margin: 3px 0px;
   white-space: pre-wrap;
@@ -730,26 +715,26 @@ div.commentfield pre {
   /* Internet Explorer 5.5+ */
 }
 
-/* line 150, ../../../webapp/css-src/screen.scss */
+/* line 151, ../../../webapp/css-src/screen.scss */
 .bp .listbox {
   text-align: center;
   float: left;
   clear: none;
 }
 
-/* line 156, ../../../webapp/css-src/screen.scss */
+/* line 157, ../../../webapp/css-src/screen.scss */
 .bp .listboxbuttons {
   text-align: center;
   float: left;
   clear: none;
 }
 
-/* line 162, ../../../webapp/css-src/screen.scss */
+/* line 163, ../../../webapp/css-src/screen.scss */
 #mandatory {
   color: #f00;
 }
 
-/* line 176, ../../../webapp/css-src/screen.scss */
+/* line 177, ../../../webapp/css-src/screen.scss */
 #inserted_ErrorMessage {
   display: block;
   padding: 14px 5px 12px 35px;
@@ -764,7 +749,7 @@ div.commentfield pre {
   background-image: url("../images/forbidden.png");
 }
 
-/* line 184, ../../../webapp/css-src/screen.scss */
+/* line 185, ../../../webapp/css-src/screen.scss */
 #inserted_WarningMessage {
   display: block;
   padding: 14px 5px 12px 35px;
@@ -779,7 +764,7 @@ div.commentfield pre {
   background-image: url("../images/warning.png");
 }
 
-/* line 192, ../../../webapp/css-src/screen.scss */
+/* line 193, ../../../webapp/css-src/screen.scss */
 #inserted_InfoMessage {
   display: block;
   padding: 14px 5px 12px 35px;
@@ -794,7 +779,7 @@ div.commentfield pre {
   background-image: url("../images/information.png");
 }
 
-/* line 200, ../../../webapp/css-src/screen.scss */
+/* line 201, ../../../webapp/css-src/screen.scss */
 #inserted_SuccessMessage {
   display: block;
   padding: 14px 5px 12px 35px;
@@ -809,12 +794,12 @@ div.commentfield pre {
   background-image: url("../images/check.png");
 }
 
-/* line 208, ../../../webapp/css-src/screen.scss */
+/* line 209, ../../../webapp/css-src/screen.scss */
 #caseid_message {
   font-size: 1.2em;
 }
 
-/* line 212, ../../../webapp/css-src/screen.scss */
+/* line 213, ../../../webapp/css-src/screen.scss */
 #caseid {
   font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
   font-style: italic;
@@ -822,7 +807,7 @@ div.commentfield pre {
   font-size: 2em;
 }
 
-/* line 219, ../../../webapp/css-src/screen.scss */
+/* line 220, ../../../webapp/css-src/screen.scss */
 #form_signatures_content {
   display: block;
   padding: 14px 5px 12px 35px;
@@ -836,21 +821,21 @@ div.commentfield pre {
   border-color: #153e7e;
 }
 
-/* line 226, ../../../webapp/css-src/screen.scss */
+/* line 227, ../../../webapp/css-src/screen.scss */
 #form_signatures_column_1 {
   float: left;
   clear: none;
   display: inline;
 }
 
-/* line 232, ../../../webapp/css-src/screen.scss */
+/* line 233, ../../../webapp/css-src/screen.scss */
 #form_signatures_column_2 {
   float: left;
   clear: none;
   display: inline;
 }
 
-/* line 238, ../../../webapp/css-src/screen.scss */
+/* line 239, ../../../webapp/css-src/screen.scss */
 #form_signatures_content .signature_label {
   font-weight: bold;
   margin-right: 10px;
@@ -858,7 +843,7 @@ div.commentfield pre {
   height: 30px;
 }
 
-/* line 245, ../../../webapp/css-src/screen.scss */
+/* line 246, ../../../webapp/css-src/screen.scss */
 #form_signatures_content .signature_value_signed {
   font-style: italic;
   clear: none;
@@ -866,7 +851,7 @@ div.commentfield pre {
   height: 30px;
 }
 
-/* line 252, ../../../webapp/css-src/screen.scss */
+/* line 253, ../../../webapp/css-src/screen.scss */
 #form_signatures_content .signature_value_unsigned {
   clear: none;
   padding-top: 4px;
@@ -874,19 +859,19 @@ div.commentfield pre {
   height: 30px;
 }
 
-/* line 259, ../../../webapp/css-src/screen.scss */
+/* line 260, ../../../webapp/css-src/screen.scss */
 #inserted_form_page_summary ul {
   padding-left: 1.33em;
 }
 
-/* line 263, ../../../webapp/css-src/screen.scss */
+/* line 264, ../../../webapp/css-src/screen.scss */
 #inserted_form_page_summary td.field_label {
   vertical-align: top;
   font-weight: bold;
   width: 130px;
 }
 
-/* line 269, ../../../webapp/css-src/screen.scss */
+/* line 270, ../../../webapp/css-src/screen.scss */
 #inserted_form_page_summary td.field_value {
   vertical-align: top;
   font-style: italic;
