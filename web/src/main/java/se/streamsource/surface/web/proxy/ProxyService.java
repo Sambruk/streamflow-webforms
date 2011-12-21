@@ -22,8 +22,10 @@ import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.service.Activatable;
+import org.qi4j.api.service.Availability;
 import org.qi4j.api.service.ServiceComposite;
-import org.restlet.Client;
+import org.qi4j.api.service.ServiceReference;
+import org.qi4j.api.service.qualifier.IdentifiedBy;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Uniform;
@@ -47,15 +49,16 @@ import java.io.ByteArrayOutputStream;
  */
 @Mixins(ProxyService.Mixin.class)
 public interface ProxyService
-   extends ServiceComposite, Activatable, Configuration<ProxyConfiguration>, Uniform
+   extends ServiceComposite, Activatable, Configuration<ProxyConfiguration>, Uniform, Availability
 {
    
 
    class Mixin
-      implements Activatable, Uniform
+      implements Activatable, Uniform, Availability
    {
       @Service
-      Client client;
+      @IdentifiedBy("client")
+      ServiceReference<Uniform> client;
 
       @This
       Configuration<ProxyConfiguration> config;
@@ -75,9 +78,14 @@ public interface ProxyService
       {
       }
 
+      public boolean isAvailable()
+      {
+         return config.configuration().enabled().get() && client.isAvailable();
+      }
+
       public void handle( Request request, Response response )
       {
-         if (proxyRef == null)
+         if (proxyRef == null || !client.isAvailable())
          {
             // Not enabled
             response.setStatus( Status.SERVER_ERROR_SERVICE_UNAVAILABLE, "Streamflow proxy is not enabled" );
@@ -88,16 +96,16 @@ public interface ProxyService
          Reference ref = request.getResourceRef();
          if (ref.getBaseRef() == null)
          {
-            proxyReference = ref;
+            proxyReference = new Reference( proxyRef.toString()+ref.getPath().substring( 1 ));
          } else
          {
             String remaining = ref.getRemainingPart();
-            proxyReference = new Reference( proxyRef.toString()+remaining.substring(1 ));
+            proxyReference = new Reference( proxyRef.toString()+remaining.substring(1));
          }
 
          ClientResource client = new ClientResource( proxyReference );
          client.setClientInfo( request.getClientInfo() );
-         client.setNext( this.client );
+         client.setNext( this.client.get() );
          client.setChallengeResponse( challengeResponse );
          client.setMethod( request.getMethod() );
          client.getRequest().setEntity( request.getEntity() );

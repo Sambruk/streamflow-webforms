@@ -18,7 +18,7 @@
 package se.streamsource.surface.web.resource;
 
 import se.streamsource.dci.restlet.server.CommandQueryResource;
-import se.streamsource.dci.restlet.server.SubResource;
+import se.streamsource.dci.restlet.server.api.SubResource;
 
 /**
  * JAVADOC

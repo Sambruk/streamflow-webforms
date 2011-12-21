@@ -90,17 +90,6 @@ var Contexts = (function() {
         return hash.substring(1).split('/');
     }
 
-    function trim(a){
-        var tmp=new Array();
-        for(j=0;j<a.length;j++)
-            if(a[j]!='')
-                tmp[tmp.length]=a[j];
-        a.length=tmp.length;
-        for(j=0;j<tmp.length;j++)
-            a[j]=tmp[j];
-        return a;
-    }
-
     function build( map ) {
         var context = new Context( map.view, map.init );
         if ( !map.subContexts ) return context;
@@ -110,6 +99,11 @@ var Contexts = (function() {
         return context;
     }
 
+    inner.init = function( map ) {
+        rootContext = build( map );
+        hash = null;
+    }
+
     inner.findView = function( loc ) {
         if ( hash == loc ) return $.noop;
         hash = loc;
@@ -117,9 +111,34 @@ var Contexts = (function() {
         return function() { rootContext.runView( segments ); }
     }
 
-    inner.init = function( map ) {
-        rootContext = build( map );
-        hash = null;
+    inner.findUrl = function( fn, ids ) {
+        var search = buildUrl( rootContext, fn, ids,  "");
+        if ( search.found ) {
+            if ( search.url.match(/\/$/) ) {
+                return search.url.substring(0, search.url.length-1);
+            }
+            return search.url;
+        } else {
+            throw "function not found";
+        }
+    }
+
+    // depth first search to find the view function
+    function buildUrl( context, fn, ids, url ) {
+        if ( context.view == fn ) return { url:url, found:true};
+        var result = {found:false};
+        $.each( context.subContexts, function(key, value) {
+            var subId = ids;
+            if ( key == 'idContext' && ids) {
+                key = ids[0];
+                subId = ids.slice(1);
+            }
+            result = buildUrl( value, fn, subId,  url + key + '/');
+            if ( result.found ) {
+                return false;
+            }
+        });
+        return result;
     }
 
     return inner;
