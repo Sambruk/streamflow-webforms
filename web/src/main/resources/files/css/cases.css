@@ -37,8 +37,8 @@ label.detail-value { float: left; padding-right: 10px; width: 20%; }
 	label#project-value.detail-value { width: 45%; }
 	div.closed-details label#project-value.detail-value { width: 30%; }
 	
-#caselog { clear: both; }
-#caselog-table { clear: both; }
+#caselog, #submittedforms { clear: both; }
+#caselog-table, #submittedforms-list { clear: both; }
 div#caselog-table.ui-widget tr.google-visualization-table-tr-sel td.google-visualization-table-td { background-color: #fff; }
 .google-visualization-table-div-page .goog-custom-button-inner-box { padding: 4px 5px; }
 
@@ -47,3 +47,11 @@ div#caselog-table.ui-widget tr.google-visualization-table-tr-sel td.google-visua
 tr.ui-state-hover { font-weight: normal; }
 tr.ui-state-active { font-weight: normal; }
 legend label#case-id-value.ui-state-active { border: none; font-weight: normal; background: none; }
+
+ul { list-style-type: none; padding-left: 0px; }
+li.submittedForm {
+	background-image: url(../images/pdficon_small.gif);
+	background-repeat: no-repeat;
+	padding: 3px 2px 3px 20px;
+	margin: .4em 0;
+}

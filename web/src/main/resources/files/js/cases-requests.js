@@ -134,5 +134,10 @@ var RequestModule = (function() {
     	return getData( parameters );
     };
 
+    inner.getSubmittedForms = function (caseIdentity) {
+        var parameters = request('GET', UrlModule.getSubmittedFormsQuery(caseIdentity) );
+        parameters.error = null;
+        return getData(parameters);
+    };
     return inner;
 }());

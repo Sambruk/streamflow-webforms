@@ -251,6 +251,8 @@ var View = (function() {
 		var caseDetails = RequestModule.getCase(selectedValue);
 		buildCase(caseDetails);
 
+		addSubmittedForms(selectedValue);
+		
 		var logsTotal = setupCaseLogTotal(RequestModule.getCaseLogTotal(selectedValue));
 		caseLogOptions['pageSize'] = 10;
 		
@@ -287,6 +289,15 @@ var View = (function() {
 		
 		google.load('visualization', '1', {'callback' : buildCaseLog(selectedValue), 'packages' : ['table']});
 	}
+	
+	function addSubmittedForms(caseIdentity) {
+		var submittedForms = RequestModule.getSubmittedForms(caseIdentity);
+		$.each(submittedForms.links, function(index, value) {
+			var li = clone("submittedForm");
+			li.find("#submittedformLink").attr("href", UrlModule.getSubmittedForms(caseIdentity) + "/" + value.href).append(value.form);
+			$("#submittedforms-list").append(li);
+		});
+	}
 
 	function buildCase(caseDetails) {
 		if(getFieldType(caseDetails.index._type) == "OpenCaseDTO") {
@@ -312,9 +323,7 @@ var View = (function() {
 		if (caseDetails.index.description) {
 			caseNode.find('#description-value').text(caseDetails.index.description);
 		}
-		if (caseDetails.index.formlink) {
-			caseNode.find('#form-link-value').text(caseDetails.index.formlink);
-		}
+		
 		caseNode.find('#created-value').text(formatDate(utcStringToDate(caseDetails.index.creationDate)));
 		caseNode.find('#status-value').text(translateCaseStatus(caseDetails.index.status));
 		caseNode.find('#project-value').text(caseDetails.index.project);

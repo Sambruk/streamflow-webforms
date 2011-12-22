@@ -121,5 +121,13 @@ var UrlModule = (function () {
     	return urls.enduser + 'closed/cases.json' + '?tq=' + casesQuery;
     };
     
+    inner.getSubmittedForms = function (entityid) {
+    	return this.caseDataSource + entityid + "submittedforms";
+    };
+    
+    inner.getSubmittedFormsQuery = function (entityid) {
+    	return this.getSubmittedForms(entityid) + "/index.json";
+    };
+    
     return inner;
 }());
