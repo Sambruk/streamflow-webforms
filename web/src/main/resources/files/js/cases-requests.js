@@ -98,12 +98,18 @@ var RequestModule = (function() {
         return getData(parameters);
     };
 
-    inner.getCaseHistory = function (caseIdentity) {
-        var parameters = request('GET', UrlModule.getCaseHistory(caseIdentity) );
+    inner.getCaseLog = function (caseIdentity) {
+        var parameters = request('GET', UrlModule.getCaseLog(caseIdentity) );
         parameters.error = null;
         return getData(parameters);
     };
 
+    inner.getCaseLogTotal = function (caseIdentity) {
+    	var parameters = request('GET', UrlModule.getCaseLogTotal(caseIdentity) );
+    	parameters.error = null;
+    	return getData( parameters );
+    };
+    
     inner.getOpenCase = function (caseIdentity) {
         var parameters = request('GET', UrlModule.getOpenCase(caseIdentity) );
         parameters.error = null;
@@ -119,7 +125,6 @@ var RequestModule = (function() {
     inner.getOpenCasesTotal = function () {
     	var parameters = request('GET', UrlModule.getOpenCasesTotal() );
     	parameters.error = null;
-//        return invoke( $.ajax, parameters, texts.errorservernocontact ).responseText;
     	return getData( parameters );
     };
 
@@ -129,5 +134,10 @@ var RequestModule = (function() {
     	return getData( parameters );
     };
 
+    inner.getSubmittedForms = function (caseIdentity) {
+        var parameters = request('GET', UrlModule.getSubmittedFormsQuery(caseIdentity) );
+        parameters.error = null;
+        return getData(parameters);
+    };
     return inner;
 }());

@@ -19,7 +19,7 @@
 form.cases-paging { clear: both; margin-bottom: 2px; font-size: 8pt; }
 .cases-view { margin-bottom: 10px; }
 .ui-widget div div.google-visualization-table-div-page { float: left; }
-div#pagination { float: left; margin-top: 7px; margin-left: 10px; margin-bottom: 15px; font-size: 8pt; }
+div#pagination, div#caselog-pagination { float: left; margin-top: 7px; margin-left: 10px; margin-bottom: 15px; font-size: 8pt; }
 
 /* Case details */
 .case-details { clear: both; }
@@ -37,9 +37,9 @@ label.detail-value { float: left; padding-right: 10px; width: 20%; }
 	label#project-value.detail-value { width: 45%; }
 	div.closed-details label#project-value.detail-value { width: 30%; }
 	
-#case-history { clear: both; }
-#case-history-table { clear: both; }
-div#case-history-table.ui-widget tr.google-visualization-table-tr-sel td.google-visualization-table-td { background-color: #fff; }
+#caselog, #submittedforms { clear: both; }
+#caselog-table, #submittedforms-list { clear: both; }
+div#caselog-table.ui-widget tr.google-visualization-table-tr-sel td.google-visualization-table-td { background-color: #fff; }
 .google-visualization-table-div-page .goog-custom-button-inner-box { padding: 4px 5px; }
 
 /* jQuery UI Themeroller customizations */
@@ -47,3 +47,11 @@ div#case-history-table.ui-widget tr.google-visualization-table-tr-sel td.google-
 tr.ui-state-hover { font-weight: normal; }
 tr.ui-state-active { font-weight: normal; }
 legend label#case-id-value.ui-state-active { border: none; font-weight: normal; background: none; }
+
+ul { list-style-type: none; padding-left: 0px; }
+li.submittedForm {
+	background-image: url(../images/pdficon_small.gif);
+	background-repeat: no-repeat;
+	padding: 3px 2px 3px 20px;
+	margin: .4em 0;
+}

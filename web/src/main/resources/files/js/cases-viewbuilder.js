@@ -47,8 +47,9 @@ var View = (function() {
 			'sort' : 'disable'
 		};
 
+
 	// Adding support for jQuery UI and the portlet standard
-	var caseHistoryCssClasses = {
+	var caseLogCssClasses = {
 		'headerRow' : 'ui-widget-header portlet-table-header',
 		'headerCell' : 'portlet-table-subheader',
 		'oddTableRow' : 'portlet-table-alternate',
@@ -59,12 +60,13 @@ var View = (function() {
 //		'hoverTableRow' : 'ui-state-hover'
 	};
 
-	var caseHistoryOptions = {
+	var caseLogOptions = {
 		'showRowNumber' : false,
 		'allowHtml' : true,
-		'cssClassNames' : caseHistoryCssClasses, 
+		'cssClassNames' : caseLogCssClasses, 
 		'sortColumn': 1,
-		'sortAscending': false
+		'sortAscending': false,
+		'page' : 'disable'
 	};
 
 	inner.error = function(message) {
@@ -79,7 +81,7 @@ var View = (function() {
 		PersistModule.setCasesPageSize(value);
 		buildCases();
 		removeCaseDetails();
-		removeCaseHistory();
+		removeCaseLog();
 	};
 	
 	function setupCasesTotal(casesTotalJson) {
@@ -87,7 +89,13 @@ var View = (function() {
 		casesOptions['rowsTotal'] = casesTotal;
 		return casesTotal;
 	}
-
+	
+	function setupCaseLogTotal(caseLogTotalJson) {
+		caseLogTotal = caseLogTotalJson.table.rows.length;
+		caseLogOptions['rowsTotal'] = caseLogTotal;
+		return caseLogTotal;
+	}
+	
 	inner.openCases = function() {
 		var openCasesTotal = setupCasesTotal(RequestModule.getOpenCasesTotal());
 		caseNodeId = 'open-case';
@@ -114,8 +122,7 @@ var View = (function() {
 			                     2,
 			                     {calc:cellFormatCreated, type:"string", label:texts.columnlabelcreated},
 			                     {calc:cellTranslateCaseStatus, type:"string", label:texts.columnlabelstatus},
-			                     {calc:cellFormatLastUpdated, type:"string", label:texts.columnlabellastupdated},
-			                     {calc:cellTranslateHistoryMessage, type:"string", label:texts.columnlabellastmessage}]);
+			                     {calc:cellFormatLastUpdated, type:"string", label:texts.columnlabellastupdated}]);
 			
 			function cellFormatCreated(dataTable, rowNum){
 				return formatDate(utcStringToDate(dataTable.getValue(rowNum, 3)));
@@ -127,10 +134,6 @@ var View = (function() {
 
 			function cellFormatLastUpdated(dataTable, rowNum){
 				return formatDate(utcStringToDate(dataTable.getValue(rowNum, 6)));
-			}
-			
-			function cellTranslateHistoryMessage(dataTable, rowNum){
-				return translateHistoryMessage(dataTable.getValue(rowNum, 7));
 			}
 			
 			// Table Column Translations
@@ -208,7 +211,7 @@ var View = (function() {
 	function selectionHandler(row, dataTable) {
 		if (row === undefined) {
 			removeCaseDetails();
-			removeCaseHistory();
+			removeCaseLog();
 			return;
 		}
 		var value = dataTable.getValue(row, 0);
@@ -231,23 +234,69 @@ var View = (function() {
 	function buildCases() {
 		setupCasesPageSize();
 		casesOptions['selectClause'] = UrlModule.getCasesQuery();
-
+		
 		var labelNode = $('#number-of-cases-label').text(texts.numberofcasestoshow);
 		var table = new google.visualization.Table(document
 				.getElementById(casesNodeId));
 		var query = new google.visualization.Query(UrlModule
 				.getCasesDataSource());
 		var tableQueryWrapper = new TableQueryWrapper(table, query, casesOptions,
-				selectionHandler, formatViewAction, pagingAction);
+				selectionHandler, formatViewAction);
 		tableQueryWrapper.sendAndDraw();
 	}
 
 	function casesAction(selectedValue) {
 		removeCaseDetails();
-		removeCaseHistory();
+		removeCaseLog();
 		var caseDetails = RequestModule.getCase(selectedValue);
 		buildCase(caseDetails);
-		google.load('visualization', '1', {'packages' : ['table'], "callback": drawCaseHistoryTable(selectedValue)});
+
+		addSubmittedForms(selectedValue);
+		
+		var logsTotal = setupCaseLogTotal(RequestModule.getCaseLogTotal(selectedValue));
+		caseLogOptions['pageSize'] = 10;
+		
+		pagingAction = function (pageSize, pageIndex, callback) {
+			var from = parseInt(pageSize)*(parseInt(pageIndex))+1;
+			var to = from+parseInt(pageSize)-1;
+			if (logsTotal){
+				to = logsTotal<to ? logsTotal : to;
+				$('#caselog-pagination-info').text(replacePlaceholdersInTranslatedString(texts.labelcaselogpaginationinfo, from, to, logsTotal));
+			} else {
+				$('#caselog-pagination-info').text('');
+			}
+		} 
+
+		pagingAction(caseLogOptions['pageSize'], 0);
+		
+		formatViewAction = function(dataTable, dataView) {
+			
+			dataView.setColumns([0,
+			                     1,
+			                     {calc:cellFormatCreated, type:"string", label:texts.columnlabelcaselogcreated}]);
+			
+			function cellFormatCreated(dataTable, rowNum){
+				return formatDate(utcStringToDate(dataTable.getValue(rowNum, 2)));
+			}
+
+			
+			// Table Column Translations
+			dataTable.setColumnLabel(0, texts.columnlabelcaselogmessage);
+			dataTable.setColumnLabel(1, texts.columnlabelcaselogcreator);
+			dataTable.setColumnLabel(2, texts.columnlabelcaselogcreated);
+			
+		};
+		
+		google.load('visualization', '1', {'callback' : buildCaseLog(selectedValue), 'packages' : ['table']});
+	}
+	
+	function addSubmittedForms(caseIdentity) {
+		var submittedForms = RequestModule.getSubmittedForms(caseIdentity);
+		$.each(submittedForms.links, function(index, value) {
+			var li = clone("submittedForm");
+			li.find("#submittedformLink").attr("href", UrlModule.getSubmittedForms(caseIdentity) + "/" + value.href).append(value.form);
+			$("#submittedforms-list").append(li);
+		});
 	}
 
 	function buildCase(caseDetails) {
@@ -274,9 +323,7 @@ var View = (function() {
 		if (caseDetails.index.description) {
 			caseNode.find('#description-value').text(caseDetails.index.description);
 		}
-		if (caseDetails.index.formlink) {
-			caseNode.find('#form-link-value').text(caseDetails.index.formlink);
-		}
+		
 		caseNode.find('#created-value').text(formatDate(utcStringToDate(caseDetails.index.creationDate)));
 		caseNode.find('#status-value').text(translateCaseStatus(caseDetails.index.status));
 		caseNode.find('#project-value').text(caseDetails.index.project);
@@ -314,50 +361,22 @@ var View = (function() {
 		$('#app').append(caseNode);
 	}
 	
-	function drawCaseHistoryTable(caseIdentity) {
-		$('#history-label').text(texts.labelcasehistory);
-		var historyFormatColumnsAction = function(dataTable) {
-			$.each(dataTable.F, function(index, value) {
-				// Date formatting
-				dataTable.setFormattedValue(index, 1,
-						formatDate(utcStringToDate(value.c[1].v)));
 
-				// Case status translation
-				dataTable.setFormattedValue(index, 0, translateHistoryMessage(value.c[0].v));
-			});
-			// Table Column Translations
-			dataTable.setColumnLabel(0, texts.columnlabelmessage);
-			dataTable.setColumnLabel(1, texts.columnlabelchanged);
-		};
-
-		// Create the history data table.
-		var caseHistory = RequestModule.getCaseHistory(caseIdentity);
-		var data = new google.visualization.DataTable(caseHistory.table, '0.6');
-		historyFormatColumnsAction(data);
-
-		// Create a view.
-		var view = new google.visualization.DataView(data);
-		var table = new google.visualization.Table(document.getElementById('case-history-table'));
-		table.draw(view, caseHistoryOptions);
-	}
-	
-	function translateHistoryMessage(value) {
-		// Value is a JSON value, for example {"name":"assigned", "user":"Administrator"}.
-		if (!value) {
+	function buildCaseLog(caseIdentity) {
+		$('#caselog-label').text(texts.labelcaselog);
+		
+		var caseLogSelectionHandler = function(row, dataTable) {
 			return;
 		}
-		// Temporary call before correct format comes from server call.
-		value = convertMsgToJsonValue(value);
-		value.name = 'labelhistorymsg' + value.name;
-		value.name = texts[value.name];
-		if (value.name && value.value) {
-			return value.name + ' ' + value.value;
-		}
-		else if (value.value) {
-			return value.value;
-		} else {
-			return value.name;
-		}
+		
+		caseLogOptions['selectClause'] = UrlModule.getCaseLogQuery(caseIdentity);
+		var tableDiv = document.getElementById('caselog-table')
+		var table = new google.visualization.Table(tableDiv);
+		var query = new google.visualization.Query(UrlModule
+				.getCaseLogDataSource(caseIdentity));
+		var tableQueryWrapper = new TableQueryWrapper(table, query, caseLogOptions,
+				caseLogSelectionHandler, formatViewAction, pagingAction);
+		tableQueryWrapper.sendAndDraw();
 	}
 	
 	/* A temporary adapter function to convert from
@@ -376,9 +395,9 @@ var View = (function() {
 		$('#' + caseNode.attr('id')).remove();
 	}
 
-	function removeCaseHistory() {
-		var caseHistoryNode = clone('case-history');
-		$('#' + caseHistoryNode.attr('id')).remove();
+	function removeCaseLog() {
+		var caseLogNode = clone('caselog');
+		$('#' + caseLogNode.attr('id')).remove();
 	}
 
 	function translateCaseStatus(value) {

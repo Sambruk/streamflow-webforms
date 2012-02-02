@@ -63,12 +63,15 @@
 	    <label id="description-label" class="detail-label first single">#Description</label>
         <label id="description-value" class="detail-value single">-</label>
 
-	    <label id="form-link-label" class="detail-label first single">#Forms</label>
-        <label id="form-link-value" class="detail-value single">-</label>
-
-		<div id="case-history" class="case-details ui-widget">
-			<label id="history-label" class="detail-label single">#Case History</label>
-			<div id="case-history-table" class="ui-widget"></div>
+		<div id="submittedforms" class="case-details ui-widget">
+	    	<label id="form-link-label" class="detail-label first single">#Forms</label>
+	    	<ul id="submittedforms-list"></ul>
+	    </div>
+        
+		<div id="caselog" class="case-details ui-widget">
+			<label id="caselog-label" class="detail-label single">#Caselog</label>
+			<div id="caselog-table" class="ui-widget"></div>
+			<div id="caselog-pagination"><label id="caselog-pagination-info">#Showing 1 to 5 of 10 caselogs</label></div>
 		</div>
 	</fieldset>
 </div>
@@ -92,25 +95,19 @@
 	    <label id="form-link-label" class="detail-label first single">#Forms</label>
         <label id="form-link-value" class="detail-value single">-</label>
 
-		<div id="case-history" class="case-details ui-widget">
-			<label id="history-label" class="detail-label single">#Case History</label>
-			<div id="case-history-table" class="ui-widget"></div>
+		<div id="caselog" class="case-details ui-widget">
+			<label id="history-label" class="detail-label single">#Caselog</label>
+			<div id="caselog-table" class="ui-widget"></div>
 		</div>
 	</fieldset>
 </div>
 
-<div id="case-history" class="case-details ui-widget">
+<li id="submittedForm" class="submittedForm"><a id="submittedformLink" href=""></a></li>
+
+<div id="caselog" class="case-details ui-widget">
 	<fieldset class="ui-widget-content ui-corner-all">
-        <legend><label id="history-label"></label></legend>
-<!-- 		<form action="" class="history-paging"> -->
-<!-- 			<label id="number-of-history-label">#Show number of history items:</label> -->
-<!-- 			<select onChange="View.setHistoryOption('pageSize', parseInt(this.value, 10))"> -->
-<!-- 				<option class="3" value="3">3</option> -->
-<!-- 				<option class="5" value="5">5</option> -->
-<!-- 				<option class="10" value="10">10</option> -->
-<!-- 			</select> -->
-<!-- 		</form> -->
-		<div id="case-history-table" class="ui-widget"></div>
+        <legend><label id="caselog-label"></label></legend>
+		<div id="caselog-table" class="ui-widget"></div>
 	</fieldset>
 </div>
 
