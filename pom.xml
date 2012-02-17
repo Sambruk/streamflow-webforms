@@ -16,7 +16,7 @@
         <version.eid.plugin>1.3.0</version.eid.plugin>
         <version.qi4j-tools>1.3</version.qi4j-tools>
         <version.restlet>2.0.3</version.restlet>
-        <version.streamflow>1.5.0</version.streamflow>
+        <version.streamflow>1.6.0-SNAPSHOT</version.streamflow>
     </properties>
     
     <repositories>

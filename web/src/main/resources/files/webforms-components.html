@@ -33,30 +33,13 @@
 	<a href="http://jayway.com/streamsource"><p>Powered by Streamflow&#153;</p></a>
 </footer>
 
-<div id="buttons" class="form-actions"></div>
-			    
-<a id="button" href="#" class="btn"></a>
-
-<div id="form_summary_div">
-
-    <div id="form_pages_summary"></div>
-
-    <div id="form_signatures" style="display: none;">
-		<div id="form_signatures_heading"></div>
-		<div id="form_signatures_content">
-			<div id="form_signatures_column_1"></div>
-			<div id="form_signatures_column_2"></div>
-			<div id="footer" style="clear: both;"></div>
-		</div>
-		<div id="eIdPlugin"></div>
-    </div>
-</div>
-
-
-<div id="thank_you_div" class="well">
-	<div id="thank-you-message"></div>
-    <div id="caseid_message"></div>
-    <div id="caseid"></div>
+<form id="form" class="form-vertical">
+	<fieldset>
+	</fieldset>
+</form>
+<div id="formfield" class="control-group">
+	<label class="control-label"></label>
+    <div class="controls"></div>        
 </div>
 
 <div id="form_page_summary" class="well">
@@ -66,13 +49,16 @@
 	</table>
 </div>
 
-<form id="form" class="form-vertical">
-	<fieldset>
-	</fieldset>
-</form>
-<div id="formfield" class="control-group">
-	<label class="control-label"></label>
-    <div class="controls"></div>        
+<div id="form_signatures">
+	<h3></h3>
+	<table id="signatures"></table>
+	<div id="eIdPlugin"></div>
+</div>
+
+<div id="thank_you_div" class="well">
+	<div id="thank-you-message"></div>
+    <div id="caseid_message"></div>
+    <div id="caseid"></div>
 </div>
 
 <div id="CommentFieldValue" class="commentfield"></div>
@@ -100,6 +86,10 @@
 	<select id="selectedvalues" class="listbox" multiple="multiple" ></select>
 </div>
 
+<div id="buttons" class="form-actions"></div>
+<a id="button" href="#" class="btn"></a>
+
+
 <div id="modal" class="modal hide fade" style="display: none;">
 	<div class="modal-header"><a class="close" data-dismiss="modal">&times;</a></div>
 	<div class="modal-body"></div>
@@ -108,7 +98,4 @@
 
 <form id="uploadform" action="POST" enctype="multipart/form-data" ></form>
 
-<div id="signature_label" class="signature_label"></div>
-<div id="signature" class="signature_value_signed"></div>
-
-<select id="eidProviders"></select>
+<select id="eidProviders" class="eidproviders"></select>

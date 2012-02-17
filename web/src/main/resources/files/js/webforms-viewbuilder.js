@@ -73,11 +73,10 @@ var View = (function() {
     }
 
     inner.summary = function( args ) {
-    	createPageContent(getSummary(), function(node) {
-            FormModule.fold( function( page ) { return foldPage(node, page ) } );
-         	addSignaturesDiv(node.find('#form_signatures') );
+    	createPageContent( getSummary(), function( node ) {
+    		FormModule.fold( function( page ) { return foldPage( node, page ) } );
+            addSignaturesDiv( node );
     	});
-    	
     }
 
     function createPageContent(page, contentFunction){
@@ -160,7 +159,7 @@ var View = (function() {
         } else {
             // strip parameters
             var verifyDTO = {};
-            $.each( $('#app').find('form > input:hidden'), function(idx, value ) {
+            $.each( $('#eIdPlugin').find('form > input:hidden'), function(idx, value ) {
                 if ( value.name ) {
                     verifyDTO[ value.name ] = value.value;
                 }
@@ -297,37 +296,35 @@ var View = (function() {
         return '#' + Contexts.findUrl( inner.sign, [idx] );
     }
 
-    function addSignaturesDiv( summarySignatures ) {
+    function addSignaturesDiv( node ) {
         if ( FormModule.requiredSignaturesCount() > 0 ) {
-            addSignatures( summarySignatures );
+        	var signaturesNode = clone('form_signatures');
+        	signaturesNode.addClass('well');
+        	signaturesNode.find("h3").append( texts.signatures );
+        	
+        	var table = signaturesNode.find('table');
+        	$.each( FormModule.getRequiredSignatures(), function(idx, reqSign ) {
+        		var row = $('<tr/>');
+        		table.append( row );
+        		row.addClass("signature-row");
+        		row.append( $('<td/>').append(reqSign.name + ":") );
+        		var signature = getSignature( reqSign.name, FormModule.getSignatures() );
+        		if ( signature ) {
+        			row.append( $('<td/>').append(signature.signerName).addClass('signer-name'));
+        		} else {
+        			row.append( $('<td/>').append( eidProviders(idx) ));
+        			var buttonCell = $('<td/>');
+        			new inner.Button( buttonCell )
+        				.name(texts.sign)
+        				.href(getSign(idx))
+        				.attr('id',"link_" + idx)
+        				.image('icon-pencil')
+        				.enable(false);
+        			row.append( buttonCell );
+        		}
+        	});
+        	node.append( signaturesNode );
         }
-    }
-    
-    function addSignatures( summarySignatures ) {
-    	    	
-    	summarySignatures.find("#form_signatures_heading").append( $('<h3 />').text( texts.signatures ) );
-
-    	var column_1 = summarySignatures.find("#form_signatures_column_1");
-    	var column_2 = summarySignatures.find("#form_signatures_column_2");
-
-    	$.each( FormModule.getRequiredSignatures(), function(idx, reqSign ) {
-            column_1.append( clone('signature_label').append(reqSign.name + ":") );
-            var signatureValue = clone('signature');
-            var signature = getSignature( reqSign.name, FormModule.getSignatures() );
-            if ( signature ) {
-            	signatureValue.append(signature.signerName);
-            } else {
-            	signatureValue.attr("class", "signature_value_unsigned").append( eidProviders(idx) ).append( "&nbsp;&nbsp;");
-            	new inner.Button( signatureValue )
-            	    .name(texts.sign)
-            	    .href(getSign(idx))
-            	    .small()
-            	    .attr('id',"link_" + idx)
-            	    .enable(false);
-            }
-            column_2.append( signatureValue );
-        });
-        summarySignatures.show();
     }
 
     function eidProviders( signatureId ){
@@ -424,7 +421,7 @@ var View = (function() {
     }
 
     inner.Button.prototype.small = function() {
-        this.elm.addClass('small');
+        this.elm.addClass('btn-small');
         return this;
     }
 
@@ -439,7 +436,7 @@ var View = (function() {
     }
 
     inner.Button.prototype.image = function( imageClass ) {
-        this.elm.prepend( '<i class="' + imageClass + '"/>');
+        this.elm.prepend( '<i class="' + imageClass + '"/> ');
         return this;
     }
 
