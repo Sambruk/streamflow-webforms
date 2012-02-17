@@ -1,0 +1,114 @@
+<!--
+
+
+    Copyright 2009-2010 Streamsource AB
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+
+<!-- Components goes here-->
+<div id="form_header" class="header">
+	<h2 id="form_description"></h2>
+</div>
+
+<div id="row" class="row"></div>
+<div id="content" class="span8"></div>
+
+<ul id="progress" class="breadcrumb"></ul>
+<li id="progressItem"><a id="link" href="#"></a><span id="divider" class="divider">/</span></li>
+<li id="progressItemLast"><a id="link" href="#"></a></li>
+
+<footer id="footer" class="footer">
+	<a href="http://jayway.com/streamsource"><p>Powered by Streamflow&#153;</p></a>
+</footer>
+
+<div id="buttons" class="form-actions"></div>
+			    
+<a id="button" href="#" class="btn"></a>
+
+<div id="form_summary_div">
+
+    <div id="form_pages_summary"></div>
+
+    <div id="form_signatures" style="display: none;">
+		<div id="form_signatures_heading"></div>
+		<div id="form_signatures_content">
+			<div id="form_signatures_column_1"></div>
+			<div id="form_signatures_column_2"></div>
+			<div id="footer" style="clear: both;"></div>
+		</div>
+		<div id="eIdPlugin"></div>
+    </div>
+</div>
+
+
+<div id="thank_you_div" class="well">
+	<div id="thank-you-message"></div>
+    <div id="caseid_message"></div>
+    <div id="caseid"></div>
+</div>
+
+<div id="form_page_summary" class="well">
+    <h3></h3>
+	<table id="fields_table" class="fields_table">
+		<tr id="field_summary"></tr>
+	</table>
+</div>
+
+<form id="form" class="form-vertical">
+	<fieldset>
+	</fieldset>
+</form>
+<div id="formfield" class="control-group">
+	<label class="control-label"></label>
+    <div class="controls"></div>        
+</div>
+
+<div id="CommentFieldValue" class="commentfield"></div>
+<select id="ComboBoxFieldValue" ></select>
+<textarea id="TextAreaFieldValue" cols="" rows=""></textarea>
+<input id="textfield" type="text" />
+<label id="checkbox" class="checkbox"><input type="checkbox" /></label>
+<label id="radio" class="radio"><input type="radio" /></label>
+<label id="label"></label>
+<p id="help-block" class="help-block"></p>
+<span id="help-inline" class="help-inline"></span>
+
+<span id="label_missing" class="label label-important">Saknas</span>
+<font id="mandatory" color="red">&nbsp;*</font>
+<font id="hint" class="hint"></font>
+
+<div id="AttachmentFieldValue">
+    <label id="attachmentLabel"></label><br/>
+    <input id="Attachment" type="file"/>
+</div>
+
+<div id="ListBoxFieldValue" class="listbox_container">
+	<select id="possiblevalues" class="listbox" multiple="multiple"></select>
+	<div id="listboxbuttons" class="listboxbuttons"></div>
+	<select id="selectedvalues" class="listbox" multiple="multiple" ></select>
+</div>
+
+<div id="modal" class="modal hide fade" style="display: none;">
+	<div class="modal-header"><a class="close" data-dismiss="modal">&times;</a></div>
+	<div class="modal-body"></div>
+	<div class="modal-footer"></div>
+</div>
+
+<form id="uploadform" action="POST" enctype="multipart/form-data" ></form>
+
+<div id="signature_label" class="signature_label"></div>
+<div id="signature" class="signature_value_signed"></div>
+
+<select id="eidProviders"></select>

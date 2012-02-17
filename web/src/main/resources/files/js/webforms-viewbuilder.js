@@ -22,20 +22,25 @@ var View = (function() {
     var messages = {};
 
     inner.error = function( message ) {
-        var node = clone('ErrorMessage');
-        node.text( message );
-        displayView( node );
+        var node = clone('alert');
+        node.addClass("alert-error")
+        node.append( message );
+        node.insertAfter($('#inserted_content').find('ul.breadcrumb'));        
     }
 
     inner.discard = function( args ) {
         RequestModule.discard();
         FormModule.destroy();
 
+        var container = $('#container').empty();
         var node = clone( 'thank_you_div' );
-        var message = clone('InfoMessage');
-        message.append(texts.formdiscarded );
-        message.appendTo( node );
-        displayView( node );
+        var alert = clone('alert');
+        alert.addClass("alert-info")
+        alert.append( texts.formdiscarded );
+        node.prepend(alert);
+        
+        new inner.Button( node ).name(texts.restart).href("#");
+        container.append(node);
     }
 
     inner.submit = function() {
@@ -44,58 +49,81 @@ var View = (function() {
         var printUrl = UrlModule.getPrintUrl( FormModule.getFormId() );
         FormModule.destroy();
 
+        var container = $('#container').empty();
         var node = clone( 'thank_you_div' );
-        var message = clone('SuccessMessage');
-        message.append(texts.formSubmittedThankYou).prependTo( node );
 
         if ( typeof( caseName )!="undefined") {
+        	node.find('#thank-you-message').text(texts.formSubmittedThankYou);
             node.find('#caseid_message').text(texts.caseidmessage);
             node.find('#caseid').text(caseName);
         }
         new inner.Button( node ).image('print').name(texts.print).href(printUrl).attr('target','_new');
-        displayView( node );
+        container.append(node);
     }
 
     inner.formPage = function( args ) {
-        var node = clone( 'form_filling_div' );
         var page = parseInt( args.segment );
-        addHeader( node, page );
-
-        FormModule.foldEditPage( page, function(field) { foldEditField(node, field); });
-
-        addFooter( node, page );
-        displayView( node );
+        createPageContent(page, function(node) { 
+        	var form = clone('form');
+        	FormModule.foldEditPage( page, function(field) { 
+        		foldEditField(form.find('fieldset'), field); 
+        	})
+        	node.append(form);
+        });
     }
 
-    function foldEditField( node, field ) {
-        FieldTypeModule.createFieldUI( field );
+    inner.summary = function( args ) {
+    	createPageContent(getSummary(), function(node) {
+            FormModule.fold( function( page ) { return foldPage(node, page ) } );
+         	addSignaturesDiv(node.find('#form_signatures') );
+    	});
+    	
+    }
 
-        var fieldNode = clone( 'FormField', 'Field' + field.id ).appendTo( node );
+    function createPageContent(page, contentFunction){
+    	 var container = $('#container').empty();
+         addHeader( container );
+         var node = clone('row');
+         container.append(node);
+         var content = clone('content');
+         node.append(content);
+         addProgressbar( page, FormModule.pages() , content );
+         
+         contentFunction(content);
+
+         addButtons( content, page);
+         addFooter( container);
+    }
+    
+    function foldEditField( node, field ) {
+
+        var fieldNode = clone( 'formfield', 'Field' + field.id ).appendTo( node );
+        var controlsNode = fieldNode.find('div.controls');
+        FieldTypeModule.createFieldUI( field, controlsNode );
        
         if ( field.fieldType == "CommentFieldValue" ) {
-        	fieldNode.find('div.fieldname').remove();
+        	fieldNode.find('label').remove();
         } else {
-        	var fieldHeader = fieldNode.find('div.fieldname');
-	        clone('label').append(field.name).appendTo( fieldHeader );
-	        hint( fieldHeader, field );
+        	var fieldHeader = fieldNode.find('label.control-label');
+	        fieldHeader.append( field.name );
 	        mandatory( fieldHeader, field );
-	        toolTip( fieldHeader, field );
+	        hint( fieldHeader, field );
+	        help( controlsNode, field);
         }
-        fieldNode.find('div.fieldvalue').append( field.node );
         field.refreshUI();
     };
+    
 
-    inner.summary = function( args ) {
-        var node = clone( 'form_summary_div' );
-        addHeader( node, -1 );
+    function mandatory( node, field ) {
+        if ( field.field.field.mandatory ) {
+            clone('mandatory', 'mandatory' + field.id).appendTo( node );
+        }
+    }
 
-        var pages = node.find('#form_pages_summary');
-        FormModule.fold( function( page ) { return foldPage(pages, page ) } );
-         
-    	addSignaturesDiv(node.find('#form_signatures') );
-    	addSubmit( addFooter( node, args.segment ) );
-        
-    	displayView( node );
+    function hint( node, field ) {
+        if ( field.fieldValue.hint ) {
+        	clone('hint', 'hint' + field.id).text( ' (' + field.fieldValue.hint + ')' ).appendTo( node );
+        }
     }
     
     function foldPage( node, page ) {
@@ -109,37 +137,21 @@ var View = (function() {
     function foldField( node, field ) {
         if ( field.fieldType == "CommentFieldValue" ) return;
         var row = clone( 'field_summary', field.id ).appendTo( node );
-        var tr = $('<td class="field_label"/>').append( field.name + ':');
-    	mandatory( tr, field );
+        var tr = $('<td class="field_label"/>').append( field.name );
         row.append( tr );
         $('<td class="field_value"/>').append( field.formattedValue ).appendTo( row );
-    }
-
-    function mandatory( node, field ) {
-        if ( field.field.field.mandatory ) {
-            clone('mandatory').appendTo( node );
+        if (field.field.field.mandatory && !field.formattedValue) {
+    		row.addClass('validation-error');
+    		row.append($('<td class="field_message"/>').append(clone('label_missing', 'missing')));
         }
     }
 
-    function hint( node, field ) {
-        if ( field.fieldValue.hint ) {
-        	clone('hint').text( ' (' + field.fieldValue.hint + ')' ).appendTo( node );
-        }
-    }
-
-    function toolTip( node, field ) {
+    function help( node, field ) {
         if ( field.field.field.note != "" && field.fieldType != "CommentFieldValue") {
-            node.append( clone('tooltip').aToolTip({ fixed: true, tipContent: field.field.field.note }) );
+            node.append( clone('help-block').append(field.field.field.note) );
         }
     }
 
-    function addError( button ) {
-        var errorTxt = FormModule.errorTxt();
-        if ( errorTxt != "" ) {
-            button.elm.aToolTip({ tipContent: errorTxt });
-        }
-    }
-    
     inner.sign = function( args ) {
         var retVal = doSign();
         if ( retVal != 0 ) {
@@ -168,6 +180,9 @@ var View = (function() {
             showMessages();
             $(window).scrollTop( 0 );
         } catch ( e ) {
+        	if (!e) {
+        		console.log(e.message);
+        	}
             messages = {};
             if ( e.info ) messages.info = e.info;
             else if ( e.warning ) messages.warning = e.warning;
@@ -199,22 +214,51 @@ var View = (function() {
         }
     }
 
-    function addHeader( node, page ) {
+    function addHeader( node ) {
         var header = clone('form_header');
         header.find('#form_description').text( FormModule.title() );
-        appendPageNames( page, FormModule.pages() , header.find('#form_pages') );
         node.prepend( header );
     }
 
-    function addFooter( node, page ) {
-        var footer = clone('form_footer');
-	    new inner.Button( footer ).image('previous').name(texts.previous).href( getPrevious( page ) ).enable( page!=0 );
-	    new inner.Button( footer ).image('next').name(texts.next).href(getNext( page ) ).enable( page!='summary' );
-	    new inner.Button( footer ).image('discard').name(texts.discard).href(getDiscard()).confirm(texts.confirmDiscard);
-        node.append( footer );
-        return footer;
+    function addButtons( node, page) {
+    	var buttons = clone('buttons');
+	    new inner.Button( buttons ).name(texts.previous).href( getPrevious( page ) ).enable( page!=0 );
+	    new inner.Button( buttons ).name(texts.next).href(getNext( page ) ).enable( page!='summary' );
+	   
+	    var dialogElement = createDiscardDialog(node);
+	    new inner.Button( buttons ).name(texts.discard).confirm('#' + dialogElement.attr('id')).addClass("btn-danger");
+	    
+	    if( page == getSummary()) {
+	    	var button = new inner.Button( buttons ).name(texts.submit).href(getSubmit());
+	    	if (FormModule.canSubmit()) {
+	    		button.addClass("btn-primary");
+	    	} else {
+	    		button.enable( false ); 
+	    	}
+	    }
+        node.append( buttons );
+        return buttons;
     }
 
+    function createDiscardDialog( node ) {
+    	var dialog = clone('modal', 'confirmAbortModal');
+	    dialog.find('.modal-header').prepend(texts.discard);
+	    dialog.find('.modal-body').append(texts.confirmDiscard);
+	    dialog.find('.modal-footer').append();
+	    var button = new inner.Button(dialog.find('.modal-footer')).name(texts.no).attr({'data-dismiss':'modal'});
+	    var button = new inner.Button(dialog.find('.modal-footer')).name(texts.yes).attr({'data-dismiss':'modal'}).href(getDiscard()).click(function() {
+	    	inner.discard();
+	    	dialog.modal('hide');
+	    });
+	    node.append(dialog);
+	    return dialog;	
+    }
+    
+    function addFooter( node ) {
+        var footer = clone('footer');
+        node.append( footer );
+    }
+    
     function getPrevious( segment ) {
         var current = parseInt( segment );
         if ( isNaN( current ) ) {
@@ -259,11 +303,6 @@ var View = (function() {
         }
     }
     
-    function addSubmit( footer ) {
-    	var button = new inner.Button( footer ).image('submit').name(texts.submit).href(getSubmit()).enable( FormModule.canSubmit() );
-        addError( button );
-    }
-
     function addSignatures( summarySignatures ) {
     	    	
     	summarySignatures.find("#form_signatures_heading").append( $('<h3 />').text( texts.signatures ) );
@@ -280,7 +319,6 @@ var View = (function() {
             } else {
             	signatureValue.attr("class", "signature_value_unsigned").append( eidProviders(idx) ).append( "&nbsp;&nbsp;");
             	new inner.Button( signatureValue )
-            	    .image('pencil_small')
             	    .name(texts.sign)
             	    .href(getSign(idx))
             	    .small()
@@ -333,10 +371,6 @@ var View = (function() {
         return match;
     }
 
-    function displayView( node ) {
-        $('#app').empty().append( node );
-    }
-
     function redirect( view ) {
         location.hash = view;
     }
@@ -354,25 +388,27 @@ var View = (function() {
         messages = {};
     }
 
-    function appendPageNames( current, pages, pagesNode ) {
-        var listStyle = "progress_first";
+    function addProgressbar( current, pages, contentNode ) {
+    	var progress = clone('progress');
         $.each( pages, function(idx, page){
-            pagesNode.append( createBreadcrumb(listStyle, idx==current, getPage(idx), page.title) );
-            listStyle = "progress";
+            progress.append( createProgressItem(idx==current, getPage(idx), page.title) );
         });
-        pagesNode.append( createBreadcrumb("progress_last", current==-1, getSummary(), texts.summary) );
+        var summary = clone('progressItemLast');
+    	summary.find('#link').append(texts.summary).attr({'href':getSummary()});
+    	if ( current==getSummary()) {
+    		summary.addClass("active");
+    	}
+    	progress.append( summary );
+        contentNode.append(progress);
     }
 
-    function createBreadcrumb( listStyle, selected, href, title ){
-    	var pageElm = clone('progress');
-    	pageElm.attr('class', listStyle);
+    function createProgressItem( selected, href, title ){
+    	var pageElm = clone('progressItem');
+    	pageElm.find('#link').append(title).attr({'href':href});
     	if ( selected) {
-    		pageElm.find('#progress_image').append(clone('link').attr({'href':href, "class":"progress"}).append(clone('progress_icon_selected')));
-    	} else {
-    		pageElm.find('#progress_image').append(clone('link').attr({'href':href, "class":"progress"}).append(clone('progress_icon')));
+    		pageElm.addClass("active");
     	}
-    	pageElm.find('#progress_text').append(clone('link').attr({'href':href, "class":"progress"}).append(title));
-        return pageElm;
+    	return pageElm;
     }
 
     inner.Button = function( placeholder ) {
@@ -381,20 +417,10 @@ var View = (function() {
         return this;
     }
 
-    inner.Button.prototype.confirm = function( message ) {
+    inner.Button.prototype.confirm = function( modalElement ) {
         var button = this.elm;
-        button.attr("onClick", "return false;");
-        button.click( function() {
-            $(this).fastConfirm({
-                position: "right",
-                proceedText: "Ja",
-                cancelText: "Nej",
-                questionText: message,
-                onProceed: function(trigger) {
-                    location.hash = button.attr('href');
-                }
-            });
-        });
+        button.attr({'href':modalElement, 'data-toggle':'modal', 'data-backdrop': false} );
+        return this;
     }
 
     inner.Button.prototype.small = function() {
@@ -407,8 +433,13 @@ var View = (function() {
         return this;
     }
 
-    inner.Button.prototype.image = function( id ) {
-        this.elm.prepend( clone( id ) );
+    inner.Button.prototype.addClass = function(clazz) {
+        this.elm.addClass(clazz);
+        return this;
+    }
+
+    inner.Button.prototype.image = function( imageClass ) {
+        this.elm.prepend( '<i class="' + imageClass + '"/>');
         return this;
     }
 
@@ -434,12 +465,10 @@ var View = (function() {
 
     function enable( button, _enable ) {
         if ( _enable ) {
-            button.removeClass('disabled').addClass('positive');
-            button.find('img').removeAttr('style');
+            button.removeClass('disabled');
             button.removeAttr("onclick");
         } else {
-            button.removeClass('positive').addClass('disabled');
-            button.find('img').fadeTo(0, 0.4);
+            button.addClass('disabled');
             button.attr("onClick", "return false;");
         }
     }

@@ -146,7 +146,7 @@ jQuery(document).ready(function()
            'submit'    : {view:View.submit,   init: [ verifySubmit ]},
            'idContext' : {view:View.sign,     init: [ verifySigner, verifyProvider, setupRequiredSignature ]}}}}};
 
-	$('#components').hide().load(contextRoot + '/static/surface-components.html', function() {
+	$('#components').hide().load(contextRoot + '/static/webforms-components.html', function() {
         try {
             login( contextRoot, accesspoint );
             $(window).hashchange( setupView );

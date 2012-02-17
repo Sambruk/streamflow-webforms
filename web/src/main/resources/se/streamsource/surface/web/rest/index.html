@@ -20,35 +20,50 @@
 -->
 <html lang="en">
 <head>
+	
+	<title>Streamflow&#8482; Surface WebForms</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>Streamflow&#8482; Surface</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Surface WebForms">
 	<meta name="author" content="Streamsource">
+	<meta charset="utf-8">
+	
+	<!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+	<!--[if lt IE 9]>
+	  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	
+	<!-- Le styles -->
+	<link rel="stylesheet" type="text/css" href="$context-root/static/css/external/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="$context-root/static/css/external/bootstrap-responsive.css">
+	<link rel="stylesheet" type="text/css" href="$context-root/static/css/external/redmond/jquery-ui-1.8.10.custom.css">
+	<link rel="stylesheet" type="text/css" href="$context-root/static/css/style.css">
+	
+	<!-- Le fav and touch icons 
+	<link rel="shortcut icon" href="assets/ico/favicon.ico">
+	<link rel="apple-touch-icon" href="assets/ico/apple-touch-icon.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="assets/ico/apple-touch-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="assets/ico/apple-touch-icon-114x114.png">
+	-->
 
-    <link rel="stylesheet" type="text/css" href="$context-root/static/css/external/atooltip.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="$context-root/static/css/external/jquery-ui-1.8.2.css" media="all" />
-    <link rel="stylesheet" type="text/css" href="$context-root/static/css/external/ui.theme.css" media="all" />
-    <link rel="stylesheet" type="text/css" href="$context-root/static/css/external/jquery.fastconfirm.css" />
-    <link rel="stylesheet" type="text/css" href="$context-root/static/css/screen.css" />
-    <!--[if lt IE 9]>
-    <link rel="stylesheet" type="text/css" href="$context-root/static/css/ie.css"  />
-    <![endif]-->
 	$externalcss
+	
+	<script type="text/javascript" src="$context-root/static/js/external/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src="$context-root/static/js/external/bootstrap-alert.js"></script>
+	<script type="text/javascript" src="$context-root/static/js/external/bootstrap-modal.js"></script>
+	<script type="text/javascript" src="$context-root/static/js/external/jquery-ui-1.8.10.custom.min.js"></script>
+	<script type="text/javascript" src="$context-root/static/js/external/date.format.js"></script>
+	<script type="text/javascript" src="$context-root/static/js/external/jquery.hashchange-1.0.0.js"></script>
+	<script type="text/javascript" src="$context-root/static/js/external/jquery.ui.datepicker2-sv.js"></script>
+	<script type="text/javascript" src="$context-root/static/js/external/ajaxfileupload.js"></script>
+	<script type="text/javascript" src="$context-root/static/js/contexts.js"></script>
+	<script type="text/javascript" src="$context-root/static/js/webforms-client.js"></script>
+	<script type="text/javascript" src="$context-root/static/js/webforms-formfields.js"></script>
+	<script type="text/javascript" src="$context-root/static/js/webforms-urls.js"></script>
+	<script type="text/javascript" src="$context-root/static/js/webforms-requests.js"></script>
+	<script type="text/javascript" src="$context-root/static/js/webforms-viewbuilder.js"></script>
+	<script type="text/javascript" src="$context-root/static/js/webforms-form.js"></script>
 
-    <script type="text/javascript" src="$context-root/static/js/external/jquery.min-1.4.2.js"></script>
-    <script type="text/javascript" src="$context-root/static/js/external/jquery-ui.min-1.8.2.js"></script>
-    <script type="text/javascript" src="$context-root/static/js/external/date.format.js"></script>
-    <script type="text/javascript" src="$context-root/static/js/external/atooltip.min.jquery.js"></script>
-    <script type="text/javascript" src="$context-root/static/js/external/jquery.hashchange-1.0.0.js"></script>
-    <script type="text/javascript" src="$context-root/static/js/external/jquery.ui.datepicker2-sv.js"></script>
-    <script type="text/javascript" src="$context-root/static/js/external/ajaxfileupload.js"></script>
-    <script type="text/javascript" src="$context-root/static/js/external/jquery.fastconfirm.js"></script>
-    <script type="text/javascript" src="$context-root/static/js/contexts.js"></script>
-    <script type="text/javascript" src="$context-root/static/js/surface-client.js"></script>
-    <script type="text/javascript" src="$context-root/static/js/surface-formfields.js"></script>
-    <script type="text/javascript" src="$context-root/static/js/surface-urls.js"></script>
-    <script type="text/javascript" src="$context-root/static/js/surface-requests.js"></script>
-    <script type="text/javascript" src="$context-root/static/js/surface-viewbuilder.js"></script>
-    <script type="text/javascript" src="$context-root/static/js/surface-form.js"></script>
 
     <script type="text/javascript" src="$context-root/texts?locale=sv"></script>
     <script type="text/javascript">
@@ -59,11 +74,9 @@
 </head>
 <body>
 <div id="signerDiv"></div>
-<div class="bp">
-<div id="app">
-	Loading...
-</div>
-<span class="copy">Powered by Streamflow&#153;</span>
+
+<div id="container" class="container">
+
 </div>
 
 <div id="components">
