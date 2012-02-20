@@ -31,7 +31,7 @@ var FieldTypeModule = (function() {
         return value.replace(/\W/g, '');
     }
 
-    function listBoxArrow(id, toBox) {
+    function listBoxArrow(id, toBox, emptyFunction) {
         var fromBox = nameMap[ toBox ] + id;
         $('#'+toBox+id).append( $('#'+fromBox+' > option:selected') );
     }
@@ -43,11 +43,12 @@ var FieldTypeModule = (function() {
 
     /** All field type functions **/
 
-    function AttachmentFieldValue( field ) {
+    function AttachmentFieldValue( field, controlsNode ) {
     	field.node = clone( field.fieldType, field.id );
     	field.node.find('#Attachment').change( function() { button.enable(true); } ).
         attr({id:'Attachment'+field.id, name: field.id });
-
+        controlsNode.append(field.node);
+        
         var button = new View.Button( field.node ).small().image('document_up').name( texts.upload )
         .enable( false ).click( function() {
             $('#Field'+field.id+' .fieldwaiting > img')
@@ -75,13 +76,17 @@ var FieldTypeModule = (function() {
         }
     }
 
-    function CheckboxesFieldValue( field ) {
-    	field.node = clone( 'fieldset', field.id );
+    function CheckboxesFieldValue( field, controlsNode ) {
+    	field.node = controlsNode;
+    	field.node.attr('class', 'well');
     	$.each( field.fieldValue.values, function( idx, value ) {
             var selectionId = field.id + safeIdString( value );
-            var element = clone('checkbox', selectionId).click( function() { field.changed().update(); });
-            var label = clone('label', 'label'+selectionId).attr('for', selectionId).text( value );
-            field.node.append( $('<div />').append( element ).append( label ) );
+            var element = clone('checkbox', 'label' + selectionId);
+            element.find('input').attr('id', selectionId).click( function() { 
+            	field.changed().update();
+            });
+            element.append( value );
+            field.node.append( element );
         });
 
         field.refreshUI = function() {
@@ -95,7 +100,7 @@ var FieldTypeModule = (function() {
         }
     }
 
-    function ComboBoxFieldValue( field ) {
+    function ComboBoxFieldValue( field, controlsNode ) {
     	field.node = clone( field.fieldType, field.id );
     	field.node.append( $('<option />') );
         $.each(field.fieldValue.values, function(idx, value ) {
@@ -103,7 +108,7 @@ var FieldTypeModule = (function() {
             field.node.append( $('<option />').attr({value: value, id: selectionId}).text(value) );
         });
         field.node.change( function() { field.changed().update(); });
-
+        controlsNode.append( field.node );
         field.refreshUI = function() {
             field.node.find('#' + field.id + safeIdString(this.value)).attr('selected', 'selected');
         }
@@ -113,14 +118,15 @@ var FieldTypeModule = (function() {
         }
     }
 
-    function CommentFieldValue( field ) {
+    function CommentFieldValue( field, controlsNode ) {
     	field.node = clone( field.fieldType, field.id );
     	field.node.append( '<pre>'+field.field.field.note+'</pre>' );
         field.name = "";
         field.refreshUI = $.noop;
+        controlsNode.append(field.node);
     }
 
-    function DateFieldValue( field ) {
+    function DateFieldValue( field, controlsNode ) {
     	field.node = clone( 'textfield', field.id );
     	field.node.change( function() {
     		field.formattedValue = field.getUIValue();
@@ -128,20 +134,21 @@ var FieldTypeModule = (function() {
     	    update( field.id, field.value )
         });
         field.node.datepicker();
+        controlsNode.append(field.node);
     }
 
-    function ListBoxFieldValue( field ) {
+    function ListBoxFieldValue( field, controlsNode ) {
     	field.node = clone( field.fieldType, field.id );
     	var possible = field.node.find('#possiblevalues').attr({id: 'Possible'+field.id});
         var selected = field.node.find('#selectedvalues').attr({id: 'Selected'+field.id});
         var buttons = field.node.find('#listboxbuttons');
-        new View.Button( buttons ).image('next').click( function() {
+        new View.Button( buttons ).image('icon-arrow-right').click( function() {
             listBoxArrow( field.id, 'Selected' );
             field.changed().update();
             return false;
         });
-        buttons.append( $('<br />') );
-        new View.Button( buttons ).image('previous').click( function() {
+        buttons.append('<br/>');
+        new View.Button( buttons ).image('icon-arrow-left').click( function() {
             listBoxArrow( field.id, 'Possible' );
             field.changed().update();
             return false;
@@ -151,6 +158,7 @@ var FieldTypeModule = (function() {
             var optionNode = $('<option />').attr('id', field.id+safeIdString(value)).text( value );
             possible.append( optionNode );
         });
+        controlsNode.append(field.node);
 
 
         field.refreshUI = function() {
@@ -161,16 +169,19 @@ var FieldTypeModule = (function() {
         }
 
         field.getUIValue = function() {
-            return $.map ( field.node.find('#Selected'+field.id+' > option'), function( elm ) { return elm.text }).join(', ');
+            var val =  $.map ( field.node.find('#Selected'+field.id+' > option'), function( elm ) { return elm.text }).join(', ');
+            return val;
         }
     }
 
 
-    function NumberFieldValue( field ) {
+    function NumberFieldValue( field, controlsNode ) {
     	field.node = clone( 'textfield', field.id );
     	field.node.change( function() { field.changed(); } );
         field.node.blur( function() {
             if ( !field.dirty ) return;
+        	$('#Field' + field.id).removeClass("error");
+        	$('#help' + field.id).remove();
             var enteredValue = field.getUIValue();
             update( field.id, enteredValue );
 
@@ -179,24 +190,30 @@ var FieldTypeModule = (function() {
             if ( field.dirty = ( updatedValue != serverValue ) ) {
                 field.setUIValue( enteredValue );
                 setTimeout(function(){field.node.focus(); field.node.select()}, 10);
+                $('#Field' + field.id).addClass("error");
+                var help = clone('help-inline', 'help' + field.id);
                 if ( field.fieldValue.integer ) {
-                    alert( texts.invalidinteger );
+                	help.append(texts.invalidinteger);
                 } else {
-                    alert( texts.invalidfloat );
+                	help.append(texts.invalidfloat);
                 }
+                controlsNode.append( help );
             }
         });
+        controlsNode.append(field.node);
     }
 
-    function OptionButtonsFieldValue( field ) {
-    	field.node = clone( 'fieldset', field.id );
+    function OptionButtonsFieldValue( field, controlsNode ) {
+    	field.node = controlsNode;
+    	field.node.attr('class', 'well');
     	$.each( field.fieldValue.values, function(idx, value) {
-            var id = field.id + safeIdString(value);
-            var element = clone('radio', id ).attr('name',field.id).click( function() { 
+    		var selectionId = field.id + safeIdString( value );
+            var element = clone('radio', 'label' + selectionId );
+            element.find('input').attr({'id': selectionId, 'name': field.id}).click( function() { 
             	field.changed().update();
         	});
-            var label = clone('label', 'label'+id).attr('for', id ).text(value);
-            field.node.append( $('<div />').append( element ).append( label ) );
+            element.append(value);
+            field.node.append( element );
         });
 
         field.refreshUI = function() {
@@ -208,26 +225,33 @@ var FieldTypeModule = (function() {
         }
     }
 
-    function OpenSelectionFieldValue( field ) {
-    	field.node = clone( 'fieldset', field.id );
+    function OpenSelectionFieldValue( field, controlsNode ) {
+    	field.node = controlsNode;
+    	field.node.attr('class', 'well');
     	$.each( field.fieldValue.values, function(idx, value){
-            var id = field.id + safeIdString(value);
-            var element = clone('radio', id ).attr('name',field.id).click( function() { 
+            var selectionId = field.id + safeIdString(value);
+            var element = clone('radio', 'label' + selectionId );
+            element.find('input').attr({'id': selectionId, 'name':field.id}).click( function() { 
             	textfield.attr({value:'', disabled:true});
             	field.changed().update();
     		});
-            var label = clone('label', 'label'+id).attr('for', id).text(value);
-            field.node.append( $('<div />').append( element ).append( label ) );
+            element.append(value);
+            field.node.append( element );
         });
 
         var id = 'openSelectionOption' + field.id;
-        var option = clone('radio', id).attr('name', field.id).click( function( ) { textfield.removeAttr('disabled'); });
-        var label = clone('label', 'label'+id).attr('for', id).text(field.fieldValue.openSelectionName );
+        var option = clone('radio', 'label' + id);
+        option.find('input').attr({'id': id, 'name':field.id}).click( function( ) { 
+        	textfield.removeAttr('disabled'); 
+        });
+        option.append(field.fieldValue.openSelectionName );
 
         var textfield = clone('textfield', 'TextField' + field.id );
+        textfield.addClass('openselection-text');
         textfield.change( function() { field.changed(); } );
         textfield.blur( function() { field.update(); } );
-        field.node.append( $('<div />').append( option ).append( label ).append('&nbsp;').append( textfield) );
+        option.append( '&nbsp;').append( textfield);
+        field.node.append( option );
 
 
         field.refreshUI = function() {
@@ -249,25 +273,28 @@ var FieldTypeModule = (function() {
         }
     }
 
-    function TextAreaFieldValue( field ) {
+    function TextAreaFieldValue( field, controlsNode ) {
     	field.node = clone( field.fieldType, field.id );
-    	var maxWidth = $('#app').width();
+    	var maxWidth = $('#inserted_content').width();
     	var cssWidth = field.fieldValue.cols * 7.3;
     	field.node.css("width", cssWidth < maxWidth ? cssWidth : maxWidth )
     	field.node.css("height", field.fieldValue.rows * 13);
     	field.node.change( function() { field.changed(); } );
         field.node.blur( function() { field.update(); } );
+        controlsNode.append(field.node);
     }
 
 
-    function TextFieldValue( field ) {
+    function TextFieldValue( field, controlsNode) {
     	field.node = clone( "textfield", field.id );
-    	var maxWidth = $('#app').width();
+    	var maxWidth = $('#inserted_content').width();
     	var cssWidth = field.fieldValue.width * 7.3;
     	field.node.css("width", cssWidth < maxWidth ? cssWidth : maxWidth )
         field.node.change( function() { field.changed(); });
         field.node.blur( function() {
             if ( !field.dirty ) return;
+        	$('#Field' + field.id).removeClass("error");
+        	$('#help' + field.id).remove();
             var value = field.value;
             update( field.id, field.value );
 
@@ -276,12 +303,16 @@ var FieldTypeModule = (function() {
             if ( field.dirty = ( newValue != serverValue ) ) {
                 field.setUIValue(value);
                 setTimeout(function(){ field.node.focus(); field.node.select()}, 10);
-                alert( texts.invalidformat );
+                $('#Field' + field.id).addClass("error");
+                var help = clone('help-inline', 'help' + field.id);
+                help.append(texts.invalidformat);
+                controlsNode.append( help );
             }
         });
+        controlsNode.append(field.node);
     }
     
-    inner.createFieldUI = function( field ) {
+    inner.createFieldUI = function( field, node ) {
         field.changed = function( ) {
             field.dirty = true;
             field.setValue( field.getUIValue() );
@@ -309,7 +340,7 @@ var FieldTypeModule = (function() {
             }
         };
 
-        eval( field.fieldType + '(field)');
+        eval( field.fieldType + '(field, node)');
     }
     
     inner.updateField = function( id, value ) {
