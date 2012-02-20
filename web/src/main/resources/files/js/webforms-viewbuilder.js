@@ -373,15 +373,24 @@ var View = (function() {
     }
 
     function showMessages() {
-        if ( messages && messages.info ) {
-            $('#app').prepend( clone( 'InfoMessage' ).append( messages.info ) );
-        }
-        if ( messages && messages.warning ) {
-            $('#app').prepend( clone( 'WarningMessage' ).append( messages.warning ) );
-        }
-        if ( messages && messages.error ) {
-            $('#app').prepend( clone( 'ErrorMessage' ).append( messages.error ) );
-        }
+    	if ( messages.info || messages.warning || messages.error ) {
+    		var node = clone('alert');
+    		var content = $('#inserted_content');
+    		var breadcrumb = content.find('ul.breadcrumb');
+            node.insertAfter(breadcrumb);  
+
+            if ( messages.info ) {
+                node.append( messages.info );
+            	node.addClass("alert-info");
+            }
+	        if ( messages.warning ) {
+	            node.append( messages.warning );
+	        }
+	        if ( messages.error ) {
+	            node.append( messages.error );
+            	node.addClass("alert-error");
+	        }
+    	}
         messages = {};
     }
 

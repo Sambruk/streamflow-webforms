@@ -161,6 +161,7 @@ tr.signature-row {
 }
 
 td.signer-name {
+	padding-left: 7px;
 	font-style: italic;
 	font-weight: 600;
 }
