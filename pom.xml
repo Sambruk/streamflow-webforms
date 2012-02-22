@@ -292,7 +292,12 @@
                         <exclude>**/site/**</exclude>
                         <exclude>**/resources/files/js/external/**</exclude>
                         <exclude>**/resources/files/css/external/**</exclude>
-                        <exclude>**/index.html</exclude> <!--  IE will screw up if anything is added before the doctype, add license manually instead -->
+                        <!--  IE will screw up if anything is added before the doctype, add license manually instead to these files-->
+                        <exclude>**/index.html</exclude>
+                        <exclude>**/opencases.html</exclude>
+                        <exclude>**/closedcases.html</exclude>
+                        <exclude>**/profile.html</exclude>
+                        <exclude>**/logout.html</exclude>
                     </excludes>
                     <mapping>
                         <tcl>SCRIPT_STYLE</tcl>

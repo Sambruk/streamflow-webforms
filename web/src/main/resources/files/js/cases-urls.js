@@ -106,15 +106,15 @@ var UrlModule = (function () {
     };
     
     inner.getCaseLogDataSource = function (entityid) {
-    	return this.caseDataSource + entityid + 'caselog.json';
+    	return this.caseDataSource + entityid + 'caselog.json?locale=sv';
     };
     
     inner.getCaseLog = function (entityid) {
-    	return this.caseDataSource + entityid + 'caselog.json' + '?tq=' + caseLogQuery;
+    	return this.caseDataSource + entityid + 'caselog.json?locale=sv&tq=' + caseLogQuery;
     };
 	
 	inner.getCaseLogTotal = function (entityid) {
-		return this.caseDataSource + entityid + 'caselog.json' + '?tq=' + caseLogQueryTotal;
+		return this.caseDataSource + entityid + 'caselog.json?locale=sv&tq=' + caseLogQueryTotal;
 	};
     inner.getClosedCases = function () {
     	return urls.enduser + 'closed/cases.json' + '?tq=' + casesQuery;
