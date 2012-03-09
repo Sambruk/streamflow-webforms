@@ -119,7 +119,7 @@ public class FormDraftContext
             AttachmentResponseHandler responseHandler = module.objectBuilderFactory()
                   .newObjectBuilder( AttachmentResponseHandler.class )
                   .newInstance();
-            client.getClient( "attachments/" ).postCommand( "createattachment", input, responseHandler );
+            client.getClient( "attachments/" ).postCommand( "createformattachment", input, responseHandler );
 
             ValueBuilder<AttachmentFieldDTO> builder = responseHandler.getAttachmentValue();
             builder.prototype().field().set( EntityReference.parseEntityReference( fi.getFieldName() ) );
