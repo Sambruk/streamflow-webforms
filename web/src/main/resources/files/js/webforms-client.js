@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2009-2010 Streamsource AB
+ * Copyright 2009-2012 Streamsource AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 jQuery(document).ready(function()
 {
     function login( contextRoot, accesspoint ) {
@@ -146,7 +144,7 @@ jQuery(document).ready(function()
            'submit'    : {view:View.submit,   init: [ verifySubmit ]},
            'idContext' : {view:View.sign,     init: [ verifySigner, verifyProvider, setupRequiredSignature ]}}}}};
 
-	$('#components').hide().load(contextRoot + '/static/surface-components.html', function() {
+	$('#components').hide().load(contextRoot + '/static/webforms-components.html', function() {
         try {
             login( contextRoot, accesspoint );
             $(window).hashchange( setupView );

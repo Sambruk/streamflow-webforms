@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2009-2010 Streamsource AB
+ * Copyright 2009-2012 Streamsource AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 var UrlModule = (function () {
     var inner = {};
     var enduserid;
@@ -25,8 +24,9 @@ var UrlModule = (function () {
 
     var openCasesQuery = "select href,caseid,description,created,project,status,lastupdated,lastmessage order by lastupdated desc";
     var closedCasesQuery = "select href,caseid,description,created,project,closed,resolution order by closed desc";
-    var caseHistoryQuery = "select message,created order by created desc";
     var casesTotalQuery = "select description";
+    var caseLogQuery = "select message,sender,created order by created desc";
+    var caseLogQueryTotal = "select empty";
     var casesQuery = {};
 
     inner.init = function(contextRoot){
@@ -101,20 +101,31 @@ var UrlModule = (function () {
     	return this.caseDataSource + entityid;
     };
     
-    inner.getCaseHistoryQuery = function (entityid) {
-    	return caseHistoryQuery;
+    inner.getCaseLogQuery = function () {
+    	return caseLogQuery;
     };
     
-    inner.getCaseHistoryDataSource = function (entityid) {
-    	return this.caseDataSource + entityid + 'history';
+    inner.getCaseLogDataSource = function (entityid) {
+    	return this.caseDataSource + entityid + 'caselog.json?locale=sv';
     };
     
-    inner.getCaseHistory = function (entityid) {
-    	return this.caseDataSource + entityid + 'history?tq=' + caseHistoryQuery;
+    inner.getCaseLog = function (entityid) {
+    	return this.caseDataSource + entityid + 'caselog.json?locale=sv&tq=' + caseLogQuery;
     };
-    
+	
+	inner.getCaseLogTotal = function (entityid) {
+		return this.caseDataSource + entityid + 'caselog.json?locale=sv&tq=' + caseLogQueryTotal;
+	};
     inner.getClosedCases = function () {
     	return urls.enduser + 'closed/cases.json' + '?tq=' + casesQuery;
+    };
+    
+    inner.getSubmittedForms = function (entityid) {
+    	return this.caseDataSource + entityid + "submittedforms";
+    };
+    
+    inner.getSubmittedFormsQuery = function (entityid) {
+    	return this.getSubmittedForms(entityid) + "/index.json";
     };
     
     return inner;
