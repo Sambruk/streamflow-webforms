@@ -154,7 +154,7 @@
         </contributor>
     </contributors>
 
-    <inceptionYear>2009-2010</inceptionYear>
+    <inceptionYear>2009-2012</inceptionYear>
     <url>http://www.streamsource.se</url>
 
     <organization>
@@ -292,7 +292,8 @@
                         <exclude>**/site/**</exclude>
                         <exclude>**/resources/files/js/external/**</exclude>
                         <exclude>**/webapp/css/external/**</exclude>
-                        <exclude>**/index.html</exclude> <!--  IE will screw up if anything is added before the doctype, add license manually instead -->
+                        <exclude>**/*.html</exclude> <!--  IE will screw up if anything is added before the doctype, add license manually instead -->
+                        <exclude>**/jquery-ui-1.8.2.css</exclude>
                     </excludes>
                     <mapping>
                         <tcl>SCRIPT_STYLE</tcl>
