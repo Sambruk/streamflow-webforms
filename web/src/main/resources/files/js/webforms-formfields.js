@@ -75,27 +75,54 @@ var FieldTypeModule = (function() {
         }
     }
 
+    function selectedValues( input ) {
+    	var values = new Array();
+    	if ( !input ) return values;
+    	var i = 0;
+    	input.replace(/(\[.*?\])/g, function(a, b){
+            values[ i ] = b.substring( 1, b.length-1 );
+            i++;
+            return "";
+        });
+
+        $.each( input.split( ", " ), function( idx, selectionValue ) {
+            values[i] = selectionValue;
+            i++;
+        });
+        return values;
+    }
+
     function CheckboxesFieldValue( field, controlsNode ) {
     	field.node = controlsNode;
     	field.node.attr('class', 'well');
     	$.each( field.fieldValue.values, function( idx, value ) {
             var selectionId = field.id + safeIdString( value );
             var element = clone('checkbox', 'label' + selectionId);
-            element.find('input').attr('id', selectionId).click( function() { 
+            element.find('input').attr('id', selectionId).click( function() {
             	field.changed().update();
             });
             element.append( value );
             field.node.append( element );
         });
+        field.node.change( function() { field.formattedValue = "TST" });
 
+        var values = selectedValues( field.value );
         field.refreshUI = function() {
-            $.each( this.value.split(', '), function(idx, selectionValue) {
+            $.each( values, function(idx, selectionValue) {
                 field.node.find('#' + field.id + safeIdString(selectionValue)).attr('checked', 'checked');
             });
         }
 
         field.getUIValue = function() {
-            return $.map( $('#Field'+field.id+ ' input:checked'), function( elm ) {return $('#label'+elm.id).text() }).join(', ');
+            return $.map( $('#Field'+field.id+ ' input:checked'),
+            function( elm ) {
+                var value = $('#label'+elm.id).text();
+                if ( value.indexOf(",") != -1 ) {
+                    return "["+value+"]";
+                } else {
+                    return value;
+                }
+            }).join(', ');
         }
     }
 
@@ -159,16 +186,22 @@ var FieldTypeModule = (function() {
         });
         controlsNode.append(field.node);
 
-
+        var values = selectedValues( field.value );
         field.refreshUI = function() {
-            if ( !this.value ) return;
-            $.each( this.value.split(', '), function(idx, selectionValue) {
+            $.each( values, function(idx, selectionValue) {
                 selected.append( field.node.find('#' + field.id + safeIdString(selectionValue)) );
             });
         }
 
         field.getUIValue = function() {
-            var val =  $.map ( field.node.find('#Selected'+field.id+' > option'), function( elm ) { return elm.text }).join(', ');
+            var val =  $.map ( field.node.find('#Selected'+field.id+' > option'),
+            function( elm ) {
+                if ( elm.text.indexOf(",") != -1 ) {
+                    return "["+elm.text+"]";
+                } else {
+                    return elm.text;
+                }
+            }).join(', ');
             return val;
         }
     }
