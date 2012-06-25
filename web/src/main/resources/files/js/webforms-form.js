@@ -69,6 +69,8 @@ var FormModule = (function() {
     		this.uIFormatter = formatUTCStringToIsoString;
     	} else if ( this.fieldType == "AttachmentFieldValue" ) {
     		this.uIFormatter = formatJSONAttachment;
+    	} else if ( this.fieldType == "CheckboxesFieldValue" || this.fieldType == "ListBoxFieldValue" ) {
+    	    this.uIFormatter = formatSelectionValues;
     	}
     }
 
@@ -86,6 +88,10 @@ var FormModule = (function() {
     function formatJSONAttachment( value ) {
         if ( value ) return $.parseJSON( value ).name;
         return "";
+    }
+
+    function formatSelectionValues( value ) {
+        return value.replace(/(\[|\])/g, "'" );
     }
 
     Field.prototype.setValue = function( value ) {
