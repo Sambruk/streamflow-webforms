@@ -119,6 +119,11 @@ tr.validation-error {
 	background-color: #F2DEDE;
 	border: 1px solid #EED3D7;
 }
+tr.validation-missing {
+	color: #3A87AD;
+	background-color: #D9EDF7;
+	border: 1px solid #BCE8F1;
+}
 td.field_label {
 	padding-left: 10px;
 	width: 150px;
@@ -127,7 +132,7 @@ td.field_value {
 	font-style: italic;
 }
 td.field_message {
-	width: 50px;	
+	width: 62px;	
 }
 
 #thank-you-message {

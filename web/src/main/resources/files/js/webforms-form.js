@@ -54,7 +54,7 @@ var FormModule = (function() {
         this.dirty = false;
         this.fieldType = getFieldType( field.field.fieldValue._type );
         this.setUIFormatter();
-        this.error = '';
+        this.invalidformat = false;
         this.setValue( this.field.value == null ? "" : this.field.value );
         fieldMap[ this.id ] = this;
     }	
@@ -91,11 +91,6 @@ var FormModule = (function() {
     Field.prototype.setValue = function( value ) {
     	this.value = value;
     	this.formattedValue = this.uIFormatter==null ? value : this.uIFormatter( value );
-        if ( this.field.field.mandatory && !value) {
-        	this.error = texts.missingfield + " '"+this.name+"' <br>";
-    	} else {
-    	    this.error = '';
-    	}
     	return this;
     }
 
@@ -193,9 +188,16 @@ var FormModule = (function() {
         return tbs;
 	}
 
-    inner.errorTxt = function() {
-        var error = '';
-        fieldIterator( function(field) { error += field.error; } );
+    inner.hasErrors = function() {
+        var error = false;
+        fieldIterator( function(field) { 
+        	if ( field.field.field.mandatory && !field.value) {
+            	error = true;
+        	} 
+        	if (field.invalidformat != '' ) {
+        		error = true;
+        	}
+        });
         return error;
     }
 
@@ -229,7 +231,7 @@ var FormModule = (function() {
     }
     
     inner.canSubmit = function() {
-    	var formFilled = (inner.errorTxt()=="");
+    	var formFilled = !inner.hasErrors();
         if ( inner.requiredSignaturesCount() > 0 ) {
             return formFilled && inner.isFormSigned();
         }

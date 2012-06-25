@@ -77,7 +77,7 @@ var FieldTypeModule = (function() {
 
     function CheckboxesFieldValue( field, controlsNode ) {
     	field.node = controlsNode;
-    	field.node.attr('class', 'well');
+    	field.node.addClass('well');
     	$.each( field.fieldValue.values, function( idx, value ) {
             var selectionId = field.id + safeIdString( value );
             var element = clone('checkbox', 'label' + selectionId);
@@ -128,11 +128,20 @@ var FieldTypeModule = (function() {
     function DateFieldValue( field, controlsNode ) {
     	field.node = clone( 'textfield', field.id );
     	field.node.change( function() {
+            removeErrorFromField(controlsNode.parent(), field);
+            field.invalidformat = '';
     		field.formattedValue = field.getUIValue();
-    		field.value = $.datepicker.parseDate('yy-mm-dd', field.formattedValue ).format("UTC:yyyy-mm-dd'T'HH:MM:ss.0000'Z'");
+    		if (field.formattedValue != '') {
+    			try {
+    				field.value = $.datepicker.parseDate('yy-mm-dd', field.formattedValue ).format("UTC:yyyy-mm-dd'T'HH:MM:ss.0000'Z'");
+	    		} catch (e) {
+	    			field.invalidformat = texts.invaliddate;
+	                addErrorToField(field, field.invalidformat);
+	    		}
+    		}
     	    update( field.id, field.value )
         });
-        field.node.datepicker();
+    	field.node.datepicker();
         controlsNode.append(field.node);
     }
 
@@ -179,8 +188,8 @@ var FieldTypeModule = (function() {
     	field.node.change( function() { field.changed(); } );
         field.node.blur( function() {
             if ( !field.dirty ) return;
-        	$('#Field' + field.id).removeClass("error");
-        	$('#help' + field.id).remove();
+            removeErrorFromField(controlsNode.parent(), field);
+            field.invalidformat = "";
             var enteredValue = field.getUIValue();
             update( field.id, enteredValue );
 
@@ -188,15 +197,8 @@ var FieldTypeModule = (function() {
             var serverValue = RequestModule.refreshField( field.id );
             if ( field.dirty = ( updatedValue != serverValue ) ) {
                 field.setUIValue( enteredValue );
-                setTimeout(function(){field.node.focus(); field.node.select()}, 10);
-                $('#Field' + field.id).addClass("error");
-                var help = clone('help-inline', 'help' + field.id);
-                if ( field.fieldValue.integer ) {
-                	help.append(texts.invalidinteger);
-                } else {
-                	help.append(texts.invalidfloat);
-                }
-                controlsNode.append( help );
+                field.invalidformat = texts.invalidformat;
+                addErrorToField(field, field.invalidformat);
             }
         });
         controlsNode.append(field.node);
@@ -204,7 +206,7 @@ var FieldTypeModule = (function() {
 
     function OptionButtonsFieldValue( field, controlsNode ) {
     	field.node = controlsNode;
-    	field.node.attr('class', 'well');
+    	field.node.addClass('well');
     	$.each( field.fieldValue.values, function(idx, value) {
     		var selectionId = field.id + safeIdString( value );
             var element = clone('radio', 'label' + selectionId );
@@ -226,7 +228,7 @@ var FieldTypeModule = (function() {
 
     function OpenSelectionFieldValue( field, controlsNode ) {
     	field.node = controlsNode;
-    	field.node.attr('class', 'well');
+    	field.node.addClass('well');
     	$.each( field.fieldValue.values, function(idx, value){
             var selectionId = field.id + safeIdString(value);
             var element = clone('radio', 'label' + selectionId );
@@ -292,23 +294,34 @@ var FieldTypeModule = (function() {
         field.node.change( function() { field.changed(); });
         field.node.blur( function() {
             if ( !field.dirty ) return;
-        	$('#Field' + field.id).removeClass("error");
-        	$('#help' + field.id).remove();
+            removeErrorFromField(controlsNode.parent(), field);
+            field.invalidformat = "";
             var value = field.value;
             update( field.id, field.value );
 
             var newValue = field.getUIValue();
             var serverValue = RequestModule.refreshField( field.id );
+            
             if ( field.dirty = ( newValue != serverValue ) ) {
                 field.setUIValue(value);
-                setTimeout(function(){ field.node.focus(); field.node.select()}, 10);
-                $('#Field' + field.id).addClass("error");
-                var help = clone('help-inline', 'help' + field.id);
-                help.append(texts.invalidformat);
-                controlsNode.append( help );
-            }
+                field.invalidformat = texts.invalidformat;
+                addErrorToField(field, field.invalidformat);
+            } 
         });
         controlsNode.append(field.node);
+    }
+    
+    function removeErrorFromField(node, field) {
+    	node.removeClass("error");
+    	$('#help' + field.id).remove();
+    }
+    
+    function addErrorToField(field, error){
+    	removeErrorFromField(field.node.parent().parent(), field);
+    	field.node.parent().parent().addClass("error");
+        var help = clone('help-inline', 'help' + field.id);
+        help.append(error);
+        field.node.parent().append( help );
     }
     
     inner.createFieldUI = function( field, node ) {
@@ -325,6 +338,9 @@ var FieldTypeModule = (function() {
 
         field.refreshUI = function() {
             field.node.attr( 'value', field.formattedValue );
+            if (field.invalidformat) {
+            	addErrorToField(field, field.invalidformat);
+            }
         };
 
         field.setUIValue = function( value ) {

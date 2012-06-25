@@ -22,7 +22,8 @@ var View = (function() {
         var node = clone('alert');
         node.addClass("alert-error")
         node.append( message );
-        node.insertAfter($('#inserted_content').find('ul.breadcrumb'));        
+        var breadcrumbNode = $('#inserted_content').find('ul.breadcrumb');
+        node.insertAfter(breadcrumbNode);        
     }
 
     inner.discard = function( args ) {
@@ -77,6 +78,7 @@ var View = (function() {
     }
 
     function createPageContent(page, contentFunction){
+    	 var errors = $('#inserted_alert');
     	 var container = $('#container').empty();
          addHeader( container );
          var node = clone('row');
@@ -137,9 +139,13 @@ var View = (function() {
         row.append( tr );
         $('<td class="field_value"/>').append( field.formattedValue ).appendTo( row );
         if (field.field.field.mandatory && !field.formattedValue) {
+    		row.addClass('validation-missing');
+    		row.append($('<td class="field_message pull-right"/>').append(clone('label_missing', 'missing')));
+        } else if (field.invalidformat) {
     		row.addClass('validation-error');
-    		row.append($('<td class="field_message"/>').append(clone('label_missing', 'missing')));
+    		row.append($('<td class="field_message pull-right"/>').append(clone('label_error', 'error')));
         }
+        
     }
 
     function help( node, field ) {
