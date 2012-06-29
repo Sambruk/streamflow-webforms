@@ -41,6 +41,7 @@ var View = (function() {
     }
 
     inner.submit = function() {
+        // get mails if any
         RequestModule.submitAndSend();
         var caseName = RequestModule.getCaseName();
         var printUrl = UrlModule.getPrintUrl( FormModule.getFormId() );
@@ -72,6 +73,7 @@ var View = (function() {
     inner.summary = function( args ) {
     	createPageContent( getSummary(), function( node ) {
     		FormModule.fold( function( page ) { return foldPage( node, page ) } );
+            addMailNotification( node );
             addSignaturesDiv( node );
     	});
     }
@@ -291,6 +293,34 @@ var View = (function() {
 
     function getSign( idx ) {
         return '#' + Contexts.findUrl( inner.sign, [idx] );
+    }
+
+    function addMailNotification( node ) {
+        var message = FormModule.getMailSelectionMessage();
+
+        // or default message ???
+        if ( message ) {
+            node.append( "<div class='well'><input type='checkbox' class='mailSelector'/> " + message + " <input class='mailSelectorInput' type='text' name='email'></div>" );
+            var checkbox = $('input.mailSelector');
+            var textInput = $('input.mailSelectorInput');
+            checkbox.change( function() {
+                textInput.prop('disabled', !checkbox.prop('checked') );
+                RequestModule.setMailNotificationEnablement( checkbox.prop('checked') );
+                FormModule.setMailNotificationEnabled( checkbox.prop('checked') );
+            });
+            checkbox.prop('checked', FormModule.mailNotificationEnabled() );
+            if ( !FormModule.mailNotificationEnabled() ) {
+                textInput.prop( 'disabled', true );
+            }
+            textInput.val( FormModule.enteredEmails() );
+            textInput.blur( function() {
+                // update server
+                var stringDTO = {};
+                stringDTO.string = textInput.val();
+                RequestModule.setEnteredEmails( stringDTO );
+                FormModule.setEnteredEmails( stringDTO.string );
+            });
+        }
     }
 
     function addSignaturesDiv( node ) {

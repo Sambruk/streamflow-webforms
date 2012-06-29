@@ -74,6 +74,11 @@ var RequestModule = (function() {
         return getData( parameters );
     }
 
+    inner.getMailSelectionMessage = function() {
+        var params = request( 'GET', UrlModule.getMailSelectionMessage() );
+        return getData( params ).string;
+    }
+
     inner.getFormDraft = function() {
         var params = request('GET', UrlModule.getFormDraft() );
         return getData( params );
@@ -119,6 +124,22 @@ var RequestModule = (function() {
     inner.getCaseName = function() {
         var parameters = request('GET', UrlModule.getCaseName() );
         return getData( parameters ).caseId;
+    }
+
+    inner.setMailNotificationEnablement = function( value ) {
+        var parameters;
+        if ( value ) {
+            parameters = request( 'POST', UrlModule.enableMailNotification() );
+        } else {
+            parameters = request( 'POST', UrlModule.disableMailNotification() );
+        }
+        $.ajax( parameters );
+    }
+
+    inner.setEnteredEmails = function( stringDTO ) {
+        var parameters = request( 'POST', UrlModule.setEnteredEmails() );
+        parameters.data = stringDTO;
+        $.ajax( parameters );
     }
 
     inner.sign = function( signDTO ) {

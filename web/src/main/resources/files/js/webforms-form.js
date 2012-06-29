@@ -17,6 +17,7 @@
 var FormModule = (function() {
 	var inner = {};
 	var formDraft;
+	var mailSelectionMessageText;
 	var eIdProviders;
 	var fieldMap = {};
 	var initDone = false;
@@ -28,6 +29,8 @@ var FormModule = (function() {
 		this.id = formDraft.form;
 		this.signatures = formDraft.signatures;
 		this.pages = [];
+		this.enteredEmails = formDraft.enteredEmails;
+		this.mailSelectionEnablement = formDraft.mailSelectionEnablement;
 		var pages = this.pages;
 		$.each( formDraft.pages, function(idx, page) {
 			pages[ idx ] = new Page( page, idx );
@@ -130,14 +133,30 @@ var FormModule = (function() {
 
 	inner.init = function( formDraftValue ) {
 		formDraft = new Form( formDraftValue );
-		
+		mailSelectionMessageText = RequestModule.getMailSelectionMessage();
 		initDone = true;
 	}
 	
 	inner.initialized = function() {
 		return initDone;
 	}
-	
+
+	inner.mailNotificationEnabled = function() {
+	    return formDraft.mailSelectionEnablement;
+	}
+
+	inner.setMailNotificationEnabled = function( enabled ) {
+	    formDraft.mailSelectionEnablement = enabled;
+	}
+
+    inner.setEnteredEmails = function( emails ) {
+        formDraft.enteredEmails = emails;
+    }
+
+    inner.enteredEmails = function() {
+        return formDraft.enteredEmails;
+    }
+
 	inner.pageCount = function() {
 		return formDraft.pages.length;
 	}
@@ -249,6 +268,10 @@ var FormModule = (function() {
     inner.destroy = function() {
     	initDone = false;
     	formDraft = null;
+    }
+
+    inner.getMailSelectionMessage = function() {
+        return mailSelectionMessageText;
     }
     
 	return inner;
