@@ -74,7 +74,7 @@ jQuery(document).ready(function()
     }
 
     function formIsFilled( ifError ) {
-    	if ( FormModule.errorTxt() != '' ) throw ifError;
+    	if ( FormModule.hasErrors() ) throw ifError;
     }
 
     function verifyPage( args ) {

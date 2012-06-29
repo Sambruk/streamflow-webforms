@@ -21,7 +21,7 @@ var RequestModule = (function() {
     var inner = {};
 
     function request(type, url) {
-        return {type:type, url:url, async:false, cache:false, error:errorPopup, dataType:'json'};
+        return {type:type,url:url,async:false,cache:false,error:errorPopup,dataType:'json'};
     }
 
     function getData( parameters ) {
@@ -31,9 +31,15 @@ var RequestModule = (function() {
         return data;
     }
 
-    function errorPopup() {
-        alert( texts.erroroccurred );
-        throw "http call failed";
+    function errorPopup(jqXHR, textStatus, errorThrown) {
+    	if (jqXHR.responseText) {
+    		if (texts[jqXHR.responseText])
+    			throw { error: texts[jqXHR.responseText] };
+    		else
+    			throw { error: texts[jqXHR.responseText] };
+    	} else {
+			throw { error: texts.erroroccurred + "<br/>Status: " + textStatus + "<br/>Error: " + errorThrown };
+    	}
     }
 
     function invoke( fn, arguments, message ) {
