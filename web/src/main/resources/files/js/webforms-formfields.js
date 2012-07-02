@@ -47,7 +47,8 @@ var FieldTypeModule = (function() {
     	field.node.find('#Attachment').change( function() { button.enable(true); } ).
         attr({id:'Attachment'+field.id, name: field.id });
         controlsNode.append(field.node);
-        
+
+        field.node.append( '<br>' );
         var button = new View.Button( field.node ).small().image('document_up').name( texts.upload )
         .enable( false ).click( function() {
             $('#Field'+field.id+' .fieldwaiting > img')
