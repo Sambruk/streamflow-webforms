@@ -17,6 +17,7 @@
 var View = (function() {
     var inner = {};
     var messages = {};
+    var fieldGroups = {};
 
     inner.error = function( message ) {
         var node = clone('alert');
@@ -66,7 +67,14 @@ var View = (function() {
         	var form = clone('form');
         	FormModule.foldEditPage( page, function(field) { 
         		foldEditField(form.find('fieldset'), field); 
-        	})
+        	});
+        	$.each( fieldGroups, function( key, value ) {
+                var group = form.find( '#' + key );
+        	    $.each( value.embedded, function( i, val) {
+                    // find element and move into group
+                    group.append( form.find('#Field'+val ) );
+        	    });
+        	});
         	node.append(form);
         });
     }
@@ -100,15 +108,31 @@ var View = (function() {
         var fieldNode = clone( 'formfield', 'Field' + field.id ).appendTo( node );
         var controlsNode = fieldNode.find('div.controls');
         FieldTypeModule.createFieldUI( field, controlsNode );
-       
-        if ( field.fieldType == "CommentFieldValue" ) {
-        	fieldNode.find('label').remove();
+
+        if ( field.fieldType == "FieldGroupFieldValue" ) {
+            // setup a collector that collect the next field id's
+            var fieldGroup = {};
+            fieldGroup.count = field.fieldValue.fieldCount;
+            fieldGroup.embedded = [];
+            fieldGroups[ field.id ] = fieldGroup;
+            var fieldHeader = fieldNode.find('label.control-label');
+            fieldHeader.append( field.name );
         } else {
-        	var fieldHeader = fieldNode.find('label.control-label');
-	        fieldHeader.append( field.name );
-	        mandatory( fieldHeader, field );
-	        hint( fieldHeader, field );
-	        help( controlsNode, field);
+            $.each( fieldGroups, function( key, value) {
+                if ( value.count > 0 ) {
+                    value.embedded.push( field.id );
+                    value.count--;
+                }
+            });
+            if ( field.fieldType == "CommentFieldValue" ) {
+                fieldNode.find('label').remove();
+            } else {
+                var fieldHeader = fieldNode.find('label.control-label');
+                fieldHeader.append( field.name );
+                mandatory( fieldHeader, field );
+                hint( fieldHeader, field );
+                help( controlsNode, field);
+            }
         }
         field.refreshUI();
     };
