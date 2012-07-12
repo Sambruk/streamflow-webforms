@@ -173,6 +173,11 @@ var FieldTypeModule = (function() {
         controlsNode.append(field.node);
     }
 
+    function FieldGroupFieldValue( field, controlsNode ) {
+        field.node = clone( field.fieldType, field.id );
+        controlsNode.append( field.node );
+    }
+
     function ListBoxFieldValue( field, controlsNode ) {
     	field.node = clone( field.fieldType, field.id );
     	var possible = field.node.find('#possiblevalues').attr({id: 'Possible'+field.id});
