@@ -96,7 +96,7 @@ public class FormDraftContext
       if (MediaType.MULTIPART_FORM_DATA.equals( representation.getMediaType(), true ))
       {
          RestletFileUpload upload = new RestletFileUpload( factory );
-
+         upload.setHeaderEncoding( "UTF-8" );
          try
          {
             List items = upload.parseRequest( request );
