@@ -50,6 +50,7 @@ pre {
 label {
 	font-size: 15px;
 	font-weight: 500;
+	margin-bottom: 0px;
 }
 
 .btn {
@@ -73,6 +74,10 @@ label.radio {
 	color: #999;
 }
 	
+.controls {
+	margin-top: 5px;
+}
+
 select.listbox {
 	text-align: left;
 	float: left;
@@ -125,7 +130,7 @@ tr.validation-missing {
 	border: 1px solid #BCE8F1;
 }
 td.field_label {
-	padding-left: 10px;
+	padding: 2px 0px 2px 10px;
 	width: 150px;
 }
 td.field_value {
