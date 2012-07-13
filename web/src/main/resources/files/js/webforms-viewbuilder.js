@@ -18,6 +18,7 @@ var View = (function() {
     var inner = {};
     var messages = {};
     var fieldGroups = {};
+    var confirmEmail;
 
     inner.error = function( message ) {
         var node = clone('alert');
@@ -43,7 +44,6 @@ var View = (function() {
     }
 
     inner.submit = function() {
-        // get mails if any
         RequestModule.submitAndSend();
         var caseName = RequestModule.getCaseName();
         var printUrl = UrlModule.getPrintUrl( FormModule.getFormId() );
@@ -258,6 +258,25 @@ var View = (function() {
 	    
 	    if( page == getSummary()) {
 	    	var button = new inner.Button( buttons ).name(texts.submit).href(getSubmit());
+	    	button.click( function() {
+                // check the notifyEmails before proceeding
+                var notify = $('#mailCheckbox').find('input').prop('checked');
+                if ( notify ) {
+                    var email = $('#email');
+                    var confirm = $('#emailConfirm');
+                    if ( email.val() != confirm.val() ) {
+                        // show error
+                        var submitAlert = $('#submitAlert');
+                        if ( submitAlert.length == 0 ) {
+                            var alert = clone('alert', 'submitAlert');
+                            alert.addClass("alert-error");
+                            alert.append( texts.submitEmailMismatch );
+                            $('#inserted_buttons').append( alert );
+                        }
+                        return false;
+                    }
+                }
+	    	});
 	    	if (FormModule.canSubmit()) {
 	    		button.addClass("btn-primary");
 	    	} else {
@@ -327,29 +346,67 @@ var View = (function() {
 
     function addMailNotification( node ) {
         var message = FormModule.getMailSelectionMessage();
-
-        // or default message ???
         if ( message ) {
-            node.append( "<div class='well'><input type='checkbox' class='mailSelector'/> " + message + " <input class='mailSelectorInput' type='text' name='email'></div>" );
-            var checkbox = $('input.mailSelector');
-            var textInput = $('input.mailSelectorInput');
-            checkbox.change( function() {
-                textInput.prop('disabled', !checkbox.prop('checked') );
-                RequestModule.setMailNotificationEnablement( checkbox.prop('checked') );
-                FormModule.setMailNotificationEnabled( checkbox.prop('checked') );
+            var notification = clone('mailNotification', "insertedMailNotification" );
+            var controls = notification.find('#mailControls');
+            var inputs   = notification.find('#mailInputs');
+
+            var checkbox = clone('checkbox', 'mailCheckbox' );
+            checkbox.find('input').click( function() {
+                var checked = checkbox.find('input').prop('checked');
+                RequestModule.setMailNotificationEnablement( checked );
+                FormModule.setMailNotificationEnabled( checked );
+
+                if ( checked ) {
+                    inputs.show( 'slow' );
+                } else {
+                    inputs.hide( 'slow' );
+                }
             });
-            checkbox.prop('checked', FormModule.mailNotificationEnabled() );
+            checkbox.find('input').prop('checked', FormModule.mailNotificationEnabled() );
             if ( !FormModule.mailNotificationEnabled() ) {
-                textInput.prop( 'disabled', true );
+                inputs.hide();
             }
-            textInput.val( FormModule.enteredEmails() );
-            textInput.blur( function() {
+            checkbox.append( message );
+            controls.append( checkbox );
+
+            var emailField = clone('textfield', 'email' );
+            var emailConfirmField = clone('textfield', 'emailConfirm' );
+            emailField.change( function() {
+
+            });
+            emailField.val( FormModule.enteredEmails() );
+            emailField.blur( function() {
                 // update server
                 var stringDTO = {};
-                stringDTO.string = textInput.val();
+                stringDTO.string = emailField.val();
                 RequestModule.setEnteredEmails( stringDTO );
                 FormModule.setEnteredEmails( stringDTO.string );
             });
+            // fill with current values
+            if ( confirmEmail ) {
+                emailConfirmField.val( confirmEmail );
+            }
+            emailConfirmField.blur( function() {
+                confirmEmail = emailConfirmField.val();
+                // if not match show error
+                if ( confirmEmail != emailField.val() ) {
+                    var errorElm = inputs.find('#emailMismatch' );
+                    if ( errorElm.length == 0 ) {
+                        var errorMsg = clone('alert', 'emailMismatch' );
+                        errorMsg.addClass("alert-error");
+                        errorMsg.append( texts.emailMismatch );
+                        errorMsg.insertAfter( inputs.find('#emailConfirm' ) );
+                    }
+                }
+            });
+
+            inputs.append( 'Email <br>' );
+            inputs.append( emailField );
+            inputs.append( '<br>Confirm email <br>' );
+            inputs.append( emailConfirmField );
+
+            node.append( notification );
         }
     }
 
