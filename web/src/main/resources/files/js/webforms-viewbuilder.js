@@ -131,7 +131,7 @@ var View = (function() {
                 fieldHeader.append( field.name );
                 mandatory( fieldHeader, field );
                 hint( fieldHeader, field );
-                help( controlsNode, field);
+                help( fieldHeader, field);
             }
         }
         field.refreshUI();
@@ -176,7 +176,7 @@ var View = (function() {
 
     function help( node, field ) {
         if ( field.field.field.note != "" && field.fieldType != "CommentFieldValue") {
-            node.append( clone('help-block').append(field.field.field.note) );
+            clone('help-block').append(field.field.field.note).insertAfter(node);
         }
     }
 
