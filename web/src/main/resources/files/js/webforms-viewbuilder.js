@@ -401,7 +401,7 @@ var View = (function() {
                 }
             });
 
-            inputs.append( texts.email + '<br>' );
+            inputs.append( '<br>' + texts.email + '<br>' );
             inputs.append( emailField );
             inputs.append( '<br>' + texts.confirmEmail + '<br>' );
             inputs.append( emailConfirmField );
