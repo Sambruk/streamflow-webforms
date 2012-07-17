@@ -16,7 +16,7 @@
         <version.eid.plugin>1.3.0</version.eid.plugin>
         <version.qi4j-tools>1.3</version.qi4j-tools>
         <version.restlet>2.0.3</version.restlet>
-        <version.streamflow>1.6.0</version.streamflow>
+        <version.streamflow>1.7.0-SNAPSHOT</version.streamflow>
     </properties>
     
     <repositories>
@@ -155,11 +155,11 @@
     </contributors>
 
     <inceptionYear>2009-2012</inceptionYear>
-    <url>http://www.streamsource.se</url>
+    <url>http://www.jayway.com/streamflow/</url>
 
     <organization>
-        <name>Streamsource AB</name>
-        <url>N/A</url>
+        <name>Jayway Products AB</name>
+        <url>http://www.jayway.com/streamflow/</url>
     </organization>
 
     <build>
@@ -327,11 +327,11 @@
                             </properties>
                             <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
                             <resourceBundles>
-                                <resourceBundle>se.streamsource.streamflow:streamflow-jar-resource-bundle:1.2
+                                <resourceBundle>se.streamsource.streamflow:streamflow-jar-resource-bundle:1.3
                                 </resourceBundle>
                             </resourceBundles>
                             <supplementalModelArtifacts>
-                                <supplementalModelArtifact>se.streamsource.streamflow:dependency-resource-supplement:1.4
+                                <supplementalModelArtifact>se.streamsource.streamflow:dependency-resource-supplement:1.6
                                 </supplementalModelArtifact>
                             </supplementalModelArtifacts>
                             <supplementalModels>
