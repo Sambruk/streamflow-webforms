@@ -401,9 +401,9 @@ var View = (function() {
                 }
             });
 
-            inputs.append( 'Email <br>' );
+            inputs.append( texts.email + '<br>' );
             inputs.append( emailField );
-            inputs.append( '<br>Confirm email <br>' );
+            inputs.append( '<br>' + texts.confirmEmail + '<br>' );
             inputs.append( emailConfirmField );
 
             node.append( notification );
