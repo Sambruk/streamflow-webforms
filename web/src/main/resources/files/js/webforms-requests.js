@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2009-2012 Streamsource AB
+ * Copyright 2009-2012 Jayway Products AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ var RequestModule = (function() {
     var inner = {};
 
     function request(type, url) {
-        return {type:type, url:url, async:false, cache:false, error:errorPopup, dataType:'json'};
+        return {type:type,url:url,async:false,cache:false,error:errorPopup,dataType:'json'};
     }
 
     function getData( parameters ) {
@@ -31,9 +31,15 @@ var RequestModule = (function() {
         return data;
     }
 
-    function errorPopup() {
-        alert( texts.erroroccurred );
-        throw "http call failed";
+    function errorPopup(jqXHR, textStatus, errorThrown) {
+    	if (jqXHR.responseText) {
+    		if (texts[jqXHR.responseText])
+    			throw { error: texts[jqXHR.responseText] };
+    		else
+    			throw { error: texts[jqXHR.responseText] };
+    	} else {
+			throw { error: texts.erroroccurred + "<br/>Status: " + textStatus + "<br/>Error: " + errorThrown };
+    	}
     }
 
     function invoke( fn, arguments, message ) {
@@ -72,6 +78,11 @@ var RequestModule = (function() {
         var parameters = request('GET', UrlModule.getCaseForm() );
         parameters.error = null;
         return getData( parameters );
+    }
+
+    inner.getMailSelectionMessage = function() {
+        var params = request( 'GET', UrlModule.getMailSelectionMessage() );
+        return getData( params ).string;
     }
 
     inner.getFormDraft = function() {
@@ -119,6 +130,22 @@ var RequestModule = (function() {
     inner.getCaseName = function() {
         var parameters = request('GET', UrlModule.getCaseName() );
         return getData( parameters ).caseId;
+    }
+
+    inner.setMailNotificationEnablement = function( value ) {
+        var parameters;
+        if ( value ) {
+            parameters = request( 'POST', UrlModule.enableMailNotification() );
+        } else {
+            parameters = request( 'POST', UrlModule.disableMailNotification() );
+        }
+        $.ajax( parameters );
+    }
+
+    inner.setEnteredEmails = function( stringDTO ) {
+        var parameters = request( 'POST', UrlModule.setEnteredEmails() );
+        parameters.data = stringDTO;
+        $.ajax( parameters );
     }
 
     inner.sign = function( signDTO ) {

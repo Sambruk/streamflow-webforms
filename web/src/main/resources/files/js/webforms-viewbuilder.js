@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2009-2012 Streamsource AB
+ * Copyright 2009-2012 Jayway Products AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,15 @@
 var View = (function() {
     var inner = {};
     var messages = {};
+    var fieldGroups = {};
+    var confirmEmail;
 
     inner.error = function( message ) {
         var node = clone('alert');
         node.addClass("alert-error")
         node.append( message );
-        node.insertAfter($('#inserted_content').find('ul.breadcrumb'));        
+        var breadcrumbNode = $('#inserted_content').find('ul.breadcrumb');
+        node.insertAfter(breadcrumbNode);        
     }
 
     inner.discard = function( args ) {
@@ -64,7 +67,14 @@ var View = (function() {
         	var form = clone('form');
         	FormModule.foldEditPage( page, function(field) { 
         		foldEditField(form.find('fieldset'), field); 
-        	})
+        	});
+        	$.each( fieldGroups, function( key, value ) {
+                var group = form.find( '#' + key );
+        	    $.each( value.embedded, function( i, val) {
+                    // find element and move into group
+                    group.append( form.find('#Field'+val ) );
+        	    });
+        	});
         	node.append(form);
         });
     }
@@ -72,11 +82,13 @@ var View = (function() {
     inner.summary = function( args ) {
     	createPageContent( getSummary(), function( node ) {
     		FormModule.fold( function( page ) { return foldPage( node, page ) } );
+            addMailNotification( node );
             addSignaturesDiv( node );
     	});
     }
 
     function createPageContent(page, contentFunction){
+    	 var errors = $('#inserted_alert');
     	 var container = $('#container').empty();
          addHeader( container );
          var node = clone('row');
@@ -96,15 +108,31 @@ var View = (function() {
         var fieldNode = clone( 'formfield', 'Field' + field.id ).appendTo( node );
         var controlsNode = fieldNode.find('div.controls');
         FieldTypeModule.createFieldUI( field, controlsNode );
-       
-        if ( field.fieldType == "CommentFieldValue" ) {
-        	fieldNode.find('label').remove();
+
+        if ( field.fieldType == "FieldGroupFieldValue" ) {
+            // setup a collector that collect the next field id's
+            var fieldGroup = {};
+            fieldGroup.count = field.fieldValue.fieldCount;
+            fieldGroup.embedded = [];
+            fieldGroups[ field.id ] = fieldGroup;
+            var fieldHeader = fieldNode.find('label.control-label');
+            fieldHeader.append( field.name );
         } else {
-        	var fieldHeader = fieldNode.find('label.control-label');
-	        fieldHeader.append( field.name );
-	        mandatory( fieldHeader, field );
-	        hint( fieldHeader, field );
-	        help( controlsNode, field);
+            $.each( fieldGroups, function( key, value) {
+                if ( value.count > 0 ) {
+                    value.embedded.push( field.id );
+                    value.count--;
+                }
+            });
+            if ( field.fieldType == "CommentFieldValue" ) {
+                fieldNode.find('label').remove();
+            } else {
+                var fieldHeader = fieldNode.find('label.control-label');
+                fieldHeader.append( field.name );
+                mandatory( fieldHeader, field );
+                hint( fieldHeader, field );
+                help( fieldHeader, field);
+            }
         }
         field.refreshUI();
     };
@@ -137,14 +165,18 @@ var View = (function() {
         row.append( tr );
         $('<td class="field_value"/>').append( field.formattedValue ).appendTo( row );
         if (field.field.field.mandatory && !field.formattedValue) {
+    		row.addClass('validation-missing');
+    		row.append($('<td class="field_message pull-right"/>').append(clone('label_missing', 'missing')));
+        } else if (field.invalidformat) {
     		row.addClass('validation-error');
-    		row.append($('<td class="field_message"/>').append(clone('label_missing', 'missing')));
+    		row.append($('<td class="field_message pull-right"/>').append(clone('label_error', 'error')));
         }
+        
     }
 
     function help( node, field ) {
         if ( field.field.field.note != "" && field.fieldType != "CommentFieldValue") {
-            node.append( clone('help-block').append(field.field.field.note) );
+            clone('help-block').append(field.field.field.note).insertAfter(node);
         }
     }
 
@@ -226,6 +258,25 @@ var View = (function() {
 	    
 	    if( page == getSummary()) {
 	    	var button = new inner.Button( buttons ).name(texts.submit).href(getSubmit());
+	    	button.click( function() {
+                // check the notifyEmails before proceeding
+                var notify = $('#mailCheckbox').find('input').prop('checked');
+                if ( notify ) {
+                    var email = $('#email');
+                    var confirm = $('#emailConfirm');
+                    if ( email.val() != confirm.val() ) {
+                        // show error
+                        var submitAlert = $('#submitAlert');
+                        if ( submitAlert.length == 0 ) {
+                            var alert = clone('alert', 'submitAlert');
+                            alert.addClass("alert-error");
+                            alert.append( texts.submitEmailMismatch );
+                            $('#inserted_buttons').append( alert );
+                        }
+                        return false;
+                    }
+                }
+	    	});
 	    	if (FormModule.canSubmit()) {
 	    		button.addClass("btn-primary");
 	    	} else {
@@ -291,6 +342,72 @@ var View = (function() {
 
     function getSign( idx ) {
         return '#' + Contexts.findUrl( inner.sign, [idx] );
+    }
+
+    function addMailNotification( node ) {
+        var message = FormModule.getMailSelectionMessage();
+        if ( message ) {
+            var notification = clone('mailNotification', "insertedMailNotification" );
+            var controls = notification.find('#mailControls');
+            var inputs   = notification.find('#mailInputs');
+
+            var checkbox = clone('checkbox', 'mailCheckbox' );
+            checkbox.find('input').click( function() {
+                var checked = checkbox.find('input').prop('checked');
+                RequestModule.setMailNotificationEnablement( checked );
+                FormModule.setMailNotificationEnabled( checked );
+
+                if ( checked ) {
+                    inputs.show( 'slow' );
+                } else {
+                    inputs.hide( 'slow' );
+                }
+            });
+            checkbox.find('input').prop('checked', FormModule.mailNotificationEnabled() );
+            if ( !FormModule.mailNotificationEnabled() ) {
+                inputs.hide();
+            }
+            checkbox.append( message );
+            controls.append( checkbox );
+
+            var emailField = clone('textfield', 'email' );
+            var emailConfirmField = clone('textfield', 'emailConfirm' );
+            emailField.change( function() {
+
+            });
+            emailField.val( FormModule.enteredEmails() );
+            emailField.blur( function() {
+                // update server
+                var stringDTO = {};
+                stringDTO.string = emailField.val();
+                RequestModule.setEnteredEmails( stringDTO );
+                FormModule.setEnteredEmails( stringDTO.string );
+            });
+            // fill with current values
+            if ( confirmEmail ) {
+                emailConfirmField.val( confirmEmail );
+            }
+            emailConfirmField.blur( function() {
+                confirmEmail = emailConfirmField.val();
+                // if not match show error
+                if ( confirmEmail != emailField.val() ) {
+                    var errorElm = inputs.find('#emailMismatch' );
+                    if ( errorElm.length == 0 ) {
+                        var errorMsg = clone('alert', 'emailMismatch' );
+                        errorMsg.addClass("alert-error");
+                        errorMsg.append( texts.emailMismatch );
+                        errorMsg.insertAfter( inputs.find('#emailConfirm' ) );
+                    }
+                }
+            });
+
+            inputs.append( '<br>' + texts.email + '<br>' );
+            inputs.append( emailField );
+            inputs.append( '<br>' + texts.confirmEmail + '<br>' );
+            inputs.append( emailConfirmField );
+
+            node.append( notification );
+        }
     }
 
     function addSignaturesDiv( node ) {

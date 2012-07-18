@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2009-2012 Streamsource AB
+ * Copyright 2009-2012 Jayway Products AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 var FormModule = (function() {
 	var inner = {};
 	var formDraft;
+	var mailSelectionMessageText;
 	var eIdProviders;
 	var fieldMap = {};
 	var initDone = false;
@@ -28,6 +29,8 @@ var FormModule = (function() {
 		this.id = formDraft.form;
 		this.signatures = formDraft.signatures;
 		this.pages = [];
+		this.enteredEmails = formDraft.enteredEmails;
+		this.mailSelectionEnablement = formDraft.mailSelectionEnablement;
 		var pages = this.pages;
 		$.each( formDraft.pages, function(idx, page) {
 			pages[ idx ] = new Page( page, idx );
@@ -54,7 +57,7 @@ var FormModule = (function() {
         this.dirty = false;
         this.fieldType = getFieldType( field.field.fieldValue._type );
         this.setUIFormatter();
-        this.error = '';
+        this.invalidformat = false;
         this.setValue( this.field.value == null ? "" : this.field.value );
         fieldMap[ this.id ] = this;
     }	
@@ -69,6 +72,8 @@ var FormModule = (function() {
     		this.uIFormatter = formatUTCStringToIsoString;
     	} else if ( this.fieldType == "AttachmentFieldValue" ) {
     		this.uIFormatter = formatJSONAttachment;
+    	} else if ( this.fieldType == "CheckboxesFieldValue" || this.fieldType == "ListBoxFieldValue" ) {
+    	    this.uIFormatter = formatSelectionValues;
     	}
     }
 
@@ -88,14 +93,13 @@ var FormModule = (function() {
         return "";
     }
 
+    function formatSelectionValues( value ) {
+        return value.replace(/(\[|\])/g, "'" );
+    }
+
     Field.prototype.setValue = function( value ) {
     	this.value = value;
     	this.formattedValue = this.uIFormatter==null ? value : this.uIFormatter( value );
-        if ( this.field.field.mandatory && !value) {
-        	this.error = texts.missingfield + " '"+this.name+"' <br>";
-    	} else {
-    	    this.error = '';
-    	}
     	return this;
     }
 
@@ -124,14 +128,30 @@ var FormModule = (function() {
 
 	inner.init = function( formDraftValue ) {
 		formDraft = new Form( formDraftValue );
-		
+		mailSelectionMessageText = RequestModule.getMailSelectionMessage();
 		initDone = true;
 	}
 	
 	inner.initialized = function() {
 		return initDone;
 	}
-	
+
+	inner.mailNotificationEnabled = function() {
+	    return formDraft.mailSelectionEnablement;
+	}
+
+	inner.setMailNotificationEnabled = function( enabled ) {
+	    formDraft.mailSelectionEnablement = enabled;
+	}
+
+    inner.setEnteredEmails = function( emails ) {
+        formDraft.enteredEmails = emails;
+    }
+
+    inner.enteredEmails = function() {
+        return formDraft.enteredEmails;
+    }
+
 	inner.pageCount = function() {
 		return formDraft.pages.length;
 	}
@@ -193,9 +213,16 @@ var FormModule = (function() {
         return tbs;
 	}
 
-    inner.errorTxt = function() {
-        var error = '';
-        fieldIterator( function(field) { error += field.error; } );
+    inner.hasErrors = function() {
+        var error = false;
+        fieldIterator( function(field) { 
+        	if ( field.field.field.mandatory && !field.value) {
+            	error = true;
+        	} 
+        	if (field.invalidformat != '' ) {
+        		error = true;
+        	}
+        });
         return error;
     }
 
@@ -229,7 +256,7 @@ var FormModule = (function() {
     }
     
     inner.canSubmit = function() {
-    	var formFilled = (inner.errorTxt()=="");
+    	var formFilled = !inner.hasErrors();
         if ( inner.requiredSignaturesCount() > 0 ) {
             return formFilled && inner.isFormSigned();
         }
@@ -243,6 +270,10 @@ var FormModule = (function() {
     inner.destroy = function() {
     	initDone = false;
     	formDraft = null;
+    }
+
+    inner.getMailSelectionMessage = function() {
+        return mailSelectionMessageText;
     }
     
 	return inner;

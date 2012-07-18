@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2009-2012 Streamsource AB
+ * Copyright 2009-2012 Jayway Products AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,12 +70,28 @@ var UrlModule = (function() {
         return urls.proxy + urls.proxydraft + 'index.json';
     }
 
+    inner.getMailSelectionMessage = function() {
+        return urls.proxy + urls.proxydraft + 'summary/mailselectionmessage.json';
+    }
+
     inner.createCaseWithForm = function() {
         return urls.proxy + urls.proxyuser + 'createcasewithform.json';
     }
 
     inner.updateField = function( ) {
         return urls.proxy + urls.proxydraft + 'updatefield.json';
+    }
+
+    inner.enableMailNotification = function() {
+        return urls.proxy + urls.proxydraft + 'summary/enablemailmessage.json';
+    }
+
+    inner.disableMailNotification = function() {
+        return urls.proxy + urls.proxydraft + 'summary/disablemailmessage.json';
+    }
+
+    inner.setEnteredEmails = function() {
+        return urls.proxy + urls.proxydraft + 'summary/changeemailstobenotified.json';
     }
 
     inner.submitAndSend = function() {
