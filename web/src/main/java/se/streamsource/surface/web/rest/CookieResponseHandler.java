@@ -65,7 +65,8 @@ public class CookieResponseHandler
                DomainEvent domainEvent = first( events( transactionEvents ));
                if ( domainEvent != null)
                {
-                  String userId = EventParameters.getParameter( domainEvent, "param1" );
+                  String endUserId = EventParameters.getParameter( domainEvent, "param1" );
+                  String userId = endUserId.split("/")[1];
 
                   cookieSetting = new CookieSetting( EndUsersContext.COOKIE_NAME, userId );
                   // two weeks
