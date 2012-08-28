@@ -112,7 +112,10 @@ public class FormDraftContext
             disposition.set( Disposition.NAME_FILENAME, fi.getName() );
             disposition.set( Disposition.NAME_SIZE, Long.toString(fi.getSize()) );
 
-            input.setDisposition( new Disposition(Disposition.TYPE_NONE, disposition) );
+            input.setMediaType( MediaType.valueOf( fi.getContentType() ) );
+            input.setSize( fi.getSize() );
+
+            input.setDisposition( new Disposition(Disposition.TYPE_INLINE, disposition) );
 
             CommandQueryClient client = RoleMap.current().get( CommandQueryClient.class );
             AttachmentResponseHandler responseHandler = module.objectBuilderFactory()
