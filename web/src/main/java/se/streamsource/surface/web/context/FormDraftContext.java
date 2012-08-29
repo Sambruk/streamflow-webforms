@@ -43,6 +43,7 @@ import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ResourceException;
 import se.streamsource.dci.api.RoleMap;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
+import se.streamsource.streamflow.api.workspace.cases.attachment.UpdateAttachmentDTO;
 import se.streamsource.streamflow.plugin.eid.api.VerifySignatureResponseValue;
 import se.streamsource.streamflow.surface.api.AttachmentFieldDTO;
 import se.streamsource.streamflow.surface.api.FormSignatureDTO;
@@ -112,10 +113,8 @@ public class FormDraftContext
             disposition.set( Disposition.NAME_FILENAME, fi.getName() );
             disposition.set( Disposition.NAME_SIZE, Long.toString(fi.getSize()) );
 
-            input.setMediaType( MediaType.valueOf( fi.getContentType() ) );
-            input.setSize( fi.getSize() );
+            input.setDisposition( new Disposition(Disposition.TYPE_NONE, disposition) );
 
-            input.setDisposition( new Disposition(Disposition.TYPE_INLINE, disposition) );
 
             CommandQueryClient client = RoleMap.current().get( CommandQueryClient.class );
             AttachmentResponseHandler responseHandler = module.objectBuilderFactory()
@@ -123,11 +122,22 @@ public class FormDraftContext
                   .newInstance();
             client.getClient( "attachments/" ).postCommand( "createformattachment", input, responseHandler );
 
-            ValueBuilder<AttachmentFieldDTO> builder = responseHandler.getAttachmentValue();
-            builder.prototype().field().set( EntityReference.parseEntityReference( fi.getFieldName() ) );
-            builder.prototype().name().set( fi.getName() );
+            ValueBuilder<UpdateAttachmentDTO> attachmentUpdateBuilder = module.valueBuilderFactory().newValueBuilder(UpdateAttachmentDTO.class);
+            attachmentUpdateBuilder.prototype().name().set( fi.getName() );
+            attachmentUpdateBuilder.prototype().size().set( fi.getSize() );
+            attachmentUpdateBuilder.prototype().mimeType().set( fi.getContentType() );
 
-            client.postCommand( "updateattachmentfield", builder.newInstance() );
+            ValueBuilder<AttachmentFieldDTO> attachmentFieldUpdateBuilder = responseHandler.getAttachmentValue();
+
+            // update attachment entity first with filename, size and mime type
+            client.getClient( "attachments/" + attachmentFieldUpdateBuilder.prototype().attachment().get().identity() + "/" ).postCommand( "update", attachmentUpdateBuilder.newInstance() );
+
+            attachmentFieldUpdateBuilder.prototype().field().set( EntityReference.parseEntityReference( fi.getFieldName() ) );
+            attachmentFieldUpdateBuilder.prototype().name().set( fi.getName() );
+
+            // update form submission attachment field with name and attachment field entity reference.
+            client.postCommand( "updateattachmentfield", attachmentFieldUpdateBuilder.newInstance() );
+
          } catch (FileUploadException e)
          {
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Could not upload file", e );
