@@ -160,12 +160,7 @@ var RequestModule = (function() {
         parameters.data = verifyDTO;
         invoke( $.ajax, parameters, {error: texts.verifyfailed, redirect:'summary'} );
     }
-
-    inner.attach = function( attachmentDTO ) {
-        attachmentDTO.url = UrlModule.attach();
-        $.ajaxFileUpload( attachmentDTO );
-    }
-
+    
     inner.refreshField = function( fieldId ) {
         var parameters = request('GET', UrlModule.refreshField() );
         parameters.data = { string: fieldId };

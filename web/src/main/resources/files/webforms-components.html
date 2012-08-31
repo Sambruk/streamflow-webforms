@@ -76,10 +76,29 @@
 <font id="hint" class="hint"></font>
 
 <div id="AttachmentFieldValue">
-    <label id="attachmentLabel"></label><br/>
-    <input id="Attachment" type="file"/>
+
 </div>
 
+<div id="AttachedFile">
+   <a href="#"><i class="icon-trash"></i></a>
+   <span class="filename"></span>
+   <br/>
+</div>
+   
+<form id="AttachmentFieldValueForm">
+	<span class="btn btn-success fileinput-button">
+	    <i class="icon-plus icon-white"></i>
+	    <span id="button-text"></span>
+	    <input type="file" id="Attachment"/>
+	</span>
+	<div class="span5 fileupload-progress fade">
+	    <!-- The global progress bar -->
+	    <div class="progress progress-success progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+	        <div class="bar" style="width:0%;"></div>
+	    </div>
+   </div>
+</form>
+    
 <div id="ListBoxFieldValue" class="listbox_container">
 	<select id="possiblevalues" class="listbox" multiple="multiple"></select>
 	<div id="listboxbuttons" class="listboxbuttons"></div>

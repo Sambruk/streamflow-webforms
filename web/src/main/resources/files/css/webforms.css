@@ -1,0 +1,74 @@
+/**
+ *
+ * Copyright 2009-2012 Jayway Products AB
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+body {
+	background: whiteSmoke;
+}
+
+/* Jumbotron
+------------------------- */
+.jumbotron {
+  position: relative;
+  padding: 40px 0 40px 100px;
+  color: #fff;
+  background-color: #3cc2ed;
+  background-image: url(../images/program_icons205x205.png);
+  background-repeat: no-repeat;
+}
+
+.jumbotron h1 {
+  color: #fff;
+  font-size: 80px;
+  font-weight: bold;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.jumbotron p {
+   font-size: 24px;
+   font-weight: 300;
+   line-height: 30px;
+   letter-spacing: 2px;
+}
+
+.category-widget {
+	margin: 15px 10px 0px 10px;
+	float: left;
+	width: 320px;
+	background: white;
+	border: 1px solid #DDD;
+   border-radius: 3px;
+   padding: 15px;
+   position: relative;
+   border-top: 1px solid #EEE;
+}
+
+.category-widget i {
+	vertical-align: baseline;
+	margin-right: 10px;
+}
+
+.category-widget ul {
+   border-top: 1px solid #EEE;
+   margin-top: 5px;
+   padding-top: 5px;
+}
+
+.category-widget li {
+	font-size: 14px;
+	line-height: 150%;
+}
+

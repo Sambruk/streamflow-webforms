@@ -16,9 +16,22 @@
  */
 package se.streamsource.surface.web.context;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Structure;
@@ -41,6 +54,7 @@ import org.restlet.representation.InputRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ResourceException;
+
 import se.streamsource.dci.api.RoleMap;
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.streamflow.api.workspace.cases.attachment.UpdateAttachmentDTO;
@@ -50,15 +64,6 @@ import se.streamsource.streamflow.surface.api.FormSignatureDTO;
 import se.streamsource.surface.web.dto.VerifyDTO;
 import se.streamsource.surface.web.proxy.ProxyService;
 import se.streamsource.surface.web.rest.AttachmentResponseHandler;
-
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
 
 /**
  */
@@ -89,7 +94,7 @@ public class FormDraftContext
       acceptedTypes.add( MediaType.IMAGE_JPEG );
    }
 
-   public void createattachment( Response response )
+   public JSONArray createattachment( Response response ) throws Exception
    {
       Request request = response.getRequest();
       Representation representation = request.getEntity();
@@ -101,7 +106,10 @@ public class FormDraftContext
          try
          {
             List items = upload.parseRequest( request );
-            if ( items.size() != 1 ) return; // handle only one attachment
+            if ( items.size() != 1 ) 
+            {
+               throw new ResourceException( Status.CLIENT_ERROR_METHOD_NOT_ALLOWED, "Could not handle multiple files" );
+            }
             final FileItem fi = (FileItem) items.get( 0 );
             if ( !acceptedTypes.contains( MediaType.valueOf( fi.getContentType() ) ) )
             {
@@ -138,6 +146,9 @@ public class FormDraftContext
             // update form submission attachment field with name and attachment field entity reference.
             client.postCommand( "updateattachmentfield", attachmentFieldUpdateBuilder.newInstance() );
 
+            StringBuffer result = new StringBuffer( "[" ).append(attachmentUpdateBuilder.newInstance().toJSON() ).append( "]");
+            return new JSONArray(result.toString());
+            
          } catch (FileUploadException e)
          {
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Could not upload file", e );
@@ -146,6 +157,7 @@ public class FormDraftContext
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Could not upload file", e );
          }
       }
+      return null;
    }
 
    public void verify( VerifyDTO verify)
