@@ -59,6 +59,7 @@ var FieldTypeModule = (function() {
         				RequestModule.deleteAttachment(JSON.parse(field.value).attachment)
         				field.value = "";
         				update( field.id, field.value );
+        				return false;
         			});
         		this.node.find('.filename').text( this.formattedValue );
 
