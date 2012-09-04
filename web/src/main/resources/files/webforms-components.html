@@ -76,7 +76,6 @@
 <font id="hint" class="hint"></font>
 
 <div id="AttachmentFieldValue">
-
 </div>
 
 <div id="AttachedFile">
@@ -92,7 +91,6 @@
 	    <input type="file" id="Attachment"/>
 	</span>
 	<div class="span5 fileupload-progress fade">
-	    <!-- The global progress bar -->
 	    <div class="progress progress-success progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
 	        <div class="bar" style="width:0%;"></div>
 	    </div>
@@ -111,7 +109,12 @@
 <div id="mailNotification" class="well">
     <div id="mailControls">
     </div>
-    <div id="mailInputs">
+    <div id="mailInputs" class="control-group">
+         <label id="confirmation-email-label" class="control-label"></label>
+         <input id="confirmation-email" type="text" />
+         <label id="confirmation-email-confirm-label" class="control-label"></label>
+         <input id="confirmation-email-confirm" type="text" />
+         <span id="confirmation-help" class="help-inline"></span>
     </div>
 </div>
 

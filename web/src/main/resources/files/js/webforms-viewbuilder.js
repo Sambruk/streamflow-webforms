@@ -370,11 +370,11 @@ var View = (function() {
             checkbox.append( message );
             controls.append( checkbox );
 
-            var emailField = clone('textfield', 'email' );
-            var emailConfirmField = clone('textfield', 'emailConfirm' );
-            emailField.change( function() {
-
-            });
+            inputs.find('#confirmation-email-label').text(texts.email);
+            inputs.find('#confirmation-email-confirm-label').text(texts.confirmEmail);
+            var emailField = inputs.find('#confirmation-email');
+            var emailConfirmField = inputs.find('#confirmation-email-confirm');
+            
             emailField.val( FormModule.enteredEmails() );
             emailField.blur( function() {
                 // update server
@@ -387,29 +387,27 @@ var View = (function() {
             if ( confirmEmail ) {
                 emailConfirmField.val( confirmEmail );
             }
+           
             emailConfirmField.blur( function() {
                 confirmEmail = emailConfirmField.val();
                 // if not match show error
                 if ( confirmEmail != emailField.val() ) {
-                    var errorElm = inputs.find('#emailMismatch' );
-                    if ( errorElm.length == 0 ) {
-                        var errorMsg = clone('alert', 'emailMismatch' );
-                        errorMsg.addClass("alert-error");
-                        errorMsg.append( texts.emailMismatch );
-                        errorMsg.insertAfter( inputs.find('#emailConfirm' ) );
-                    }
+            		inputs.addClass('error');
+                    inputs.find('#confirmation-help').append(texts.emailMismatch);
+                    
+                    emailConfirmField.focus( function() {
+                    	// Remove old error messages
+                    	inputs.removeClass("error");
+                    	inputs.find('#confirmation-help').text("");
+                    	emailConfirmField.focus( function(){});
+                    });
                 }
             });
-
-            inputs.append( '<br>' + texts.email + '<br>' );
-            inputs.append( emailField );
-            inputs.append( '<br>' + texts.confirmEmail + '<br>' );
-            inputs.append( emailConfirmField );
-
+            
             node.append( notification );
         }
     }
-
+    
     function addSignaturesDiv( node ) {
         if ( FormModule.requiredSignaturesCount() > 0 ) {
         	var signaturesNode = clone('form_signatures');
