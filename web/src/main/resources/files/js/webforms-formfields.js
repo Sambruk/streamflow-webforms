@@ -54,6 +54,12 @@ var FieldTypeModule = (function() {
         		var valueNode = clone( "AttachedFile", "AttachedFile" + fieldId);
         		field.node.append(valueNode);
 
+        		this.node.find('#delete_link').attr({id:'delete_link' + fieldId})
+        			.click(function() {
+        				RequestModule.deleteAttachment(JSON.parse(field.value).attachment)
+        				field.value = "";
+        				update( field.id, field.value );
+        			});
         		this.node.find('.filename').text( this.formattedValue );
 
         	} else {

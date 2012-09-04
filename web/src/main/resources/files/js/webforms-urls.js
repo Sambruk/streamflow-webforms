@@ -134,6 +134,10 @@ var UrlModule = (function() {
         return urls.surface + urls.draft + 'createattachment';
     }
 
+    inner.deleteAttachment = function( attachmentId ) {
+    	return urls.proxy + urls.proxydraft + 'attachments/' + attachmentId + '/delete';
+    }
+    
     inner.refreshField = function( ) {
         return urls.proxy + urls.proxydraft + 'fieldvalue.json';
     }

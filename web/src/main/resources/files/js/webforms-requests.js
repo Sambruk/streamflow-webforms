@@ -101,6 +101,11 @@ var RequestModule = (function() {
         return getData( parameters );
     }
 
+    inner.deleteAttachment = function( attachmentId ) {
+    	var parameters = request('POST', UrlModule.deleteAttachment( attachmentId ));
+    	$.ajax( parameters );
+    }
+    
     inner.submitAndSend = function() {
         var parameters = request('POST', UrlModule.submitAndSend() );
         $.ajax( parameters );
