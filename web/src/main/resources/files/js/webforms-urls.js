@@ -90,7 +90,7 @@ var UrlModule = (function() {
         return urls.proxy + urls.proxydraft + 'summary/disablemailmessage.json';
     }
 
-    inner.setEnteredEmails = function() {
+    inner.setConfirmationEmail = function() {
         return urls.proxy + urls.proxydraft + 'summary/changeemailstobenotified.json';
     }
 

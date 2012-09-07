@@ -147,8 +147,8 @@ var RequestModule = (function() {
         $.ajax( parameters );
     }
 
-    inner.setEnteredEmails = function( stringDTO ) {
-        var parameters = request( 'POST', UrlModule.setEnteredEmails() );
+    inner.setConfirmationEmail = function( stringDTO ) {
+        var parameters = request( 'POST', UrlModule.setConfirmationEmail() );
         parameters.data = stringDTO;
         $.ajax( parameters );
     }

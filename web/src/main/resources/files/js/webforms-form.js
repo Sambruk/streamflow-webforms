@@ -29,7 +29,7 @@ var FormModule = (function() {
 		this.id = formDraft.form;
 		this.signatures = formDraft.signatures;
 		this.pages = [];
-		this.enteredEmails = formDraft.enteredEmails;
+		this.confirmationEmail = formDraft.enteredEmails;
 		this.mailSelectionEnablement = formDraft.mailSelectionEnablement;
 		var pages = this.pages;
 		$.each( formDraft.pages, function(idx, page) {
@@ -144,12 +144,12 @@ var FormModule = (function() {
 	    formDraft.mailSelectionEnablement = enabled;
 	}
 
-    inner.setEnteredEmails = function( emails ) {
-        formDraft.enteredEmails = emails;
+    inner.setConfirmationEmail = function( emailaddress ) {
+        formDraft.confirmationEmail = emailaddress;
     }
 
-    inner.enteredEmails = function() {
-        return formDraft.enteredEmails;
+    inner.confirmationEmail = function() {
+        return formDraft.confirmationEmail;
     }
 
 	inner.pageCount = function() {
@@ -257,6 +257,14 @@ var FormModule = (function() {
     
     inner.canSubmit = function() {
     	var formFilled = !inner.hasErrors();
+    	var notify = $('#mailCheckbox').find('input').prop('checked');
+        if ( notify ) {
+            var email = $('#confirmation-email');
+            var confirm = $('#confirmation-eamil-confirmed');
+            if ( email.val() != confirm.val() ) {
+            	return false;
+            }
+        }
         if ( inner.requiredSignaturesCount() > 0 ) {
             return formFilled && inner.isFormSigned();
         }
