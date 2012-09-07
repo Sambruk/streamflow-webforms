@@ -360,7 +360,7 @@ var View = (function() {
             }
            
             var toogleSubmitButton = function( enabled) {
-            	if (enabled) {
+            	if (enabled && FormModule.canSubmit()) {
             		enable($('#inserted_button_submit'), true);
                 	$('#inserted_button_submit').addClass("btn-primary");         
             	} else {
