@@ -47,6 +47,7 @@ var View = (function() {
         RequestModule.submitAndSend();
         var caseName = RequestModule.getCaseName();
         var printUrl = UrlModule.getPrintUrl( FormModule.getFormId() );
+        confirmEmail = null;
         FormModule.destroy();
 
         var container = $('#container').empty();
@@ -258,25 +259,7 @@ var View = (function() {
 	    
 	    if( page == getSummary()) {
 	    	var button = new inner.Button( buttons ).name(texts.submit).href(getSubmit());
-	    	button.click( function() {
-                // check the notifyEmails before proceeding
-                var notify = $('#mailCheckbox').find('input').prop('checked');
-                if ( notify ) {
-                    var email = $('#email');
-                    var confirm = $('#emailConfirm');
-                    if ( email.val() != confirm.val() ) {
-                        // show error
-                        var submitAlert = $('#submitAlert');
-                        if ( submitAlert.length == 0 ) {
-                            var alert = clone('alert', 'submitAlert');
-                            alert.addClass("alert-error");
-                            alert.append( texts.submitEmailMismatch );
-                            $('#inserted_buttons').append( alert );
-                        }
-                        return false;
-                    }
-                }
-	    	});
+	    	button.attr('id', 'inserted_button_submit');
 	    	if (FormModule.canSubmit()) {
 	    		button.addClass("btn-primary");
 	    	} else {
@@ -352,6 +335,64 @@ var View = (function() {
             var inputs   = notification.find('#mailInputs');
 
             var checkbox = clone('checkbox', 'mailCheckbox' );
+            checkbox.find('input').prop('checked', FormModule.mailNotificationEnabled() );
+            
+            checkbox.append( message );
+            controls.append( checkbox );
+
+            inputs.find('#confirmation-email-label').text(texts.email);
+            inputs.find('#confirmation-email-confirm-label').text(texts.confirmEmail);
+            var emailField = inputs.find('#confirmation-email');
+            var emailConfirmField = inputs.find('#confirmation-email-confirm');
+            
+            emailField.val( FormModule.confirmationEmail() );
+            emailField.blur( function() {
+                // update server
+                var stringDTO = {};
+                stringDTO.string = emailField.val();
+                RequestModule.setConfirmationEmail( stringDTO );
+                FormModule.setConfirmationEmail( stringDTO.string );
+            });
+            // Fill with value that is temporary stored in the application while running. 
+            // Not persisted on the server
+            if ( confirmEmail ) {
+                emailConfirmField.val( confirmEmail );
+            }
+           
+            var toogleSubmitButton = function( enabled) {
+            	if (enabled && FormModule.canSubmit()) {
+            		enable($('#inserted_button_submit'), true);
+                	$('#inserted_button_submit').addClass("btn-primary");         
+            	} else {
+            		enable($('#inserted_button_submit'), false);
+                	$('#inserted_button_submit').removeClass("btn-primary");    
+            	}
+            }
+            var emailFunction = function() {
+                // if not match show error and disable submit-button
+                if ( emailConfirmField.val() != emailField.val() ) {
+            		inputs.addClass('error');
+                    inputs.find('#confirmation-help').append(texts.emailMismatch);
+                    toogleSubmitButton( false );   
+                    
+                    emailConfirmField.focus( function() {
+                    	// Remove old error messages and enable submit button
+                    	inputs.removeClass("error");
+                    	inputs.find('#confirmation-help').text("");
+                    	emailConfirmField.focus( function(){});
+                    });
+                } else if (emailField.val()) {
+                	toogleSubmitButton( true);                	
+                }
+            };
+            
+            if (FormModule.mailNotificationEnabled() ) {
+            	toogleSubmitButton(false);
+                emailFunction.call();
+            } else {
+                inputs.hide();
+            }
+            
             checkbox.find('input').click( function() {
                 var checked = checkbox.find('input').prop('checked');
                 RequestModule.setMailNotificationEnablement( checked );
@@ -359,57 +400,21 @@ var View = (function() {
 
                 if ( checked ) {
                     inputs.show( 'slow' );
+                    toogleSubmitButton( false );
+                    emailFunction.call();
                 } else {
                     inputs.hide( 'slow' );
+                    toogleSubmitButton( true );
                 }
+                
+                
             });
-            checkbox.find('input').prop('checked', FormModule.mailNotificationEnabled() );
-            if ( !FormModule.mailNotificationEnabled() ) {
-                inputs.hide();
-            }
-            checkbox.append( message );
-            controls.append( checkbox );
-
-            var emailField = clone('textfield', 'email' );
-            var emailConfirmField = clone('textfield', 'emailConfirm' );
-            emailField.change( function() {
-
-            });
-            emailField.val( FormModule.enteredEmails() );
-            emailField.blur( function() {
-                // update server
-                var stringDTO = {};
-                stringDTO.string = emailField.val();
-                RequestModule.setEnteredEmails( stringDTO );
-                FormModule.setEnteredEmails( stringDTO.string );
-            });
-            // fill with current values
-            if ( confirmEmail ) {
-                emailConfirmField.val( confirmEmail );
-            }
-            emailConfirmField.blur( function() {
-                confirmEmail = emailConfirmField.val();
-                // if not match show error
-                if ( confirmEmail != emailField.val() ) {
-                    var errorElm = inputs.find('#emailMismatch' );
-                    if ( errorElm.length == 0 ) {
-                        var errorMsg = clone('alert', 'emailMismatch' );
-                        errorMsg.addClass("alert-error");
-                        errorMsg.append( texts.emailMismatch );
-                        errorMsg.insertAfter( inputs.find('#emailConfirm' ) );
-                    }
-                }
-            });
-
-            inputs.append( '<br>' + texts.email + '<br>' );
-            inputs.append( emailField );
-            inputs.append( '<br>' + texts.confirmEmail + '<br>' );
-            inputs.append( emailConfirmField );
-
+            emailConfirmField.blur( emailFunction );
+            
             node.append( notification );
         }
     }
-
+    
     function addSignaturesDiv( node ) {
         if ( FormModule.requiredSignaturesCount() > 0 ) {
         	var signaturesNode = clone('form_signatures');

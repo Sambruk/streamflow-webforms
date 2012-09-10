@@ -41,39 +41,72 @@ var FieldTypeModule = (function() {
     }
 
     /** All field type functions **/
-
     function AttachmentFieldValue( field, controlsNode ) {
     	field.node = clone( field.fieldType, field.id );
-    	field.node.find('#Attachment').change( function() { button.enable(true); } ).
-        attr({id:'Attachment'+field.id, name: field.id });
-        controlsNode.append(field.node);
-
-        field.node.append( '<br>' );
-        var button = new View.Button( field.node ).small().image('document_up').name( texts.upload )
-        .enable( false ).click( function() {
-            $('#Field'+field.id+' .fieldwaiting > img')
-            .ajaxStart( function(){ $(this).show(); })
-            .ajaxComplete(function(){ $(this).hide(); });
-
-            var attachmentDTO = {
-                secureuri: false,
-                fileElementId: 'Attachment'+field.id,
-                dataType: 'json',
-                fieldName: field.name,
-                success: function() {
-                    FormModule.setValue( field.id, RequestModule.refreshField( field.id ) );
-                    field.refreshUI( );
-                    button.enable( false );
-                }
-            }
-
-            RequestModule.attach( attachmentDTO );
-        	return false;
-        });
-
+    	controlsNode.append(field.node);
+    	
         field.refreshUI = function() {
-            this.node.find('#attachmentLabel').text( this.formattedValue );
+        	
+        	var fieldId = this.id;
+        	if (this.formattedValue) {
+        		$("#AttachmentFieldValueForm" + fieldId).remove();
+        		
+        		var valueNode = clone( "AttachedFile", "AttachedFile" + fieldId);
+        		field.node.append(valueNode);
+
+        		this.node.find('#delete_link').attr({id:'delete_link' + fieldId})
+        			.click(function() {
+        				RequestModule.deleteAttachment(JSON.parse(field.value).attachment)
+        				field.value = "";
+        				update( field.id, field.value );
+        				return false;
+        			});
+        		this.node.find('.filename').text( this.formattedValue );
+
+        	} else {
+        		$("#AttachedFile" + fieldId).remove();
+        		
+        		var formNode = clone( "AttachmentFieldValueForm", "AttachmentFieldValueForm" + fieldId);
+        		field.node.append(formNode);
+        		
+	    		formNode.find('#Attachment').attr({id:'Attachment'+fieldId, name: fieldId });
+	            formNode.find('#button-text').text(texts.add_file);
+	            
+	            // Initialize the jQuery File Upload widget
+	            formNode.fileupload({
+	                dropZone: null
+	            });
+	            
+	            // Disable default dropzone
+	            $(document).bind('drop dragover', function (e) {
+	                e.preventDefault();
+	            });
+	            
+	            // Settings
+	            var url = UrlModule.attach();
+	            formNode.fileupload('option', {
+	                acceptFileTypes: /(\.|\/)(jpe?g|png|pdf)$/i,
+	                autoUpload: true,
+	                url: url
+	            });
+
+	            formNode.bind('fileuploaddone', function (e, data) {
+	           		FormModule.setValue( field.id, RequestModule.refreshField( fieldId) );
+	           		field.refreshUI( );
+	           		removeErrorFromField(controlsNode.parent(), field);
+	        	});
+	            
+	            formNode.bind('fileuploadadded', function (e, data) {
+	            	if (!data.isValidated) {
+	            		$.each(data.files, function (index, file) {
+	            			addErrorToField(field, texts[file.error]);
+	            	    });
+	            	}
+	            	
+	        	});
+        	}	
         }
+
     }
 
     function selectedValues( input ) {
