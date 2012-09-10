@@ -400,6 +400,7 @@ var View = (function() {
 
                 if ( checked ) {
                     inputs.show( 'slow' );
+                    toogleSubmitButton( false );
                     emailFunction.call();
                 } else {
                     inputs.hide( 'slow' );
