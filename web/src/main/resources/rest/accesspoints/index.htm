@@ -1,4 +1,6 @@
-<!--
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+   <!--
 
 
     Copyright 2009-2012 Jayway Products AB
@@ -16,22 +18,66 @@
     limitations under the License.
 
 -->
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
 <head>
-    <title>${request.resourceRef.remainingPart}</title>
-    <link media="print" title="Atom feed"
-      type="application/atom+xml"
-      rel="alternate"
-      href="${request.resourceRef.path}.atom?$!{request.resourceRef.query}"/>
+   
+   <title>Streamflow&#8482; Surface WebForms</title>
+   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <meta name="description" content="Surface WebForms">
+   <meta name="author" content="Jayway Products AB">
+   <meta charset="utf-8">
+   
+   <!-- HTML5 shim, for IE6-8 support of HTML elements -->
+   <!--[if lt IE 9]>
+     <script src="/surface/static/js/external/html5shiv.js"></script>
+   <![endif]-->
+   
+   <link rel="stylesheet" type="text/css" href="/surface/static/css/external/bootstrap.css">
+   <link rel="stylesheet" type="text/css" href="/surface/static/css/external/bootstrap-responsive.css">
+   <link rel="stylesheet" type="text/css" href="/surface/static/css/external/redmond/jquery-ui-1.8.10.custom.css">
+  
+   <link rel="stylesheet" type="text/css" href="/surface/static/css/webforms.css">
+   
+   <!-- favorite and touch icons -->
+   <link rel="shortcut icon" href="/surface/static/images/favicon.png">
+   <link rel="apple-touch-icon" href="/surface/static/images/app_icons512x512.png">
+   <link rel="apple-touch-icon" sizes="57x57" href="/surface/static/images/app_icons57x57.png">
+   <link rel="apple-touch-icon" sizes="72x72" href="/surface/static/images/app_icons72x72.png">
+   <link rel="apple-touch-icon" sizes="114x114" href="/surface/static/images/app_icons114x114.png">
+   
+   <script type="text/javascript" src="/surface/static/js/external/jquery-1.7.1.min.js"></script>
+   <script type="text/javascript" src="/surface/static/js/external/bootstrap-alert.js"></script>
+   <script type="text/javascript" src="/surface/static/js/external/bootstrap-modal.js"></script>
+   <script type="text/javascript" src="/surface/static/js/external/jquery-ui-1.8.10.custom.min.js"></script>
+   <script type="text/javascript" src="/surface/static/js/contexts.js"></script>
+
+    <script type="text/javascript" src="/surface/texts?locale=sv"></script>
+
 </head>
-
 <body>
-<h3>Surface accesspoints</h3>
-<ul>
-#foreach($link in $result.links)
-<li><a href="${link.href}">${link.text}</a></li>
-#end
-</ul>
-</body>
 
+<header class="jumbotron">
+  <div class="container">
+    <h1>E-Tjänster</h1>
+    <!-- <p class="lead">Tillgängliga e-tjänster.</p>-->
+  </div>
+</header>
+
+<div class="container">
+   <div class="row">
+      <div class="span12">
+         <div class="category-widget">
+            <h2><i class="icon-book"></i>Alla tjänster</h2>
+            <ul>
+               #foreach($link in $result.links)
+               <li><a href="${link.href}">${link.text}</a></li>
+               #end
+            </ul>
+         </div>
+      </div>
+   </div>
+</div>
+
+</body>
 </html>

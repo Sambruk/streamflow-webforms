@@ -20,6 +20,7 @@ import org.qi4j.bootstrap.Assembler;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import se.streamsource.dci.restlet.server.ResourceFinder;
+import se.streamsource.streamflow.api.workspace.cases.attachment.UpdateAttachmentDTO;
 import se.streamsource.surface.web.application.security.AuthenticationFilter;
 import se.streamsource.surface.web.application.security.HashService;
 import se.streamsource.surface.web.dto.UserInfoDTO;
@@ -37,6 +38,6 @@ public class SurfaceRestAssembler
       module.objects(SurfaceRestApplication.class,
             ResourceFinder.class, MyPagesAccessFilter.class, AuthenticationFilter.class);
 
-      module.values(UserInfoDTO.class);
+      module.values(UserInfoDTO.class, UpdateAttachmentDTO.class);
    }
 }
