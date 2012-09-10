@@ -260,7 +260,7 @@ var FormModule = (function() {
     	var notify = $('#mailCheckbox').find('input').prop('checked');
         if ( notify ) {
             var email = $('#confirmation-email');
-            var confirm = $('#confirmation-eamil-confirmed');
+            var confirm = $('#confirmation-email-confirm');
             if ( email.val() != confirm.val() ) {
             	return false;
             }
