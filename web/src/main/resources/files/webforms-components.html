@@ -76,10 +76,27 @@
 <font id="hint" class="hint"></font>
 
 <div id="AttachmentFieldValue">
-    <label id="attachmentLabel"></label><br/>
-    <input id="Attachment" type="file"/>
 </div>
 
+<div id="AttachedFile">
+   <a href="#" id="delete_link"><i class="icon-trash"></i></a>
+   <span class="filename"></span>
+   <br/>
+</div>
+   
+<form id="AttachmentFieldValueForm">
+	<span class="btn btn-success fileinput-button">
+	    <i class="icon-plus icon-white"></i>
+	    <span id="button-text"></span>
+	    <input type="file" id="Attachment"/>
+	</span>
+	<div class="span5 fileupload-progress fade">
+	    <div class="progress progress-success progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+	        <div class="bar" style="width:0%;"></div>
+	    </div>
+   </div>
+</form>
+    
 <div id="ListBoxFieldValue" class="listbox_container">
 	<select id="possiblevalues" class="listbox" multiple="multiple"></select>
 	<div id="listboxbuttons" class="listboxbuttons"></div>
@@ -92,7 +109,12 @@
 <div id="mailNotification" class="well">
     <div id="mailControls">
     </div>
-    <div id="mailInputs">
+    <div id="mailInputs" class="control-group">
+         <label id="confirmation-email-label" class="control-label"></label>
+         <input id="confirmation-email" type="text" />
+         <label id="confirmation-email-confirm-label" class="control-label"></label>
+         <input id="confirmation-email-confirm" type="text" />
+         <span id="confirmation-help" class="help-inline"></span>
     </div>
 </div>
 

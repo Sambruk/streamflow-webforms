@@ -114,6 +114,16 @@ input.hasDatepicker {
 	font-size: 13px;
 	color: #999;	
 }
+
+.filename {
+   font-size: 15px;
+   font-weight: 500;
+   font-style: italic;
+   margin-bottom: 0px;
+   margin-left: 15px;
+}
+
+
 /* Summary 
 -------------------------------------------------- */
 table.fields_table {
@@ -162,6 +172,12 @@ td.field_message {
 .alert-success {
 	font-weight: 600;
 	font-size: 15px;
+}
+
+/* Mail comfirmation
+-------------------------------------------------- */
+#mailInputs {
+	margin-top: 12px;
 }
 
 /* Signature

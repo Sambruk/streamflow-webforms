@@ -101,6 +101,11 @@ var RequestModule = (function() {
         return getData( parameters );
     }
 
+    inner.deleteAttachment = function( attachmentId ) {
+    	var parameters = request('POST', UrlModule.deleteAttachment( attachmentId ));
+    	$.ajax( parameters );
+    }
+    
     inner.submitAndSend = function() {
         var parameters = request('POST', UrlModule.submitAndSend() );
         $.ajax( parameters );
@@ -142,8 +147,8 @@ var RequestModule = (function() {
         $.ajax( parameters );
     }
 
-    inner.setEnteredEmails = function( stringDTO ) {
-        var parameters = request( 'POST', UrlModule.setEnteredEmails() );
+    inner.setConfirmationEmail = function( stringDTO ) {
+        var parameters = request( 'POST', UrlModule.setConfirmationEmail() );
         parameters.data = stringDTO;
         $.ajax( parameters );
     }
@@ -160,12 +165,7 @@ var RequestModule = (function() {
         parameters.data = verifyDTO;
         invoke( $.ajax, parameters, {error: texts.verifyfailed, redirect:'summary'} );
     }
-
-    inner.attach = function( attachmentDTO ) {
-        attachmentDTO.url = UrlModule.attach();
-        $.ajaxFileUpload( attachmentDTO );
-    }
-
+    
     inner.refreshField = function( fieldId ) {
         var parameters = request('GET', UrlModule.refreshField() );
         parameters.data = { string: fieldId };

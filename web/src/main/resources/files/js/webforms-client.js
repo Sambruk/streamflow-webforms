@@ -71,6 +71,7 @@ jQuery(document).ready(function()
         if ( FormModule.formNeedsSigning() && !FormModule.isFormSigned() ) {
             throw {error:texts.signBeforeSubmit};
         }
+        
     }
 
     function formIsFilled( ifError ) {
