@@ -30,6 +30,7 @@ var FormModule = (function() {
 		this.signatures = formDraft.signatures;
 		this.pages = [];
 		this.confirmationEmail = formDraft.enteredEmails;
+		this.confirmationEmailConfirm;
 		this.mailSelectionEnablement = formDraft.mailSelectionEnablement;
 		var pages = this.pages;
 		$.each( formDraft.pages, function(idx, page) {
@@ -152,6 +153,14 @@ var FormModule = (function() {
         return formDraft.confirmationEmail;
     }
 
+    inner.setConfirmationEmailConfirm = function( emailaddress ) {
+        formDraft.confirmationEmailConfirm = emailaddress;
+    }
+
+    inner.confirmationEmailConfirm = function() {
+        return formDraft.confirmationEmailConfirm;
+    }
+    
 	inner.pageCount = function() {
 		return formDraft.pages.length;
 	}
