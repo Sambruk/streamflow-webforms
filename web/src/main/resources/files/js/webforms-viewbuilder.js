@@ -195,7 +195,14 @@ var View = (function() {
             verifyDTO.name = FormModule.getRequiredSignature();
             verifyDTO.form = FormModule.getFormTBS();
             RequestModule.verify( verifyDTO );
+            
+            // Store the email before reloading the formdraft
+            var confirmationEmail = FormModule.confirmationEmail();
+            var confirmationEmailConfirm = FormModule.confirmationEmailConfirm();
+            
             FormModule.init( RequestModule.getFormDraft() );
+            FormModule.setConfirmationEmail( confirmationEmail );
+            FormModule.setConfirmationEmailConfirm( confirmationEmailConfirm );
             // signing success redirect to summary
             throw {info:texts.formSigned, redirect:getSummary()};
         }
