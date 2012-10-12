@@ -18,7 +18,6 @@ var View = (function() {
     var inner = {};
     var messages = {};
     var fieldGroups = {};
-    var confirmEmail;
 
     inner.error = function( message ) {
         var node = clone('alert');
@@ -47,7 +46,6 @@ var View = (function() {
         RequestModule.submitAndSend();
         var caseName = RequestModule.getCaseName();
         var printUrl = UrlModule.getPrintUrl( FormModule.getFormId() );
-        confirmEmail = null;
         FormModule.destroy();
 
         var container = $('#container').empty();
@@ -197,7 +195,14 @@ var View = (function() {
             verifyDTO.name = FormModule.getRequiredSignature();
             verifyDTO.form = FormModule.getFormTBS();
             RequestModule.verify( verifyDTO );
+            
+            // Store the email before reloading the formdraft
+            var confirmationEmail = FormModule.confirmationEmail();
+            var confirmationEmailConfirm = FormModule.confirmationEmailConfirm();
+            
             FormModule.init( RequestModule.getFormDraft() );
+            FormModule.setConfirmationEmail( confirmationEmail );
+            FormModule.setConfirmationEmailConfirm( confirmationEmailConfirm );
             // signing success redirect to summary
             throw {info:texts.formSigned, redirect:getSummary()};
         }
@@ -355,10 +360,11 @@ var View = (function() {
             });
             // Fill with value that is temporary stored in the application while running. 
             // Not persisted on the server
-            if ( confirmEmail ) {
-                emailConfirmField.val( confirmEmail );
-            }
-           
+            emailConfirmField.val( FormModule.confirmationEmailConfirm() );
+            emailConfirmField.blur( function() {
+            	FormModule.setConfirmationEmailConfirm( emailConfirmField.val());
+            });
+            
             var toogleSubmitButton = function( enabled) {
             	if (enabled && FormModule.canSubmit()) {
             		enable($('#inserted_button_submit'), true);

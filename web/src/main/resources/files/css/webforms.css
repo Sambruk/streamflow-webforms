@@ -56,19 +56,3 @@ body {
    border-top: 1px solid #EEE;
 }
 
-.category-widget i {
-	vertical-align: baseline;
-	margin-right: 10px;
-}
-
-.category-widget ul {
-   border-top: 1px solid #EEE;
-   margin-top: 5px;
-   padding-top: 5px;
-}
-
-.category-widget li {
-	font-size: 14px;
-	line-height: 150%;
-}
-
