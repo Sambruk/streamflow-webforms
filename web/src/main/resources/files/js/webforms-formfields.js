@@ -180,7 +180,7 @@ var FieldTypeModule = (function() {
 
     function CommentFieldValue( field, controlsNode ) {
     	field.node = clone( field.fieldType, field.id );
-    	field.node.append( '<pre>'+field.field.field.note+'</pre>' );
+    	field.node.append( field.field.field.note );
         field.name = "";
         field.refreshUI = $.noop;
         controlsNode.append(field.node);
