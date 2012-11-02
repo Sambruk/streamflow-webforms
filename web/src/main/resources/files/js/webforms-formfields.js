@@ -187,7 +187,8 @@ var FieldTypeModule = (function() {
     }
 
     function DateFieldValue( field, controlsNode ) {
-    	field.node = clone( 'textfield', field.id );
+    	var containerNode = clone( 'datefieldcontainer', "datecontainer-" + field.id );
+    	field.node = clone( 'datefield', field.id );
     	field.node.change( function() {
             removeErrorFromField(controlsNode.parent(), field);
             field.invalidformat = '';
@@ -203,7 +204,8 @@ var FieldTypeModule = (function() {
     	    update( field.id, field.value )
         });
     	field.node.datepicker();
-        controlsNode.append(field.node);
+    	containerNode.prepend(field.node);
+        controlsNode.append(containerNode);
     }
 
     function FieldGroupFieldValue( field, controlsNode ) {
@@ -314,7 +316,7 @@ var FieldTypeModule = (function() {
 
         var id = 'openSelectionOption' + field.id;
         var option = clone('radio', 'label' + id);
-        option.find('input').attr({'id': id, 'name':field.id}).click( function( ) { 
+        option.find('input').attr({'id': id, 'name':field.id, 'class':'openselection-radio'}).click( function( ) { 
         	textfield.removeAttr('disabled'); 
         });
         option.append(field.fieldValue.openSelectionName );

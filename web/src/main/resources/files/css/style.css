@@ -96,6 +96,10 @@ select.listbox {
 	margin-bottom: 10px;
 }
 
+input.openselection-radio {
+	margin-top: 11px;
+}
+
 input.openselection-text {
 	display: inline;
 }
@@ -123,6 +127,9 @@ input.hasDatepicker {
    margin-left: 15px;
 }
 
+.alert-info {
+	color: #333;
+}
 
 /* Summary 
 -------------------------------------------------- */

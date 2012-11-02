@@ -257,7 +257,7 @@ var View = (function() {
     function addButtons( node, page) {
     	var buttons = clone('buttons');
 	    new inner.Button( buttons ).name(texts.previous).href( getPrevious( page ) ).enable( page!=0 );
-	    new inner.Button( buttons ).name(texts.next).href(getNext( page ) ).enable( page!='summary' );
+	    new inner.Button( buttons ).name(texts.next).href(getNext( page ) ).enable( page!='#summary' );
 	   
 	    var dialogElement = createDiscardDialog(node);
 	    new inner.Button( buttons ).name(texts.discard).confirm('#' + dialogElement.attr('id')).addClass("btn-danger");
@@ -534,12 +534,16 @@ var View = (function() {
     }
 
     function createProgressItem( selected, href, title ){
-    	var pageElm = clone('progressItem');
-    	pageElm.find('#link').append(title).attr({'href':href});
-    	if ( selected) {
-    		pageElm.addClass("active");
+    	if (selected) {
+    		var pageElm = clone('progressItemActive');
+    		pageElm.prepend(title);
+        	pageElm.addClass("active");
+        	return pageElm;
+    	} else {
+    		var pageElm = clone('progressItem');
+    		pageElm.find('#link').append(title).attr({'href':href});
+    		return pageElm;
     	}
-    	return pageElm;
     }
 
     inner.Button = function( placeholder ) {
