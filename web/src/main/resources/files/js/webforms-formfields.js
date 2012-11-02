@@ -201,9 +201,12 @@ var FieldTypeModule = (function() {
 	                addErrorToField(field, field.invalidformat);
 	    		}
     		}
-    	    update( field.id, field.value )
+    	    update( field.id, field.value );
         });
     	field.node.datepicker();
+    	containerNode.find('button').click(function() {
+    		field.node.datepicker("show");
+    	});
     	containerNode.prepend(field.node);
         controlsNode.append(containerNode);
     }

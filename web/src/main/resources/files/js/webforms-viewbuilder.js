@@ -524,12 +524,9 @@ var View = (function() {
         $.each( pages, function(idx, page){
             progress.append( createProgressItem(idx==current, getPage(idx), page.title) );
         });
-        var summary = clone('progressItemLast');
-    	summary.find('#link').append(texts.summary).attr({'href':getSummary()});
-    	if ( current==getSummary()) {
-    		summary.addClass("active");
-    	}
-    	progress.append( summary );
+        
+    	progress.append( createProgressItem(current==getSummary(), getSummary(), texts.summary ));
+    	progress.find('li').last().find('#divider').remove();
         contentNode.append(progress);
     }
 
