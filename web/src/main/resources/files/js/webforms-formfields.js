@@ -156,7 +156,7 @@ var FieldTypeModule = (function() {
 		});
 
 		field.refreshUI = function() {
-			values = selectedValues(field.value);
+			var values = selectedValues(field.value);
 			$.each(values, function(idx, selectionValue) {
 				field.node.find('#' + field.id + safeIdString(selectionValue))
 						.attr('checked', 'checked');
