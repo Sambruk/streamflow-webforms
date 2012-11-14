@@ -3,5 +3,9 @@
 *.iws
 *.log
 *.1
+.classpath
+.project
+.settings
+target
 /web/target/
 .sass-cache
