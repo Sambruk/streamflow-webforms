@@ -142,7 +142,6 @@ tr.validation-error {
 	border: 1px solid #EED3D7;
 }
 tr.validation-missing {
-	color: #3A87AD;
 	background-color: #D9EDF7;
 	border: 1px solid #BCE8F1;
 }
