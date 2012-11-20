@@ -257,7 +257,7 @@ var View = (function() {
     function addButtons( node, page) {
     	var buttons = clone('buttons');
 	    new inner.Button( buttons ).name(texts.previous).href( getPrevious( page ) ).enable( page!=0 );
-	    new inner.Button( buttons ).name(texts.next).href(getNext( page ) ).enable( page!='summary' );
+	    new inner.Button( buttons ).name(texts.next).href(getNext( page ) ).enable( page!='#summary' );
 	   
 	    var dialogElement = createDiscardDialog(node);
 	    new inner.Button( buttons ).name(texts.discard).confirm('#' + dialogElement.attr('id')).addClass("btn-danger");
@@ -524,22 +524,23 @@ var View = (function() {
         $.each( pages, function(idx, page){
             progress.append( createProgressItem(idx==current, getPage(idx), page.title) );
         });
-        var summary = clone('progressItemLast');
-    	summary.find('#link').append(texts.summary).attr({'href':getSummary()});
-    	if ( current==getSummary()) {
-    		summary.addClass("active");
-    	}
-    	progress.append( summary );
+        
+    	progress.append( createProgressItem(current==getSummary(), getSummary(), texts.summary ));
+    	progress.find('li').last().find('#divider').remove();
         contentNode.append(progress);
     }
 
     function createProgressItem( selected, href, title ){
-    	var pageElm = clone('progressItem');
-    	pageElm.find('#link').append(title).attr({'href':href});
-    	if ( selected) {
-    		pageElm.addClass("active");
+    	if (selected) {
+    		var pageElm = clone('progressItemActive');
+    		pageElm.prepend(title);
+        	pageElm.addClass("active");
+        	return pageElm;
+    	} else {
+    		var pageElm = clone('progressItem');
+    		pageElm.find('#link').append(title).attr({'href':href});
+    		return pageElm;
     	}
-    	return pageElm;
     }
 
     inner.Button = function( placeholder ) {
