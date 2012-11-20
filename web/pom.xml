@@ -6,7 +6,6 @@
         <version>1.6.0-SNAPSHOT</version>
     </parent>
     <artifactId>surface-web</artifactId>
-    <version>1.6.0-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>Streamsource Surface web</name>
     <description>Streamsource Surface web application</description>
