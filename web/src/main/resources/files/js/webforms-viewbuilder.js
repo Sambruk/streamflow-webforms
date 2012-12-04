@@ -429,28 +429,28 @@ var View = (function() {
         	signaturesNode.find("h3").append( texts.signatures );
         	
         	var table = signaturesNode.find('table');
-        	$.each( FormModule.getRequiredSignatures(), function(idx, reqSign ) {
-        		var row = $('<tr/>');
-        		table.append( row );
-        		row.addClass("signature-row");
-        		row.append( $('<td/>').append(reqSign.name + ":") );
-        		var signature = getSignature( reqSign.name, FormModule.getSignatures() );
-        		if ( signature ) {
-        			row.append( $('<td/>').append(signature.signerName).addClass('signer-name'));
-        		} else {
-        			row.append( $('<td/>').append( eidProviders(idx) ));
-        			var buttonCell = $('<td/>');
-        			new inner.Button( buttonCell )
-        				.name(texts.sign)
-        				.href(getSign(idx))
-        				.attr('id',"link_" + idx)
-        				.image('icon-pencil')
-        				.enable(false);
-        			row.append( buttonCell );
-        		}
-        	});
-        	node.append( signaturesNode );
-        }
+        	var reqSign = FormModule.getRequiredSignatures()[0];
+        	var idx = 0;
+        	var row = $('<tr/>');
+        	table.append( row );
+        	row.addClass("signature-row");
+        	row.append( $('<td/>').append(reqSign.name + ":") );
+        	var signature = getSignature( reqSign.name, FormModule.getSignatures() );
+        	if ( signature ) {
+        		row.append( $('<td/>').append(signature.signerName).addClass('signer-name'));
+        	} else {
+        		row.append( $('<td/>').append( eidProviders(idx) ));
+        		var buttonCell = $('<td/>');
+        		new inner.Button( buttonCell )
+        			.name(texts.sign)
+       				.href(getSign(idx))
+       				.attr('id',"link_" + idx)
+       				.image('icon-pencil')
+       				.enable(false);
+       			row.append( buttonCell );
+       		}
+       	node.append( signaturesNode );
+       }
     }
     
     function addSecondSignatureDiv( node ) {
@@ -466,7 +466,7 @@ var View = (function() {
         secondSignature.find('#email-label').text(texts.email);
         secondSignature.find('#emailconfirm-label').text(texts.confirmEmail);
         
-        node.append(secondSignature);
+        node.append( secondSignature );
       }
     }
 
