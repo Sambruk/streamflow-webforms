@@ -33,8 +33,6 @@ import org.qi4j.library.jmx.JMXAssembler;
 
 import se.streamsource.dci.restlet.client.ClientAssembler;
 import se.streamsource.surface.web.config.ExternalCssConfiguration;
-import se.streamsource.surface.web.mypages.MyPagesAccessConfiguration;
-import se.streamsource.surface.web.mypages.MyPagesAccessFilterService;
 import se.streamsource.surface.web.proxy.ProxyConfiguration;
 import se.streamsource.surface.web.proxy.ProxyService;
 import se.streamsource.surface.web.rest.ClientConfiguration;
@@ -92,7 +90,7 @@ public class SurfaceWebAssembler
    {
       ModuleAssembly module = configLayer.module("Configurations");
 
-      module.entities(ClientConfiguration.class, ProxyConfiguration.class, MyPagesAccessConfiguration.class, ExternalCssConfiguration.class).visibleIn(Visibility.application);
+      module.entities(ClientConfiguration.class, ProxyConfiguration.class, ExternalCssConfiguration.class).visibleIn(Visibility.application);
 
       // Configuration store
       Application.Mode mode = module.layer().application().mode();
@@ -159,13 +157,6 @@ public class SurfaceWebAssembler
               identifiedBy("client").
               instantiateOnStartup().
               visibleIn(Visibility.application);
-
-      ModuleAssembly myPages = appLayer.module("My Pages");
       
-      myPages.addServices( MyPagesAccessFilterService.class ).
-              visibleIn(Visibility.application).
-              identifiedBy( "mypagesfilter" ).
-              taggedWith( "mypages" ).
-              instantiateOnStartup();
    }
 }
