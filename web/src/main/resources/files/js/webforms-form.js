@@ -193,6 +193,10 @@ var FormModule = (function() {
 		return requiredSignatures.length;
 	}
 	
+	inner.formNeedsSecondSignature = function() {
+		return requiredSignatures.length > 1;
+	}
+	
 	inner.title = function() {
 		return formDraft.title;
 	}
