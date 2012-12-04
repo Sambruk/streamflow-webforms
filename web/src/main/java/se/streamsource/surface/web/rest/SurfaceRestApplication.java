@@ -18,7 +18,6 @@ package se.streamsource.surface.web.rest;
 
 import java.util.logging.Logger;
 
-import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.object.ObjectBuilderFactory;
 import org.qi4j.api.unitofwork.UnitOfWorkFactory;
@@ -26,26 +25,17 @@ import org.qi4j.bootstrap.Energy4Java;
 import org.qi4j.spi.structure.ApplicationSPI;
 import org.restlet.Application;
 import org.restlet.Restlet;
-import org.restlet.data.MediaType;
 import org.restlet.resource.Directory;
-import org.restlet.routing.Filter;
 import org.restlet.routing.Router;
 import org.restlet.routing.Template;
 
 import se.streamsource.dci.restlet.server.ExtensionMediaTypeFilter;
 import se.streamsource.surface.web.application.security.AuthenticationFilter;
 import se.streamsource.surface.web.assembler.SurfaceWebAssembler;
-import se.streamsource.surface.web.mypages.MyPagesAccessFilter;
-import se.streamsource.surface.web.mypages.MyPagesAccessFilterService;
 import se.streamsource.surface.web.resource.SurfaceRestlet;
 
 public class SurfaceRestApplication extends Application
 {
-
-   public static final MediaType APPLICATION_SPARQL_JSON = new MediaType( "application/sparql-results+json",
-         "SPARQL JSON" );
-   @Service 
-   MyPagesAccessFilterService filterService;
    
    @Structure
    ObjectBuilderFactory factory;
@@ -55,12 +45,6 @@ public class SurfaceRestApplication extends Application
 
    @Structure
    ApplicationSPI app;
-
-   public SurfaceRestApplication() throws Exception
-   {
-      getMetadataService().addExtension( "srj", APPLICATION_SPARQL_JSON );
-
-   }
 
    Thread shutdownHook = new Thread()
    {
@@ -83,7 +67,6 @@ public class SurfaceRestApplication extends Application
    public Restlet createInboundRoot()
    {
       Router surfaceRouter = new Router();
-      Router mypagesRouter = new Router();
 
       AuthenticationFilter authenticationFilter = factory.newObjectBuilder( AuthenticationFilter.class ).use( getContext(), surfaceRouter ).newInstance(); 
       authenticationFilter.addProtectedUrls( "proxy/endusers/" );
@@ -99,17 +82,6 @@ public class SurfaceRestApplication extends Application
       surfaceRouter.attach( "/texts", new TextsRestlet() );
       surfaceRouter.attach( "/static", new Directory( getContext(), "clap://thread/files/" ) );
       
-      Filter mypagesFilter = factory.newObjectBuilder( MyPagesAccessFilter.class ).use( getContext(), mypagesRouter , filterService ).newInstance(); 
-      
-      surfaceRouter.attach( "/mypages", mypagesFilter, Template.MODE_STARTS_WITH);
-      mypagesRouter.attach( "/static", new Directory( getContext(), "clap://thread/files/" ) );
-      mypagesRouter.attach( "/texts", new TextsRestlet() );
-      mypagesRouter.attach( "/opencases", new StaticFileRestlet("opencases.html"), Template.MODE_EQUALS );
-      mypagesRouter.attach( "/closedcases", new StaticFileRestlet("closedcases.html"), Template.MODE_EQUALS );
-      mypagesRouter.attach( "/profile", new StaticFileRestlet("profile.html"), Template.MODE_STARTS_WITH );
-      mypagesRouter.attach( "/logout", new StaticFileRestlet("logout.html"), Template.MODE_EQUALS );
-      mypagesRouter.attach( "/authenticate", factory.newObject( AuthenticateRestlet.class ), Template.MODE_STARTS_WITH );
-
       getTunnelService().setLanguageParameter( "locale" );
 
       return authenticationFilter;
