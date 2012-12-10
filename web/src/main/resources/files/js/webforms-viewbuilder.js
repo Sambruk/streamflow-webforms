@@ -424,49 +424,73 @@ var View = (function() {
     
     function addSignaturesDiv( node ) {
         if ( FormModule.requiredSignaturesCount() > 0 ) {
-        	var signaturesNode = clone('form_signatures');
-        	signaturesNode.addClass('well');
-        	signaturesNode.find("h3").append( texts.signatures );
+          var reqSign = FormModule.getRequiredSignatures()[0];
+          
+          if( reqSign.active ) {
+            var signaturesNode = clone('form_signatures');
+            signaturesNode.addClass('well');
+            signaturesNode.find("h3").append( texts.signatures );
+            
+            var table = signaturesNode.find('table');
+            var idx = 0;
+            var row = $('<tr/>');
+            table.append( row );
+            row.addClass("signature-row");
+            row.append( $('<td/>').append(reqSign.name + ":") );
+            var signature = getSignature( reqSign.name, FormModule.getSignatures() );
+            if ( signature ) {
+              row.append( $('<td/>').append(signature.signerName).addClass('signer-name'));
+            } else {
+              row.append( $('<td/>').append( eidProviders(idx) ));
+              var buttonCell = $('<td/>');
+              new inner.Button( buttonCell )
+                .name(texts.sign)
+                .href(getSign(idx))
+                .attr('id',"link_" + idx)
+                .image('icon-pencil')
+                .enable(false);
+              row.append( buttonCell );
+            }
+          node.append( signaturesNode );
+            
+          }        
         	
-        	var table = signaturesNode.find('table');
-        	var reqSign = FormModule.getRequiredSignatures()[0];
-        	var idx = 0;
-        	var row = $('<tr/>');
-        	table.append( row );
-        	row.addClass("signature-row");
-        	row.append( $('<td/>').append(reqSign.name + ":") );
-        	var signature = getSignature( reqSign.name, FormModule.getSignatures() );
-        	if ( signature ) {
-        		row.append( $('<td/>').append(signature.signerName).addClass('signer-name'));
-        	} else {
-        		row.append( $('<td/>').append( eidProviders(idx) ));
-        		var buttonCell = $('<td/>');
-        		new inner.Button( buttonCell )
-        			.name(texts.sign)
-       				.href(getSign(idx))
-       				.attr('id',"link_" + idx)
-       				.image('icon-pencil')
-       				.enable(false);
-       			row.append( buttonCell );
-       		}
-       	node.append( signaturesNode );
        }
     }
     
     function addSecondSignatureDiv( node ) {
       if ( FormModule.formNeedsSecondSignature() ) {
-        var secondSignature = clone('second_signature');
-        secondSignature.find('#secondsignature-label').text(texts.secondSignatureHeader);
-        
-        secondSignature.find('#firstname-label').text(texts.firstname);
-        secondSignature.find('#lastname-label').text(texts.lastname);
-        secondSignature.find('#socialsecuritynumber-label').text(texts.socialSecurityNumber);
-        secondSignature.find('#phonenumber-label').text(texts.phonenumber);
-        
-        secondSignature.find('#email-label').text(texts.email);
-        secondSignature.find('#emailconfirm-label').text(texts.confirmEmail);
-        
-        node.append( secondSignature );
+        var reqSign = FormModule.getRequiredSignatures()[1];
+        if ( reqSign.active ) {
+          var secondSignature = clone('second_signature');
+          var signatureFields = secondSignature.find('#secondsignature-fields');
+          
+          secondSignature.find('#secondsignature-label').text(reqSign.name);
+
+          secondSignature.find('#name-label').text(texts.name);
+          secondSignature.find('#socialsecuritynumber-label').text(texts.socialSecurityNumber);
+          secondSignature.find('#phonenumber-label').text(texts.phonenumber);
+          
+          secondSignature.find('#email-label').text(texts.email);
+          secondSignature.find('#emailconfirm-label').text(texts.confirmEmail);
+          
+          if ( !reqSign.mandatory && reqSign.question != '') {
+            var questionCheckbox = clone('checkbox', 'signatureCheckbox' );
+            questionCheckbox.append( reqSign.question );            
+            secondSignature.append( questionCheckbox );
+          }
+          
+          questionCheckbox.find('input').click( function() {
+            var checked = questionCheckbox.find('input').prop('checked');
+            if ( checked ) {
+              signatureFields.hide( 'slow' );
+            } else {
+              signatureFields.show( 'slow' );
+            }            
+          });
+          
+          node.append( secondSignature );          
+        }
       }
     }
 
