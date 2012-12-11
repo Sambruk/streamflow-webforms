@@ -170,11 +170,15 @@ var FormModule = (function() {
 	}
 	
 	inner.isFormSigned = function() {
-		return requiredSignatures.length == formDraft.signatures.length;
+		return inner.requiredSingedSignaturesCount() == formDraft.signatures.length;
 	}
-	
+
 	inner.formNeedsSigning = function() {
-		return requiredSignatures.length > 0;
+	  var needsSigning = false;
+	  if ( requiredSignatures.length > 0 ) {
+	    needsSigning = requiredSignatures[0].active;
+	  }
+	  return needsSigning;
 	}
 
 	inner.setRequiredSignatures = function( required ) {
@@ -189,12 +193,31 @@ var FormModule = (function() {
 		return selectedRequiredSignature;
 	}
 	
-	inner.requiredSignaturesCount = function() {
-		return requiredSignatures.length;
+	inner.formNeedsSecondSignature = function() {
+	  var needsSigning = false;
+	  if ( requiredSignatures.length > 1 ) {
+	    needsSigning = requiredSignatures[1].active;
+	  }
+	  return needsSigning;
 	}
 	
-	inner.formNeedsSecondSignature = function() {
-		return requiredSignatures.length > 1;
+	inner.requiredSignaturesCount = function() {
+	  var reqSignNbrs = 0;
+	  if ( inner.formNeedsSigning() ) {
+	    reqSignNbrs++;
+	    if ( inner.formNeedsSecondSignature() ) {
+	      reqSignNbrs++;
+	    }
+	  }
+	  return reqSignNbrs;
+	}
+	
+	inner.requiredSingedSignaturesCount = function() {
+	  var reqSignNbrs = 0;
+    if ( inner.formNeedsSigning() ) {
+      reqSignNbrs++;
+    }
+    return reqSignNbrs;
 	}
 	
 	inner.title = function() {
@@ -278,7 +301,7 @@ var FormModule = (function() {
             	return false;
             }
         }
-        if ( inner.requiredSignaturesCount() > 0 ) {
+        if ( inner.formNeedsSigning() ) {
             return formFilled && inner.isFormSigned();
         }
 	    return formFilled;

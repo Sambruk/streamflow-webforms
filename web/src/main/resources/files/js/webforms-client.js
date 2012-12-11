@@ -25,7 +25,7 @@ jQuery(document).ready(function()
     }
 
     function loadEidPlugins() {
-    	if ( FormModule.requiredSignaturesCount() > 0 ) {
+    	if ( FormModule.formNeedsSigning() ) {
 	        $("#signerDiv").append( RequestModule.getHeader() );
 	        addSigners($("#signerDiv"));
     	}
@@ -58,7 +58,7 @@ jQuery(document).ready(function()
     }
 
     function setupProviders() {
-        if ( !FormModule.providersInitialized() && FormModule.requiredSignaturesCount() > 0) {
+        if ( !FormModule.providersInitialized() && FormModule.formNeedsSigning() ) {
     	    FormModule.setProviders( RequestModule.getProviders() );
         }
     }
@@ -89,12 +89,12 @@ jQuery(document).ready(function()
     }
 
     function verifySigner(args ) {
-        if ( FormModule.requiredSignaturesCount() == 0)
+        if ( !FormModule.formNeedsSigning() )
             throw {error:texts.noRequiredSignatures};
 
         formIsFilled( {error:texts.fillBeforeSign } );
 
-        validateNumber( args.segment, FormModule.requiredSignaturesCount(),
+        validateNumber( args.segment, FormModule.requiredSingedSignaturesCount(),
             {error:texts.requiredSignatureNotValid + args.segment });
     }
 
