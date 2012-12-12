@@ -32,6 +32,11 @@ var FormModule = (function() {
 		this.confirmationEmail = formDraft.enteredEmails;
 		this.confirmationEmailConfirm;
 		this.mailSelectionEnablement = formDraft.mailSelectionEnablement;
+		this.secondSignatureName = formDraft.secondSignatureName;
+		this.secondSignaturePhoneNumber = formDraft.secondSignaturePhoneNumber;
+		this.secondSignatureSocialSecurityNumber = formDraft.socialSecurityNumber;
+		this.secondSignatureSingleSignature = formDraft.secondSignatureSingleSignature;
+		this.secondSignatureEmail = formDraft.secondSignatureEmail;
 		var pages = this.pages;
 		$.each( formDraft.pages, function(idx, page) {
 			pages[ idx ] = new Page( page, idx );
@@ -319,6 +324,46 @@ var FormModule = (function() {
     inner.getMailSelectionMessage = function() {
         return mailSelectionMessageText;
     }
+    
+  inner.setSecondSignatureName = function( name ) {
+    formDraft.secondSignatureName = name;
+  }
+    
+  inner.secondSignatureName = function() {
+    return formDraft.secondSignatureName;
+  }
+  
+  inner.setSecondSignaturePhoneNumber = function( phoneNumber) {
+    formDraft.secondSignaturePhoneNumber = phoneNumber;
+  }
+  
+  inner.secondSignaturePhoneNumber = function() {
+    return formDraft.secondSignaturePhoneNumber;
+  }
+  
+  inner.setSecondSignatureSocialSecurityNumber = function( number ) {
+    formDraft.secondSignatureSocialSecurityNumber = number;
+  }
+  
+  inner.secondSignatureSocialSecurityNumber = function() {
+    return formDraft.secondSignatureSocialSecurityNumber;
+  }
+  
+  inner.setSecondSignatureSingleSignature = function( enabled ) {
+    formDraft.secondSignatureSingleSignature = enabled;
+  }
+  
+  inner.secondSignatureSingleSignature = function() {
+    return formDraft.secondSignatureSingleSignature;
+  }
+  
+  inner.setSecondSignatureEmail = function( email ) {
+    formDraft.secondSignatureEmail = email;
+  }
+  
+  inner.secondSignatureEmail = function() {
+    return formDraft.secondSignatureEmail;
+  }
     
 	return inner;
 }());

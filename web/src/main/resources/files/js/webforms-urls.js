@@ -145,6 +145,26 @@ var UrlModule = (function() {
     inner.getPrintUrl = function( formId ) {
         return inner.getCaseUrl() +'submittedforms/'+ formId + '/generateformaspdf';
     }
+    
+    inner.setSecondSignatureName = function() {
+      return urls.proxy + urls.proxydraft + 'updatename.json';
+    }
+    
+    inner.setSecondSignaturePhoneNumber = function() {
+      return urls.proxy + urls.proxydraft + 'updatephonenumber.json';
+    }
+    
+    inner.setSecondSignatureSocialSecurityNumber = function() {
+      return urls.proxy + urls.proxydraft + 'updatesocialsecuritynumber.json';
+    }
+    
+    inner.setSecondSignatureEmail = function() {
+      return urls.proxy + urls.proxydraft + 'updateemail.json';
+    }
+    
+    inner.setSecondSignatureSingleSignature = function() {
+      return urls.proxy + urls.proxydraft + 'updatesinglesignature.json';
+    }
 
     return inner;
 }());

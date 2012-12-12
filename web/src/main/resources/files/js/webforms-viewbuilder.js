@@ -197,13 +197,34 @@ var View = (function() {
             verifyDTO.form = FormModule.getFormTBS();
             RequestModule.verify( verifyDTO );
             
-            // Store the email before reloading the formdraft
+            // Store the email etc before reloading the formdraft
             var confirmationEmail = FormModule.confirmationEmail();
             var confirmationEmailConfirm = FormModule.confirmationEmailConfirm();
             
+            if(FormModule.formNeedsSecondSignature()) {
+              var secondSignatureName = FormModule.secondSignatureName();
+              var secondSignaturePhoneNumber = FormModule.secondSignaturePhoneNumber();
+              var secondSignatureSocialSecurityNumber = FormModule.secondSignatureSocialSecurityNumber();
+              var secondSignatureEmail = FormModule.secondSignatureEmail();
+              var secondSignatureSingleSignature = FormModule.secondSignatureSingleSignature();
+              if (!FormModule.secondSignatureSingleSignature()) {
+                RequestModule.setSecondSignatureSingleSignature( false );
+                FormModule.setSecondSignatureSingleSignature( false );
+                secondSignatureSingleSignature = FormModule.secondSignatureSingleSignature();
+              }
+            }
+
             FormModule.init( RequestModule.getFormDraft() );
             FormModule.setConfirmationEmail( confirmationEmail );
             FormModule.setConfirmationEmailConfirm( confirmationEmailConfirm );
+            
+            if(FormModule.formNeedsSecondSignature()) {
+              FormModule.setSecondSignatureName( secondSignatureName );
+              FormModule.setSecondSignaturePhoneNumber( secondSignaturePhoneNumber );
+              FormModule.setSecondSignatureSocialSecurityNumber( secondSignatureSocialSecurityNumber );
+              FormModule.setSecondSignatureEmail( secondSignatureEmail );
+              FormModule.setSecondSignatureSingleSignature( secondSignatureSingleSignature );
+            }
             // signing success redirect to summary
             throw {info:texts.formSigned, redirect:getSummary()};
         }
@@ -459,33 +480,83 @@ var View = (function() {
         var reqSign = FormModule.getRequiredSignatures()[1];
         var secondSignature = clone('second_signature');
         var signatureFields = secondSignature.find('#secondsignature-fields');
-          
+        
         secondSignature.find('#secondsignature-label').text(reqSign.name);
 
-        secondSignature.find('#name-label').text(texts.name);
+        secondSignature.find('#name-label').text(texts.name);                
         secondSignature.find('#socialsecuritynumber-label').text(texts.socialSecurityNumber);
         secondSignature.find('#phonenumber-label').text(texts.phonenumber);
           
         secondSignature.find('#email-label').text(texts.email);
         secondSignature.find('#emailconfirm-label').text(texts.confirmEmail);
           
-        if ( !reqSign.mandatory && reqSign.question != '') {
-          var questionCheckbox = clone('checkbox', 'signatureCheckbox' );
-          questionCheckbox.append( reqSign.question );            
-          secondSignature.append( questionCheckbox );
+        if( !reqSign.mandatory ) {
+          var singleSignatureCheckbox = clone('checkbox', 'singleSignatureCheckbox' );
+          var isChecked = FormModule.secondSignatureSingleSignature();
+          singleSignatureCheckbox.append( reqSign.question );            
+          singleSignatureCheckbox.find('input').prop('checked', isChecked );
+          secondSignature.append(singleSignatureCheckbox);
           
-          questionCheckbox.find('input').click( function() {
-            var checked = questionCheckbox.find('input').prop('checked');
+          isChecked ? signatureFields.hide() : '';
+          
+          singleSignatureCheckbox.find('input').click( function() {
+            var checked = singleSignatureCheckbox.find('input').prop('checked');
+            RequestModule.setSecondSignatureSingleSignature( checked );
+            FormModule.setSecondSignatureSingleSignature( checked );
             if ( checked ) {
               signatureFields.hide( 'slow' );
             } else {
               signatureFields.show( 'slow' );
-            }            
+            }
           });
-        }          
-          
+        }       
+        updateSecondSignatureName(secondSignature.find('#name'));
+        updateSecondSignaturePhoneNumber(secondSignature.find('#phonenumber'));
+        updateSecondSignatureSocialSecurityNumber(secondSignature.find('#socialsecuritynumber'));
+        updateSecondSignatureEmail(secondSignature.find('#email'));
+        
         node.append( secondSignature );          
       }
+    }
+    
+    function updateSecondSignatureName( nameField ) {
+      nameField.val( FormModule.secondSignatureName() );       
+      nameField.blur( function() {
+          var stringDTO = {};
+          stringDTO.string = nameField.val();
+          RequestModule.setSecondSignatureName( stringDTO );
+          FormModule.setSecondSignatureName( stringDTO.string );
+      });
+    }
+    
+    function updateSecondSignaturePhoneNumber( phoneNumberField ) {
+      phoneNumberField.val( FormModule.secondSignaturePhoneNumber() );       
+      phoneNumberField.blur( function() {
+          var stringDTO = {};
+          stringDTO.string = phoneNumberField.val();
+          RequestModule.setSecondSignaturePhoneNumber( stringDTO );
+          FormModule.setSecondSignaturePhoneNumber( stringDTO.string );
+      });
+    }
+    
+    function updateSecondSignatureSocialSecurityNumber( socialSecurityField ) {
+      socialSecurityField.val( FormModule.secondSignatureSocialSecurityNumber() );       
+      socialSecurityField.blur( function() {
+          var stringDTO = {};
+          stringDTO.string = socialSecurityField.val();
+          RequestModule.setSecondSignatureSocialSecurityNumber( stringDTO );
+          FormModule.setSecondSignatureSocialSecurityNumber( stringDTO.string );
+      });
+    }
+    
+    function updateSecondSignatureEmail( emailField ) {
+      emailField.val( FormModule.secondSignatureEmail() );       
+      emailField.blur( function() {
+          var stringDTO = {};
+          stringDTO.string = emailField.val();
+          RequestModule.setSecondSignatureEmail( stringDTO );
+          FormModule.setSecondSignatureEmail( stringDTO.string );
+      });
     }
 
     function eidProviders( signatureId ){

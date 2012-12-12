@@ -171,6 +171,38 @@ var RequestModule = (function() {
         parameters.data = { string: fieldId };
         return getData( parameters ).value;
     }
+    
+    inner.setSecondSignatureName = function( stringDTO ) {
+      var parameters = request( 'POST', UrlModule.setSecondSignatureName() );
+      parameters.data = stringDTO;
+      $.ajax( parameters );
+    }
+    
+    inner.setSecondSignaturePhoneNumber = function( stringDTO ) {
+      var parameters = request( 'POST', UrlModule.setSecondSignaturePhoneNumber() );
+      parameters.data = stringDTO;
+      $.ajax( parameters );
+    }
+    
+    inner.setSecondSignatureSocialSecurityNumber = function( stringDTO ) {
+      var parameters = request( 'POST', UrlModule.setSecondSignatureSocialSecurityNumber() ); 
+      parameters.data = stringDTO;
+      $.ajax( parameters );
+    }
+    
+    inner.setSecondSignatureEmail = function( stringDTO ) {
+      var parameters = request( 'POST', UrlModule.setSecondSignatureEmail() );
+      parameters.data = stringDTO;
+      $.ajax( parameters );
+    }
+    
+    inner.setSecondSignatureSingleSignature = function( enabled ) {
+      var parameters = request( 'POST', UrlModule.setSecondSignatureSingleSignature() );
+      var stringDTO = {};
+      enabled ? stringDTO.string = 'true' : stringDTO.string = 'false';
+      parameters.data = stringDTO;
+      $.ajax( parameters );
+    }
 
     return inner;
 }());
