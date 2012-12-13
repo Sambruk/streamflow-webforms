@@ -488,7 +488,6 @@ var View = (function() {
         secondSignature.find('#phonenumber-label').text(texts.phonenumber);
           
         secondSignature.find('#email-label').text(texts.email);
-        secondSignature.find('#emailconfirm-label').text(texts.confirmEmail);
           
         if( !reqSign.mandatory ) {
           var singleSignatureCheckbox = clone('checkbox', 'singleSignatureCheckbox' );
