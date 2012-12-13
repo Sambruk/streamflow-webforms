@@ -136,7 +136,6 @@ var View = (function() {
         }
         field.refreshUI();
     };
-    
 
     function mandatory( node, field ) {
         if ( field.field.field.mandatory ) {
@@ -386,16 +385,7 @@ var View = (function() {
             emailConfirmField.blur( function() {
             	FormModule.setConfirmationEmailConfirm( emailConfirmField.val());
             });
-            
-            var toogleSubmitButton = function( enabled) {
-            	if (enabled && FormModule.canSubmit()) {
-            		enable($('#inserted_button_submit'), true);
-                	$('#inserted_button_submit').addClass("btn-primary");         
-            	} else {
-            		enable($('#inserted_button_submit'), false);
-                	$('#inserted_button_submit').removeClass("btn-primary");    
-            	}
-            }
+
             var emailFunction = function() {
                 // if not match show error and disable submit-button
                 if ( emailConfirmField.val() != emailField.val() ) {
@@ -434,13 +424,22 @@ var View = (function() {
                     inputs.hide( 'slow' );
                     toogleSubmitButton( true );
                 }
-                
-                
+                                
             });
             emailConfirmField.blur( emailFunction );
             
             node.append( notification );
         }
+    }
+    
+    function toogleSubmitButton( enabled ) {
+      if (enabled && FormModule.canSubmit()) {
+        enable($('#inserted_button_submit'), true);
+          $('#inserted_button_submit').addClass("btn-primary");         
+      } else {
+        enable($('#inserted_button_submit'), false);
+          $('#inserted_button_submit').removeClass("btn-primary");    
+      }
     }
     
     function addSignaturesDiv( node ) {
@@ -507,8 +506,9 @@ var View = (function() {
             } else {
               signatureFields.show( 'slow' );
             }
+            toogleSubmitButton(true);
           });
-        }       
+        }
         updateSecondSignatureName(secondSignature.find('#name'));
         updateSecondSignaturePhoneNumber(secondSignature.find('#phonenumber'));
         updateSecondSignatureSocialSecurityNumber(secondSignature.find('#socialsecuritynumber'));
@@ -525,6 +525,7 @@ var View = (function() {
           stringDTO.string = nameField.val();
           RequestModule.setSecondSignatureName( stringDTO );
           FormModule.setSecondSignatureName( stringDTO.string );
+          toogleSubmitButton(true);
       });
     }
     
@@ -535,6 +536,7 @@ var View = (function() {
           stringDTO.string = phoneNumberField.val();
           RequestModule.setSecondSignaturePhoneNumber( stringDTO );
           FormModule.setSecondSignaturePhoneNumber( stringDTO.string );
+          toogleSubmitButton(true);
       });
     }
     
@@ -545,6 +547,7 @@ var View = (function() {
           stringDTO.string = socialSecurityField.val();
           RequestModule.setSecondSignatureSocialSecurityNumber( stringDTO );
           FormModule.setSecondSignatureSocialSecurityNumber( stringDTO.string );
+          toogleSubmitButton(true);
       });
     }
     
@@ -555,6 +558,7 @@ var View = (function() {
           stringDTO.string = emailField.val();
           RequestModule.setSecondSignatureEmail( stringDTO );
           FormModule.setSecondSignatureEmail( stringDTO.string );
+          toogleSubmitButton(true);
       });
     }
 

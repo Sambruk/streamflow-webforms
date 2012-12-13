@@ -94,7 +94,7 @@ jQuery(document).ready(function()
 
         formIsFilled( {error:texts.fillBeforeSign } );
 
-        validateNumber( args.segment, FormModule.requiredSingedSignaturesCount(),
+        validateNumber( args.segment, FormModule.requiredSignedSignaturesCount(),
             {error:texts.requiredSignatureNotValid + args.segment });
     }
 
