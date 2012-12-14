@@ -566,7 +566,7 @@ var View = (function() {
     	var comboBox = clone('eidProviders').attr({name: signatureId, id: "eIdProvider_" + signatureId});
     	comboBox.change(function() {
             var button = $('#link_'+this.name);
-            if ( this.selectedIndex == 0 ) {
+            if ( this.selectedIndex == 0 || !FormModule.isSecondSignatureReady() ) {
     		    enable( button, false );
     		    return;
             }

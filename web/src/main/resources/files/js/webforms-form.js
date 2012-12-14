@@ -102,6 +102,10 @@ var FormModule = (function() {
     function formatSelectionValues( value ) {
         return value.replace(/(\[|\])/g, "'" );
     }
+    
+    function hasFieldAValue( field ) {
+      return !((typeof field === 'undefined') || (field.length < 1) );
+    }
 
     Field.prototype.setValue = function( value ) {
     	this.value = value;
@@ -175,8 +179,27 @@ var FormModule = (function() {
 	}
 	
 	inner.isFormSigned = function() {
-		return inner.requiredSingedSignaturesCount() == formDraft.signatures.length;
+	  if(inner.isSecondSignatureReady()) {
+	    return inner.requiredSignedSignaturesCount() == formDraft.signatures.length;
+	  }
+	  else { 
+	    return false;
+	  }
 	}
+	 
+	inner.isSecondSignatureReady = function() {
+	  if( inner.formNeedsSecondSignature() ) {
+	    var singleSignature = inner.secondSignatureSingleSignature();
+	    if( typeof singleSignature === 'undefined' || !singleSignature ) {
+	      return (hasFieldAValue( formDraft.secondSignatureName ) 
+	          && hasFieldAValue( formDraft.secondSignatureEmail )
+	          && hasFieldAValue( formDraft.secondSignaturePhoneNumber )
+	          && hasFieldAValue( formDraft.secondSignatureSocialSecurityNumber ) );
+	      }
+	  }
+	  return true;
+	}
+	
 
 	inner.formNeedsSigning = function() {
 	  var needsSigning = false;
@@ -217,7 +240,7 @@ var FormModule = (function() {
 	  return reqSignNbrs;
 	}
 	
-	inner.requiredSingedSignaturesCount = function() {
+	inner.requiredSignedSignaturesCount = function() {
 	  var reqSignNbrs = 0;
     if ( inner.formNeedsSigning() ) {
       reqSignNbrs++;
