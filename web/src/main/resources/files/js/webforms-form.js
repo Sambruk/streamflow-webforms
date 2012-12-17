@@ -37,6 +37,8 @@ var FormModule = (function() {
 		this.secondSignatureSocialSecurityNumber = formDraft.socialSecurityNumber;
 		this.secondSignatureSingleSignature = formDraft.secondSignatureSingleSignature;
 		this.secondSignatureEmail = formDraft.secondSignatureEmail;
+		this.secondSignatureEmailConfirm = formDraft.secondSignatureEmailConfirm;
+		this.selectedEid = formDraft.selectedEid;
 		var pages = this.pages;
 		$.each( formDraft.pages, function(idx, page) {
 			pages[ idx ] = new Page( page, idx );
@@ -193,6 +195,7 @@ var FormModule = (function() {
 	    if( typeof singleSignature === 'undefined' || !singleSignature ) {
 	      return (hasFieldAValue( formDraft.secondSignatureName ) 
 	          && hasFieldAValue( formDraft.secondSignatureEmail )
+	          && hasFieldAValue( formDraft.secondSignatureEmailConfirm )
 	          && hasFieldAValue( formDraft.secondSignaturePhoneNumber )
 	          && hasFieldAValue( formDraft.secondSignatureSocialSecurityNumber ) );
 	      }
@@ -277,18 +280,18 @@ var FormModule = (function() {
         return tbs;
 	}
 
-    inner.hasErrors = function() {
-        var error = false;
-        fieldIterator( function(field) { 
-        	if ( field.field.field.mandatory && !field.value) {
-            	error = true;
-        	} 
-        	if (field.invalidformat != '' ) {
-        		error = true;
-        	}
-        });
-        return error;
-    }
+  inner.hasErrors = function() {
+    var error = false;
+    fieldIterator( function(field) { 
+      if ( field.field.field.mandatory && !field.value) {
+        error = true;
+      } 
+      if (field.invalidformat != '' ) {
+        error = true;
+      }
+    });
+    return error;
+  }
 
 	
 	inner.pages = function() {
@@ -386,6 +389,22 @@ var FormModule = (function() {
   
   inner.secondSignatureEmail = function() {
     return formDraft.secondSignatureEmail;
+  }
+  
+  inner.setSecondSignatureEmailConfirm = function( email ) {
+    formDraft.secondSignatureEmailConfirm = email;
+  }
+  
+  inner.secondSignatureEmailConfirm = function() {
+    return formDraft.secondSignatureEmailConfirm;
+  }
+  
+  inner.selectedEid = function() {
+    return formDraft.selectedEid;
+  }
+  
+  inner.setSelectedEid = function( eid ) {
+    formDraft.selectedEid = eid;
   }
     
 	return inner;

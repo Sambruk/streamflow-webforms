@@ -143,6 +143,7 @@ var View = (function() {
         }
     }
 
+
     function hint( node, field ) {
         if ( field.fieldValue.hint ) {
         	clone('hint', 'hint' + field.id).text( ' (' + field.fieldValue.hint + ')' ).appendTo( node );
@@ -205,6 +206,7 @@ var View = (function() {
               var secondSignaturePhoneNumber = FormModule.secondSignaturePhoneNumber();
               var secondSignatureSocialSecurityNumber = FormModule.secondSignatureSocialSecurityNumber();
               var secondSignatureEmail = FormModule.secondSignatureEmail();
+              var secondSignatureEmailConfirm = FormModule.secondSignatureEmailConfirm();
               var secondSignatureSingleSignature = FormModule.secondSignatureSingleSignature();
               if (!FormModule.secondSignatureSingleSignature()) {
                 RequestModule.setSecondSignatureSingleSignature( false );
@@ -222,6 +224,7 @@ var View = (function() {
               FormModule.setSecondSignaturePhoneNumber( secondSignaturePhoneNumber );
               FormModule.setSecondSignatureSocialSecurityNumber( secondSignatureSocialSecurityNumber );
               FormModule.setSecondSignatureEmail( secondSignatureEmail );
+              FormModule.setSecondSignatureEmailConfirm( secondSignatureEmailConfirm );
               FormModule.setSecondSignatureSingleSignature( secondSignatureSingleSignature );
             }
             // signing success redirect to summary
@@ -391,7 +394,7 @@ var View = (function() {
                 if ( emailConfirmField.val() != emailField.val() ) {
             		inputs.addClass('error');
                     inputs.find('#confirmation-help').append(texts.emailMismatch);
-                    toogleSubmitButton( false );   
+                    toggleSubmitButton( false );   
                     
                     emailConfirmField.focus( function() {
                     	// Remove old error messages and enable submit button
@@ -400,12 +403,12 @@ var View = (function() {
                     	emailConfirmField.focus( function(){});
                     });
                 } else if (emailField.val()) {
-                	toogleSubmitButton( true);                	
+                	toggleSubmitButton( true);                	
                 }
             };
             
             if (FormModule.mailNotificationEnabled() ) {
-            	toogleSubmitButton(false);
+            	toggleSubmitButton(false);
                 emailFunction.call();
             } else {
                 inputs.hide();
@@ -418,11 +421,11 @@ var View = (function() {
 
                 if ( checked ) {
                     inputs.show( 'slow' );
-                    toogleSubmitButton( false );
+                    toggleSubmitButton( false );
                     emailFunction.call();
                 } else {
                     inputs.hide( 'slow' );
-                    toogleSubmitButton( true );
+                    toggleSubmitButton( true );
                 }
                                 
             });
@@ -432,7 +435,7 @@ var View = (function() {
         }
     }
     
-    function toogleSubmitButton( enabled ) {
+    function toggleSubmitButton( enabled ) {
       if (enabled && FormModule.canSubmit()) {
         enable($('#inserted_button_submit'), true);
           $('#inserted_button_submit').addClass("btn-primary");         
@@ -478,22 +481,23 @@ var View = (function() {
       if ( FormModule.formNeedsSecondSignature() ) {
         var reqSign = FormModule.getRequiredSignatures()[1];
         var secondSignature = clone('second_signature');
-        var signatureFields = secondSignature.find('#secondsignature-fields');
+        var signatureFields = secondSignature.find('#secondsignature_fields');
         
         secondSignature.find('#secondsignature-label').text(reqSign.name);
+        secondSignature.find('#secondsignaturetext').text(texts.secondSignatureComment);
 
-        secondSignature.find('#name-label').text(texts.name);                
+        secondSignature.find('#name-label').text( texts.name );
         secondSignature.find('#socialsecuritynumber-label').text(texts.socialSecurityNumber);
         secondSignature.find('#phonenumber-label').text(texts.phonenumber);
           
         secondSignature.find('#email-label').text(texts.email);
+        secondSignature.find('#emailconfirm-label').text(texts.confirmEmail);
           
         if( !reqSign.mandatory ) {
-          var singleSignatureCheckbox = clone('checkbox', 'singleSignatureCheckbox' );
+          var singleSignatureCheckbox = secondSignature.find('#singlesignaturecheckbox');
           var isChecked = FormModule.secondSignatureSingleSignature();
           singleSignatureCheckbox.append( reqSign.question );            
           singleSignatureCheckbox.find('input').prop('checked', isChecked );
-          secondSignature.append(singleSignatureCheckbox);
           
           isChecked ? signatureFields.hide() : '';
           
@@ -506,26 +510,36 @@ var View = (function() {
             } else {
               signatureFields.show( 'slow' );
             }
-            toogleSubmitButton(true);
+            toggleSubmitButton(true);
+            toggleSignButton();
           });
         }
-        updateSecondSignatureName(secondSignature.find('#name'));
-        updateSecondSignaturePhoneNumber(secondSignature.find('#phonenumber'));
-        updateSecondSignatureSocialSecurityNumber(secondSignature.find('#socialsecuritynumber'));
-        updateSecondSignatureEmail(secondSignature.find('#email'));
+        
+        updateSecondSignatureName( secondSignature.find('#name') );
+        setMandatory( secondSignature.find('#name-label'), secondSignature.find('#name') );
+        updateSecondSignaturePhoneNumber( secondSignature.find('#phonenumber') );
+        setMandatory( secondSignature.find('#phonenumber-label'), secondSignature.find('#phonenumber') );
+        updateSecondSignatureSocialSecurityNumber( secondSignature.find('#socialsecuritynumber') );
+        setMandatory( secondSignature.find('#socialsecuritynumber-label'), secondSignature.find('#socialsecuritynumber') );
+        setHint(secondSignature.find('#socialsecuritynumber-label'), secondSignature.find('#socialsecuritynumber'), texts.socialSecurityNumberHint);
+        updateSecondSignatureEmail( secondSignature.find('#email') );
+        setMandatory( secondSignature.find('#email-label'), secondSignature.find('#email') );
+        updateSecondSignatureEmailConfirm( secondSignature.find('#emailconfirm') );
+        setMandatory( secondSignature.find('#emailconfirm-label'), secondSignature.find('#emailconfirm') );
         
         node.append( secondSignature );          
       }
     }
     
     function updateSecondSignatureName( nameField ) {
-      nameField.val( FormModule.secondSignatureName() );       
+      nameField.val( FormModule.secondSignatureName() );
       nameField.blur( function() {
           var stringDTO = {};
           stringDTO.string = nameField.val();
           RequestModule.setSecondSignatureName( stringDTO );
           FormModule.setSecondSignatureName( stringDTO.string );
-          toogleSubmitButton(true);
+          toggleSubmitButton(true);
+          toggleSignButton();
       });
     }
     
@@ -536,7 +550,8 @@ var View = (function() {
           stringDTO.string = phoneNumberField.val();
           RequestModule.setSecondSignaturePhoneNumber( stringDTO );
           FormModule.setSecondSignaturePhoneNumber( stringDTO.string );
-          toogleSubmitButton(true);
+          toggleSubmitButton(true);
+          toggleSignButton();
       });
     }
     
@@ -547,7 +562,8 @@ var View = (function() {
           stringDTO.string = socialSecurityField.val();
           RequestModule.setSecondSignatureSocialSecurityNumber( stringDTO );
           FormModule.setSecondSignatureSocialSecurityNumber( stringDTO.string );
-          toogleSubmitButton(true);
+          toggleSubmitButton(true);
+          toggleSignButton();
       });
     }
     
@@ -558,25 +574,53 @@ var View = (function() {
           stringDTO.string = emailField.val();
           RequestModule.setSecondSignatureEmail( stringDTO );
           FormModule.setSecondSignatureEmail( stringDTO.string );
-          toogleSubmitButton(true);
+          toggleSubmitButton(true);
+          toggleSignButton();
       });
+    }
+    
+    function updateSecondSignatureEmailConfirm( emailConfirmField ) {
+      emailConfirmField.val( FormModule.secondSignatureEmailConfirm() );
+      emailConfirmField.blur( function() {
+        FormModule.setSecondSignatureEmailConfirm( emailConfirmField.val());
+        toggleSubmitButton(true);
+        toggleSignButton();
+      });     
+    }
+    
+    function setMandatory( node, field ) {
+      clone('mandatory', 'mandatory_' + field.attr('id')).appendTo( node );
+    }
+    
+    function setHint( node, field, hintText ) {
+      clone('hint', 'hint_' + field.attr('id')).text( ' (' + hintText + ')' ).appendTo( node );
+    }
+    
+    function toggleSignButton() {
+      var selectedEid = FormModule.selectedEid();
+      var value = selectedEid.value;
+      if(typeof selectedEid !== 'undefined' && value !== texts.provider) {
+        var button = $('#link_'+selectedEid.name);
+        (selectedEid.selectedIndex == 0 || !FormModule.isSecondSignatureReady() ) ? enable( button, false ) : enable( button, true );
+      }
     }
 
     function eidProviders( signatureId ){
     	var comboBox = clone('eidProviders').attr({name: signatureId, id: "eIdProvider_" + signatureId});
     	comboBox.change(function() {
+    	      FormModule.setSelectedEid( this );
             var button = $('#link_'+this.name);
             if ( this.selectedIndex == 0 || !FormModule.isSecondSignatureReady() ) {
-    		    enable( button, false );
-    		    return;
+    		        enable( button, false );
             }
 
             var value = this.value;
             button.attr('href', function() {
                 return this.href.split('?provider=')[0] + "?provider="+value;
             });
-            enable( button, true );
-
+            if ( this.selectedIndex !== 0 && FormModule.isSecondSignatureReady() ) {
+                enable( button, true );
+            }
             var signDTO = {
                 transactionId: FormModule.getFormId(),
                 tbs: FormModule.getFormTBS(),
