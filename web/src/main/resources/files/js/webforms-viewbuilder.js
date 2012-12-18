@@ -564,6 +564,8 @@ var View = (function() {
             toggleSubmitButton(true);
             toggleSignButton();
           });
+        } else {
+            secondSignature.find('#singlesignaturecheckbox-label').hide();
         }
         
         updateSecondSignatureName( secondSignature.find('#name') );
