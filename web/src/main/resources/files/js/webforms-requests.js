@@ -175,25 +175,25 @@ var RequestModule = (function() {
     inner.setSecondSignatureName = function( stringDTO ) {
       var parameters = request( 'POST', UrlModule.setSecondSignatureName() );
       parameters.data = stringDTO;
-      $.ajax( parameters );
+      invoke( $.ajax, parameters, texts.secondSignatureError );
     }
     
     inner.setSecondSignaturePhoneNumber = function( stringDTO ) {
       var parameters = request( 'POST', UrlModule.setSecondSignaturePhoneNumber() );
       parameters.data = stringDTO;
-      $.ajax( parameters );
+      invoke( $.ajax, parameters, texts.secondSignatureError );
     }
     
     inner.setSecondSignatureSocialSecurityNumber = function( stringDTO ) {
       var parameters = request( 'POST', UrlModule.setSecondSignatureSocialSecurityNumber() ); 
       parameters.data = stringDTO;
-      $.ajax( parameters );
+      invoke( $.ajax, parameters, texts.secondSignatureError );
     }
     
     inner.setSecondSignatureEmail = function( stringDTO ) {
       var parameters = request( 'POST', UrlModule.setSecondSignatureEmail() );
       parameters.data = stringDTO;
-      $.ajax( parameters );
+      invoke( $.ajax, parameters, texts.secondSignatureError );
     }
     
     inner.setSecondSignatureSingleSignature = function( enabled ) {

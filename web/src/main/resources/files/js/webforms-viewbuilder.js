@@ -561,7 +561,6 @@ var View = (function() {
             } else {
               signatureFields.show( 'slow' );
             }
-            toggleSubmitButton(true);
             toggleSignButton();
           });
         } else {
@@ -592,9 +591,13 @@ var View = (function() {
       nameField.blur( function() {
           var stringDTO = {};
           stringDTO.string = nameField.val();
-          RequestModule.setSecondSignatureName( stringDTO );
-          FormModule.setSecondSignatureName( stringDTO.string );
-          toggleSubmitButton(true);
+          try{
+              RequestModule.setSecondSignatureName( stringDTO );
+              nameField.removeClass('validation-error');
+              FormModule.setSecondSignatureName( stringDTO.string );
+          } catch( errorMessage ) {
+              nameField.addClass('validation-error');
+          }
           toggleSignButton();
       });
     }
@@ -604,9 +607,13 @@ var View = (function() {
       phoneNumberField.blur( function() {
           var stringDTO = {};
           stringDTO.string = phoneNumberField.val();
-          RequestModule.setSecondSignaturePhoneNumber( stringDTO );
-          FormModule.setSecondSignaturePhoneNumber( stringDTO.string );
-          toggleSubmitButton(true);
+          try{
+              RequestModule.setSecondSignaturePhoneNumber( stringDTO );
+              phoneNumberField.removeClass('validation-error');
+              FormModule.setSecondSignaturePhoneNumber( stringDTO.string );
+          } catch( errorMessage ) {
+              phoneNumberField.addClass('validation-error');
+          }
           toggleSignButton();
       });
     }
@@ -616,9 +623,13 @@ var View = (function() {
       socialSecurityField.blur( function() {
           var stringDTO = {};
           stringDTO.string = socialSecurityField.val();
-          RequestModule.setSecondSignatureSocialSecurityNumber( stringDTO );
-          FormModule.setSecondSignatureSocialSecurityNumber( stringDTO.string );
-          toggleSubmitButton(true);
+          try{
+              RequestModule.setSecondSignatureSocialSecurityNumber( stringDTO );
+              socialSecurityField.removeClass('validation-error');
+              FormModule.setSecondSignatureSocialSecurityNumber( stringDTO.string );
+          } catch( errorMessage ) {
+              socialSecurityField.addClass('validation-error');
+          }
           toggleSignButton();
       });
     }
@@ -628,9 +639,13 @@ var View = (function() {
       emailField.blur( function() {
           var stringDTO = {};
           stringDTO.string = emailField.val();
-          RequestModule.setSecondSignatureEmail( stringDTO );
-          FormModule.setSecondSignatureEmail( stringDTO.string );
-          toggleSubmitButton(true);
+          try{
+              RequestModule.setSecondSignatureEmail( stringDTO );
+              emailField.removeClass('validation-error');
+              FormModule.setSecondSignatureEmail( stringDTO.string );
+          } catch( errorMessage ) {
+              emailField.addClass('validation-error');
+          }
           toggleSignButton();
       });
     }
@@ -639,7 +654,6 @@ var View = (function() {
       emailConfirmField.val( FormModule.secondSignatureEmailConfirm() );
       emailConfirmField.blur( function() {
         FormModule.setSecondSignatureEmailConfirm( emailConfirmField.val());
-        toggleSubmitButton(true);
         toggleSignButton();
       });     
     }
