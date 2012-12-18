@@ -179,11 +179,24 @@ var View = (function() {
             clone('help-block').append(field.field.field.note).insertAfter(node);
         }
     }
+    
+    function enableSecondSignatureFields( enable ) {
+        var secondSignature = document.getElementById( "second_signature" );
+        var inputArray = secondSignature.getElementsByTagName( "input" );
+        for (var i = 0; i < inputArray.length; i++) {
+            if (enable) {
+                inputArray[i].disabled ? inputArray[i].removeAttr("disabled") : '';
+            } else {
+                inputArray[i].disabled = "disabled";
+            }
+        }
+    }
 
     inner.sign = function( args ) {
         var retVal = doSign();
         if ( retVal != 0 ) {
-			var errorKey = "eid-" + retVal; 
+            var errorKey = "eid-" + retVal;
+            FormModule.setSelectedEid( null );
             throw { warning: texts.eiderrormessage + ": " + texts[errorKey], redirect:getSummary() };
         } else {
             // strip parameters
@@ -226,6 +239,8 @@ var View = (function() {
               FormModule.setSecondSignatureEmail( secondSignatureEmail );
               FormModule.setSecondSignatureEmailConfirm( secondSignatureEmailConfirm );
               FormModule.setSecondSignatureSingleSignature( secondSignatureSingleSignature );
+              
+              enableSecondSignatureFields( false );
             }
             // signing success redirect to summary
             throw {info:texts.formSigned, redirect:getSummary()};
@@ -437,8 +452,8 @@ var View = (function() {
     
     function toggleSubmitButton( enabled ) {
       if (enabled && FormModule.canSubmit()) {
-        enable($('#inserted_button_submit'), true);
-          $('#inserted_button_submit').addClass("btn-primary");         
+          enable($('#inserted_button_submit'), true);
+          $('#inserted_button_submit').addClass("btn-primary"); 
       } else {
         enable($('#inserted_button_submit'), false);
           $('#inserted_button_submit').removeClass("btn-primary");    
@@ -494,15 +509,15 @@ var View = (function() {
         secondSignature.find('#emailconfirm-label').text(texts.confirmEmail);
           
         if( !reqSign.mandatory ) {
-          var singleSignatureCheckbox = secondSignature.find('#singlesignaturecheckbox');
+          var singleSignatureCheckboxLabel = secondSignature.find('#singlesignaturecheckbox-label');
           var isChecked = FormModule.secondSignatureSingleSignature();
-          singleSignatureCheckbox.append( reqSign.question );            
-          singleSignatureCheckbox.find('input').prop('checked', isChecked );
+          singleSignatureCheckboxLabel.append( reqSign.question );            
+          secondSignature.find('#singlesignaturecheckbox').prop('checked', isChecked );
           
           isChecked ? signatureFields.hide() : '';
           
-          singleSignatureCheckbox.find('input').click( function() {
-            var checked = singleSignatureCheckbox.find('input').prop('checked');
+          secondSignature.find('#singlesignaturecheckbox').click( function() {
+            var checked = secondSignature.find('#singlesignaturecheckbox').prop('checked');
             RequestModule.setSecondSignatureSingleSignature( checked );
             FormModule.setSecondSignatureSingleSignature( checked );
             if ( checked ) {
@@ -526,6 +541,9 @@ var View = (function() {
         setMandatory( secondSignature.find('#email-label'), secondSignature.find('#email') );
         updateSecondSignatureEmailConfirm( secondSignature.find('#emailconfirm') );
         setMandatory( secondSignature.find('#emailconfirm-label'), secondSignature.find('#emailconfirm') );
+        
+        var signature = getSignature( FormModule.getRequiredSignatures()[0].name, FormModule.getSignatures() );
+        signature ? enableSecondSignatureFields( false ) :  enableSecondSignatureFields( true );
         
         node.append( secondSignature );          
       }
@@ -598,8 +616,7 @@ var View = (function() {
     
     function toggleSignButton() {
       var selectedEid = FormModule.selectedEid();
-      var value = selectedEid.value;
-      if(typeof selectedEid !== 'undefined' && value !== texts.provider) {
+      if(typeof selectedEid !== 'undefined' && selectedEid && selectedEid.value !== texts.provider) {
         var button = $('#link_'+selectedEid.name);
         (selectedEid.selectedIndex == 0 || !FormModule.isSecondSignatureReady() ) ? enable( button, false ) : enable( button, true );
       }
