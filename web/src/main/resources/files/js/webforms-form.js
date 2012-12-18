@@ -23,7 +23,7 @@ var FormModule = (function() {
 	var initDone = false;
 	var requiredSignatures;
 	var selectedRequiredSignature;
-	var previousFormSummary;
+	var incomingSummary;
 	
 	function Form( formDraft ) {
 		this.title = formDraft.description;
@@ -117,9 +117,7 @@ var FormModule = (function() {
     }
 
 	inner.setupPreviousFormSummaryPage = function ( previousFormSummaryIN ) {
-		previousFormSummary = previousFormSummaryIN;
-		
-		
+		incomingSummary = previousFormSummaryIN;
 	}
 	
 	inner.getField = function( id ) {
@@ -139,8 +137,8 @@ var FormModule = (function() {
 		});
 	}
 
-	inner.foldPrevious = function( pageFolder ) {
-		$.each( previousFormSummary.pages, function(idx, page) {
+	inner.foldIncoming = function( pageFolder ) {
+		$.each( incomingSummary.pages, function(idx, page) {
 			var fieldFolder = pageFolder( page );
 			$.each( page.fields, function( idy, field) {
 				fieldFolder( field );
@@ -268,7 +266,7 @@ var FormModule = (function() {
 	}
 	
 	inner.isSecondSigningFlow = function () {
-		return previousFormSummary === undefined ? false : true;
+		return incomingSummary === undefined ? false : true;
 	}
 	
 	inner.title = function() {

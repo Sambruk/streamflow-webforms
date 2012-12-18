@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var View = (function() {
+var TaskView = (function() {
     var inner = {};
     var messages = {};
     var fieldGroups = {};
@@ -25,25 +25,10 @@ var View = (function() {
         node.append( message );
         var breadcrumbNode = $('#inserted_content').find('ul.breadcrumb');
         node.insertAfter(breadcrumbNode);        
-    }
-
-    inner.discard = function( args ) {
-        RequestModule.discard();
-        FormModule.destroy();
-
-        var container = $('#container').empty();
-        var node = clone( 'thank_you_div' );
-        var alert = clone('alert');
-        alert.addClass("alert-info")
-        alert.append( texts.formdiscarded );
-        node.prepend(alert);
-        
-        new inner.Button( node ).name(texts.restart).href("#");
-        container.append(node);
-    }
+    }  
 
     inner.submit = function() {
-        RequestModule.submitAndSend();
+        TaskRequestModule.submitAndSend();
         var caseName = RequestModule.getCaseName();
         var printUrl = UrlModule.getPrintUrl( FormModule.getFormId() );
         FormModule.destroy();
@@ -60,37 +45,23 @@ var View = (function() {
         container.append(node);
     }
 
-    inner.formPage = function( args ) {
-        var page = parseInt( args.segment );
-        createPageContent(page, function(node) { 
-        	var form = clone('form');
-        	FormModule.foldEditPage( page, function(field) { 
-        		foldEditField(form.find('fieldset'), field); 
-        	});
-        	$.each( fieldGroups, function( key, value ) {
-                var group = form.find( '#' + key );
-        	    $.each( value.embedded, function( i, val) {
-                    // find element and move into group
-                    group.append( form.find('#Field'+val ) );
-        	    });
-        	});
-        	node.append(form);
-        });
-    }
-
     inner.summary = function( args ) {
     	createPageContent( getSummary(), function( node ) {
-    		FormModule.fold( function( page ) { return foldPage( node, page ) } );
+    		FormModule.foldIncoming( function( page ) { return foldIncomingPage(node, page) } );
+    		FormModule.fold( function( page ) { return View.foldPage( node, page ) } );
             addMailNotification( node );
-            addSecondSignatureDiv( node );
             addSignaturesDiv( node );
     	});
     }
-
-    inner.foldPage = function( node, page) {
-    	return foldPage( node, page );
-    }
     
+    inner.incoming = function ( args ) {
+    	createPageContent( getIncoming(), function ( node) {
+    		// compose previous form summary view here.
+    		FormModule.foldIncoming( function( page ) { return foldIncomingPage(node, page) } );
+    	});
+    	messages.info = texts.doublesignaturepreviousmessage;
+    }
+
     function createPageContent(page, contentFunction){
     	 var errors = $('#inserted_alert');
     	 var container = $('#container').empty();
@@ -107,80 +78,19 @@ var View = (function() {
          addFooter( container);
     }
     
-    function foldEditField( node, field ) {
-
-        var fieldNode = clone( 'formfield', 'Field' + field.id ).appendTo( node );
-        var controlsNode = fieldNode.find('div.controls');
-        FieldTypeModule.createFieldUI( field, controlsNode );
-
-        if ( field.fieldType == "FieldGroupFieldValue" ) {
-            // setup a collector that collect the next field id's
-            var fieldGroup = {};
-            fieldGroup.count = field.fieldValue.fieldCount;
-            fieldGroup.embedded = [];
-            fieldGroups[ field.id ] = fieldGroup;
-            var fieldHeader = fieldNode.find('label.control-label');
-            fieldHeader.append( field.name );
-        } else {
-            $.each( fieldGroups, function( key, value) {
-                if ( value.count > 0 ) {
-                    value.embedded.push( field.id );
-                    value.count--;
-                }
-            });
-            if ( field.fieldType == "CommentFieldValue" ) {
-                fieldNode.find('label').remove();
-            } else {
-                var fieldHeader = fieldNode.find('label.control-label');
-                fieldHeader.append( field.name );
-                mandatory( fieldHeader, field );
-                hint( fieldHeader, field );
-                help( fieldHeader, field);
-            }
-        }
-        field.refreshUI();
-    };
-
-    function mandatory( node, field ) {
-        if ( field.field.field.mandatory ) {
-            clone('mandatory', 'mandatory' + field.id).appendTo( node );
-        }
-    }
-
-
-    function hint( node, field ) {
-        if ( field.fieldValue.hint ) {
-        	clone('hint', 'hint' + field.id).text( ' (' + field.fieldValue.hint + ')' ).appendTo( node );
-        }
-    }
-    
-    function foldPage( node, page ) {
-    	var pageDiv = clone('form_page_summary').appendTo( node );
-    	pageDiv.find('h3').append( clone('link').attr('href',getPage(page.index)).text(page.title) );
+    function foldIncomingPage( node, page ) {
+    	var pageDiv = clone('previous_form_summary').appendTo( node );
+    	pageDiv.find('h3').append( page.name );
     	return function( field ) {
-    		foldField( pageDiv.find('#fields_table'), field );
-    	}
+    		foldPreviousSummaryField( pageDiv.find('#fields_table'), field );
+    	};
     }
     
-    function foldField( node, field ) {
-        if ( field.fieldType == "CommentFieldValue" ) return;
-        var row = clone( 'field_summary', field.id ).appendTo( node );
-        var tr = $('<td class="field_label"/>').append( field.name );
+    function foldPreviousSummaryField( node, field ) {
+        var row = clone( 'field_summary', field.field ).appendTo( node );
+        var tr = $('<td class="field_label"/>').append( field.field );
         row.append( tr );
-        $('<td class="field_value"/>').append( field.formattedValue ).appendTo( row );
-        if (field.field.field.mandatory && !field.formattedValue) {
-    		row.addClass('validation-missing');
-    		row.append($('<td class="field_message pull-right"/>').append(clone('label_missing', 'missing')));
-        } else if (field.invalidformat) {
-    		row.addClass('validation-error');
-    		row.append($('<td class="field_message pull-right"/>').append(clone('label_error', 'error')));
-        }
-    }
-
-    function help( node, field ) {
-        if ( field.field.field.note != "" && field.fieldType != "CommentFieldValue") {
-            clone('help-block').append(field.field.field.note).insertAfter(node);
-        }
+        $('<td class="field_value"/>').append( field.value ).appendTo( row );
     }
 
     inner.sign = function( args ) {
@@ -198,38 +108,16 @@ var View = (function() {
             });
             verifyDTO.name = FormModule.getRequiredSignature();
             verifyDTO.form = FormModule.getFormTBS();
-            RequestModule.verify( verifyDTO );
+            TaskRequestModule.verify( verifyDTO );
             
             // Store the email etc before reloading the formdraft
             var confirmationEmail = FormModule.confirmationEmail();
             var confirmationEmailConfirm = FormModule.confirmationEmailConfirm();
-            
-            if(FormModule.formNeedsSecondSignature()) {
-              var secondSignatureName = FormModule.secondSignatureName();
-              var secondSignaturePhoneNumber = FormModule.secondSignaturePhoneNumber();
-              var secondSignatureSocialSecurityNumber = FormModule.secondSignatureSocialSecurityNumber();
-              var secondSignatureEmail = FormModule.secondSignatureEmail();
-              var secondSignatureEmailConfirm = FormModule.secondSignatureEmailConfirm();
-              var secondSignatureSingleSignature = FormModule.secondSignatureSingleSignature();
-              if (!FormModule.secondSignatureSingleSignature()) {
-                RequestModule.setSecondSignatureSingleSignature( false );
-                FormModule.setSecondSignatureSingleSignature( false );
-                secondSignatureSingleSignature = FormModule.secondSignatureSingleSignature();
-              }
-            }
-
-            FormModule.init( RequestModule.getFormDraft() );
+           
+            FormModule.init( TaskRequestModule.getFormDraft() );
             FormModule.setConfirmationEmail( confirmationEmail );
             FormModule.setConfirmationEmailConfirm( confirmationEmailConfirm );
-            
-            if(FormModule.formNeedsSecondSignature()) {
-              FormModule.setSecondSignatureName( secondSignatureName );
-              FormModule.setSecondSignaturePhoneNumber( secondSignaturePhoneNumber );
-              FormModule.setSecondSignatureSocialSecurityNumber( secondSignatureSocialSecurityNumber );
-              FormModule.setSecondSignatureEmail( secondSignatureEmail );
-              FormModule.setSecondSignatureEmailConfirm( secondSignatureEmailConfirm );
-              FormModule.setSecondSignatureSingleSignature( secondSignatureSingleSignature );
-            }
+           
             // signing success redirect to summary
             throw {info:texts.formSigned, redirect:getSummary()};
         }
@@ -258,23 +146,6 @@ var View = (function() {
         }
     }
 
-    inner.updateField = function(fieldId, fieldValue) {
-        var fieldDTO = {
-            field: fieldId,
-            value: fieldValue
-        };
-        var image = $('#Field'+fieldId+' .fieldwaiting > img').show();
-        try{
-            return RequestModule.updateField( fieldDTO );
-        } catch( e ) {
-            message = { error: e.info };
-            showMessages();
-            return "";
-        }finally{
-            image.hide();
-        }
-    }
-
     function addHeader( node ) {
         var header = clone('form_header');
         header.find('#form_description').text( FormModule.title() );
@@ -283,16 +154,8 @@ var View = (function() {
 
     function addButtons( node, page) {
     	var buttons = clone('buttons');
-	    var previousBtn = new inner.Button( buttons ).name(texts.previous).href( getPrevious( page ) )
-	    var nextBtn = new inner.Button( buttons ).name(texts.next).href(getNext( page ) ).enable( page!=getSummary() );
-	   
-	    if ( !FormModule.isSecondSigningFlow() ) {
-	    	previousBtn.enable( page!=0 );
-		    var dialogElement = createDiscardDialog(node);
-		    new inner.Button( buttons ).name(texts.discard).confirm('#' + dialogElement.attr('id')).addClass("btn-danger");
-	    } else {
-	    	previousBtn.enable( page!=getIncoming());
-	    }
+	    new inner.Button( buttons ).name(texts.previous).href( getPrevious( page ) ).enable( page!=getIncoming());
+	    new inner.Button( buttons ).name(texts.next).href(getNext( page ) ).enable( page!=getSummary() );
 	    
 	    if( page == getSummary()) {
 	    	var button = new inner.Button( buttons ).name(texts.submit).href(getSubmit());
@@ -307,20 +170,6 @@ var View = (function() {
         return buttons;
     }
 
-    function createDiscardDialog( node ) {
-    	var dialog = clone('modal', 'confirmAbortModal');
-	    dialog.find('.modal-header').prepend(texts.discard);
-	    dialog.find('.modal-body').append(texts.confirmDiscard);
-	    dialog.find('.modal-footer').append();
-	    var button = new inner.Button(dialog.find('.modal-footer')).name(texts.no).attr({'data-dismiss':'modal'});
-	    var button = new inner.Button(dialog.find('.modal-footer')).name(texts.yes).attr({'data-dismiss':'modal'}).href(getDiscard()).click(function() {
-	    	inner.discard();
-	    	dialog.modal('hide');
-	    });
-	    node.append(dialog);
-	    return dialog;	
-    }
-    
     function addFooter( node ) {
         var footer = clone('footer');
         node.append( footer );
@@ -329,9 +178,13 @@ var View = (function() {
     function getPrevious( segment ) {
         var current = parseInt( segment );
         if ( isNaN( current ) ) {
-            return getPage( FormModule.pageCount()-1 );
+        	if (segment == getIncoming()) {
+        		return getIncoming();
+        	} else {
+        		return getPage( FormModule.pageCount()-1 );
+        	}
         } else if (current == 0){
-        	return getIncoming();
+        	return getPreviousFormSummary();
         } else {
             return getPage( current-1);
         }
@@ -350,27 +203,19 @@ var View = (function() {
     }
 
     function getPage( page ) {
-        return '#' + Contexts.findUrl( inner.formPage, [page]);
+        return '#' + page;
     }
 
     function getIncoming() {
-        return '#incoming';
+        return '#' + Contexts.findUrl( inner.incoming );
     }
 
     function getSummary() {
-        return '#summary';
-    }
-
-    function getSecondSignSummary() {
-        return '#' + Contexts.findUrl( inner.secondSignSummary );
+        return '#' + Contexts.findUrl( inner.summary );
     }
 
     function getSubmit( ) {
         return '#' + Contexts.findUrl( inner.submit );
-    }
-
-    function getDiscard() {
-        return '#' + Contexts.findUrl( inner.discard );
     }
 
     function getSign( idx ) {
@@ -400,7 +245,7 @@ var View = (function() {
                 // update server
                 var stringDTO = {};
                 stringDTO.string = emailField.val();
-                RequestModule.setConfirmationEmail( stringDTO );
+                TaskRequestModule.setConfirmationEmail( stringDTO );
                 FormModule.setConfirmationEmail( stringDTO.string );
             });
             // Fill with value that is temporary stored in the application while running. 
@@ -437,7 +282,7 @@ var View = (function() {
             
             checkbox.find('input').click( function() {
                 var checked = checkbox.find('input').prop('checked');
-                RequestModule.setMailNotificationEnablement( checked );
+                TaskRequestModule.setMailNotificationEnablement( checked );
                 FormModule.setMailNotificationEnabled( checked );
 
                 if ( checked ) {
@@ -498,124 +343,6 @@ var View = (function() {
        }
     }
     
-    function addSecondSignatureDiv( node ) {
-      if ( FormModule.formNeedsSecondSignature() ) {
-        var reqSign = FormModule.getRequiredSignatures()[1];
-        var secondSignature = clone('second_signature');
-        var signatureFields = secondSignature.find('#secondsignature_fields');
-        
-        secondSignature.find('#secondsignature-label').text(reqSign.name);
-        secondSignature.find('#secondsignaturetext').text(texts.secondSignatureComment);
-
-        secondSignature.find('#name-label').text( texts.name );
-        secondSignature.find('#socialsecuritynumber-label').text(texts.socialSecurityNumber);
-        secondSignature.find('#phonenumber-label').text(texts.phonenumber);
-          
-        secondSignature.find('#email-label').text(texts.email);
-        secondSignature.find('#emailconfirm-label').text(texts.confirmEmail);
-          
-        if( !reqSign.mandatory ) {
-          var singleSignatureCheckbox = secondSignature.find('#singlesignaturecheckbox');
-          var isChecked = FormModule.secondSignatureSingleSignature();
-          singleSignatureCheckbox.append( reqSign.question );            
-          singleSignatureCheckbox.find('input').prop('checked', isChecked );
-          
-          isChecked ? signatureFields.hide() : '';
-          
-          singleSignatureCheckbox.find('input').click( function() {
-            var checked = singleSignatureCheckbox.find('input').prop('checked');
-            RequestModule.setSecondSignatureSingleSignature( checked );
-            FormModule.setSecondSignatureSingleSignature( checked );
-            if ( checked ) {
-              signatureFields.hide( 'slow' );
-            } else {
-              signatureFields.show( 'slow' );
-            }
-            toggleSubmitButton(true);
-            toggleSignButton();
-          });
-        }
-        
-        updateSecondSignatureName( secondSignature.find('#name') );
-        setMandatory( secondSignature.find('#name-label'), secondSignature.find('#name') );
-        updateSecondSignaturePhoneNumber( secondSignature.find('#phonenumber') );
-        setMandatory( secondSignature.find('#phonenumber-label'), secondSignature.find('#phonenumber') );
-        updateSecondSignatureSocialSecurityNumber( secondSignature.find('#socialsecuritynumber') );
-        setMandatory( secondSignature.find('#socialsecuritynumber-label'), secondSignature.find('#socialsecuritynumber') );
-        setHint(secondSignature.find('#socialsecuritynumber-label'), secondSignature.find('#socialsecuritynumber'), texts.socialSecurityNumberHint);
-        updateSecondSignatureEmail( secondSignature.find('#email') );
-        setMandatory( secondSignature.find('#email-label'), secondSignature.find('#email') );
-        updateSecondSignatureEmailConfirm( secondSignature.find('#emailconfirm') );
-        setMandatory( secondSignature.find('#emailconfirm-label'), secondSignature.find('#emailconfirm') );
-        
-        node.append( secondSignature );          
-      }
-    }
-    
-    function updateSecondSignatureName( nameField ) {
-      nameField.val( FormModule.secondSignatureName() );
-      nameField.blur( function() {
-          var stringDTO = {};
-          stringDTO.string = nameField.val();
-          RequestModule.setSecondSignatureName( stringDTO );
-          FormModule.setSecondSignatureName( stringDTO.string );
-          toggleSubmitButton(true);
-          toggleSignButton();
-      });
-    }
-    
-    function updateSecondSignaturePhoneNumber( phoneNumberField ) {
-      phoneNumberField.val( FormModule.secondSignaturePhoneNumber() );       
-      phoneNumberField.blur( function() {
-          var stringDTO = {};
-          stringDTO.string = phoneNumberField.val();
-          RequestModule.setSecondSignaturePhoneNumber( stringDTO );
-          FormModule.setSecondSignaturePhoneNumber( stringDTO.string );
-          toggleSubmitButton(true);
-          toggleSignButton();
-      });
-    }
-    
-    function updateSecondSignatureSocialSecurityNumber( socialSecurityField ) {
-      socialSecurityField.val( FormModule.secondSignatureSocialSecurityNumber() );       
-      socialSecurityField.blur( function() {
-          var stringDTO = {};
-          stringDTO.string = socialSecurityField.val();
-          RequestModule.setSecondSignatureSocialSecurityNumber( stringDTO );
-          FormModule.setSecondSignatureSocialSecurityNumber( stringDTO.string );
-          toggleSubmitButton(true);
-          toggleSignButton();
-      });
-    }
-    
-    function updateSecondSignatureEmail( emailField ) {
-      emailField.val( FormModule.secondSignatureEmail() );       
-      emailField.blur( function() {
-          var stringDTO = {};
-          stringDTO.string = emailField.val();
-          RequestModule.setSecondSignatureEmail( stringDTO );
-          FormModule.setSecondSignatureEmail( stringDTO.string );
-          toggleSubmitButton(true);
-          toggleSignButton();
-      });
-    }
-    
-    function updateSecondSignatureEmailConfirm( emailConfirmField ) {
-      emailConfirmField.val( FormModule.secondSignatureEmailConfirm() );
-      emailConfirmField.blur( function() {
-        FormModule.setSecondSignatureEmailConfirm( emailConfirmField.val());
-        toggleSubmitButton(true);
-        toggleSignButton();
-      });     
-    }
-    
-    function setMandatory( node, field ) {
-      clone('mandatory', 'mandatory_' + field.attr('id')).appendTo( node );
-    }
-    
-    function setHint( node, field, hintText ) {
-      clone('hint', 'hint_' + field.attr('id')).text( ' (' + hintText + ')' ).appendTo( node );
-    }
     
     function toggleSignButton() {
       var selectedEid = FormModule.selectedEid();
@@ -650,7 +377,7 @@ var View = (function() {
                 errorUrl: "error"
             };
 
-            var htmlSnippet = RequestModule.sign( signDTO );
+            var htmlSnippet = TaskRequestModule.sign( signDTO );
             $('#eIdPlugin').html( htmlSnippet ).hide();
     	});
         comboBox.append( $('<option>/').append(texts.provider	) );
@@ -696,10 +423,8 @@ var View = (function() {
 
     function addProgressbar( current, pages, contentNode ) {
     	var progress = clone('progress');
-    	if ( FormModule.isSecondSigningFlow() ) {
-    		progress.append( createProgressItem(current==getIncoming(), getIncoming(), texts.incomingform ));
-    	}
-    	$.each( pages, function(idx, page){
+    	progress.append( createProgressItem(current==getIncoming(), getIncoming(), texts.incomingform ));
+        $.each( pages, function(idx, page){
             progress.append( createProgressItem(idx==current, getPage(idx), page.title) );
         });
         
