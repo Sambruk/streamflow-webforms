@@ -38,6 +38,8 @@ var FormModule = (function() {
 		this.secondSignatureSocialSecurityNumber = formDraft.socialSecurityNumber;
 		this.secondSignatureSingleSignature = formDraft.secondSignatureSingleSignature;
 		this.secondSignatureEmail = formDraft.secondSignatureEmail;
+		this.secondSignatureEmailConfirm = formDraft.secondSignatureEmailConfirm;
+		this.selectedEid = formDraft.selectedEid;
 		var pages = this.pages;
 		$.each( formDraft.pages, function(idx, page) {
 			pages[ idx ] = new Page( page, idx );
@@ -102,6 +104,10 @@ var FormModule = (function() {
 
     function formatSelectionValues( value ) {
         return value.replace(/(\[|\])/g, "'" );
+    }
+    
+    function hasFieldAValue( field ) {
+      return !((typeof field === 'undefined') || (field.length < 1) );
     }
 
     Field.prototype.setValue = function( value ) {
@@ -191,8 +197,28 @@ var FormModule = (function() {
 	}
 	
 	inner.isFormSigned = function() {
-		return inner.requiredSingedSignaturesCount() == formDraft.signatures.length;
+	  if(inner.isSecondSignatureReady()) {
+	    return inner.requiredSignedSignaturesCount() == formDraft.signatures.length;
+	  }
+	  else { 
+	    return false;
+	  }
 	}
+	 
+	inner.isSecondSignatureReady = function() {
+	  if( inner.formNeedsSecondSignature() ) {
+	    var singleSignature = inner.secondSignatureSingleSignature();
+	    if( typeof singleSignature === 'undefined' || !singleSignature ) {
+	      return (hasFieldAValue( formDraft.secondSignatureName ) 
+	          && hasFieldAValue( formDraft.secondSignatureEmail )
+	          && hasFieldAValue( formDraft.secondSignatureEmailConfirm )
+	          && hasFieldAValue( formDraft.secondSignaturePhoneNumber )
+	          && hasFieldAValue( formDraft.secondSignatureSocialSecurityNumber ) );
+	      }
+	  }
+	  return true;
+	}
+	
 
 	inner.formNeedsSigning = function() {
 	  var needsSigning = false;
@@ -233,7 +259,7 @@ var FormModule = (function() {
 	  return reqSignNbrs;
 	}
 	
-	inner.requiredSingedSignaturesCount = function() {
+	inner.requiredSignedSignaturesCount = function() {
 	  var reqSignNbrs = 0;
 	  if ( inner.formNeedsSigning() ) {
 	    reqSignNbrs++;
@@ -274,18 +300,18 @@ var FormModule = (function() {
         return tbs;
 	}
 
-    inner.hasErrors = function() {
-        var error = false;
-        fieldIterator( function(field) { 
-        	if ( field.field.field.mandatory && !field.value) {
-            	error = true;
-        	} 
-        	if (field.invalidformat != '' ) {
-        		error = true;
-        	}
-        });
-        return error;
-    }
+  inner.hasErrors = function() {
+    var error = false;
+    fieldIterator( function(field) { 
+      if ( field.field.field.mandatory && !field.value) {
+        error = true;
+      } 
+      if (field.invalidformat != '' ) {
+        error = true;
+      }
+    });
+    return error;
+  }
 
 	
 	inner.pages = function() {
@@ -383,6 +409,22 @@ var FormModule = (function() {
   
   inner.secondSignatureEmail = function() {
     return formDraft.secondSignatureEmail;
+  }
+  
+  inner.setSecondSignatureEmailConfirm = function( email ) {
+    formDraft.secondSignatureEmailConfirm = email;
+  }
+  
+  inner.secondSignatureEmailConfirm = function() {
+    return formDraft.secondSignatureEmailConfirm;
+  }
+  
+  inner.selectedEid = function() {
+    return formDraft.selectedEid;
+  }
+  
+  inner.setSelectedEid = function( eid ) {
+    formDraft.selectedEid = eid;
   }
     
 	return inner;

@@ -201,6 +201,18 @@ select.eidproviders {
 	margin: 4px;
 }
 
+/* Second signature
+---------------------------------------------------*/
+
+input#email,
+input#emailconfirm {
+    width: 250px;
+}
+
+table#second_signature td {
+    padding-right: 30px; 
+}
+
 /* Modal
 -------------------------------------------------- */
 .modal-header {

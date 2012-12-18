@@ -63,16 +63,31 @@
 </div>
 
 <div id="second_signature" class="well">
-    <h3 id="secondsignature-label" class="control-label"></h3>
-    <div id="secondsignature-fields">
-     <label id="name-label" class="control-label"></label>
-     <input id="name" type="text" />
-     <label id="socialsecuritynumber-label" class="control-label"></label>
-     <input id="socialsecuritynumber" type="text" />
-     <label id="phonenumber-label" class="control-label"></label>
-     <input id="phonenumber" type="text" />	
-     <label id="email-label" class="control-label"></label>
-     <input id="email" type="text" />
+    <label id="singlesignaturecheckbox" class="checkbox"><input type="checkbox" /></label>
+    <div id="secondsignature_fields">
+        <h3 id="secondsignature-label" class="control-label"></h3>  
+        <div id="secondsignaturetext" class='commentfield alert alert-info'></div>
+        <table id="second_signature">
+        <tr>
+        <td>
+            <label id="name-label" class="control-label"></label>
+            <input id="name" type="text"/>
+        </td>
+        <td>
+            <label id="socialsecuritynumber-label" class="control-label"></label>
+            <input id="socialsecuritynumber" type="text" />
+        </td>
+        <td>
+            <label id="phonenumber-label" class="control-label"></label>
+            <input id="phonenumber" type="text" /> 
+        </td>        
+        </tr>
+        </table>        
+        <label id="email-label" class="control-label"></label>
+        <input id="email" type="text" />
+        <label id="emailconfirm-label" class="control-label"></label>
+        <input id="emailconfirm" type="text" />
+        <span id="confirmation-help" class="help-inline"></span>
     </div>
 </div>
 
