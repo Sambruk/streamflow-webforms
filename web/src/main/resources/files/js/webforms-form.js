@@ -23,6 +23,7 @@ var FormModule = (function() {
 	var initDone = false;
 	var requiredSignatures;
 	var selectedRequiredSignature;
+	var previousFormSummary;
 	
 	function Form( formDraft ) {
 		this.title = formDraft.description;
@@ -115,6 +116,12 @@ var FormModule = (function() {
     	return this;
     }
 
+	inner.setupPreviousFormSummaryPage = function ( previousFormSummaryIN ) {
+		previousFormSummary = previousFormSummaryIN;
+		
+		
+	}
+	
 	inner.getField = function( id ) {
 	    return fieldMap[ id ];
 	}
@@ -132,15 +139,24 @@ var FormModule = (function() {
 		});
 	}
 
+	inner.foldPrevious = function( pageFolder ) {
+		$.each( previousFormSummary.pages, function(idx, page) {
+			var fieldFolder = pageFolder( page );
+			$.each( page.fields, function( idy, field) {
+				fieldFolder( field );
+			});
+		});
+	}
+
 	inner.foldEditPage = function( pageIndex, fieldFolder ) {
 	    $.each( formDraft.pages[ pageIndex ].fields, function( idx, field ) {
 	        fieldFolder( field );
         });
 	}
 
-	inner.init = function( formDraftValue ) {
+	inner.init = function( formDraftValue, mailSelectionMessageTextIn ) {
 		formDraft = new Form( formDraftValue );
-		mailSelectionMessageText = RequestModule.getMailSelectionMessage();
+		mailSelectionMessageText = mailSelectionMessageTextIn;
 		initDone = true;
 	}
 	
@@ -211,7 +227,7 @@ var FormModule = (function() {
 	  }
 	  return needsSigning;
 	}
-
+	
 	inner.setRequiredSignatures = function( required ) {
 	    requiredSignatures = required;
 	}
@@ -245,10 +261,14 @@ var FormModule = (function() {
 	
 	inner.requiredSignedSignaturesCount = function() {
 	  var reqSignNbrs = 0;
-    if ( inner.formNeedsSigning() ) {
-      reqSignNbrs++;
-    }
-    return reqSignNbrs;
+	  if ( inner.formNeedsSigning() ) {
+	    reqSignNbrs++;
+	  }
+	  return reqSignNbrs;
+	}
+	
+	inner.isSecondSigningFlow = function () {
+		return previousFormSummary === undefined ? false : true;
 	}
 	
 	inner.title = function() {

@@ -86,6 +86,13 @@ var View = (function() {
             addSignaturesDiv( node );
     	});
     }
+    
+    inner.previous = function ( args ) {
+    	createPageContent( getPreviousFormSummary(), function ( node) {
+    		// compose previous form summary view here.
+    		FormModule.foldPrevious( function( page ) { return foldPage(node, page) } );
+    	});
+    }
 
     function createPageContent(page, contentFunction){
     	 var errors = $('#inserted_alert');
@@ -160,6 +167,29 @@ var View = (function() {
     
     function foldField( node, field ) {
         if ( field.fieldType == "CommentFieldValue" ) return;
+        var row = clone( 'field_summary', field.id ).appendTo( node );
+        var tr = $('<td class="field_label"/>').append( field.name );
+        row.append( tr );
+        $('<td class="field_value"/>').append( field.formattedValue ).appendTo( row );
+        if (field.field.field.mandatory && !field.formattedValue) {
+    		row.addClass('validation-missing');
+    		row.append($('<td class="field_message pull-right"/>').append(clone('label_missing', 'missing')));
+        } else if (field.invalidformat) {
+    		row.addClass('validation-error');
+    		row.append($('<td class="field_message pull-right"/>').append(clone('label_error', 'error')));
+        }
+        
+    }
+
+    function foldPreviousSummaryPage( node, page ) {
+    	var pageDiv = clone('previous_form_summary').appendTo( node );
+    	pageDiv.find('h3').append( clone('link').attr('href', getPage(page.index)).text(page.title) );
+    	return function( field ) {
+    		foldPreviousSummaryField( pageDiv.find('#fields_table'), field );
+    	}
+    }
+    
+    function foldPreviousSummaryField( node, field ) {
         var row = clone( 'field_summary', field.id ).appendTo( node );
         var tr = $('<td class="field_label"/>').append( field.name );
         row.append( tr );
@@ -298,8 +328,10 @@ var View = (function() {
 	    new inner.Button( buttons ).name(texts.previous).href( getPrevious( page ) ).enable( page!=0 );
 	    new inner.Button( buttons ).name(texts.next).href(getNext( page ) ).enable( page!='#summary' );
 	   
-	    var dialogElement = createDiscardDialog(node);
-	    new inner.Button( buttons ).name(texts.discard).confirm('#' + dialogElement.attr('id')).addClass("btn-danger");
+	    if ( !FormModule.isSecondSigningFlow() ) {
+		    var dialogElement = createDiscardDialog(node);
+		    new inner.Button( buttons ).name(texts.discard).confirm('#' + dialogElement.attr('id')).addClass("btn-danger");
+	    }
 	    
 	    if( page == getSummary()) {
 	    	var button = new inner.Button( buttons ).name(texts.submit).href(getSubmit());
@@ -353,6 +385,10 @@ var View = (function() {
 
     function getPage( page ) {
         return '#' + Contexts.findUrl( inner.formPage, [page]);
+    }
+
+    function getPreviousFormSummary() {
+        return '#' + Contexts.findUrl( inner.previous );
     }
 
     function getSummary() {

@@ -62,7 +62,7 @@ public interface IndexRestletService extends ServiceComposite, Configuration<Ext
       {
 
          String accessPointId = request.getResourceRef().getQueryAsForm().getFirstValue( "ap" );
-         String caseId = request.getResourceRef().getQueryAsForm().getFirstValue( "cid" );
+         String taskId = request.getResourceRef().getQueryAsForm().getFirstValue( "tid" );
 
          if (accessPointId != null)
          {
@@ -76,12 +76,13 @@ public interface IndexRestletService extends ServiceComposite, Configuration<Ext
                template = template.replace( "$externalcss", externalCssReplaceString );
 
                response.setEntity( template, MediaType.TEXT_HTML );
-         } else if (caseId != null)
+         } else if (taskId != null)
          {
-            String template = getTemplate( "caseformdraft.html", getClass() );
+            String template = getTemplate( "webforms-task.html", getClass() );
 
             template = template.replace( "$context-root", "/"
                   + request.getResourceRef().getBaseRef().getSegments().get( 0 ) );
+            template = template.replace( "$task", taskId );
             template = template.replace( "$hostname", request.getResourceRef().getHostIdentifier() );
             String externalCssReplaceString = externalCssReplaceString( cssConfig.configuration().cssUrl().get() );
             template = template.replace( "$externalcss", externalCssReplaceString );
