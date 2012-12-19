@@ -546,7 +546,7 @@ var View = (function() {
             } else {
               signatureFields.show( 'slow' );
             }
-            toggleSignButton();
+            toggleSignButton( false );
           });
         } else {
             secondSignature.find('#singlesignaturecheckbox-label').hide();
@@ -559,9 +559,9 @@ var View = (function() {
         updateSecondSignatureSocialSecurityNumber( secondSignature.find('#socialsecuritynumber') );
         setMandatory( secondSignature.find('#socialsecuritynumber-label'), secondSignature.find('#socialsecuritynumber') );
         setHint(secondSignature.find('#socialsecuritynumber-label'), secondSignature.find('#socialsecuritynumber'), texts.socialSecurityNumberHint);
-        updateSecondSignatureEmail( secondSignature.find('#email') );
+        updateSecondSignatureEmail( secondSignature.find('#emailfields') );
         setMandatory( secondSignature.find('#email-label'), secondSignature.find('#email') );
-        updateSecondSignatureEmailConfirm( secondSignature.find('#emailconfirm') );
+        updateSecondSignatureEmailConfirm( secondSignature.find('#emailfields') );
         setMandatory( secondSignature.find('#emailconfirm-label'), secondSignature.find('#emailconfirm') );
         
         var signature = getSignature( FormModule.getRequiredSignatures()[0].name, FormModule.getSignatures() );
@@ -571,25 +571,46 @@ var View = (function() {
       }
     }
     
+    function validateSecondSignatureEmail( emailField ) {
+        var disableSignButton = false;
+        var email = emailField.find('#email');
+        var emailconfirm = emailField.find('#emailconfirm');
+        if ( email.val() !== emailconfirm.val() ) {
+            emailField.addClass('error');
+            emailField.find('#confirmation-help').append(texts.emailMismatch);
+            disableSignButton = true;
+        } else if( email.hasClass('validation-error') ) {
+            emailField.addClass('error');
+            emailField.find('#confirmation-help').append(texts.emailNotAnEmail);
+            disableSignButton = true;
+        } else {
+            emailField.removeClass('error');
+        }       
+        toggleSignButton( disableSignButton );
+    }
+    
     function updateSecondSignatureName( nameField ) {
-      nameField.val( FormModule.secondSignatureName() );
-      nameField.blur( function() {
-          var stringDTO = {};
-          stringDTO.string = nameField.val();
-          try{
-              RequestModule.setSecondSignatureName( stringDTO );
-              nameField.removeClass('validation-error');
-              FormModule.setSecondSignatureName( stringDTO.string );
-          } catch( errorMessage ) {
-              nameField.addClass('validation-error');
-          }
-          toggleSignButton();
-      });
+        nameField.val( FormModule.secondSignatureName() );
+        nameField.blur( function() {
+            var disableSignButton = false;
+            var stringDTO = {};
+            stringDTO.string = nameField.val();
+            try{
+                RequestModule.setSecondSignatureName( stringDTO );
+                nameField.removeClass('validation-error');
+                FormModule.setSecondSignatureName( stringDTO.string );
+            } catch( errorMessage ) {
+                nameField.addClass('validation-error');
+                disableSignButton = true;
+            }
+            toggleSignButton( disableSignButton );
+        });
     }
     
     function updateSecondSignaturePhoneNumber( phoneNumberField ) {
       phoneNumberField.val( FormModule.secondSignaturePhoneNumber() );       
       phoneNumberField.blur( function() {
+          var disableSignButton = false;
           var stringDTO = {};
           stringDTO.string = phoneNumberField.val();
           try{
@@ -598,64 +619,78 @@ var View = (function() {
               FormModule.setSecondSignaturePhoneNumber( stringDTO.string );
           } catch( errorMessage ) {
               phoneNumberField.addClass('validation-error');
+              disableSignButton = true;
           }
-          toggleSignButton();
+          toggleSignButton( disableSignButton );
       });
     }
     
     function updateSecondSignatureSocialSecurityNumber( socialSecurityField ) {
       socialSecurityField.val( FormModule.secondSignatureSocialSecurityNumber() );       
       socialSecurityField.blur( function() {
+          var disableSignButton = false;
           var stringDTO = {};
           stringDTO.string = socialSecurityField.val();
           try{
               RequestModule.setSecondSignatureSocialSecurityNumber( stringDTO );
               socialSecurityField.removeClass('validation-error');
+              socialSecurityField.removeClass('error');
               FormModule.setSecondSignatureSocialSecurityNumber( stringDTO.string );
           } catch( errorMessage ) {
               socialSecurityField.addClass('validation-error');
+              socialSecurityField.addClass('error');
+              disableSignButton = true;
           }
-          toggleSignButton();
+          toggleSignButton( disableSignButton );
       });
     }
     
     function updateSecondSignatureEmail( emailField ) {
-      emailField.val( FormModule.secondSignatureEmail() );       
-      emailField.blur( function() {
-          var stringDTO = {};
-          stringDTO.string = emailField.val();
-          try{
-              RequestModule.setSecondSignatureEmail( stringDTO );
-              emailField.removeClass('validation-error');
-              FormModule.setSecondSignatureEmail( stringDTO.string );
-          } catch( errorMessage ) {
-              emailField.addClass('validation-error');
-          }
-          toggleSignButton();
-      });
+        var email = emailField.find('#email')      
+        email.val( FormModule.secondSignatureEmail() );       
+        email.blur( function() {
+            var stringDTO = {};
+            stringDTO.string = email.val();
+            try{
+                RequestModule.setSecondSignatureEmail( stringDTO );
+                email.removeClass('validation-error');
+                FormModule.setSecondSignatureEmail( stringDTO.string );
+            } catch( errorMessage ) {
+                email.addClass('validation-error');
+            }
+            validateSecondSignatureEmail( emailField );
+        });
+        email.focus( function() {
+            email.removeClass('validation-error');           
+            emailField.find('#confirmation-help').text("");
+        });
     }
     
-    function updateSecondSignatureEmailConfirm( emailConfirmField ) {
-      emailConfirmField.val( FormModule.secondSignatureEmailConfirm() );
-      emailConfirmField.blur( function() {
-        FormModule.setSecondSignatureEmailConfirm( emailConfirmField.val());
-        toggleSignButton();
-      });     
+    function updateSecondSignatureEmailConfirm( emailField ) {
+        var email = emailField.find('#emailconfirm') 
+        email.val( FormModule.secondSignatureEmailConfirm() );
+        email.blur( function() {
+            FormModule.setSecondSignatureEmailConfirm( email.val());
+            validateSecondSignatureEmail( emailField );
+        });
+        email.focus( function() {
+            emailField.find('#confirmation-help').text("");
+        });
     }
     
     function setMandatory( node, field ) {
-      clone('mandatory', 'mandatory_' + field.attr('id')).appendTo( node );
+        clone('mandatory', 'mandatory_' + field.attr('id')).appendTo( node );
     }
     
     function setHint( node, field, hintText ) {
-      clone('hint', 'hint_' + field.attr('id')).text( ' (' + hintText + ')' ).appendTo( node );
+        clone('hint', 'hint_' + field.attr('id')).text( ' (' + hintText + ')' ).appendTo( node );
     }
     
-    function toggleSignButton() {
+    function toggleSignButton( disable ) {
       var selectedEid = FormModule.selectedEid();
       if(typeof selectedEid !== 'undefined' && selectedEid && selectedEid.value !== texts.provider) {
         var button = $('#link_'+selectedEid.name);
-        (selectedEid.selectedIndex == 0 || !FormModule.isSecondSignatureReady() ) ? enable( button, false ) : enable( button, true );
+        (disable || selectedEid.selectedIndex == 0 || !FormModule.isSecondSignatureReady() ) ? enable( button, false ) : enable( button, true );
       }
     }
 
