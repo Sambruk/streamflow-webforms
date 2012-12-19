@@ -39,7 +39,7 @@ jQuery(document).ready(function()
 
     function setupForm() {
     	if ( FormModule.initialized() ) return;
-        FormModule.init( TaskRequestModule.getTaskFormDraft(), TaskRequestModule.getTaskSubmittedFormSummary() );
+        FormModule.init( TaskRequestModule.getTaskFormDraft(), TaskRequestModule.getMailSelectionMessage() );
     }
 
     function setupRequiredSignatures() {
@@ -56,8 +56,8 @@ jQuery(document).ready(function()
         }
     }
 
-    function setupPreviousFormSummary() {
-    	FormModule.setupPreviousFormSummaryPage( TaskRequestModule.getTaskSubmittedFormSummary() );
+    function setupIncomgingFormSummary() {
+    	FormModule.setupIncomingFormSummaryPage( TaskRequestModule.getTaskSubmittedFormSummary() );
     }
     
     /** Verify functions **/
@@ -135,7 +135,7 @@ jQuery(document).ready(function()
         throw { redirect: Contexts.findUrl( TaskView.incoming ) }
     }
 
-    var contexts = {view:rootView,          init: [ setupForm, setupPreviousFormSummary, setupRequiredSignatures ], subContexts: {
+    var contexts = {view:rootView,          init: [ setupForm, setupIncomgingFormSummary, setupRequiredSignatures ], subContexts: {
         'incoming'   : {view:TaskView.incoming, init : [  ]},
         'idContext' : {view:View.formPage,   init: [ verifyPage, verifyFormEditing ]},
         'summary'   : {view:TaskView.summary,    init: [ setupProviders ], subContexts: {

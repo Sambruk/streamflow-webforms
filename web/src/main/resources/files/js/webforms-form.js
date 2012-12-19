@@ -116,8 +116,8 @@ var FormModule = (function() {
     	return this;
     }
 
-	inner.setupPreviousFormSummaryPage = function ( previousFormSummaryIN ) {
-		incomingSummary = previousFormSummaryIN;
+	inner.setupIncomingFormSummaryPage = function ( incomingFormSummary ) {
+		incomingSummary = incomingFormSummary;
 	}
 	
 	inner.getField = function( id ) {
