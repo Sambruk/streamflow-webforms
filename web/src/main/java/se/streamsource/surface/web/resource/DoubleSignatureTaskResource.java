@@ -24,13 +24,12 @@ import se.streamsource.dci.restlet.server.api.SubResource;
 /**
  * JAVADOC
  */
-public class AccessPointResource
-        extends CommandQueryResource
+public class DoubleSignatureTaskResource extends CommandQueryResource
 {
    @SubResource
-   public void endusers()
+   public void formdraft()
    {
-      current().set(current().get(CommandQueryClient.class).getSubClient("endusers"));
-      subResource(EndUsersResource.class);
+      current().set(current().get(CommandQueryClient.class).getSubClient("formdraft"));
+      subResource( FormDraftResource.class );
    }
 }

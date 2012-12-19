@@ -23,7 +23,7 @@ var FormModule = (function() {
 	var initDone = false;
 	var requiredSignatures;
 	var selectedRequiredSignature;
-	var previousFormSummary;
+	var incomingSummary;
 	
 	function Form( formDraft ) {
 		this.title = formDraft.description;
@@ -116,10 +116,8 @@ var FormModule = (function() {
     	return this;
     }
 
-	inner.setupPreviousFormSummaryPage = function ( previousFormSummaryIN ) {
-		previousFormSummary = previousFormSummaryIN;
-		
-		
+	inner.setupIncomingFormSummaryPage = function ( incomingFormSummary ) {
+		incomingSummary = incomingFormSummary;
 	}
 	
 	inner.getField = function( id ) {
@@ -139,8 +137,8 @@ var FormModule = (function() {
 		});
 	}
 
-	inner.foldPrevious = function( pageFolder ) {
-		$.each( previousFormSummary.pages, function(idx, page) {
+	inner.foldIncoming = function( pageFolder ) {
+		$.each( incomingSummary.pages, function(idx, page) {
 			var fieldFolder = pageFolder( page );
 			$.each( page.fields, function( idy, field) {
 				fieldFolder( field );
@@ -268,7 +266,7 @@ var FormModule = (function() {
 	}
 	
 	inner.isSecondSigningFlow = function () {
-		return previousFormSummary === undefined ? false : true;
+		return incomingSummary === undefined ? false : true;
 	}
 	
 	inner.title = function() {
@@ -282,9 +280,13 @@ var FormModule = (function() {
 	inner.getSignatures = function() {
 		return formDraft.signatures;
 	}
+	
+	inner.incomingSignerName = function () {
+		return incomingSummary === undefined ? undefined : incomingSummary.signatures[0].signerName; 
+	}
 
-	function fieldIterator( iterate ) {
-	    $.each( formDraft.pages, function(idx, page) {
+	function fieldIterator( iterate, form ) {
+	    $.each( form.pages, function(idx, page) {
 	        $.each( page.fields, function(idy, field) {
 	            iterate( field );
             })
@@ -296,20 +298,29 @@ var FormModule = (function() {
         fieldIterator( function( field ) {
             if ( field.fieldType != 'CommentFieldValue' )
                 tbs += field.name + ' = ' + field.formattedValue + '. ';
-        });
+        }, formDraft);
+        return tbs;
+	}
+
+	inner.getIncomingFormTBS = function() {
+        var tbs = "";
+        fieldIterator( function( field ) {
+            if ( field.fieldType != 'CommentFieldValue' )
+                tbs += field.field + ' = ' + field.value + '. ';
+        }, incomingSummary);
         return tbs;
 	}
 
   inner.hasErrors = function() {
     var error = false;
-    fieldIterator( function(field) { 
+    fieldIterator( function(field ) { 
       if ( field.field.field.mandatory && !field.value) {
         error = true;
       } 
       if (field.invalidformat != '' ) {
         error = true;
       }
-    });
+    }, formDraft);
     return error;
   }
 

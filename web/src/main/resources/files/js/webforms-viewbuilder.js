@@ -86,14 +86,11 @@ var View = (function() {
             addSignaturesDiv( node );
     	});
     }
-    
-    inner.previous = function ( args ) {
-    	createPageContent( getPreviousFormSummary(), function ( node) {
-    		// compose previous form summary view here.
-    		FormModule.foldPrevious( function( page ) { return foldPage(node, page) } );
-    	});
-    }
 
+    inner.foldPage = function( node, page) {
+    	return foldPage( node, page );
+    }
+    
     function createPageContent(page, contentFunction){
     	 var errors = $('#inserted_alert');
     	 var container = $('#container').empty();
@@ -178,30 +175,6 @@ var View = (function() {
     		row.addClass('validation-error');
     		row.append($('<td class="field_message pull-right"/>').append(clone('label_error', 'error')));
         }
-        
-    }
-
-    function foldPreviousSummaryPage( node, page ) {
-    	var pageDiv = clone('previous_form_summary').appendTo( node );
-    	pageDiv.find('h3').append( clone('link').attr('href', getPage(page.index)).text(page.title) );
-    	return function( field ) {
-    		foldPreviousSummaryField( pageDiv.find('#fields_table'), field );
-    	}
-    }
-    
-    function foldPreviousSummaryField( node, field ) {
-        var row = clone( 'field_summary', field.id ).appendTo( node );
-        var tr = $('<td class="field_label"/>').append( field.name );
-        row.append( tr );
-        $('<td class="field_value"/>').append( field.formattedValue ).appendTo( row );
-        if (field.field.field.mandatory && !field.formattedValue) {
-    		row.addClass('validation-missing');
-    		row.append($('<td class="field_message pull-right"/>').append(clone('label_missing', 'missing')));
-        } else if (field.invalidformat) {
-    		row.addClass('validation-error');
-    		row.append($('<td class="field_message pull-right"/>').append(clone('label_error', 'error')));
-        }
-        
     }
 
     function help( node, field ) {
@@ -325,12 +298,15 @@ var View = (function() {
 
     function addButtons( node, page) {
     	var buttons = clone('buttons');
-	    new inner.Button( buttons ).name(texts.previous).href( getPrevious( page ) ).enable( page!=0 );
-	    new inner.Button( buttons ).name(texts.next).href(getNext( page ) ).enable( page!='#summary' );
+	    var previousBtn = new inner.Button( buttons ).name(texts.previous).href( getPrevious( page ) )
+	    var nextBtn = new inner.Button( buttons ).name(texts.next).href(getNext( page ) ).enable( page!=getSummary() );
 	   
 	    if ( !FormModule.isSecondSigningFlow() ) {
+	    	previousBtn.enable( page!=0 );
 		    var dialogElement = createDiscardDialog(node);
 		    new inner.Button( buttons ).name(texts.discard).confirm('#' + dialogElement.attr('id')).addClass("btn-danger");
+	    } else {
+	    	previousBtn.enable( page!=getIncoming());
 	    }
 	    
 	    if( page == getSummary()) {
@@ -369,12 +345,17 @@ var View = (function() {
         var current = parseInt( segment );
         if ( isNaN( current ) ) {
             return getPage( FormModule.pageCount()-1 );
+        } else if (current == 0){
+        	return getIncoming();
         } else {
             return getPage( current-1);
         }
     }
 
     function getNext( segment ) {
+    	if (segment == getIncoming()) {
+    		return getPage(0);
+    	}
         var current = parseInt( segment );
         if ( isNaN( current ) || (current == FormModule.pageCount()-1 ) ) {
             return getSummary();
@@ -387,12 +368,16 @@ var View = (function() {
         return '#' + Contexts.findUrl( inner.formPage, [page]);
     }
 
-    function getPreviousFormSummary() {
-        return '#' + Contexts.findUrl( inner.previous );
+    function getIncoming() {
+        return '#incoming';
     }
 
     function getSummary() {
-        return '#' + Contexts.findUrl( inner.summary );
+        return '#summary';
+    }
+
+    function getSecondSignSummary() {
+        return '#' + Contexts.findUrl( inner.secondSignSummary );
     }
 
     function getSubmit( ) {
@@ -779,7 +764,10 @@ var View = (function() {
 
     function addProgressbar( current, pages, contentNode ) {
     	var progress = clone('progress');
-        $.each( pages, function(idx, page){
+    	if ( FormModule.isSecondSigningFlow() ) {
+    		progress.append( createProgressItem(current==getIncoming(), getIncoming(), texts.incomingform ));
+    	}
+    	$.each( pages, function(idx, page){
             progress.append( createProgressItem(idx==current, getPage(idx), page.title) );
         });
         

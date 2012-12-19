@@ -55,8 +55,6 @@ var TaskRequestModule = (function() {
     inner.init = function( contextRoot, task ) {
     	TaskUrlModule.init( contextRoot, task );
         verifyTask();
-        //selectEndUser();
-        //TaskUrlModule.setUserUrl( getUser() );
     }
 
     function verifyTask() {

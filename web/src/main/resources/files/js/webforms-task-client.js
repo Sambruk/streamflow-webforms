@@ -26,7 +26,7 @@ jQuery(document).ready(function()
 
     function loadEidPlugins() {
     	if ( FormModule.requiredSignaturesCount() > 0 ) {
-	        $("#signerDiv").append( RequestModule.getHeader() );
+	        $("#signerDiv").append( TaskRequestModule.getHeader() );
 	        addSigners($("#signerDiv"));
     	}
     }
@@ -39,7 +39,7 @@ jQuery(document).ready(function()
 
     function setupForm() {
     	if ( FormModule.initialized() ) return;
-        FormModule.init( TaskRequestModule.getTaskFormDraft(), TaskRequestModule.getTaskSubmittedFormSummary() );
+        FormModule.init( TaskRequestModule.getTaskFormDraft(), TaskRequestModule.getMailSelectionMessage() );
     }
 
     function setupRequiredSignatures() {
@@ -56,8 +56,8 @@ jQuery(document).ready(function()
         }
     }
 
-    function setupPreviousFormSummary() {
-    	FormModule.setupPreviousFormSummaryPage( TaskRequestModule.getTaskSubmittedFormSummary() );
+    function setupIncomgingFormSummary() {
+    	FormModule.setupIncomingFormSummaryPage( TaskRequestModule.getTaskSubmittedFormSummary() );
     }
     
     /** Verify functions **/
@@ -127,20 +127,20 @@ jQuery(document).ready(function()
     }
 
     function setupView() {
-        View.runView( Contexts.findView( location.hash ));
+        TaskView.runView( Contexts.findView( location.hash ));
     }
 
     function rootView() {
         // since we have no root view redirect to first page of form
-        throw { redirect: Contexts.findUrl( View.previous ) }
+        throw { redirect: Contexts.findUrl( TaskView.incoming ) }
     }
 
-    var contexts = {view:rootView,          init: [ setupForm, setupRequiredSignatures ], subContexts: {
-        'previous'   : {view:View.previous, init : [ setupPreviousFormSummary ]},
+    var contexts = {view:rootView,          init: [ setupForm, setupIncomgingFormSummary, setupRequiredSignatures ], subContexts: {
+        'incoming'   : {view:TaskView.incoming, init : [  ]},
         'idContext' : {view:View.formPage,   init: [ verifyPage, verifyFormEditing ]},
-        'summary'   : {view:View.summary,    init: [ setupProviders ], subContexts: {
-           'submit'    : {view:View.submit,   init: [ verifySubmit ]},
-           'idContext' : {view:View.sign,     init: [ verifySigner, verifyProvider, setupRequiredSignature ]}}}}};
+        'summary'   : {view:TaskView.summary,    init: [ setupProviders ], subContexts: {
+           'submit'    : {view:TaskView.submit,   init: [ verifySubmit ]},
+           'idContext' : {view:TaskView.sign,     init: [ verifySigner, verifyProvider, setupRequiredSignature ]}}}}};
 
 	$('#components').hide().load(contextRoot + '/static/webforms-components.html', function() {
         try {
