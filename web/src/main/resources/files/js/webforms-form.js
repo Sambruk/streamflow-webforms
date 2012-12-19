@@ -285,8 +285,8 @@ var FormModule = (function() {
 		return incomingSummary === undefined ? undefined : incomingSummary.signatures[0].signerName; 
 	}
 
-	function fieldIterator( iterate ) {
-	    $.each( formDraft.pages, function(idx, page) {
+	function fieldIterator( iterate, form ) {
+	    $.each( form.pages, function(idx, page) {
 	        $.each( page.fields, function(idy, field) {
 	            iterate( field );
             })
@@ -298,20 +298,29 @@ var FormModule = (function() {
         fieldIterator( function( field ) {
             if ( field.fieldType != 'CommentFieldValue' )
                 tbs += field.name + ' = ' + field.formattedValue + '. ';
-        });
+        }, formDraft);
+        return tbs;
+	}
+
+	inner.getIncomingFormTBS = function() {
+        var tbs = "";
+        fieldIterator( function( field ) {
+            if ( field.fieldType != 'CommentFieldValue' )
+                tbs += field.field + ' = ' + field.value + '. ';
+        }, incomingSummary);
         return tbs;
 	}
 
   inner.hasErrors = function() {
     var error = false;
-    fieldIterator( function(field) { 
+    fieldIterator( function(field ) { 
       if ( field.field.field.mandatory && !field.value) {
         error = true;
       } 
       if (field.invalidformat != '' ) {
         error = true;
       }
-    });
+    }, formDraft);
     return error;
   }
 

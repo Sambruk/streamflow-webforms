@@ -371,7 +371,7 @@ var TaskView = (function() {
             }
             var signDTO = {
                 transactionId: FormModule.getFormId(),
-                tbs: FormModule.getFormTBS(),
+                tbs: FormModule.getIncomingFormTBS() + FormModule.getFormTBS(),
                 provider: value,
                 successUrl: "verify",
                 errorUrl: "error"
