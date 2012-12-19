@@ -59,8 +59,7 @@ var TaskView = (function() {
     		// compose previous form summary view here.
     		FormModule.foldIncoming( function( page ) { return foldIncomingPage(node, page) } );
     	});
-    	var signerName = FormModule.incomingSignerName();
-    	messages.info = texts.doublesignaturepreviousmessage.replace('{0}', signerName);
+    	messages.info = texts.doublesignaturepreviousmessage.replace('{0}', FormModule.incomingSignerName());
     }
 
     function createPageContent(page, contentFunction){
