@@ -280,6 +280,10 @@ var FormModule = (function() {
 	inner.getSignatures = function() {
 		return formDraft.signatures;
 	}
+	
+	inner.incomingSignerName = function () {
+		return incomingSummary === undefined ? undefined : incomingSummary.signatures[0].signerName; 
+	}
 
 	function fieldIterator( iterate ) {
 	    $.each( formDraft.pages, function(idx, page) {
