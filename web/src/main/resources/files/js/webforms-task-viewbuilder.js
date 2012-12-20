@@ -29,8 +29,8 @@ var TaskView = (function() {
 
     inner.submit = function() {
         TaskRequestModule.submitAndSend();
-        var caseName = RequestModule.getCaseName();
-        var printUrl = UrlModule.getPrintUrl( FormModule.getFormId() );
+        var caseName = TaskRequestModule.getCaseName();
+        var printUrl = TaskUrlModule.getPrintUrl( FormModule.getFormId() );
         FormModule.destroy();
 
         var container = $('#container').empty();

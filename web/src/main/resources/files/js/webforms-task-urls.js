@@ -112,7 +112,7 @@ var TaskUrlModule = (function() {
     }
 
     inner.getCaseName = function() {
-        return urls.proxy + urls.proxycaze + 'index.json';
+        return urls.proxy + urls.task + 'caseid.json';
     }
 
     inner.getCaseUrl = function() {
