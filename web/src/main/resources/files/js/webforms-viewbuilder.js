@@ -183,9 +183,11 @@ var View = (function() {
         }
     }
     
-    function enableSecondSignatureFields( enable ) {
-        var secondSignature = document.getElementById( "second_signature" );
-        var inputArray = secondSignature.getElementsByTagName( "input" );
+    function enableSecondSignatureFields( secondSignature ) {
+        var enable = false;
+        var signature = getSignature( FormModule.getRequiredSignatures()[0].name, FormModule.getSignatures() );
+        signature ? enable = false : enable = true;
+        var inputArray = secondSignature.find('input');
         for (var i = 0; i < inputArray.length; i++) {
             if (enable) {
                 inputArray[i].disabled ? inputArray[i].removeAttr("disabled") : '';
@@ -242,8 +244,6 @@ var View = (function() {
               FormModule.setSecondSignatureEmail( secondSignatureEmail );
               FormModule.setSecondSignatureEmailConfirm( secondSignatureEmailConfirm );
               FormModule.setSecondSignatureSingleSignature( secondSignatureSingleSignature );
-              
-              enableSecondSignatureFields( false );
             }
             // signing success redirect to summary
             throw {info:texts.formSigned, redirect:getSummary()};
@@ -428,7 +428,7 @@ var View = (function() {
             var emailFunction = function() {
                 // if not match show error and disable submit-button
                 if ( emailConfirmField.val() != emailField.val() ) {
-            		inputs.addClass('error');
+            		    inputs.addClass('error');
                     inputs.find('#confirmation-help').append(texts.emailMismatch);
                     toggleSubmitButton( false );   
                     
@@ -564,10 +564,10 @@ var View = (function() {
         updateSecondSignatureEmailConfirm( secondSignature.find('#emailfields') );
         setMandatory( secondSignature.find('#emailconfirm-label'), secondSignature.find('#emailconfirm') );
         
-        var signature = getSignature( FormModule.getRequiredSignatures()[0].name, FormModule.getSignatures() );
-        signature ? enableSecondSignatureFields( false ) :  enableSecondSignatureFields( true );
+        enableSecondSignatureFields(secondSignature);
         
-        node.append( secondSignature );          
+        node.append( secondSignature );  
+     
       }
     }
     
@@ -600,6 +600,7 @@ var View = (function() {
                 nameField.removeClass('validation-error');
                 FormModule.setSecondSignatureName( stringDTO.string );
             } catch( errorMessage ) {
+                FormModule.setSecondSignatureName( "" );
                 nameField.addClass('validation-error');
                 disableSignButton = true;
             }
@@ -618,6 +619,7 @@ var View = (function() {
               phoneNumberField.removeClass('validation-error');
               FormModule.setSecondSignaturePhoneNumber( stringDTO.string );
           } catch( errorMessage ) {
+              FormModule.setSecondSignaturePhoneNumber( "" );
               phoneNumberField.addClass('validation-error');
               disableSignButton = true;
           }
@@ -637,6 +639,7 @@ var View = (function() {
               socialSecurityField.removeClass('error');
               FormModule.setSecondSignatureSocialSecurityNumber( stringDTO.string );
           } catch( errorMessage ) {
+              FormModule.setSecondSignatureSocialSecurityNumber( "" );
               socialSecurityField.addClass('validation-error');
               socialSecurityField.addClass('error');
               disableSignButton = true;
@@ -656,6 +659,7 @@ var View = (function() {
                 email.removeClass('validation-error');
                 FormModule.setSecondSignatureEmail( stringDTO.string );
             } catch( errorMessage ) {
+                FormModule.setSecondSignatureEmail( "" );
                 email.addClass('validation-error');
             }
             validateSecondSignatureEmail( emailField );
