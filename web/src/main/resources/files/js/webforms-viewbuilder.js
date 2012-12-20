@@ -487,7 +487,7 @@ var View = (function() {
           
           var signaturesNode = clone('form_signatures');
           signaturesNode.addClass('well');
-          signaturesNode.find("h3").append( texts.signatures );
+          signaturesNode.find("h3").append( texts.signature );
             
           var table = signaturesNode.find('table');
           var idx = 0;
