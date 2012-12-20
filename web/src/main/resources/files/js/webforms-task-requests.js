@@ -138,7 +138,7 @@ var TaskRequestModule = (function() {
     
     inner.getCaseName = function() {
         var parameters = request('GET', TaskUrlModule.getCaseName() );
-        return getData( parameters ).caseId;
+        return getData( parameters ).string;
     }
 
     inner.setMailNotificationEnablement = function( value ) {
