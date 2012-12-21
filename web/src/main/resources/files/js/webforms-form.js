@@ -33,12 +33,15 @@ var FormModule = (function() {
 		this.confirmationEmail = formDraft.enteredEmails;
 		this.confirmationEmailConfirm;
 		this.mailSelectionEnablement = formDraft.mailSelectionEnablement;
-		this.secondSignatureName = formDraft.secondsignee.name;
-		this.secondSignaturePhoneNumber = formDraft.secondsignee.phonenumber;
-		this.secondSignatureSocialSecurityNumber = formDraft.secondsignee.socialsecuritynumber;
-		this.secondSignatureSingleSignature = formDraft.secondsignee.singelsignature;
-		this.secondSignatureEmail = formDraft.secondsignee.email;
-		//this.secondSignatureEmailConfirm = formDraft.secondSignatureEmailConfirm;
+		if ( formDraft.secondsignee ) {
+			// Load stored data
+			this.secondSignatureName = formDraft.secondsignee.name;
+			this.secondSignaturePhoneNumber = formDraft.secondsignee.phonenumber;
+			this.secondSignatureSocialSecurityNumber = formDraft.secondsignee.socialsecuritynumber;
+			this.secondSignatureSingleSignature = formDraft.secondsignee.singelsignature;
+			this.secondSignatureEmail = formDraft.secondsignee.email;
+			//this.secondSignatureEmailConfirm = formDraft.secondSignatureEmailConfirm;
+		}
 		this.selectedEid = formDraft.selectedEid;
 		var pages = this.pages;
 		$.each( formDraft.pages, function(idx, page) {
