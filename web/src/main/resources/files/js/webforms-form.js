@@ -33,6 +33,12 @@ var FormModule = (function() {
 		this.confirmationEmail = formDraft.enteredEmails;
 		this.confirmationEmailConfirm;
 		this.mailSelectionEnablement = formDraft.mailSelectionEnablement;
+		this.secondSignatureName = formDraft.secondsignee.name;
+		this.secondSignaturePhoneNumber = formDraft.secondsignee.phonenumber;
+		this.secondSignatureSocialSecurityNumber = formDraft.secondsignee.socialsecuritynumber;
+		this.secondSignatureSingleSignature = formDraft.secondsignee.singelsignature;
+		this.secondSignatureEmail = formDraft.secondsignee.email;
+		//this.secondSignatureEmailConfirm = formDraft.secondSignatureEmailConfirm;
 		this.selectedEid = formDraft.selectedEid;
 		var pages = this.pages;
 		$.each( formDraft.pages, function(idx, page) {
@@ -148,7 +154,6 @@ var FormModule = (function() {
 
 	inner.init = function( formDraftValue, mailSelectionMessageTextIn ) {
 		formDraft = new Form( formDraftValue );
-		formDraft.secondsignee = formDraftValue.secondsignee;
 		mailSelectionMessageText = mailSelectionMessageTextIn;
 		initDone = true;
 	}
@@ -190,24 +195,18 @@ var FormModule = (function() {
 	}
 	
 	inner.isFormSigned = function() {
-		// This check needs to be done at the send level instead.
-	  /*if(inner.isSecondSignatureReady()) {
-	  }
-	  else { 
-	    return false;
-	  }*/
-	  return inner.requiredSignedSignaturesCount() == formDraft.signatures.length;
+	    return inner.requiredSignedSignaturesCount() == formDraft.signatures.length;
 	}
 	 
 	inner.isSecondSignatureReady = function() {
 	  if( inner.formNeedsSecondSignature() ) {
 	    var singleSignature = inner.secondSignatureSingleSignature();
 	    if( typeof singleSignature === 'undefined' || !singleSignature ) {
-	      return (hasFieldAValue( formDraft.secondsignee.name ) 
-	          && hasFieldAValue( formDraft.secondsignee.email )
-	          && hasFieldAValue( formDraft.secondsignee.emailconfirm )
-	          && hasFieldAValue( formDraft.secondsignee.phonenumber )
-	          && hasFieldAValue( formDraft.secondsignee.socialsecuritynumber ) );
+	      return (hasFieldAValue( formDraft.secondSignatureName ) 
+	          && hasFieldAValue( formDraft.secondSignatureEmail )
+	          && hasFieldAValue( formDraft.secondSignatureEmailConfirm )
+	          && hasFieldAValue( formDraft.secondSignaturePhoneNumber )
+	          && hasFieldAValue( formDraft.secondSignatureSocialSecurityNumber ) );
 	      }
 	  }
 	  return true;
@@ -379,65 +378,53 @@ var FormModule = (function() {
     }
     
   inner.setSecondSignatureName = function( name ) {
-    formDraft.secondsignee.name = name;
+    formDraft.secondSignatureName = name;
   }
     
   inner.secondSignatureName = function() {
-	  if( formDraft.secondsignee ) {
-	    return formDraft.secondsignee.name;
-	  } else return undefined;
+    return formDraft.secondSignatureName;
   }
   
   inner.setSecondSignaturePhoneNumber = function( phoneNumber) {
-    formDraft.secondsignee.phonenumber = phoneNumber;
+    formDraft.secondSignaturePhoneNumber = phoneNumber;
   }
   
   inner.secondSignaturePhoneNumber = function() {
-	  if( formDraft.secondsignee ) {
-		    return formDraft.secondsignee.phonenumber;
-	  } else return undefined;
+    return formDraft.secondSignaturePhoneNumber;
   }
   
   inner.setSecondSignatureSocialSecurityNumber = function( number ) {
-    formDraft.secondsignee.socialsecuritynumber = number;
+    formDraft.secondSignatureSocialSecurityNumber = number;
   }
   
   inner.secondSignatureSocialSecurityNumber = function() {
-	  if( formDraft.secondsignee ) {
-		    return formDraft.secondsignee.socialsecuritynumber;
-	  } else return undefined;
+    return formDraft.secondSignatureSocialSecurityNumber;
   }
   
   inner.setSecondSignatureSingleSignature = function( enabled ) {
-	  formDraft.secondsignee.singlesignature = enabled;
+    formDraft.secondSignatureSingleSignature = enabled;
   }
   
   inner.secondSignatureSingleSignature = function() {
-	  if( formDraft.secondsignee ) {
-		    return formDraft.secondsignee.singlesignature;
-	  } else return undefined;
+    return formDraft.secondSignatureSingleSignature;
   }
   
   inner.setSecondSignatureEmail = function( email ) {
-    formDraft.secondsignee.email = email;
+    formDraft.secondSignatureEmail = email;
   }
   
   inner.secondSignatureEmail = function() {
-	  if( formDraft.secondsignee ) {
-		    return formDraft.secondsignee.email;
-	  } else return undefined;
+    return formDraft.secondSignatureEmail;
   }
   
   inner.setSecondSignatureEmailConfirm = function( email ) {
-    formDraft.secondsignee.emailconfirm = email;
+    formDraft.secondSignatureEmailConfirm = email;
   }
   
   inner.secondSignatureEmailConfirm = function() {
-	  if( formDraft.secondsignee && inner.isFormSigned() ) {
-		    return formDraft.secondsignee.email;
-	  } else if ( formDraft.secondsignee ) {
-		  return formDraft.secondsignee.emailconfirm;
-	  } else return undefined;
+	  if ( inner.isFormSigned ()) {
+		  return formDraft.secondSignatureEmail;
+	  } else return formDraft.secondSignatureEmailConfirm;
   }
   
   inner.selectedEid = function() {
