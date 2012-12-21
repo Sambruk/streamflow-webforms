@@ -25,6 +25,14 @@ var nameMap = {
 var FieldTypeModule = (function() {
 	var inner = {};
 
+	function requestModule() {
+		if ( FormModule.isSecondSigningFlow() ) {
+			return TaskRequestModule;
+		} else {
+			return RequestModule;
+		}
+	}
+	
 	function currentPage() {
 		return parseInt(location.hash.substring(1));
 	}
@@ -62,7 +70,7 @@ var FieldTypeModule = (function() {
 					id : 'delete_link' + fieldId
 				}).click(
 						function() {
-							RequestModule.deleteAttachment(JSON
+							requestModule().deleteAttachment(JSON
 									.parse(field.value).attachment)
 							field.value = "";
 							update(field.id, field.value);
@@ -102,7 +110,7 @@ var FieldTypeModule = (function() {
 				});
 
 				formNode.bind('fileuploaddone', function(e, data) {
-					FormModule.setValue(field.id, RequestModule
+					FormModule.setValue(field.id, requestModule()
 							.refreshField(fieldId));
 					field.refreshUI();
 					removeErrorFromField(controlsNode.parent(), field);
@@ -305,7 +313,7 @@ var FieldTypeModule = (function() {
 			update(field.id, enteredValue);
 
 			var updatedValue = field.getUIValue();
-			var serverValue = RequestModule.refreshField(field.id);
+			var serverValue = requestModule().refreshField(field.id);
 			if (field.dirty = (updatedValue != serverValue)) {
 				field.setUIValue(enteredValue);
 				field.invalidformat = texts.invalidformat;
@@ -447,7 +455,7 @@ var FieldTypeModule = (function() {
 			update(field.id, field.value);
 
 			var newValue = field.getUIValue();
-			var serverValue = RequestModule.refreshField(field.id);
+			var serverValue = requestModule().refreshField(field.id);
 
 			if (field.dirty = (newValue != serverValue)) {
 				field.setUIValue(value);

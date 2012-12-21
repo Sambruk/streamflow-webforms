@@ -280,6 +280,11 @@ var View = (function() {
         };
         var image = $('#Field'+fieldId+' .fieldwaiting > img').show();
         try{
+        	if ( FormModule.isSecondSigningFlow() ) {
+    			return TaskRequestModule.updateField( fieldDTO );
+    		} else {
+    			return RequestModule.updateField( fieldDTO );
+    		}
             return RequestModule.updateField( fieldDTO );
         } catch( e ) {
             message = { error: e.info };
