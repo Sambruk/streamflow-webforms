@@ -66,7 +66,8 @@ label.radio {
 	margin-top: 0px;	
 }
 
-.control-group {
+
+.form-vertical .control-group {
 	clear: both;
 }
 

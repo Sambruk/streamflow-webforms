@@ -602,11 +602,13 @@ var View = (function() {
             stringDTO.string = nameField.val();
             try{
                 RequestModule.setSecondSignatureName( stringDTO );
-                nameField.removeClass('validation-error');
+                phoneNumberField.parent().removeClass('error');
+                phoneNumberField.parent().find('#name-help').text("");
                 FormModule.setSecondSignatureName( stringDTO.string );
             } catch( errorMessage ) {
                 FormModule.setSecondSignatureName( "" );
-                nameField.addClass('validation-error');
+                phoneNumberField.parent().addClass('error');
+                phoneNumberField.parent().find('#name-help').text(texts.invalidformat);
                 disableSignButton = true;
             }
             toggleSignButton( disableSignButton );
@@ -621,11 +623,13 @@ var View = (function() {
           stringDTO.string = phoneNumberField.val();
           try{
               RequestModule.setSecondSignaturePhoneNumber( stringDTO );
-              phoneNumberField.removeClass('validation-error');
+              phoneNumberField.parent().removeClass('error');
+              phoneNumberField.parent().find('#phonenumber-help').text("");
               FormModule.setSecondSignaturePhoneNumber( stringDTO.string );
           } catch( errorMessage ) {
               FormModule.setSecondSignaturePhoneNumber( "" );
-              phoneNumberField.addClass('validation-error');
+              phoneNumberField.parent().addClass('error');
+              phoneNumberField.parent().find('#phonenumber-help').text(texts.invalidformat);
               disableSignButton = true;
           }
           toggleSignButton( disableSignButton );
@@ -640,13 +644,13 @@ var View = (function() {
           stringDTO.string = socialSecurityField.val();
           try{
               RequestModule.setSecondSignatureSocialSecurityNumber( stringDTO );
-              socialSecurityField.removeClass('validation-error');
-              socialSecurityField.removeClass('error');
+              socialSecurityField.parent().removeClass('error');
+              socialSecurityField.parent().find('#socialsecuritynumber-help').text("");
               FormModule.setSecondSignatureSocialSecurityNumber( stringDTO.string );
           } catch( errorMessage ) {
               FormModule.setSecondSignatureSocialSecurityNumber( "" );
-              socialSecurityField.addClass('validation-error');
-              socialSecurityField.addClass('error');
+              socialSecurityField.parent().addClass('error');
+              socialSecurityField.parent().find('#socialsecuritynumber-help').text(texts.invalidformat);
               disableSignButton = true;
           }
           toggleSignButton( disableSignButton );
@@ -667,7 +671,9 @@ var View = (function() {
                 FormModule.setSecondSignatureEmail( "" );
                 email.addClass('validation-error');
             }
-            validateSecondSignatureEmail( emailField );
+            if (emailField.find('#emailconfirm').val() != "") {
+            	validateSecondSignatureEmail( emailField );
+            }
         });
         email.focus( function() {
             email.removeClass('validation-error');           
