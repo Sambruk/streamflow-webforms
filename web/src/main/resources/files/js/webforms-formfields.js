@@ -391,7 +391,7 @@ var FieldTypeModule = (function() {
 		textfield.blur(function() {
 			field.update();
 		});
-		option.append('&nbsp;').append(textfield);
+		option.append(textfield);
 		field.node.append(option);
 
 		field.refreshUI = function() {
