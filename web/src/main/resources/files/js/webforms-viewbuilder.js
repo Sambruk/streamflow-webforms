@@ -159,7 +159,7 @@ var View = (function() {
     	pageDiv.find('h3').append( clone('link').attr('href',getPage(page.index)).text(page.title) );
     	return function( field ) {
     		foldField( pageDiv.find('#fields_table'), field );
-    	}
+    	};
     }
     
     function foldField( node, field ) {
