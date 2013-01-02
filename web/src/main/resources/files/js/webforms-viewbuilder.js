@@ -602,13 +602,13 @@ var View = (function() {
             stringDTO.string = nameField.val();
             try{
                 RequestModule.setSecondSignatureName( stringDTO );
-                phoneNumberField.parent().removeClass('error');
-                phoneNumberField.parent().find('#name-help').text("");
+                nameField.parent().removeClass('error');
+                nameField.parent().find('#name-help').text("");
                 FormModule.setSecondSignatureName( stringDTO.string );
             } catch( errorMessage ) {
                 FormModule.setSecondSignatureName( "" );
-                phoneNumberField.parent().addClass('error');
-                phoneNumberField.parent().find('#name-help').text(texts.invalidformat);
+                nameField.parent().addClass('error');
+                nameField.parent().find('#name-help').text(texts.invalidformat);
                 disableSignButton = true;
             }
             toggleSignButton( disableSignButton );
@@ -705,7 +705,7 @@ var View = (function() {
       var selectedEid = FormModule.selectedEid();
       if(typeof selectedEid !== 'undefined' && selectedEid && selectedEid.value !== texts.provider) {
         var button = $('#link_'+selectedEid.name);
-        (disable || selectedEid.selectedIndex == 0 || !FormModule.isSecondSignatureReady() ) ? enable( button, false ) : enable( button, true );
+        (disable || selectedEid.selectedIndex === 0 || !FormModule.isSecondSignatureReady() ) ? enable( button, false ) : enable( button, true );
       }
     }
 
