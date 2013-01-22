@@ -602,13 +602,13 @@ var View = (function() {
             stringDTO.string = nameField.val();
             try{
                 RequestModule.setSecondSignatureName( stringDTO );
-                phoneNumberField.parent().removeClass('error');
-                phoneNumberField.parent().find('#name-help').text("");
+                nameField.parent().removeClass('error');
+                nameField.parent().find('#name-help').text("");
                 FormModule.setSecondSignatureName( stringDTO.string );
             } catch( errorMessage ) {
                 FormModule.setSecondSignatureName( "" );
-                phoneNumberField.parent().addClass('error');
-                phoneNumberField.parent().find('#name-help').text(texts.invalidformat);
+                nameField.parent().addClass('error');
+                nameField.parent().find('#name-help').text(texts.invalidformat);
                 disableSignButton = true;
             }
             toggleSignButton( disableSignButton );

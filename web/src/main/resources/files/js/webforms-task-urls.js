@@ -140,7 +140,7 @@ var TaskUrlModule = (function() {
     }
 
     inner.getPrintUrl = function( formId ) {
-        return inner.getCaseUrl() +'submittedforms/'+ formId + '/generateformaspdf';
+        return urls.proxy + urls.draft +'submittedforms/'+ formId + '/generateformaspdf';
     }
 
     return inner;
