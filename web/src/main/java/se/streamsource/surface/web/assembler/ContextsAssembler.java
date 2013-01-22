@@ -91,6 +91,8 @@ public class ContextsAssembler
               CaseResource.class,
               FormDraftsResource.class,
               FormDraftResource.class,
+              DoubleSignatureTasksResource.class,
+              DoubleSignatureTaskResource.class,
 
               AccessPointsContext.class,
               EndUsersContext.class,

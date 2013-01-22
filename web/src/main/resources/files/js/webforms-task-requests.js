@@ -17,7 +17,7 @@
 /**
  * Module for handling all outgoing requests
  */
-var RequestModule = (function() {
+var TaskRequestModule = (function() {
     var inner = {};
 
     function request(type, url) {
@@ -52,156 +52,128 @@ var RequestModule = (function() {
         return result;
     }
 
-    inner.init = function( contextRoot, accesspoint ) {
-        UrlModule.init( contextRoot, accesspoint );
-        verifyAccessPoint();
-        selectEndUser();
-        UrlModule.setUserUrl( getUser() );
+    inner.init = function( contextRoot, task ) {
+    	TaskUrlModule.init( contextRoot, task );
+        verifyTask();
     }
 
-    function verifyAccessPoint() {
-        var parameters = request('GET', UrlModule.verifyAccessPoint() );
-        invoke( $.ajax, parameters, texts.invalidaccesspoint );
+    function verifyTask() {
+        var parameters = request('GET', TaskUrlModule.verifyTask() );
+        invoke( $.ajax, parameters, texts.invalidtask );
     }
 
     function selectEndUser() {
-        var parameters = request('POST', UrlModule.selectEndUser() );
+        var parameters = request('POST', TaskUrlModule.selectEndUser() );
         invoke( $.ajax, parameters, texts.loginfailed );
     }
 
     function getUser() {
-        var parameters = request('GET', UrlModule.getUser() );
+        var parameters = request('GET', TaskUrlModule.getUser() );
         return invoke( getData, parameters, texts.loginfailed ).entity;
     }
 
-    inner.getCaseForm = function() {
-        var parameters = request('GET', UrlModule.getCaseForm() );
+    inner.getTaskSubmittedFormSummary = function() {
+        var parameters = request('GET', TaskUrlModule.getTaskSubmittedFormSummary() );
+        parameters.error = null;
+        return getData( parameters );
+    }
+
+    inner.getTaskFormDraft = function() {
+        var parameters = request('GET', TaskUrlModule.getTaskFormDraftUrl() );
         parameters.error = null;
         return getData( parameters );
     }
 
     inner.getMailSelectionMessage = function() {
-        var params = request( 'GET', UrlModule.getMailSelectionMessage() );
+        var params = request( 'GET', TaskUrlModule.getMailSelectionMessage() );
         return getData( params ).string;
     }
 
     inner.getFormDraft = function() {
-        var params = request('GET', UrlModule.getFormDraft() );
+        var params = request('GET', TaskUrlModule.getFormDraft() );
         return getData( params );
     }
 
     inner.createCaseWithForm = function() {
-        var parameters = request('POST', UrlModule.createCaseWithForm() );
+        var parameters = request('POST', TaskUrlModule.createCaseWithForm() );
         return getData( parameters );
     }
 
     inner.updateField = function( fieldDTO ) {
-        var parameters = request('POST', UrlModule.updateField() );
+        var parameters = request('POST', TaskUrlModule.updateField() );
         parameters.data = fieldDTO;     
         return getData( parameters );
     }
 
     inner.deleteAttachment = function( attachmentId ) {
-    	var parameters = request('POST', UrlModule.deleteAttachment( attachmentId ));
+    	var parameters = request('POST', TaskUrlModule.deleteAttachment( attachmentId ));
     	$.ajax( parameters );
     }
     
     inner.submitAndSend = function() {
-        var parameters = request('POST', UrlModule.submitAndSend() );
+        var parameters = request('POST', TaskUrlModule.submitAndSend() );
         $.ajax( parameters );
     }
 
     inner.discard = function() {
-        var parameters = request('POST', UrlModule.discard() );
+        var parameters = request('POST', TaskUrlModule.discard() );
         $.ajax( parameters );
     }
 
     inner.getFormSignatures = function() {
-        var parameters = request('GET', UrlModule.getFormSignatures() );
+        var parameters = request('GET', TaskUrlModule.getFormSignatures() );
         return getData( parameters ).signatures;
     }
 
     inner.getProviders = function() {
-        var parameters = request('GET', UrlModule.getProviders() );
+        var parameters = request('GET', TaskUrlModule.getProviders() );
         return getData( parameters );
     }
 
     inner.getHeader = function() {
-        var parameters = request('GET', UrlModule.getHeader() );
+        var parameters = request('GET', TaskUrlModule.getHeader() );
         parameters.dataType = null;
         return invoke( getData, parameters, texts.eidServiceUnavailable );
     }
     
     inner.getCaseName = function() {
-        var parameters = request('GET', UrlModule.getCaseName() );
-        return getData( parameters ).caseId;
+        var parameters = request('GET', TaskUrlModule.getCaseName() );
+        return getData( parameters ).string;
     }
 
     inner.setMailNotificationEnablement = function( value ) {
         var parameters;
         if ( value ) {
-            parameters = request( 'POST', UrlModule.enableMailNotification() );
+            parameters = request( 'POST', TaskUrlModule.enableMailNotification() );
         } else {
-            parameters = request( 'POST', UrlModule.disableMailNotification() );
+            parameters = request( 'POST', TaskUrlModule.disableMailNotification() );
         }
         $.ajax( parameters );
     }
 
     inner.setConfirmationEmail = function( stringDTO ) {
-        var parameters = request( 'POST', UrlModule.setConfirmationEmail() );
+        var parameters = request( 'POST', TaskUrlModule.setConfirmationEmail() );
         parameters.data = stringDTO;
         $.ajax( parameters );
     }
 
     inner.sign = function( signDTO ) {
-        var parameters = request('GET', UrlModule.sign() );
+        var parameters = request('GET', TaskUrlModule.sign() );
         parameters.dataType = null;
         parameters.data = signDTO;        
         return getData( parameters );
     }
 
     inner.verify = function( verifyDTO ) {
-        var parameters = request('POST', UrlModule.verify() );
+        var parameters = request('POST', TaskUrlModule.verify() );
         parameters.data = verifyDTO;
         invoke( $.ajax, parameters, {error: texts.verifyfailed, redirect:'summary'} );
     }
     
     inner.refreshField = function( fieldId ) {
-        var parameters = request('GET', UrlModule.refreshField() );
+        var parameters = request('GET', TaskUrlModule.refreshField() );
         parameters.data = { string: fieldId };
         return getData( parameters ).value;
-    }
-    
-    inner.setSecondSignatureName = function( stringDTO ) {
-      var parameters = request( 'POST', UrlModule.setSecondSignatureName() );
-      parameters.data = stringDTO;
-      invoke( $.ajax, parameters, texts.secondSignatureError );
-    }
-    
-    inner.setSecondSignaturePhoneNumber = function( stringDTO ) {
-      var parameters = request( 'POST', UrlModule.setSecondSignaturePhoneNumber() );
-      parameters.data = stringDTO;
-      invoke( $.ajax, parameters, texts.secondSignatureError );
-    }
-    
-    inner.setSecondSignatureSocialSecurityNumber = function( stringDTO ) {
-      var parameters = request( 'POST', UrlModule.setSecondSignatureSocialSecurityNumber() ); 
-      parameters.data = stringDTO;
-      invoke( $.ajax, parameters, texts.secondSignatureError );
-    }
-    
-    inner.setSecondSignatureEmail = function( stringDTO ) {
-      var parameters = request( 'POST', UrlModule.setSecondSignatureEmail() );
-      parameters.data = stringDTO;
-      invoke( $.ajax, parameters, texts.secondSignatureError );
-    }
-    
-    inner.setSecondSignatureSingleSignature = function( enabled ) {
-      var parameters = request( 'POST', UrlModule.setSecondSignatureSingleSignature() );
-      var stringDTO = {};
-      enabled ? stringDTO.string = 'true' : stringDTO.string = 'false';
-      parameters.data = stringDTO;
-      $.ajax( parameters );
     }
 
     return inner;

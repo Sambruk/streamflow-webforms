@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var UrlModule = (function() {
+var TaskUrlModule = (function() {
     var inner = {};
 
     var urls = {
@@ -24,45 +24,42 @@ var UrlModule = (function() {
     };
 
 
-    inner.init = function( contextRoot, accesspoint ) {
+    inner.init = function( contextRoot, task ) {
     	urls.proxy = contextRoot + urls.proxy;
     	urls.surface = contextRoot + urls.surface;
     	urls.eid = contextRoot + urls.eid;
-        urls.accesspoint = 'accesspoints/' + accesspoint + '/endusers/';
+        urls.task = 'tasks/' + task + '/';
     }
 
-    inner.verifyAccessPoint = function() {
-        return urls.proxy + urls.accesspoint + '.json';
+    inner.verifyTask = function() {
+        return urls.proxy + urls.task + '.json';
     }
 
     inner.selectEndUser = function() {
-        return urls.surface + urls.accesspoint + 'selectenduser.json';
+        return urls.surface + urls.task + 'selectenduser.json';
     }
 
     inner.getUser = function() {
-        return urls.surface + urls.accesspoint + 'userreference.json';
+        return urls.surface + urls.task + 'userreference.json';
     }
     
     inner.setUserUrl = function( user ) {
-        urls.user = urls.accesspoint + user + '/';
-        urls.proxyuser = urls.accesspoint + user + '/drafts/';
+        urls.user = urls.task + user + '/';
+        urls.proxyuser = urls.task + user + '/drafts/';
     }
 
-    inner.createCaseUrl = function( caze ) {
-        if ( !urls.proxyuser && !urls.user) throw "URL to user not defined";
-        urls.caze = urls.user + caze + '/';
-        urls.draft = null;
-        urls.proxycaze = urls.proxyuser + caze + '/';
-        urls.proxydraft = null;
+    inner.getTaskFormDraftUrl = function( form ) {
+        if ( !urls.task ) throw "URL to task not defined";
+        urls.draft = urls.task + 'formdraft/';
+        urls.proxydraft = urls.task + 'formdraft/';
+        return urls.proxy + urls.draft + 'index.json';        
     }
 
-    inner.createFormDraftUrl = function( form ) {
-        if ( !urls.caze && !urls.proxycaze ) throw "URL to case not defined";
-        urls.draft = urls.caze + 'formdrafts/' + form + '/';
-        urls.proxydraft = urls.proxycaze + 'formdrafts/' + form + '/';
+    inner.getTaskSubmittedFormSummary = function () {
+    	return urls.proxy + urls.task + 'submittedform/summary/index.json';
     }
-
-    inner.getCaseForm = function() {
+    
+    inner.getTaskForm = function() {
         return urls.proxy + urls.proxyuser + 'findcasewithform.json';
     }
 
@@ -115,7 +112,7 @@ var UrlModule = (function() {
     }
 
     inner.getCaseName = function() {
-        return urls.proxy + urls.proxycaze + 'index.json';
+        return urls.proxy + urls.task + 'caseid.json';
     }
 
     inner.getCaseUrl = function() {
@@ -143,27 +140,7 @@ var UrlModule = (function() {
     }
 
     inner.getPrintUrl = function( formId ) {
-        return inner.getCaseUrl() +'submittedforms/'+ formId + '/generateformaspdf';
-    }
-    
-    inner.setSecondSignatureName = function() {
-      return urls.proxy + urls.proxydraft + 'updatename.json';
-    }
-    
-    inner.setSecondSignaturePhoneNumber = function() {
-      return urls.proxy + urls.proxydraft + 'updatephonenumber.json';
-    }
-    
-    inner.setSecondSignatureSocialSecurityNumber = function() {
-      return urls.proxy + urls.proxydraft + 'updatesocialsecuritynumber.json';
-    }
-    
-    inner.setSecondSignatureEmail = function() {
-      return urls.proxy + urls.proxydraft + 'updateemail.json';
-    }
-    
-    inner.setSecondSignatureSingleSignature = function() {
-      return urls.proxy + urls.proxydraft + 'updatesinglesignature.json';
+        return urls.proxy + urls.draft +'submittedforms/'+ formId + '/generateformaspdf';
     }
 
     return inner;

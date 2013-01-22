@@ -82,10 +82,15 @@ var View = (function() {
     	createPageContent( getSummary(), function( node ) {
     		FormModule.fold( function( page ) { return foldPage( node, page ) } );
             addMailNotification( node );
+            addSecondSignatureDiv( node );
             addSignaturesDiv( node );
     	});
     }
 
+    inner.foldPage = function( node, page) {
+    	return foldPage( node, page );
+    }
+    
     function createPageContent(page, contentFunction){
     	 var errors = $('#inserted_alert');
     	 var container = $('#container').empty();
@@ -135,13 +140,13 @@ var View = (function() {
         }
         field.refreshUI();
     };
-    
 
     function mandatory( node, field ) {
         if ( field.field.field.mandatory ) {
             clone('mandatory', 'mandatory' + field.id).appendTo( node );
         }
     }
+
 
     function hint( node, field ) {
         if ( field.fieldValue.hint ) {
@@ -154,7 +159,7 @@ var View = (function() {
     	pageDiv.find('h3').append( clone('link').attr('href',getPage(page.index)).text(page.title) );
     	return function( field ) {
     		foldField( pageDiv.find('#fields_table'), field );
-    	}
+    	};
     }
     
     function foldField( node, field ) {
@@ -170,7 +175,6 @@ var View = (function() {
     		row.addClass('validation-error');
     		row.append($('<td class="field_message pull-right"/>').append(clone('label_error', 'error')));
         }
-        
     }
 
     function help( node, field ) {
@@ -178,11 +182,26 @@ var View = (function() {
             clone('help-block').append(field.field.field.note).insertAfter(node);
         }
     }
+    
+    function enableSecondSignatureFields( secondSignature ) {
+        var enable = false;
+        var signature = getSignature( FormModule.getRequiredSignatures()[0].name, FormModule.getSignatures() );
+        signature ? enable = false : enable = true;
+        var inputArray = secondSignature.find('input');
+        for (var i = 0; i < inputArray.length; i++) {
+            if (enable) {
+                inputArray[i].disabled ? inputArray[i].removeAttr("disabled") : '';
+            } else {
+                inputArray[i].disabled = "disabled";
+            }
+        }
+    }
 
     inner.sign = function( args ) {
         var retVal = doSign();
         if ( retVal != 0 ) {
-			var errorKey = "eid-" + retVal; 
+            var errorKey = "eid-" + retVal;
+            FormModule.setSelectedEid( null );
             throw { warning: texts.eiderrormessage + ": " + texts[errorKey], redirect:getSummary() };
         } else {
             // strip parameters
@@ -196,13 +215,36 @@ var View = (function() {
             verifyDTO.form = FormModule.getFormTBS();
             RequestModule.verify( verifyDTO );
             
-            // Store the email before reloading the formdraft
+            // Store the email etc before reloading the formdraft
             var confirmationEmail = FormModule.confirmationEmail();
             var confirmationEmailConfirm = FormModule.confirmationEmailConfirm();
             
+            if(FormModule.formNeedsSecondSignature()) {
+              var secondSignatureName = FormModule.secondSignatureName();
+              var secondSignaturePhoneNumber = FormModule.secondSignaturePhoneNumber();
+              var secondSignatureSocialSecurityNumber = FormModule.secondSignatureSocialSecurityNumber();
+              var secondSignatureEmail = FormModule.secondSignatureEmail();
+              var secondSignatureEmailConfirm = FormModule.secondSignatureEmailConfirm();
+              var secondSignatureSingleSignature = FormModule.secondSignatureSingleSignature();
+              if (!FormModule.secondSignatureSingleSignature()) {
+                RequestModule.setSecondSignatureSingleSignature( false );
+                FormModule.setSecondSignatureSingleSignature( false );
+                secondSignatureSingleSignature = FormModule.secondSignatureSingleSignature();
+              }
+            }
+
             FormModule.init( RequestModule.getFormDraft() );
             FormModule.setConfirmationEmail( confirmationEmail );
             FormModule.setConfirmationEmailConfirm( confirmationEmailConfirm );
+            
+            if(FormModule.formNeedsSecondSignature()) {
+              FormModule.setSecondSignatureName( secondSignatureName );
+              FormModule.setSecondSignaturePhoneNumber( secondSignaturePhoneNumber );
+              FormModule.setSecondSignatureSocialSecurityNumber( secondSignatureSocialSecurityNumber );
+              FormModule.setSecondSignatureEmail( secondSignatureEmail );
+              FormModule.setSecondSignatureEmailConfirm( secondSignatureEmailConfirm );
+              FormModule.setSecondSignatureSingleSignature( secondSignatureSingleSignature );
+            }
             // signing success redirect to summary
             throw {info:texts.formSigned, redirect:getSummary()};
         }
@@ -238,6 +280,11 @@ var View = (function() {
         };
         var image = $('#Field'+fieldId+' .fieldwaiting > img').show();
         try{
+        	if ( FormModule.isSecondSigningFlow() ) {
+    			return TaskRequestModule.updateField( fieldDTO );
+    		} else {
+    			return RequestModule.updateField( fieldDTO );
+    		}
             return RequestModule.updateField( fieldDTO );
         } catch( e ) {
             message = { error: e.info };
@@ -256,11 +303,16 @@ var View = (function() {
 
     function addButtons( node, page) {
     	var buttons = clone('buttons');
-	    new inner.Button( buttons ).name(texts.previous).href( getPrevious( page ) ).enable( page!=0 );
-	    new inner.Button( buttons ).name(texts.next).href(getNext( page ) ).enable( page!='#summary' );
+	    var previousBtn = new inner.Button( buttons ).name(texts.previous).href( getPrevious( page ) )
+	    var nextBtn = new inner.Button( buttons ).name(texts.next).href(getNext( page ) ).enable( page!=getSummary() );
 	   
-	    var dialogElement = createDiscardDialog(node);
-	    new inner.Button( buttons ).name(texts.discard).confirm('#' + dialogElement.attr('id')).addClass("btn-danger");
+	    if ( !FormModule.isSecondSigningFlow() ) {
+	    	previousBtn.enable( page!=0 );
+		    var dialogElement = createDiscardDialog(node);
+		    new inner.Button( buttons ).name(texts.discard).confirm('#' + dialogElement.attr('id')).addClass("btn-danger");
+	    } else {
+	    	previousBtn.enable( page!=getIncoming());
+	    }
 	    
 	    if( page == getSummary()) {
 	    	var button = new inner.Button( buttons ).name(texts.submit).href(getSubmit());
@@ -298,12 +350,17 @@ var View = (function() {
         var current = parseInt( segment );
         if ( isNaN( current ) ) {
             return getPage( FormModule.pageCount()-1 );
+        } else if (current == 0){
+        	return getIncoming();
         } else {
             return getPage( current-1);
         }
     }
 
     function getNext( segment ) {
+    	if (segment == getIncoming()) {
+    		return getPage(0);
+    	}
         var current = parseInt( segment );
         if ( isNaN( current ) || (current == FormModule.pageCount()-1 ) ) {
             return getSummary();
@@ -316,8 +373,16 @@ var View = (function() {
         return '#' + Contexts.findUrl( inner.formPage, [page]);
     }
 
+    function getIncoming() {
+        return '#incoming';
+    }
+
     function getSummary() {
-        return '#' + Contexts.findUrl( inner.summary );
+        return '#summary';
+    }
+
+    function getSecondSignSummary() {
+        return '#' + Contexts.findUrl( inner.secondSignSummary );
     }
 
     function getSubmit( ) {
@@ -364,22 +429,13 @@ var View = (function() {
             emailConfirmField.blur( function() {
             	FormModule.setConfirmationEmailConfirm( emailConfirmField.val());
             });
-            
-            var toogleSubmitButton = function( enabled) {
-            	if (enabled && FormModule.canSubmit()) {
-            		enable($('#inserted_button_submit'), true);
-                	$('#inserted_button_submit').addClass("btn-primary");         
-            	} else {
-            		enable($('#inserted_button_submit'), false);
-                	$('#inserted_button_submit').removeClass("btn-primary");    
-            	}
-            }
+
             var emailFunction = function() {
                 // if not match show error and disable submit-button
                 if ( emailConfirmField.val() != emailField.val() ) {
-            		inputs.addClass('error');
+            		    inputs.addClass('error');
                     inputs.find('#confirmation-help').append(texts.emailMismatch);
-                    toogleSubmitButton( false );   
+                    toggleSubmitButton( false );   
                     
                     emailConfirmField.focus( function() {
                     	// Remove old error messages and enable submit button
@@ -388,12 +444,12 @@ var View = (function() {
                     	emailConfirmField.focus( function(){});
                     });
                 } else if (emailField.val()) {
-                	toogleSubmitButton( true);                	
+                	toggleSubmitButton( true);                	
                 }
             };
             
             if (FormModule.mailNotificationEnabled() ) {
-            	toogleSubmitButton(false);
+            	toggleSubmitButton(false);
                 emailFunction.call();
             } else {
                 inputs.hide();
@@ -406,14 +462,13 @@ var View = (function() {
 
                 if ( checked ) {
                     inputs.show( 'slow' );
-                    toogleSubmitButton( false );
+                    toggleSubmitButton( false );
                     emailFunction.call();
                 } else {
                     inputs.hide( 'slow' );
-                    toogleSubmitButton( true );
+                    toggleSubmitButton( true );
                 }
-                
-                
+                                
             });
             emailConfirmField.blur( emailFunction );
             
@@ -421,52 +476,255 @@ var View = (function() {
         }
     }
     
+    function toggleSubmitButton( enabled ) {
+      if (enabled && FormModule.canSubmit()) {
+          enable($('#inserted_button_submit'), true);
+          $('#inserted_button_submit').addClass("btn-primary"); 
+      } else {
+        enable($('#inserted_button_submit'), false);
+          $('#inserted_button_submit').removeClass("btn-primary");    
+      }
+    }
+    
     function addSignaturesDiv( node ) {
-        if ( FormModule.requiredSignaturesCount() > 0 ) {
-        	var signaturesNode = clone('form_signatures');
-        	signaturesNode.addClass('well');
-        	signaturesNode.find("h3").append( texts.signatures );
-        	
-        	var table = signaturesNode.find('table');
-        	$.each( FormModule.getRequiredSignatures(), function(idx, reqSign ) {
-        		var row = $('<tr/>');
-        		table.append( row );
-        		row.addClass("signature-row");
-        		row.append( $('<td/>').append(reqSign.name + ":") );
-        		var signature = getSignature( reqSign.name, FormModule.getSignatures() );
-        		if ( signature ) {
-        			row.append( $('<td/>').append(signature.signerName).addClass('signer-name'));
-        		} else {
-        			row.append( $('<td/>').append( eidProviders(idx) ));
-        			var buttonCell = $('<td/>');
-        			new inner.Button( buttonCell )
-        				.name(texts.sign)
-        				.href(getSign(idx))
-        				.attr('id',"link_" + idx)
-        				.image('icon-pencil')
-        				.enable(false);
-        			row.append( buttonCell );
-        		}
-        	});
-        	node.append( signaturesNode );
+        if ( FormModule.formNeedsSigning() ) {
+          var reqSign = FormModule.getRequiredSignatures()[0];
+          
+          var signaturesNode = clone('form_signatures');
+          signaturesNode.addClass('well');
+          signaturesNode.find("h3").append( texts.signature );
+            
+          var table = signaturesNode.find('table');
+          var idx = 0;
+          var row = $('<tr/>');
+          table.append( row );
+          row.addClass("signature-row");
+          row.append( $('<td/>').append(reqSign.name + ":") );
+          var signature = getSignature( reqSign.name, FormModule.getSignatures() );
+          if ( signature ) {
+            row.append( $('<td/>').append(signature.signerName).addClass('signer-name'));
+          } else {
+            row.append( $('<td/>').append( eidProviders(idx) ));
+            var buttonCell = $('<td/>');
+            new inner.Button( buttonCell )
+              .name(texts.sign)
+              .href(getSign(idx))
+              .attr('id',"link_" + idx)
+              .image('icon-pencil')
+              .enable(false);
+            row.append( buttonCell );
+          }
+          node.append( signaturesNode );
+       }
+    }
+    
+    function addSecondSignatureDiv( node ) {
+      if ( FormModule.formNeedsSecondSignature() ) {
+        var reqSign = FormModule.getRequiredSignatures()[1];
+        var secondSignature = clone('second_signature');
+        var signatureFields = secondSignature.find('#secondsignature_fields');
+        
+        secondSignature.find('#secondsignature-label').text(reqSign.name);
+        secondSignature.find('#secondsignaturetext').text(texts.secondSignatureComment);
+
+        secondSignature.find('#name-label').text( texts.name );
+        secondSignature.find('#socialsecuritynumber-label').text(texts.socialSecurityNumber);
+        secondSignature.find('#phonenumber-label').text(texts.phonenumber);
+          
+        secondSignature.find('#email-label').text(texts.email);
+        secondSignature.find('#emailconfirm-label').text(texts.confirmEmail);
+          
+        if( !reqSign.mandatory ) {
+          var singleSignatureCheckboxLabel = secondSignature.find('#singlesignaturecheckbox-label');
+          var isChecked = FormModule.secondSignatureSingleSignature();
+          singleSignatureCheckboxLabel.append( reqSign.question );            
+          secondSignature.find('#singlesignaturecheckbox').prop('checked', isChecked );
+          
+          isChecked ? signatureFields.hide() : '';
+          
+          secondSignature.find('#singlesignaturecheckbox').click( function() {
+            var checked = secondSignature.find('#singlesignaturecheckbox').prop('checked');
+            RequestModule.setSecondSignatureSingleSignature( checked );
+            FormModule.setSecondSignatureSingleSignature( checked );
+            if ( checked ) {
+              signatureFields.hide( 'slow' );
+            } else {
+              signatureFields.show( 'slow' );
+            }
+            toggleSignButton( false );
+          });
+        } else {
+            secondSignature.find('#singlesignaturecheckbox-label').hide();
         }
+        
+        updateSecondSignatureName( secondSignature.find('#name') );
+        setMandatory( secondSignature.find('#name-label'), secondSignature.find('#name') );
+        updateSecondSignaturePhoneNumber( secondSignature.find('#phonenumber') );
+        setMandatory( secondSignature.find('#phonenumber-label'), secondSignature.find('#phonenumber') );
+        updateSecondSignatureSocialSecurityNumber( secondSignature.find('#socialsecuritynumber') );
+        setMandatory( secondSignature.find('#socialsecuritynumber-label'), secondSignature.find('#socialsecuritynumber') );
+        setHint(secondSignature.find('#socialsecuritynumber-label'), secondSignature.find('#socialsecuritynumber'), texts.socialSecurityNumberHint);
+        updateSecondSignatureEmail( secondSignature.find('#emailfields') );
+        setMandatory( secondSignature.find('#email-label'), secondSignature.find('#email') );
+        updateSecondSignatureEmailConfirm( secondSignature.find('#emailfields') );
+        setMandatory( secondSignature.find('#emailconfirm-label'), secondSignature.find('#emailconfirm') );
+        
+        enableSecondSignatureFields(secondSignature);
+        
+        node.append( secondSignature );  
+     
+      }
+    }
+    
+    function validateSecondSignatureEmail( emailField ) {
+        var disableSignButton = false;
+        var email = emailField.find('#email');
+        var emailconfirm = emailField.find('#emailconfirm');
+        if ( email.val() !== emailconfirm.val() ) {
+            emailField.addClass('error');
+            emailField.find('#confirmation-help').append(texts.emailMismatch);
+            disableSignButton = true;
+        } else if( email.hasClass('validation-error') ) {
+            emailField.addClass('error');
+            emailField.find('#confirmation-help').append(texts.emailNotAnEmail);
+            disableSignButton = true;
+        } else {
+            emailField.removeClass('error');
+        }       
+        toggleSignButton( disableSignButton );
+    }
+    
+    function updateSecondSignatureName( nameField ) {
+        nameField.val( FormModule.secondSignatureName() );
+        nameField.blur( function() {
+            var disableSignButton = false;
+            var stringDTO = {};
+            stringDTO.string = nameField.val();
+            try{
+                RequestModule.setSecondSignatureName( stringDTO );
+                nameField.parent().removeClass('error');
+                nameField.parent().find('#name-help').text("");
+                FormModule.setSecondSignatureName( stringDTO.string );
+            } catch( errorMessage ) {
+                FormModule.setSecondSignatureName( "" );
+                nameField.parent().addClass('error');
+                nameField.parent().find('#name-help').text(texts.invalidformat);
+                disableSignButton = true;
+            }
+            toggleSignButton( disableSignButton );
+        });
+    }
+    
+    function updateSecondSignaturePhoneNumber( phoneNumberField ) {
+      phoneNumberField.val( FormModule.secondSignaturePhoneNumber() );       
+      phoneNumberField.blur( function() {
+          var disableSignButton = false;
+          var stringDTO = {};
+          stringDTO.string = phoneNumberField.val();
+          try{
+              RequestModule.setSecondSignaturePhoneNumber( stringDTO );
+              phoneNumberField.parent().removeClass('error');
+              phoneNumberField.parent().find('#phonenumber-help').text("");
+              FormModule.setSecondSignaturePhoneNumber( stringDTO.string );
+          } catch( errorMessage ) {
+              FormModule.setSecondSignaturePhoneNumber( "" );
+              phoneNumberField.parent().addClass('error');
+              phoneNumberField.parent().find('#phonenumber-help').text(texts.invalidformat);
+              disableSignButton = true;
+          }
+          toggleSignButton( disableSignButton );
+      });
+    }
+    
+    function updateSecondSignatureSocialSecurityNumber( socialSecurityField ) {
+      socialSecurityField.val( FormModule.secondSignatureSocialSecurityNumber() );       
+      socialSecurityField.blur( function() {
+          var disableSignButton = false;
+          var stringDTO = {};
+          stringDTO.string = socialSecurityField.val();
+          try{
+              RequestModule.setSecondSignatureSocialSecurityNumber( stringDTO );
+              socialSecurityField.parent().removeClass('error');
+              socialSecurityField.parent().find('#socialsecuritynumber-help').text("");
+              FormModule.setSecondSignatureSocialSecurityNumber( stringDTO.string );
+          } catch( errorMessage ) {
+              FormModule.setSecondSignatureSocialSecurityNumber( "" );
+              socialSecurityField.parent().addClass('error');
+              socialSecurityField.parent().find('#socialsecuritynumber-help').text(texts.invalidformat);
+              disableSignButton = true;
+          }
+          toggleSignButton( disableSignButton );
+      });
+    }
+    
+    function updateSecondSignatureEmail( emailField ) {
+        var email = emailField.find('#email')      
+        email.val( FormModule.secondSignatureEmail() );       
+        email.blur( function() {
+            var stringDTO = {};
+            stringDTO.string = email.val();
+            try{
+                RequestModule.setSecondSignatureEmail( stringDTO );
+                email.removeClass('validation-error');
+                FormModule.setSecondSignatureEmail( stringDTO.string );
+            } catch( errorMessage ) {
+                FormModule.setSecondSignatureEmail( "" );
+                email.addClass('validation-error');
+            }
+            if (emailField.find('#emailconfirm').val() != "") {
+            	validateSecondSignatureEmail( emailField );
+            }
+        });
+        email.focus( function() {
+            email.removeClass('validation-error');           
+            emailField.find('#confirmation-help').text("");
+        });
+    }
+    
+    function updateSecondSignatureEmailConfirm( emailField ) {
+        var email = emailField.find('#emailconfirm') 
+        email.val( FormModule.secondSignatureEmailConfirm() );
+        email.blur( function() {
+            FormModule.setSecondSignatureEmailConfirm( email.val());
+            validateSecondSignatureEmail( emailField );
+        });
+        email.focus( function() {
+            emailField.find('#confirmation-help').text("");
+        });
+    }
+    
+    function setMandatory( node, field ) {
+        clone('mandatory', 'mandatory_' + field.attr('id')).appendTo( node );
+    }
+    
+    function setHint( node, field, hintText ) {
+        clone('hint', 'hint_' + field.attr('id')).text( ' (' + hintText + ')' ).appendTo( node );
+    }
+    
+    function toggleSignButton( disable ) {
+      var selectedEid = FormModule.selectedEid();
+      if(typeof selectedEid !== 'undefined' && selectedEid && selectedEid.value !== texts.provider) {
+        var button = $('#link_'+selectedEid.name);
+        (disable || selectedEid.selectedIndex === 0 || !FormModule.isSecondSignatureReady() ) ? enable( button, false ) : enable( button, true );
+      }
     }
 
     function eidProviders( signatureId ){
     	var comboBox = clone('eidProviders').attr({name: signatureId, id: "eIdProvider_" + signatureId});
     	comboBox.change(function() {
+    	      FormModule.setSelectedEid( this );
             var button = $('#link_'+this.name);
-            if ( this.selectedIndex == 0 ) {
-    		    enable( button, false );
-    		    return;
+            if ( this.selectedIndex == 0 || !FormModule.isSecondSignatureReady() ) {
+    		        enable( button, false );
             }
 
             var value = this.value;
             button.attr('href', function() {
                 return this.href.split('?provider=')[0] + "?provider="+value;
             });
-            enable( button, true );
-
+            if ( this.selectedIndex !== 0 && FormModule.isSecondSignatureReady() ) {
+                enable( button, true );
+            }
             var signDTO = {
                 transactionId: FormModule.getFormId(),
                 tbs: FormModule.getFormTBS(),
@@ -521,7 +779,10 @@ var View = (function() {
 
     function addProgressbar( current, pages, contentNode ) {
     	var progress = clone('progress');
-        $.each( pages, function(idx, page){
+    	if ( FormModule.isSecondSigningFlow() ) {
+    		progress.append( createProgressItem(current==getIncoming(), getIncoming(), texts.incomingform ));
+    	}
+    	$.each( pages, function(idx, page){
             progress.append( createProgressItem(idx==current, getPage(idx), page.title) );
         });
         

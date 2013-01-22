@@ -42,7 +42,7 @@ import se.streamsource.surface.web.config.ExternalCssConfiguration;
 @Mixins(IndexRestletService.Mixin.class)
 public interface IndexRestletService extends ServiceComposite, Configuration<ExternalCssConfiguration>
 {
-   public void handle(Request request, Response response);
+   public void handle(Request request, Response response) throws Exception;
 
    abstract class Mixin implements IndexRestletService
    {
@@ -58,38 +58,53 @@ public interface IndexRestletService extends ServiceComposite, Configuration<Ext
       @This
       Configuration<ExternalCssConfiguration> cssConfig;
 
-      public void handle(Request request, Response response)
+      public void handle(Request request, Response response) throws Exception
       {
 
          String accessPointId = request.getResourceRef().getQueryAsForm().getFirstValue( "ap" );
+         String taskId = request.getResourceRef().getQueryAsForm().getFirstValue( "tid" );
 
          if (accessPointId != null)
          {
-            try
-            {
-               String template = getTemplate( "index.html", getClass() );
+               String template = getTemplate( "webforms.html", getClass() );
 
                template = template.replace( "$context-root", "/"
                      + request.getResourceRef().getBaseRef().getSegments().get( 0 ) );
                template = template.replace( "$accesspoint", accessPointId );
                template = template.replace( "$hostname", request.getResourceRef().getHostIdentifier() );
-               String externalCssReplaceString = "";
-               if (!Strings.empty( cssConfig.configuration().cssUrl().get())) {
-                  externalCssReplaceString = "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + cssConfig.configuration().cssUrl().get() + "\" />"; 
-               }
-               template = template.replace( "$externalcss", externalCssReplaceString);
-               
+               String externalCssReplaceString = externalCssReplaceString( cssConfig.configuration().cssUrl().get() );
+               template = template.replace( "$externalcss", externalCssReplaceString );
+
                response.setEntity( template, MediaType.TEXT_HTML );
-            } catch (IOException e)
-            {
-               e.printStackTrace();
-            }
+         } else if (taskId != null)
+         {
+            String template = getTemplate( "webforms-task.html", getClass() );
+
+            template = template.replace( "$context-root", "/"
+                  + request.getResourceRef().getBaseRef().getSegments().get( 0 ) );
+            template = template.replace( "$task", taskId );
+            template = template.replace( "$hostname", request.getResourceRef().getHostIdentifier() );
+            String externalCssReplaceString = externalCssReplaceString( cssConfig.configuration().cssUrl().get() );
+            template = template.replace( "$externalcss", externalCssReplaceString );
+
+            response.setEntity( template, MediaType.TEXT_HTML );
          } else
          {
             response.setLocationRef( new Reference( request.getResourceRef(), "/"
                   + request.getResourceRef().getBaseRef().getSegments().get( 0 ) + "/surface/accesspoints/index" ) );
             response.setStatus( Status.REDIRECTION_TEMPORARY );
          }
+      }
+
+      private String externalCssReplaceString(String property)
+      {
+         String externalCssReplaceString = "";
+         if (!Strings.empty( property ))
+         {
+            externalCssReplaceString = "<link rel=\"stylesheet\" type=\"text/css\" href=\""
+                  + cssConfig.configuration().cssUrl().get() + "\" />";
+         }
+         return externalCssReplaceString;
       }
 
       public static String getTemplate(String resourceName, Class resourceClass) throws IOException

@@ -23,6 +23,7 @@ var FormModule = (function() {
 	var initDone = false;
 	var requiredSignatures;
 	var selectedRequiredSignature;
+	var incomingSummary;
 	
 	function Form( formDraft ) {
 		this.title = formDraft.description;
@@ -32,6 +33,16 @@ var FormModule = (function() {
 		this.confirmationEmail = formDraft.enteredEmails;
 		this.confirmationEmailConfirm;
 		this.mailSelectionEnablement = formDraft.mailSelectionEnablement;
+		if ( formDraft.secondsignee ) {
+			// Load stored data
+			this.secondSignatureName = formDraft.secondsignee.name;
+			this.secondSignaturePhoneNumber = formDraft.secondsignee.phonenumber;
+			this.secondSignatureSocialSecurityNumber = formDraft.secondsignee.socialsecuritynumber;
+			this.secondSignatureSingleSignature = formDraft.secondsignee.singelsignature;
+			this.secondSignatureEmail = formDraft.secondsignee.email;
+			//this.secondSignatureEmailConfirm = formDraft.secondSignatureEmailConfirm;
+		}
+		this.selectedEid = formDraft.selectedEid;
 		var pages = this.pages;
 		$.each( formDraft.pages, function(idx, page) {
 			pages[ idx ] = new Page( page, idx );
@@ -97,6 +108,10 @@ var FormModule = (function() {
     function formatSelectionValues( value ) {
         return value.replace(/(\[|\])/g, "'" );
     }
+    
+    function hasFieldAValue( field ) {
+      return !((typeof field === 'undefined') || (field.length < 1) );
+    }
 
     Field.prototype.setValue = function( value ) {
     	this.value = value;
@@ -104,6 +119,10 @@ var FormModule = (function() {
     	return this;
     }
 
+	inner.setupIncomingFormSummaryPage = function ( incomingFormSummary ) {
+		incomingSummary = incomingFormSummary;
+	}
+	
 	inner.getField = function( id ) {
 	    return fieldMap[ id ];
 	}
@@ -121,15 +140,24 @@ var FormModule = (function() {
 		});
 	}
 
+	inner.foldIncoming = function( pageFolder ) {
+		$.each( incomingSummary.pages, function(idx, page) {
+			var fieldFolder = pageFolder( page );
+			$.each( page.fields, function( idy, field) {
+				fieldFolder( field );
+			});
+		});
+	}
+
 	inner.foldEditPage = function( pageIndex, fieldFolder ) {
 	    $.each( formDraft.pages[ pageIndex ].fields, function( idx, field ) {
 	        fieldFolder( field );
         });
 	}
 
-	inner.init = function( formDraftValue ) {
+	inner.init = function( formDraftValue, mailSelectionMessageTextIn ) {
 		formDraft = new Form( formDraftValue );
-		mailSelectionMessageText = RequestModule.getMailSelectionMessage();
+		mailSelectionMessageText = mailSelectionMessageTextIn;
 		initDone = true;
 	}
 	
@@ -170,13 +198,32 @@ var FormModule = (function() {
 	}
 	
 	inner.isFormSigned = function() {
-		return requiredSignatures.length == formDraft.signatures.length;
+	    return inner.requiredSignedSignaturesCount() == formDraft.signatures.length;
+	}
+	 
+	inner.isSecondSignatureReady = function() {
+	  if( inner.formNeedsSecondSignature() ) {
+	    var singleSignature = inner.secondSignatureSingleSignature();
+	    if( typeof singleSignature === 'undefined' || !singleSignature ) {
+	      return (hasFieldAValue( formDraft.secondSignatureName ) 
+	          && hasFieldAValue( formDraft.secondSignatureEmail )
+	          && hasFieldAValue( formDraft.secondSignatureEmailConfirm )
+	          && hasFieldAValue( formDraft.secondSignaturePhoneNumber )
+	          && hasFieldAValue( formDraft.secondSignatureSocialSecurityNumber ) );
+	      }
+	  }
+	  return true;
 	}
 	
-	inner.formNeedsSigning = function() {
-		return requiredSignatures.length > 0;
-	}
 
+	inner.formNeedsSigning = function() {
+	  var needsSigning = false;
+	  if ( requiredSignatures.length > 0 ) {
+	    needsSigning = requiredSignatures[0].active;
+	  }
+	  return needsSigning;
+	}
+	
 	inner.setRequiredSignatures = function( required ) {
 	    requiredSignatures = required;
 	}
@@ -189,8 +236,35 @@ var FormModule = (function() {
 		return selectedRequiredSignature;
 	}
 	
+	inner.formNeedsSecondSignature = function() {
+	  var needsSigning = false;
+	  if ( requiredSignatures.length > 1 ) {
+	    needsSigning = requiredSignatures[1].active;
+	  }
+	  return needsSigning;
+	}
+	
 	inner.requiredSignaturesCount = function() {
-		return requiredSignatures.length;
+	  var reqSignNbrs = 0;
+	  if ( inner.formNeedsSigning() ) {
+	    reqSignNbrs++;
+	    if ( inner.formNeedsSecondSignature() ) {
+	      reqSignNbrs++;
+	    }
+	  }
+	  return reqSignNbrs;
+	}
+	
+	inner.requiredSignedSignaturesCount = function() {
+	  var reqSignNbrs = 0;
+	  if ( inner.formNeedsSigning() ) {
+	    reqSignNbrs++;
+	  }
+	  return reqSignNbrs;
+	}
+	
+	inner.isSecondSigningFlow = function () {
+		return incomingSummary === undefined ? false : true;
 	}
 	
 	inner.title = function() {
@@ -204,9 +278,13 @@ var FormModule = (function() {
 	inner.getSignatures = function() {
 		return formDraft.signatures;
 	}
+	
+	inner.incomingSignerName = function () {
+		return incomingSummary === undefined ? undefined : incomingSummary.signatures[0].signerName; 
+	}
 
-	function fieldIterator( iterate ) {
-	    $.each( formDraft.pages, function(idx, page) {
+	function fieldIterator( iterate, form ) {
+	    $.each( form.pages, function(idx, page) {
 	        $.each( page.fields, function(idy, field) {
 	            iterate( field );
             })
@@ -218,22 +296,31 @@ var FormModule = (function() {
         fieldIterator( function( field ) {
             if ( field.fieldType != 'CommentFieldValue' )
                 tbs += field.name + ' = ' + field.formattedValue + '. ';
-        });
+        }, formDraft);
         return tbs;
 	}
 
-    inner.hasErrors = function() {
-        var error = false;
-        fieldIterator( function(field) { 
-        	if ( field.field.field.mandatory && !field.value) {
-            	error = true;
-        	} 
-        	if (field.invalidformat != '' ) {
-        		error = true;
-        	}
-        });
-        return error;
-    }
+	inner.getIncomingFormTBS = function() {
+        var tbs = "";
+        fieldIterator( function( field ) {
+            if ( field.fieldType != 'CommentFieldValue' )
+                tbs += field.field + ' = ' + field.value + '. ';
+        }, incomingSummary);
+        return tbs;
+	}
+
+  inner.hasErrors = function() {
+    var error = false;
+    fieldIterator( function(field ) { 
+      if ( field.field.field.mandatory && !field.value) {
+        error = true;
+      } 
+      if (field.invalidformat != '' ) {
+        error = true;
+      }
+    }, formDraft);
+    return error;
+  }
 
 	
 	inner.pages = function() {
@@ -274,7 +361,7 @@ var FormModule = (function() {
             	return false;
             }
         }
-        if ( inner.requiredSignaturesCount() > 0 ) {
+        if ( inner.formNeedsSigning() ) {
             return formFilled && inner.isFormSigned();
         }
 	    return formFilled;
@@ -292,6 +379,64 @@ var FormModule = (function() {
     inner.getMailSelectionMessage = function() {
         return mailSelectionMessageText;
     }
+    
+  inner.setSecondSignatureName = function( name ) {
+    formDraft.secondSignatureName = name;
+  }
+    
+  inner.secondSignatureName = function() {
+    return formDraft.secondSignatureName;
+  }
+  
+  inner.setSecondSignaturePhoneNumber = function( phoneNumber) {
+    formDraft.secondSignaturePhoneNumber = phoneNumber;
+  }
+  
+  inner.secondSignaturePhoneNumber = function() {
+    return formDraft.secondSignaturePhoneNumber;
+  }
+  
+  inner.setSecondSignatureSocialSecurityNumber = function( number ) {
+    formDraft.secondSignatureSocialSecurityNumber = number;
+  }
+  
+  inner.secondSignatureSocialSecurityNumber = function() {
+    return formDraft.secondSignatureSocialSecurityNumber;
+  }
+  
+  inner.setSecondSignatureSingleSignature = function( enabled ) {
+    formDraft.secondSignatureSingleSignature = enabled;
+  }
+  
+  inner.secondSignatureSingleSignature = function() {
+    return formDraft.secondSignatureSingleSignature;
+  }
+  
+  inner.setSecondSignatureEmail = function( email ) {
+    formDraft.secondSignatureEmail = email;
+  }
+  
+  inner.secondSignatureEmail = function() {
+    return formDraft.secondSignatureEmail;
+  }
+  
+  inner.setSecondSignatureEmailConfirm = function( email ) {
+    formDraft.secondSignatureEmailConfirm = email;
+  }
+  
+  inner.secondSignatureEmailConfirm = function() {
+	  if ( inner.isFormSigned ()) {
+		  return formDraft.secondSignatureEmail;
+	  } else return formDraft.secondSignatureEmailConfirm;
+  }
+  
+  inner.selectedEid = function() {
+    return formDraft.selectedEid;
+  }
+  
+  inner.setSelectedEid = function( eid ) {
+    formDraft.selectedEid = eid;
+  }
     
 	return inner;
 }());

@@ -17,20 +17,26 @@
 package se.streamsource.surface.web.resource;
 
 import static se.streamsource.dci.api.RoleMap.current;
+
+import org.restlet.resource.ResourceException;
+
 import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.dci.restlet.server.CommandQueryResource;
-import se.streamsource.dci.restlet.server.api.SubResource;
+import se.streamsource.dci.restlet.server.api.SubResources;
 
 /**
  * JAVADOC
  */
-public class AccessPointResource
-        extends CommandQueryResource
+public class DoubleSignatureTasksResource
+    extends CommandQueryResource
+    implements SubResources
 {
-   @SubResource
-   public void endusers()
-   {
-      current().set(current().get(CommandQueryClient.class).getSubClient("endusers"));
-      subResource(EndUsersResource.class);
-   }
+
+   public void resource( String segment )
+        throws ResourceException
+    {
+      current().set( current().get( CommandQueryClient.class ).getSubClient( segment ));
+
+      subResource( DoubleSignatureTaskResource.class );
+    }
 }

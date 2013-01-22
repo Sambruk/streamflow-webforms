@@ -66,7 +66,8 @@ label.radio {
 	margin-top: 0px;	
 }
 
-.control-group {
+
+.form-vertical .control-group {
 	clear: both;
 }
 
@@ -102,6 +103,7 @@ input.openselection-radio {
 
 input.openselection-text {
 	display: inline;
+	margin-left: 5px;
 }
 
 .ui-datepicker {
@@ -200,6 +202,25 @@ td.signer-name {
 select.eidproviders {
 	margin: 4px;
 }
+
+/* Second signature
+---------------------------------------------------*/
+
+input#email,
+input#emailconfirm {
+    width: 250px;
+}
+
+table#second_signature_table td {
+    padding-right: 30px; 
+}
+
+#secondsignature_fields .validation-error {
+	color: #B94A48;
+	background-color: #F2DEDE;
+	border: 1px solid #EED3D7;
+}
+
 
 /* Modal
 -------------------------------------------------- */

@@ -33,7 +33,13 @@ public class IndexRestlet extends Restlet
    {
       super.handle(request, response);
 
-      indexRestletService.handle( request, response );
+      try
+      {
+         indexRestletService.handle( request, response );
+      } catch (Exception e)
+      {
+         e.printStackTrace();
+      }
    }
 
 }

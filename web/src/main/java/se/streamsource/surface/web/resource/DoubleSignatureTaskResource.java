@@ -1,4 +1,4 @@
-/*
+/**
  *
  * Copyright 2009-2012 Jayway Products AB
  *
@@ -14,8 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-jQuery(document).ready(function() {
-    
-	$.cookie('SF_MYPAGES_USER', null, {path: '/'});
+package se.streamsource.surface.web.resource;
 
-});
+import static se.streamsource.dci.api.RoleMap.current;
+import se.streamsource.dci.restlet.client.CommandQueryClient;
+import se.streamsource.dci.restlet.server.CommandQueryResource;
+import se.streamsource.dci.restlet.server.api.SubResource;
+
+/**
+ * JAVADOC
+ */
+public class DoubleSignatureTaskResource extends CommandQueryResource
+{
+   @SubResource
+   public void formdraft()
+   {
+      current().set(current().get(CommandQueryClient.class).getSubClient("formdraft"));
+      subResource( FormDraftResource.class );
+   }
+}

@@ -16,8 +16,8 @@
  */
 jQuery(document).ready(function()
 {
-    function login( contextRoot, accesspoint ) {
-        RequestModule.init( contextRoot, accesspoint );
+    function login( contextRoot, task) {
+    	TaskRequestModule.init( contextRoot, task );
         Contexts.init( contexts );
         
         setupView();
@@ -25,8 +25,8 @@ jQuery(document).ready(function()
     }
 
     function loadEidPlugins() {
-    	if ( FormModule.formNeedsSigning() ) {
-	        $("#signerDiv").append( RequestModule.getHeader() );
+    	if ( FormModule.requiredSignaturesCount() > 0 ) {
+	        $("#signerDiv").append( TaskRequestModule.getHeader() );
 	        addSigners($("#signerDiv"));
     	}
     }
@@ -37,20 +37,13 @@ jQuery(document).ready(function()
 
     /** Setup functions **/
 
-    function setupCaseAndForm() {
+    function setupForm() {
     	if ( FormModule.initialized() ) return;
-        var data = RequestModule.getCaseForm();
-        if ( data.caze && data.form ) {
-            UrlModule.createCaseUrl( data.caze );
-            UrlModule.createFormDraftUrl( data.form );
-            FormModule.init( RequestModule.getFormDraft(), RequestModule.getMailSelectionMessage() );
-        } else {
-            handleEvents( RequestModule.createCaseWithForm() );
-        }
+        FormModule.init( TaskRequestModule.getTaskFormDraft(), TaskRequestModule.getMailSelectionMessage() );
     }
 
     function setupRequiredSignatures() {
-        FormModule.setRequiredSignatures( RequestModule.getFormSignatures() );
+        FormModule.setRequiredSignatures( TaskRequestModule.getFormSignatures() );
     }
 
     function setupRequiredSignature( args ) {
@@ -58,11 +51,15 @@ jQuery(document).ready(function()
     }
 
     function setupProviders() {
-        if ( !FormModule.providersInitialized() && FormModule.formNeedsSigning() ) {
-    	    FormModule.setProviders( RequestModule.getProviders() );
+        if ( !FormModule.providersInitialized() && FormModule.requiredSignaturesCount() > 0) {
+    	    FormModule.setProviders( TaskRequestModule.getProviders() );
         }
     }
 
+    function setupIncomgingFormSummary() {
+    	FormModule.setupIncomingFormSummaryPage( TaskRequestModule.getTaskSubmittedFormSummary() );
+    }
+    
     /** Verify functions **/
 
     function verifySubmit() {
@@ -89,12 +86,12 @@ jQuery(document).ready(function()
     }
 
     function verifySigner(args ) {
-        if ( !FormModule.formNeedsSigning() )
+        if ( FormModule.requiredSignaturesCount() == 0)
             throw {error:texts.noRequiredSignatures};
 
         formIsFilled( {error:texts.fillBeforeSign } );
 
-        validateNumber( args.segment, FormModule.requiredSignedSignaturesCount(),
+        validateNumber( args.segment, FormModule.requiredSignaturesCount(),
             {error:texts.requiredSignatureNotValid + args.segment });
     }
 
@@ -119,10 +116,10 @@ jQuery(document).ready(function()
         $.each( eventMap.events, function( idx, event){
             var params = $.parseJSON(event.parameters);
             if ( event.name == "createdCase") {
-                UrlModule.createCaseUrl( params['param1'] );
+                TaskUrlModule.createCaseUrl( params['param1'] );
             } else if ( event.name == "changedFormDraft" ) {
-                UrlModule.createFormDraftUrl( event.entity );
-                FormModule.init( $.parseJSON(params['param1']), RequestModule.getMailSelectionMessage() );
+                TaskUrlModule.createFormDraftUrl( event.entity );
+                FormModule.init( $.parseJSON(params['param1']) );
             } else if ( event.name == "changedFieldValue" ) {
                 FormModule.getField( params['param1'] ).setUIValue( params['param2'] );
             }
@@ -130,24 +127,24 @@ jQuery(document).ready(function()
     }
 
     function setupView() {
-        View.runView( Contexts.findView( location.hash ));
+        TaskView.runView( Contexts.findView( location.hash ));
     }
 
     function rootView() {
         // since we have no root view redirect to first page of form
-        throw { redirect: Contexts.findUrl( View.formPage, ['0'] ) }
+        throw { redirect: Contexts.findUrl( TaskView.incoming ) }
     }
 
-    var contexts = {view:rootView,          init: [ setupCaseAndForm, setupRequiredSignatures ], subContexts: {
-        'discard'   : {view:View.discard},
+    var contexts = {view:rootView,          init: [ setupForm, setupIncomgingFormSummary, setupRequiredSignatures ], subContexts: {
+        'incoming'   : {view:TaskView.incoming, init : [  ]},
         'idContext' : {view:View.formPage,   init: [ verifyPage, verifyFormEditing ]},
-        'summary'   : {view:View.summary,    init: [ setupProviders ], subContexts: {
-           'submit'    : {view:View.submit,   init: [ verifySubmit ]},
-           'idContext' : {view:View.sign,     init: [ verifySigner, verifyProvider, setupRequiredSignature ]}}}}};
+        'summary'   : {view:TaskView.summary,    init: [ setupProviders ], subContexts: {
+           'submit'    : {view:TaskView.submit,   init: [ verifySubmit ]},
+           'idContext' : {view:TaskView.sign,     init: [ verifySigner, verifyProvider, setupRequiredSignature ]}}}}};
 
 	$('#components').hide().load(contextRoot + '/static/webforms-components.html', function() {
         try {
-            login( contextRoot, accesspoint );
+            login( contextRoot, task );
             $(window).hashchange( setupView );
         } catch ( e ) {
             View.error( e );

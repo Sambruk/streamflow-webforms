@@ -16,18 +16,27 @@
  */
 package se.streamsource.surface.web.resource;
 
+import static se.streamsource.dci.api.RoleMap.current;
+import se.streamsource.dci.restlet.client.CommandQueryClient;
 import se.streamsource.dci.restlet.server.CommandQueryResource;
 import se.streamsource.dci.restlet.server.api.SubResource;
 
 /**
  * JAVADOC
  */
-public class RootResource
-    extends CommandQueryResource
+public class RootResource extends CommandQueryResource
 {
-    @SubResource
-    public void accesspoints()
-    {
-        subResource( AccessPointsResource.class );
-    }
+   @SubResource
+   public void accesspoints()
+   {
+      subResource( AccessPointsResource.class );
+   }
+
+   @SubResource
+   public void tasks()
+   {
+
+      current().set( current().get( CommandQueryClient.class ).getClient( "../tasks" ) );
+      subResource( DoubleSignatureTasksResource.class );
+   }
 }

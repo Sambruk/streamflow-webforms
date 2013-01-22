@@ -42,6 +42,13 @@
     <div class="controls"></div>        
 </div>
 
+<div id="previous_form_summary" class="well">
+    <h3></h3>
+	<table id="fields_table" class="fields_table">
+		<tr id="field_summary"></tr>
+	</table>
+</div>
+
 <div id="form_page_summary" class="well">
     <h3></h3>
 	<table id="fields_table" class="fields_table">
@@ -53,6 +60,40 @@
 	<h3></h3>
 	<table id="signatures"></table>
 	<div id="eIdPlugin"></div>
+</div>
+
+<div id="second_signature" class="well">
+    <label id="singlesignaturecheckbox-label" class="checkbox">
+        <input id="singlesignaturecheckbox" type="checkbox"/>
+    </label>
+    <div id="secondsignature_fields" class="control-group">
+        <h3 id="secondsignature-label" class="control-label"></h3>  
+        <div id="secondsignaturetext" class='commentfield alert alert-info'></div>
+		<div class="row-fluid">
+			<div class="control-group span4">
+		        <label id="name-label" class="control-label"></label>
+		        <input id="name" type="text"/>
+            	<span id="name-help" class="help-inline"></span>
+			</div>
+			<div class="control-group span4">
+		        <label id="socialsecuritynumber-label" class="control-label"></label>
+		        <input id="socialsecuritynumber" type="text" />
+            	<span id="socialsecuritynumber-help" class="help-inline"></span>
+			</div>
+			<div class="control-group span4">
+		        <label id="phonenumber-label" class="control-label"></label>
+		        <input id="phonenumber" type="text" />
+            	<span id="phonenumber-help" class="help-inline"></span>
+			</div> 
+		</div>
+        <div id="emailfields" class="control-group">        
+            <label id="email-label" class="control-label"></label>
+            <input id="email" type="text" />
+            <label id="emailconfirm-label" class="control-label"></label>
+            <input id="emailconfirm" type="text" />
+            <span id="confirmation-help" class="help-inline"></span>
+        </div>
+    </div>
 </div>
 
 <div id="thank_you_div" class="well">
