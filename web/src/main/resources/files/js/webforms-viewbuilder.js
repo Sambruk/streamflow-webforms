@@ -705,7 +705,7 @@ var View = (function() {
       var selectedEid = FormModule.selectedEid();
       if(typeof selectedEid !== 'undefined' && selectedEid && selectedEid.value !== texts.provider) {
         var button = $('#link_'+selectedEid.name);
-        (disable || selectedEid.selectedIndex == 0 || !FormModule.isSecondSignatureReady() ) ? enable( button, false ) : enable( button, true );
+        (disable || selectedEid.selectedIndex === 0 || !FormModule.isSecondSignatureReady() ) ? enable( button, false ) : enable( button, true );
       }
     }
 
