@@ -261,12 +261,14 @@ var FieldTypeModule = (function() {
 		new View.Button(buttons).image('icon-arrow-right').click(function() {
 			listBoxArrow(field.id, 'Selected');
 			field.changed().update();
+			selected.focus();
 			return false;
 		});
 		buttons.append('<br/>');
 		new View.Button(buttons).image('icon-arrow-left').click(function() {
 			listBoxArrow(field.id, 'Possible');
 			field.changed().update();
+			possible.focus();
 			return false;
 		});
 
@@ -277,12 +279,13 @@ var FieldTypeModule = (function() {
 		});
 		controlsNode.append(field.node);
 
-		var values = selectedValues(field.value);
 		field.refreshUI = function() {
+			var values = selectedValues(field.value);
 			$.each(values, function(idx, selectionValue) {
 				selected.append(field.node.find('#' + field.id
 						+ safeIdString(selectionValue)));
 			});
+			
 		}
 
 		field.getUIValue = function() {
