@@ -57,6 +57,7 @@ var Contexts = (function() {
         var subContext = this.sub( args.segment );
         if ( !subContext ) {
             this.view( previous );
+            
             return;
         }
         subContext.runView( segments.slice(1), args );
@@ -81,6 +82,7 @@ var Contexts = (function() {
             	providedArguments[ 'segment' ] = segment;
             }
         }
+        
         return providedArguments;
     }
 
@@ -94,7 +96,8 @@ var Contexts = (function() {
         if ( !map.subContexts ) return context;
         $.each( map.subContexts, function(key, value ) {
             context.addSubContext( key, build( value ) );
-        })
+        });
+        
         return context;
     }
 
@@ -107,6 +110,7 @@ var Contexts = (function() {
         if ( hash == loc ) return $.noop;
         hash = loc;
         var segments = getSegments();
+        
         return function() { rootContext.runView( segments ); }
     }
 
@@ -116,6 +120,7 @@ var Contexts = (function() {
             if ( search.url.match(/\/$/) ) {
                 return search.url.substring(0, search.url.length-1);
             }
+            
             return search.url;
         } else {
             throw "function not found";
@@ -137,6 +142,7 @@ var Contexts = (function() {
                 return false;
             }
         });
+        
         return result;
     }
 

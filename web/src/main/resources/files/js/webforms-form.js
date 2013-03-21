@@ -24,8 +24,8 @@ var FormModule = (function() {
 	var requiredSignatures;
 	var selectedRequiredSignature;
 	var incomingSummary;
-	
-	function Form( formDraft ) {
+
+	function Form(formDraft) {
 		this.title = formDraft.description;
 		this.id = formDraft.form;
 		this.signatures = formDraft.signatures;
@@ -33,410 +33,527 @@ var FormModule = (function() {
 		this.confirmationEmail = formDraft.enteredEmails;
 		this.confirmationEmailConfirm;
 		this.mailSelectionEnablement = formDraft.mailSelectionEnablement;
-		if ( formDraft.secondsignee ) {
+		if (formDraft.secondsignee) {
 			// Load stored data
 			this.secondSignatureName = formDraft.secondsignee.name;
 			this.secondSignaturePhoneNumber = formDraft.secondsignee.phonenumber;
 			this.secondSignatureSocialSecurityNumber = formDraft.secondsignee.socialsecuritynumber;
 			this.secondSignatureSingleSignature = formDraft.secondsignee.singelsignature;
 			this.secondSignatureEmail = formDraft.secondsignee.email;
-			//this.secondSignatureEmailConfirm = formDraft.secondSignatureEmailConfirm;
+			// this.secondSignatureEmailConfirm =
+			// formDraft.secondSignatureEmailConfirm;
 		}
 		this.selectedEid = formDraft.selectedEid;
+
 		var pages = this.pages;
-		$.each( formDraft.pages, function(idx, page) {
-			pages[ idx ] = new Page( page, idx );
+		$.each(formDraft.pages, function(idx, page) {
+			pages[idx] = new Page(page, idx);
 		});
 	}
-	
-	function Page( page, idx ) {
+
+	function Page(page, idx) {
 		this.title = page.title;
 		this.index = idx;
 		this.fields = [];
+		this.rule = page.rule;
+
 		var fields = this.fields;
 		var parent = this;
-		$.each( page.fields, function( idx, field) {
-			fields[ idx ] = new Field( field, parent );
+		$.each(page.fields, function(idx, field) {
+			fields[idx] = new Field(field, parent);
 		});
+
+		// TEST
+
+		if (page.page === "516b08f6-9bde-4390-9d5a-a41327b7b599-44") {
+			this.rule = {};
+			this.rule.field = "516b08f6-9bde-4390-9d5a-a41327b7b599-2b";
+			this.rule.condition = "anyof";
+			this.rule.values = [ "Andra", "asdf" ];
+			this.rule.visibleWhen = true;
+		} else if (page.page === "16e7c6df-1697-4ded-b07f-5210338bde23-63") {
+			this.rule = {};
+			this.rule.field = "16e7c6df-1697-4ded-b07f-5210338bde23-66";
+			this.rule.condition = "morethan";
+			this.rule.values = [ "asdf" ];
+			this.rule.visibleWhen = false;
+		} else if (page.page === "0a20a6fa-3332-49f3-81fe-f532f17a1fe5-1") {
+			// Vårdnadshavare
+			this.rule = {};
+			this.rule.field = "2191ea18-5b09-422a-b064-e0f25301d601-6e";
+			this.rule.condition = "lessthan";
+			this.rule.values = [ "20000" ];
+			this.rule.visibleWhen = false;
+		} else if (page.page === "dec46658-f1e8-4994-bd0b-249503444a2e-ee") {
+			// Formulär med alla fält
+			this.rule = {};
+			this.rule.field = "dec46658-f1e8-4994-bd0b-249503444a2e-cd";
+			this.rule.condition = "anyof";
+			this.rule.values = [ "Alternativ 1" ];
+			this.rule.visibleWhen = false;
+		} else if (page.page === "80699c1e-6e99-4f57-b986-3f544a16ae31-20b") {
+			// Formulär med alla fält
+			this.rule = {};
+			this.rule.field = "dec46658-f1e8-4994-bd0b-249503444a2e-f4";
+			this.rule.condition = "morethan";
+			this.rule.values = [ "99" ];
+			this.rule.visibleWhen = true;
+		}
 	}
-	
-	function Field( field, page ) {
-        this.page = page;
+
+	function Field(field, page) {
+		this.page = page;
 		this.field = field;
-        this.id = field.field.field;
-        this.fieldValue = field.field.fieldValue;
-        this.name = field.field.description;
-        this.dirty = false;
-        this.fieldType = getFieldType( field.field.fieldValue._type );
-        this.setUIFormatter();
-        this.invalidformat = false;
-        this.setValue( this.field.value == null ? "" : this.field.value );
-        fieldMap[ this.id ] = this;
-    }	
-	
-    function getFieldType( qualifiedField ) {
-        var list = qualifiedField.split('.');
-        return list[ list.length - 1 ];
-    }
-	
-    Field.prototype.setUIFormatter = function( ) {
-    	if ( this.fieldType == "DateFieldValue" ) {
-    		this.uIFormatter = formatUTCStringToIsoString;
-    	} else if ( this.fieldType == "AttachmentFieldValue" ) {
-    		this.uIFormatter = formatJSONAttachment;
-    	} else if ( this.fieldType == "CheckboxesFieldValue" || this.fieldType == "ListBoxFieldValue" ) {
-    	    this.uIFormatter = formatSelectionValues;
-    	}
-    }
+		this.id = field.field.field;
+		this.fieldValue = field.field.fieldValue;
+		this.name = field.field.description;
+		this.dirty = false;
+		this.fieldType = getFieldType(field.field.fieldValue._type);
+		this.setUIFormatter();
+		this.invalidformat = false;
+		this.setValue(this.field.value == null ? "" : this.field.value);
+		fieldMap[this.id] = this;
 
-    function formatUTCStringToIsoString( value ) {
-        if (value == '') return value;
+		// TEST
 
-        var d = value.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2}):(\d{2}(?:\.\d+)?)(Z|(([+-])(\d{2}):(\d{2})))$/i);
-        if (!d) return "Invalid date format";
-        var dateValue = new Date(
-        Date.UTC(d[1],d[2]-1,d[3],d[4],d[5],d[6]|0,(d[6]*1000-((d[6]|0)*1000))|0,d[7]) +
-        (d[7].toUpperCase() ==="Z" ? 0 : (d[10]*3600 + d[11]*60) * (d[9]==="-" ? 1000 : -1000)));
-        return dateFormat(dateValue,"isoDate");
-    }
+		if (this.id === "16e7c6df-1697-4ded-b07f-5210338bde23-66") {
+			field.field.rule = {};
+			field.field.rule.field = "516b08f6-9bde-4390-9d5a-a41327b7b599-2b";
+			field.field.rule.condition = "noneof";
+			field.field.rule.values = [ "Andra" ];
+			field.field.rule.visibleWhen = false;
+		} else if (this.id === "16e7c6df-1697-4ded-b07f-5210338bde23-69") {
+			field.field.rule = {};
+			field.field.rule.field = "16e7c6df-1697-4ded-b07f-5210338bde23-66";
+			field.field.rule.condition = "lessthan";
+			field.field.rule.values = [ "asdf" ];
+			field.field.rule.visibleWhen = true;
+		} else if (this.id === "16e7c6df-1697-4ded-b07f-5210338bde23-6f") {
+			field.field.rule = {};
+			field.field.rule.field = "16e7c6df-1697-4ded-b07f-5210338bde23-6c";
+			field.field.rule.condition = "morethan";
+			field.field.rule.values = [ "100" ];
+			field.field.rule.visibleWhen = true;
+		} else if (this.id === "2191ea18-5b09-422a-b064-e0f25301d601-5d") {
+			// Vårdnadshavare
+			field.field.rule = {};
+			field.field.rule.field = "2191ea18-5b09-422a-b064-e0f25301d601-58";
+			field.field.rule.condition = "anyof";
+			field.field.rule.values = [ "Henrik" ];
+			field.field.rule.visibleWhen = false;
+		} else if (this.id === "dec46658-f1e8-4994-bd0b-249503444a2e-c8") {
+			// Formulär med alla fält
+			field.field.rule = {};
+			field.field.rule.field = "dec46658-f1e8-4994-bd0b-249503444a2e-c0";
+			field.field.rule.condition = "anyof";
+			field.field.rule.values = [ "asdf" ];
+			field.field.rule.visibleWhen = false;
+		}
+	}
 
-    function formatJSONAttachment( value ) {
-        if ( value ) return $.parseJSON( value ).name;
-        return "";
-    }
+	function getFieldType(qualifiedField) {
+		var list = qualifiedField.split('.');
 
-    function formatSelectionValues( value ) {
-        return value.replace(/(\[|\])/g, "'" );
-    }
-    
-    function hasFieldAValue( field ) {
-      return !((typeof field === 'undefined') || (field.length < 1) );
-    }
+		return list[list.length - 1];
+	}
 
-    Field.prototype.setValue = function( value ) {
-    	this.value = value;
-    	this.formattedValue = this.uIFormatter==null ? value : this.uIFormatter( value );
-    	return this;
-    }
+	Field.prototype.setUIFormatter = function() {
+		if (this.fieldType == "DateFieldValue") {
+			this.uIFormatter = formatUTCStringToIsoString;
+		} else if (this.fieldType == "AttachmentFieldValue") {
+			this.uIFormatter = formatJSONAttachment;
+		} else if (this.fieldType == "CheckboxesFieldValue"
+				|| this.fieldType == "ListBoxFieldValue") {
+			this.uIFormatter = formatSelectionValues;
+		}
+	};
 
-	inner.setupIncomingFormSummaryPage = function ( incomingFormSummary ) {
+	function formatUTCStringToIsoString(value) {
+		if (value == '')
+			return value;
+
+		var d = value
+				.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2}):(\d{2}(?:\.\d+)?)(Z|(([+-])(\d{2}):(\d{2})))$/i);
+		if (!d)
+			return "Invalid date format";
+		var dateValue = new Date(Date.UTC(d[1], d[2] - 1, d[3], d[4], d[5],
+				d[6] | 0, (d[6] * 1000 - ((d[6] | 0) * 1000)) | 0, d[7])
+				+ (d[7].toUpperCase() === "Z" ? 0 : (d[10] * 3600 + d[11] * 60)
+						* (d[9] === "-" ? 1000 : -1000)));
+
+		return dateFormat(dateValue, "isoDate");
+	}
+
+	function formatJSONAttachment(value) {
+		if (value)
+			return $.parseJSON(value).name;
+
+		return "";
+	}
+
+	function formatSelectionValues(value) {
+		return value.replace(/(\[|\])/g, "'");
+	}
+
+	function hasFieldAValue(field) {
+		return !((typeof field === 'undefined') || (field.length < 1));
+	}
+
+	Field.prototype.setValue = function(value) {
+		this.value = value;
+		this.formattedValue = this.uIFormatter == null ? value : this
+				.uIFormatter(value);
+
+		return this;
+	};
+
+	inner.setupIncomingFormSummaryPage = function(incomingFormSummary) {
 		incomingSummary = incomingFormSummary;
-	}
-	
-	inner.getField = function( id ) {
-	    return fieldMap[ id ];
-	}
+	};
 
-	inner.setValue = function( id, value ) {
-		fieldMap[ id ].setValue( value );
-	}
+	inner.getField = function(id) {
+		return fieldMap[id];
+	};
 
-	inner.fold = function( pageFolder ) {
-		$.each( formDraft.pages, function(idx, page) {
-			var fieldFolder = pageFolder( page );
-			$.each( page.fields, function( idy, field) {
-				fieldFolder( field );
+	inner.setValue = function(id, value) {
+		fieldMap[id].setValue(value);
+	};
+
+	inner.selectedValues = function(field) {
+		var values = new Array();
+		if (!field.value)
+			return values;
+		var i = 0;
+		field.value.replace(/(\[.*?\])/g, function(a, b) {
+			values[i] = b.substring(1, b.length - 1);
+			i++;
+
+			return "";
+		});
+
+		$.each(field.value.split(", "), function(idx, selectionValue) {
+			values[i] = selectionValue;
+			i++;
+		});
+
+		return values;
+	};
+
+	inner.fold = function(pageFolder) {
+		$.each(formDraft.pages, function(idx, page) {
+			var fieldFolder = pageFolder(page);
+			$.each(page.fields, function(idy, field) {
+				fieldFolder(field);
 			});
 		});
-	}
+	};
 
-	inner.foldIncoming = function( pageFolder ) {
-		$.each( incomingSummary.pages, function(idx, page) {
-			var fieldFolder = pageFolder( page );
-			$.each( page.fields, function( idy, field) {
-				fieldFolder( field );
+	inner.foldIncoming = function(pageFolder) {
+		$.each(incomingSummary.pages, function(idx, page) {
+			var fieldFolder = pageFolder(page);
+			$.each(page.fields, function(idy, field) {
+				fieldFolder(field);
 			});
 		});
-	}
+	};
 
-	inner.foldEditPage = function( pageIndex, fieldFolder ) {
-	    $.each( formDraft.pages[ pageIndex ].fields, function( idx, field ) {
-	        fieldFolder( field );
-        });
-	}
+	inner.foldEditPage = function(pageIndex, fieldFolder) {
+		$.each(formDraft.pages[pageIndex].fields, function(idx, field) {
+			fieldFolder(field);
+		});
+	};
 
-	inner.init = function( formDraftValue, mailSelectionMessageTextIn ) {
-		formDraft = new Form( formDraftValue );
+	inner.init = function(formDraftValue, mailSelectionMessageTextIn) {
+		formDraft = new Form(formDraftValue);
 		mailSelectionMessageText = mailSelectionMessageTextIn;
 		initDone = true;
-	}
-	
+	};
+
 	inner.initialized = function() {
 		return initDone;
-	}
+	};
 
 	inner.mailNotificationEnabled = function() {
-	    return formDraft.mailSelectionEnablement;
-	}
+		return formDraft.mailSelectionEnablement;
+	};
 
-	inner.setMailNotificationEnabled = function( enabled ) {
-	    formDraft.mailSelectionEnablement = enabled;
-	}
+	inner.setMailNotificationEnabled = function(enabled) {
+		formDraft.mailSelectionEnablement = enabled;
+	};
 
-    inner.setConfirmationEmail = function( emailaddress ) {
-        formDraft.confirmationEmail = emailaddress;
-    }
+	inner.setConfirmationEmail = function(emailaddress) {
+		formDraft.confirmationEmail = emailaddress;
+	};
 
-    inner.confirmationEmail = function() {
-        return formDraft.confirmationEmail;
-    }
+	inner.confirmationEmail = function() {
+		return formDraft.confirmationEmail;
+	};
 
-    inner.setConfirmationEmailConfirm = function( emailaddress ) {
-        formDraft.confirmationEmailConfirm = emailaddress;
-    }
+	inner.setConfirmationEmailConfirm = function(emailaddress) {
+		formDraft.confirmationEmailConfirm = emailaddress;
+	};
 
-    inner.confirmationEmailConfirm = function() {
-        return formDraft.confirmationEmailConfirm;
-    }
-    
+	inner.confirmationEmailConfirm = function() {
+		return formDraft.confirmationEmailConfirm;
+	};
+
 	inner.pageCount = function() {
 		return formDraft.pages.length;
-	}
-	
+	};
+
 	inner.hasSignatures = function() {
 		return formDraft.signatures.length > 0;
-	}
-	
+	};
+
 	inner.isFormSigned = function() {
-	    return inner.requiredSignedSignaturesCount() == formDraft.signatures.length;
-	}
-	 
+		return inner.requiredSignedSignaturesCount() == formDraft.signatures.length;
+	};
+
 	inner.isSecondSignatureReady = function() {
-	  if( inner.formNeedsSecondSignature() ) {
-	    var singleSignature = inner.secondSignatureSingleSignature();
-	    if( typeof singleSignature === 'undefined' || !singleSignature ) {
-	      return (hasFieldAValue( formDraft.secondSignatureName ) 
-	          && hasFieldAValue( formDraft.secondSignatureEmail )
-	          && hasFieldAValue( formDraft.secondSignatureEmailConfirm )
-	          && hasFieldAValue( formDraft.secondSignaturePhoneNumber )
-	          && hasFieldAValue( formDraft.secondSignatureSocialSecurityNumber ) );
-	      }
-	  }
-	  return true;
-	}
-	
+		if (inner.formNeedsSecondSignature()) {
+			var singleSignature = inner.secondSignatureSingleSignature();
+			if (typeof singleSignature === 'undefined' || !singleSignature) {
+				return (hasFieldAValue(formDraft.secondSignatureName)
+						&& hasFieldAValue(formDraft.secondSignatureEmail)
+						&& hasFieldAValue(formDraft.secondSignatureEmailConfirm)
+						&& hasFieldAValue(formDraft.secondSignaturePhoneNumber) && hasFieldAValue(formDraft.secondSignatureSocialSecurityNumber));
+			}
+		}
+
+		return true;
+	};
 
 	inner.formNeedsSigning = function() {
-	  var needsSigning = false;
-	  if ( requiredSignatures.length > 0 ) {
-	    needsSigning = requiredSignatures[0].active;
-	  }
-	  return needsSigning;
-	}
-	
-	inner.setRequiredSignatures = function( required ) {
-	    requiredSignatures = required;
-	}
+		var needsSigning = false;
+		if (requiredSignatures.length > 0) {
+			needsSigning = requiredSignatures[0].active;
+		}
 
-	inner.setRequiredSignature = function( index ) {
-		selectedRequiredSignature = requiredSignatures[ index ].name;
-	}
-	
-	inner.getRequiredSignature = function( ) {
+		return needsSigning;
+	};
+
+	inner.setRequiredSignatures = function(required) {
+		requiredSignatures = required;
+	};
+
+	inner.setRequiredSignature = function(index) {
+		selectedRequiredSignature = requiredSignatures[index].name;
+	};
+
+	inner.getRequiredSignature = function() {
 		return selectedRequiredSignature;
-	}
-	
+	};
+
 	inner.formNeedsSecondSignature = function() {
-	  var needsSigning = false;
-	  if ( requiredSignatures.length > 1 ) {
-	    needsSigning = requiredSignatures[1].active;
-	  }
-	  return needsSigning;
-	}
-	
+		var needsSigning = false;
+		if (requiredSignatures.length > 1) {
+			needsSigning = requiredSignatures[1].active;
+		}
+
+		return needsSigning;
+	};
+
 	inner.requiredSignaturesCount = function() {
-	  var reqSignNbrs = 0;
-	  if ( inner.formNeedsSigning() ) {
-	    reqSignNbrs++;
-	    if ( inner.formNeedsSecondSignature() ) {
-	      reqSignNbrs++;
-	    }
-	  }
-	  return reqSignNbrs;
-	}
-	
+		var reqSignNbrs = 0;
+		if (inner.formNeedsSigning()) {
+			reqSignNbrs++;
+			if (inner.formNeedsSecondSignature()) {
+				reqSignNbrs++;
+			}
+		}
+
+		return reqSignNbrs;
+	};
+
 	inner.requiredSignedSignaturesCount = function() {
-	  var reqSignNbrs = 0;
-	  if ( inner.formNeedsSigning() ) {
-	    reqSignNbrs++;
-	  }
-	  return reqSignNbrs;
-	}
-	
-	inner.isSecondSigningFlow = function () {
+		var reqSignNbrs = 0;
+		if (inner.formNeedsSigning()) {
+			reqSignNbrs++;
+		}
+
+		return reqSignNbrs;
+	};
+
+	inner.isSecondSigningFlow = function() {
 		return incomingSummary === undefined ? false : true;
-	}
-	
+	};
+
 	inner.title = function() {
 		return formDraft.title;
-	}
-	
+	};
+
 	inner.getRequiredSignatures = function() {
 		return requiredSignatures;
-	}
-	
+	};
+
 	inner.getSignatures = function() {
 		return formDraft.signatures;
-	}
-	
-	inner.incomingSignerName = function () {
-		return incomingSummary === undefined ? undefined : incomingSummary.signatures[0].signerName; 
-	}
+	};
 
-	function fieldIterator( iterate, form ) {
-	    $.each( form.pages, function(idx, page) {
-	        $.each( page.fields, function(idy, field) {
-	            iterate( field );
-            })
-        })
+	inner.incomingSignerName = function() {
+		return incomingSummary === undefined ? undefined
+				: incomingSummary.signatures[0].signerName;
+	};
+
+	function fieldIterator(iterate, form) {
+		$.each(form.pages, function(idx, page) {
+			$.each(page.fields, function(idy, field) {
+				iterate(field);
+			})
+		})
 	}
 
 	inner.getFormTBS = function() {
-        var tbs = "";
-        fieldIterator( function( field ) {
-            if ( field.fieldType != 'CommentFieldValue' )
-                tbs += field.name + ' = ' + field.formattedValue + '. ';
-        }, formDraft);
-        return tbs;
-	}
+		var tbs = "";
+		fieldIterator(function(field) {
+			if (field.fieldType != 'CommentFieldValue')
+				tbs += field.name + ' = ' + field.formattedValue + '. ';
+		}, formDraft);
+
+		return tbs;
+	};
 
 	inner.getIncomingFormTBS = function() {
-        var tbs = "";
-        fieldIterator( function( field ) {
-            if ( field.fieldType != 'CommentFieldValue' )
-                tbs += field.field + ' = ' + field.value + '. ';
-        }, incomingSummary);
-        return tbs;
-	}
+		var tbs = "";
+		fieldIterator(function(field) {
+			if (field.fieldType != 'CommentFieldValue')
+				tbs += field.field + ' = ' + field.value + '. ';
+		}, incomingSummary);
 
-  inner.hasErrors = function() {
-    var error = false;
-    fieldIterator( function(field ) { 
-      if ( field.field.field.mandatory && !field.value) {
-        error = true;
-      } 
-      if (field.invalidformat != '' ) {
-        error = true;
-      }
-    }, formDraft);
-    return error;
-  }
+		return tbs;
+	};
 
-	
+	inner.hasErrors = function() {
+		var error = false;
+		fieldIterator(function(field) {
+			if (field.visible !== false && field.page.visible !== false) {
+				if (field.field.field.mandatory && !field.value) {
+					error = true;
+				}
+				if (field.invalidformat != '') {
+					error = true;
+				}
+			}
+		}, formDraft);
+
+		return error;
+	};
+
 	inner.pages = function() {
 		return formDraft.pages;
-	}
-	
-	inner.pageCount = function() {
-		return formDraft.pages.length;
-	}
+	};
 
-    inner.providersInitialized = function() {
-        return ( typeof( eIdProviders )!="undefined" );
-    }
+	inner.providersInitialized = function() {
+		return (typeof (eIdProviders) != "undefined");
+	};
 
-    inner.setProviders = function( providers ) {
-        eIdProviders = providers;
-        $.each (eIdProviders.links, function(idx, provider) {
-        	var list = provider.href.split('=');
-            if ( list.length  != 2 ) {
-                throw { error: texts.invalidProviderList, redirect:'summary' };
-            } else {
-            	provider.provider = list[1];
-            }
-        });
-    }
+	inner.setProviders = function(providers) {
+		eIdProviders = providers;
+		$.each(eIdProviders.links, function(idx, provider) {
+			var list = provider.href.split('=');
+			if (list.length != 2) {
+				throw {
+					error : texts.invalidProviderList,
+					redirect : 'summary'
+				};
+			} else {
+				provider.provider = list[1];
+			}
+		});
+	};
 
-    inner.providerLinks = function() {
-    	return eIdProviders.links;
-    }
-    
-    inner.canSubmit = function() {
-    	var formFilled = !inner.hasErrors();
-    	var notify = $('#mailCheckbox').find('input').prop('checked');
-        if ( notify ) {
-            var email = $('#confirmation-email');
-            var confirm = $('#confirmation-email-confirm');
-            if ( email.val() != confirm.val() ) {
-            	return false;
-            }
-        }
-        if ( inner.formNeedsSigning() ) {
-            return formFilled && inner.isFormSigned();
-        }
-	    return formFilled;
-    }
-    
-    inner.getFormId = function() {
-    	return formDraft.id;
-    }
-    
-    inner.destroy = function() {
-    	initDone = false;
-    	formDraft = null;
-    }
+	inner.providerLinks = function() {
+		return eIdProviders.links;
+	};
 
-    inner.getMailSelectionMessage = function() {
-        return mailSelectionMessageText;
-    }
-    
-  inner.setSecondSignatureName = function( name ) {
-    formDraft.secondSignatureName = name;
-  }
-    
-  inner.secondSignatureName = function() {
-    return formDraft.secondSignatureName;
-  }
-  
-  inner.setSecondSignaturePhoneNumber = function( phoneNumber) {
-    formDraft.secondSignaturePhoneNumber = phoneNumber;
-  }
-  
-  inner.secondSignaturePhoneNumber = function() {
-    return formDraft.secondSignaturePhoneNumber;
-  }
-  
-  inner.setSecondSignatureSocialSecurityNumber = function( number ) {
-    formDraft.secondSignatureSocialSecurityNumber = number;
-  }
-  
-  inner.secondSignatureSocialSecurityNumber = function() {
-    return formDraft.secondSignatureSocialSecurityNumber;
-  }
-  
-  inner.setSecondSignatureSingleSignature = function( enabled ) {
-    formDraft.secondSignatureSingleSignature = enabled;
-  }
-  
-  inner.secondSignatureSingleSignature = function() {
-    return formDraft.secondSignatureSingleSignature;
-  }
-  
-  inner.setSecondSignatureEmail = function( email ) {
-    formDraft.secondSignatureEmail = email;
-  }
-  
-  inner.secondSignatureEmail = function() {
-    return formDraft.secondSignatureEmail;
-  }
-  
-  inner.setSecondSignatureEmailConfirm = function( email ) {
-    formDraft.secondSignatureEmailConfirm = email;
-  }
-  
-  inner.secondSignatureEmailConfirm = function() {
-	  if ( inner.isFormSigned ()) {
-		  return formDraft.secondSignatureEmail;
-	  } else return formDraft.secondSignatureEmailConfirm;
-  }
-  
-  inner.selectedEid = function() {
-    return formDraft.selectedEid;
-  }
-  
-  inner.setSelectedEid = function( eid ) {
-    formDraft.selectedEid = eid;
-  }
-    
+	inner.canSubmit = function() {
+		var formFilled = !inner.hasErrors();
+		var notify = $('#mailCheckbox').find('input').prop('checked');
+		if (notify) {
+			var email = $('#confirmation-email');
+			var confirm = $('#confirmation-email-confirm');
+			if (email.val() != confirm.val()) {
+				return false;
+			}
+		}
+		if (inner.formNeedsSigning()) {
+			return formFilled && inner.isFormSigned();
+		}
+
+		return formFilled;
+	};
+
+	inner.getFormId = function() {
+		return formDraft.id;
+	};
+
+	inner.destroy = function() {
+		initDone = false;
+		formDraft = null;
+	};
+
+	inner.getMailSelectionMessage = function() {
+		return mailSelectionMessageText;
+	};
+
+	inner.setSecondSignatureName = function(name) {
+		formDraft.secondSignatureName = name;
+	};
+
+	inner.secondSignatureName = function() {
+		return formDraft.secondSignatureName;
+	};
+
+	inner.setSecondSignaturePhoneNumber = function(phoneNumber) {
+		formDraft.secondSignaturePhoneNumber = phoneNumber;
+	};
+
+	inner.secondSignaturePhoneNumber = function() {
+		return formDraft.secondSignaturePhoneNumber;
+	};
+
+	inner.setSecondSignatureSocialSecurityNumber = function(number) {
+		formDraft.secondSignatureSocialSecurityNumber = number;
+	};
+
+	inner.secondSignatureSocialSecurityNumber = function() {
+		return formDraft.secondSignatureSocialSecurityNumber;
+	};
+
+	inner.setSecondSignatureSingleSignature = function(enabled) {
+		formDraft.secondSignatureSingleSignature = enabled;
+	};
+
+	inner.secondSignatureSingleSignature = function() {
+		return formDraft.secondSignatureSingleSignature;
+	};
+
+	inner.setSecondSignatureEmail = function(email) {
+		formDraft.secondSignatureEmail = email;
+	};
+
+	inner.secondSignatureEmail = function() {
+		return formDraft.secondSignatureEmail;
+	};
+
+	inner.setSecondSignatureEmailConfirm = function(email) {
+		formDraft.secondSignatureEmailConfirm = email;
+	};
+
+	inner.secondSignatureEmailConfirm = function() {
+		if (inner.isFormSigned()) {
+			return formDraft.secondSignatureEmail;
+		} else
+			return formDraft.secondSignatureEmailConfirm;
+	};
+
+	inner.selectedEid = function() {
+		return formDraft.selectedEid;
+	};
+
+	inner.setSelectedEid = function(eid) {
+		formDraft.selectedEid = eid;
+	};
+
 	return inner;
 }());

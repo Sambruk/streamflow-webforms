@@ -16,6 +16,8 @@
  */
 jQuery(document).ready(function()
 {
+	RulesModule.setViewModule(TaskView);
+	
     function login( contextRoot, task) {
     	TaskRequestModule.init( contextRoot, task );
         Contexts.init( contexts );
@@ -33,7 +35,7 @@ jQuery(document).ready(function()
     
     update = function( id, value ) {
     	handleEvents( View.updateField( id, value ) );
-    }
+    };
 
     /** Setup functions **/
 
@@ -68,7 +70,6 @@ jQuery(document).ready(function()
         if ( FormModule.formNeedsSigning() && !FormModule.isFormSigned() ) {
             throw {error:texts.signBeforeSubmit};
         }
-        
     }
 
     function formIsFilled( ifError ) {
@@ -150,5 +151,4 @@ jQuery(document).ready(function()
             View.error( e );
         }
 	});
-	
-})
+});

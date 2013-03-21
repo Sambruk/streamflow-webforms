@@ -26,13 +26,13 @@ var FieldTypeModule = (function() {
 	var inner = {};
 
 	function requestModule() {
-		if ( FormModule.isSecondSigningFlow() ) {
+		if (FormModule.isSecondSigningFlow()) {
 			return TaskRequestModule;
 		} else {
 			return RequestModule;
 		}
 	}
-	
+
 	function currentPage() {
 		return parseInt(location.hash.substring(1));
 	}
@@ -49,6 +49,7 @@ var FieldTypeModule = (function() {
 	function clone(id, newId) {
 		if (!newId)
 			return $('#' + id).clone().attr('id', id + 'Cloned');
+
 		return $('#' + id).clone().attr('id', newId);
 	}
 
@@ -58,7 +59,6 @@ var FieldTypeModule = (function() {
 		controlsNode.append(field.node);
 
 		field.refreshUI = function() {
-
 			var fieldId = this.id;
 			if (this.formattedValue) {
 				$("#AttachmentFieldValueForm" + fieldId).remove();
@@ -70,14 +70,13 @@ var FieldTypeModule = (function() {
 					id : 'delete_link' + fieldId
 				}).click(
 						function() {
-							requestModule().deleteAttachment(JSON
-									.parse(field.value).attachment)
+							requestModule().deleteAttachment(
+									JSON.parse(field.value).attachment)
 							field.value = "";
 							update(field.id, field.value);
 							return false;
 						});
 				this.node.find('.filename').text(this.formattedValue);
-
 			} else {
 				$("#AttachedFile" + fieldId).remove();
 
@@ -110,8 +109,8 @@ var FieldTypeModule = (function() {
 				});
 
 				formNode.bind('fileuploaddone', function(e, data) {
-					FormModule.setValue(field.id, requestModule()
-							.refreshField(fieldId));
+					FormModule.setValue(field.id, requestModule().refreshField(
+							fieldId));
 					field.refreshUI();
 					removeErrorFromField(controlsNode.parent(), field);
 				});
@@ -122,29 +121,9 @@ var FieldTypeModule = (function() {
 							addErrorToField(field, texts[file.error]);
 						});
 					}
-
 				});
 			}
 		}
-
-	}
-
-	function selectedValues(input) {
-		var values = new Array();
-		if (!input)
-			return values;
-		var i = 0;
-		input.replace(/(\[.*?\])/g, function(a, b) {
-			values[i] = b.substring(1, b.length - 1);
-			i++;
-			return "";
-		});
-
-		$.each(input.split(", "), function(idx, selectionValue) {
-			values[i] = selectionValue;
-			i++;
-		});
-		return values;
 	}
 
 	function CheckboxesFieldValue(field, controlsNode) {
@@ -164,7 +143,7 @@ var FieldTypeModule = (function() {
 		});
 
 		field.refreshUI = function() {
-			var values = selectedValues(field.value);
+			var values = FormModule.selectedValues(field);
 			$.each(values, function(idx, selectionValue) {
 				field.node.find('#' + field.id + safeIdString(selectionValue))
 						.attr('checked', 'checked');
@@ -261,12 +240,14 @@ var FieldTypeModule = (function() {
 		new View.Button(buttons).image('icon-arrow-right').click(function() {
 			listBoxArrow(field.id, 'Selected');
 			field.changed().update();
+
 			return false;
 		});
 		buttons.append('<br/>');
 		new View.Button(buttons).image('icon-arrow-left').click(function() {
 			listBoxArrow(field.id, 'Possible');
 			field.changed().update();
+
 			return false;
 		});
 
@@ -277,13 +258,13 @@ var FieldTypeModule = (function() {
 		});
 		controlsNode.append(field.node);
 
-		var values = selectedValues(field.value);
+		var values = FormModule.selectedValues(field);
 		field.refreshUI = function() {
 			$.each(values, function(idx, selectionValue) {
 				selected.append(field.node.find('#' + field.id
 						+ safeIdString(selectionValue)));
 			});
-		}
+		};
 
 		field.getUIValue = function() {
 			var val = $.map(
@@ -295,8 +276,9 @@ var FieldTypeModule = (function() {
 							return elm.text;
 						}
 					}).join(', ');
+
 			return val;
-		}
+		};
 	}
 
 	function NumberFieldValue(field, controlsNode) {
@@ -342,14 +324,14 @@ var FieldTypeModule = (function() {
 		field.refreshUI = function() {
 			field.node.find('#' + field.id + safeIdString(this.value)).attr(
 					'checked', 'checked');
-		}
+		};
 
 		field.getUIValue = function() {
 			return $.map($('#Field' + field.id + ' input:checked'),
 					function(elm) {
 						return $('#label' + elm.id).text()
 					}).join(', ');
-		}
+		};
 	}
 
 	function OpenSelectionFieldValue(field, controlsNode) {
@@ -442,7 +424,7 @@ var FieldTypeModule = (function() {
 		field.node = clone("textfield", field.id);
 		var maxWidth = $('#inserted_content').width();
 		var cssWidth = field.fieldValue.width * 7.3;
-		field.node.css("width", cssWidth < maxWidth ? cssWidth : maxWidth)
+		field.node.css("width", cssWidth < maxWidth ? cssWidth : maxWidth);
 		field.node.change(function() {
 			field.changed();
 		});
@@ -483,11 +465,13 @@ var FieldTypeModule = (function() {
 		field.changed = function() {
 			field.dirty = true;
 			field.setValue(field.getUIValue());
+
 			return field;
 		};
 
 		field.getUIValue = function() {
 			var value = field.node.attr('value');
+
 			return value == null ? '' : value;
 		};
 
@@ -502,6 +486,8 @@ var FieldTypeModule = (function() {
 			field.setValue(value);
 			if (field.page.index == currentPage())
 				field.refreshUI();
+
+			RulesModule.applyRules(field.page, true);
 		};
 
 		field.update = function() {
@@ -512,11 +498,7 @@ var FieldTypeModule = (function() {
 		};
 
 		eval(field.fieldType + '(field, node)');
-	}
-
-	inner.updateField = function(id, value) {
-		FormModule.getField(id).setUIValue(value);
-	}
+	};
 
 	return inner;
 }());
