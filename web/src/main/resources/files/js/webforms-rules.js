@@ -116,15 +116,22 @@ var RulesModule = (function() {
 	}
 
 	function evaluateFieldRules(currentPage) {
+		var changes = [];
 		$.each(currentPage.fields, function(idx, f) {
 			var result = evaluate(f.field.field.rule);
 
 			if (result === true) {
+				if (f.visible === false)
+					changes.push(f);
 				f.visible = true;
 			} else if (result === false) {
+				if (f.visible === true)
+					changes.push(f);
 				f.visible = false;
 			}
 		});
+		
+		return changes;
 	}
 
 	function evaluatePageRules(currentPage) {
@@ -140,14 +147,17 @@ var RulesModule = (function() {
 	}
 
 	inner.evaluateRules = function(currentPage) {
+		var fieldChanges;
 		if (currentPage) {
-			evaluateFieldRules(currentPage);
+			fieldChanges = evaluateFieldRules(currentPage);
 		} else {
 			$.each(FormModule.pages(), function(idx, page) {
 				evaluateFieldRules(page);
 			});
 		}
 		evaluatePageRules(currentPage);
+		
+		return fieldChanges;
 	};
 
 	function applyFieldVisibility(currentPage, animate) {
@@ -216,8 +226,10 @@ var RulesModule = (function() {
 	};
 
 	inner.applyRules = function(currentPage, animate) {
-		inner.evaluateRules(currentPage);
+		var fieldChanges = inner.evaluateRules(currentPage);
 		inner.applyVisibility(currentPage, animate);
+		
+		return fieldChanges;
 	};
 
 	return inner;

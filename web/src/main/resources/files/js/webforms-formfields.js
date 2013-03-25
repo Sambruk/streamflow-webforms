@@ -286,6 +286,7 @@ var FieldTypeModule = (function() {
 		field.node.change(function() {
 			field.changed();
 		});
+		addTabListener(field.node, field);
 		field.node.blur(function() {
 			if (!field.dirty)
 				return;
@@ -301,6 +302,8 @@ var FieldTypeModule = (function() {
 				field.invalidformat = texts.invalidformat;
 				addErrorToField(field, field.invalidformat);
 			}
+
+			field.tabPressed = false;
 		});
 		controlsNode.append(field.node);
 	}
@@ -370,8 +373,11 @@ var FieldTypeModule = (function() {
 		textfield.change(function() {
 			field.changed();
 		});
+		addTabListener(textfield, field);
 		textfield.blur(function() {
 			field.update();
+
+			field.tabPressed = false;
 		});
 		option.append(textfield);
 		field.node.append(option);
@@ -401,6 +407,7 @@ var FieldTypeModule = (function() {
 			if (fieldValue == field.fieldValue.openSelectionName) {
 				fieldValue = $('#TextField' + field.id).attr('value');
 			}
+
 			return fieldValue;
 		}
 	}
@@ -414,8 +421,11 @@ var FieldTypeModule = (function() {
 		field.node.change(function() {
 			field.changed();
 		});
+		addTabListener(field.node, field);
 		field.node.blur(function() {
 			field.update();
+
+			field.tabPressed = false;
 		});
 		controlsNode.append(field.node);
 	}
@@ -425,9 +435,11 @@ var FieldTypeModule = (function() {
 		var maxWidth = $('#inserted_content').width();
 		var cssWidth = field.fieldValue.width * 7.3;
 		field.node.css("width", cssWidth < maxWidth ? cssWidth : maxWidth);
+
 		field.node.change(function() {
 			field.changed();
 		});
+		addTabListener(field.node, field);
 		field.node.blur(function() {
 			if (!field.dirty)
 				return;
@@ -444,8 +456,22 @@ var FieldTypeModule = (function() {
 				field.invalidformat = texts.invalidformat;
 				addErrorToField(field, field.invalidformat);
 			}
+
+			field.tabPressed = false;
 		});
 		controlsNode.append(field.node);
+	}
+
+	function addTabListener(node, field) {
+		field.textFieldNode = node;
+		node.keydown(function(e) {
+			if (e.which === 9 && !e.altKey && !e.ctrlKey && !e.metaKey
+					&& !e.shiftKey) {
+				field.tabPressed = true;
+			} else {
+				field.tabPressed = false;
+			}
+		});
 	}
 
 	function removeErrorFromField(node, field) {
@@ -484,11 +510,27 @@ var FieldTypeModule = (function() {
 
 		field.setUIValue = function(value) {
 			field.setValue(value);
-			if (field.page.index == currentPage())
-				field.refreshUI();
+			field.refreshUI();
 
-			RulesModule.applyRules(field.page, true);
+			var changes = RulesModule.applyRules(field.page, true);
+			adjustFocus(changes);
 		};
+
+		function adjustFocus(changes) {
+			if (!field.tabPressed)
+				return;
+
+			for ( var i = field.index + 1; i < field.page.fields.length; i++) {
+				if (field.page.fields[i].fieldType === "CommentFieldValue")
+					continue;
+
+				if (changes.indexOf(field.page.fields[i]) !== -1) {
+					field.textFieldNode.focus();
+					break;
+				} else if (field.page.fields[i].visible !== false)
+					break;
+			}
+		}
 
 		field.update = function() {
 			if (field.dirty) {

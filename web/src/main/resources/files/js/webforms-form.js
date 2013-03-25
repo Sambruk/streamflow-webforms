@@ -60,7 +60,7 @@ var FormModule = (function() {
 		var fields = this.fields;
 		var parent = this;
 		$.each(page.fields, function(idx, field) {
-			fields[idx] = new Field(field, parent);
+			fields[idx] = new Field(field, parent, idx);
 		});
 
 		// TEST
@@ -101,10 +101,11 @@ var FormModule = (function() {
 		}
 	}
 
-	function Field(field, page) {
+	function Field(field, page, index) {
 		this.page = page;
 		this.field = field;
 		this.id = field.field.field;
+		this.index = index;
 		this.fieldValue = field.field.fieldValue;
 		this.name = field.field.description;
 		this.dirty = false;
@@ -148,13 +149,14 @@ var FormModule = (function() {
 			field.field.rule.condition = "anyof";
 			field.field.rule.values = [ "asdf" ];
 			field.field.rule.visibleWhen = false;
+		} else if (this.id === "80699c1e-6e99-4f57-b986-3f544a16ae31-77") {
+			// Formulär med alla fält
+			field.field.rule = {};
+			field.field.rule.field = "001547bd-e8ac-48cb-8843-adf09371dab4-10d";
+			field.field.rule.condition = "anyof";
+			field.field.rule.values = [ "asdf" ];
+			field.field.rule.visibleWhen = true;
 		}
-	}
-
-	function getFieldType(qualifiedField) {
-		var list = qualifiedField.split('.');
-
-		return list[list.length - 1];
 	}
 
 	Field.prototype.setUIFormatter = function() {
@@ -167,6 +169,20 @@ var FormModule = (function() {
 			this.uIFormatter = formatSelectionValues;
 		}
 	};
+
+	Field.prototype.setValue = function(value) {
+		this.value = value;
+		this.formattedValue = this.uIFormatter == null ? value : this
+				.uIFormatter(value);
+
+		return this;
+	};
+
+	function getFieldType(qualifiedField) {
+		var list = qualifiedField.split('.');
+
+		return list[list.length - 1];
+	}
 
 	function formatUTCStringToIsoString(value) {
 		if (value == '')
@@ -198,14 +214,6 @@ var FormModule = (function() {
 	function hasFieldAValue(field) {
 		return !((typeof field === 'undefined') || (field.length < 1));
 	}
-
-	Field.prototype.setValue = function(value) {
-		this.value = value;
-		this.formattedValue = this.uIFormatter == null ? value : this
-				.uIFormatter(value);
-
-		return this;
-	};
 
 	inner.setupIncomingFormSummaryPage = function(incomingFormSummary) {
 		incomingSummary = incomingFormSummary;
