@@ -18,9 +18,10 @@ var View = (function() {
 	var inner = {};
 	var messages = {};
 	var fieldGroups = {};
+	var templates;
 
 	inner.error = function(message) {
-		var node = inner.clone('alert');
+		var node = inner.clone('alert', "inserted_alert");
 		node.addClass("alert-error")
 		node.append(message);
 		var breadcrumbNode = $('#inserted_content').find('ul.breadcrumb');
@@ -56,16 +57,18 @@ var View = (function() {
 			node.find('#caseid_message').text(texts.caseidmessage);
 			node.find('#caseid').text(caseName);
 		}
-		new inner.Button(node).image('print').name(texts.print).href(printUrl)
-				.attr('target', '_new');
+		new inner.Button(node).image('print').name(texts.print).href(printUrl).attr('target', '_new');
 		container.append(node);
 	};
 
 	inner.formPage = function(args) {
 		createPageContent(args.segment, function(node) {
 			var form = inner.clone('form');
-			FormModule.foldEditPage(parseInt(args.segment), function(field) {
-				foldEditField(form.find('fieldset'), field);
+			var page = parseInt(args.segment);
+			var fieldset = form.children('fieldset');
+			fieldset.children("legend").text(FormModule.pages()[page].title);
+			FormModule.foldEditPage(page, function(field) {
+				foldEditField(fieldset, field);
 			});
 			$.each(fieldGroups, function(key, value) {
 				var group = form.find('#' + key);
@@ -99,7 +102,7 @@ var View = (function() {
 		inner.addHeader(container);
 		var node = inner.clone('row');
 		container.append(node);
-		var content = inner.clone('content');
+		var content = inner.clone('content', 'inserted_content');
 		node.append(content);
 		addProgressbar(page, FormModule.pages(), content);
 
@@ -114,8 +117,7 @@ var View = (function() {
 	}
 
 	function foldEditField(node, field) {
-		var fieldNode = inner.clone('formfield', 'Field' + field.id).appendTo(
-				node);
+		var fieldNode = inner.clone('formfield', 'Field' + field.id).appendTo(node);
 		var controlsNode = fieldNode.find('div.controls');
 		FieldTypeModule.createFieldUI(field, controlsNode);
 
@@ -125,7 +127,7 @@ var View = (function() {
 			fieldGroup.count = field.fieldValue.fieldCount;
 			fieldGroup.embedded = [];
 			fieldGroups[field.id] = fieldGroup;
-			var fieldHeader = fieldNode.find('label.control-label');
+			var fieldHeader = fieldNode.find('.control-label');
 			fieldHeader.append(field.name);
 		} else {
 			$.each(fieldGroups, function(key, value) {
@@ -135,9 +137,9 @@ var View = (function() {
 				}
 			});
 			if (field.fieldType == "CommentFieldValue") {
-				fieldNode.find('label').remove();
+				fieldNode.find('.control-label').remove();
 			} else {
-				var fieldHeader = fieldNode.find('label.control-label');
+				var fieldHeader = fieldNode.find('.control-label');
 				fieldHeader.append(field.name);
 				mandatory(fieldHeader, field);
 				hint(fieldHeader, field);
@@ -149,67 +151,56 @@ var View = (function() {
 
 	function mandatory(node, field) {
 		if (field.field.field.mandatory) {
-			inner.clone('mandatory', 'mandatory' + field.id).appendTo(node);
+			inner.clone('mandatory').appendTo(node);
 		}
 	}
 
 	function hint(node, field) {
 		if (field.fieldValue.hint) {
-			inner.clone('hint', 'hint' + field.id).text(
-					' (' + field.fieldValue.hint + ')').appendTo(node);
+			inner.clone('hint', 'hint' + field.id).text(' (' + field.fieldValue.hint + ')').appendTo(node);
 		}
 	}
 
 	function foldPage(node, page) {
-		var pageDiv = inner.clone('form_page_summary',
-				"form_page_summary" + page.index).appendTo(node);
-		pageDiv.find('h3').append(
-				inner.clone('link').attr('href', getPage(page.index)).text(
-						page.title));
+		var pageDiv = inner.clone('form_page_summary', "form_page_summary" + page.index).appendTo(node);
+		pageDiv.children('h2').append(inner.clone("link").attr('href', getPage(page.index)).text(page.title));
+		pageDiv.children('table').attr("title", page.title);
+
 		return function(field) {
-			foldField(pageDiv.find('#fields_table'), field);
+			foldField(pageDiv.children('table'), field);
 		};
 	}
 
 	function foldField(node, field) {
 		if (field.fieldType == "CommentFieldValue")
 			return;
-		var row = inner.clone('field_summary', "Field" + field.id).appendTo(
-				node);
-		var tr = $('<td class="field_label"/>').append(field.name);
-		row.append(tr);
-		$('<td class="field_value"/>').append(field.formattedValue).appendTo(
-				row);
+
+		var row = inner.clone('field_summary', "Field" + field.id).appendTo(node);
+		$('<td class="field_label" />').append(field.name).appendTo(row);
+		$('<td class="field_value" />').append(field.formattedValue).appendTo(row);
 		if (field.field.field.mandatory && !field.formattedValue) {
 			row.addClass('validation-missing');
-			row.append($('<td class="field_message pull-right"/>').append(
-					inner.clone('label_missing', 'missing')));
+			row.append($('<td class="field_message pull-right" />').append(inner.clone('label_missing')));
 		} else if (field.invalidformat) {
 			row.addClass('validation-error');
-			row.append($('<td class="field_message pull-right"/>').append(
-					inner.clone('label_error', 'error')));
+			row.append($('<td class="field_message pull-right" />').append(inner.clone('label_error')));
 		}
 	}
 
 	function help(node, field) {
-		if (field.field.field.note != ""
-				&& field.fieldType != "CommentFieldValue") {
-			inner.clone('help-block').append(field.field.field.note)
-					.insertAfter(node);
+		if (field.field.field.note != "" && field.fieldType != "CommentFieldValue") {
+			inner.clone('help-block').append(field.field.field.note).insertAfter(node);
 		}
 	}
 
 	function enableSecondSignatureFields(secondSignature) {
 		var enable = false;
-		var signature = getSignature(
-				FormModule.getRequiredSignatures()[0].name, FormModule
-						.getSignatures());
+		var signature = getSignature(FormModule.getRequiredSignatures()[0].name, FormModule.getSignatures());
 		signature ? enable = false : enable = true;
 		var inputArray = secondSignature.find('input');
 		for ( var i = 0; i < inputArray.length; i++) {
 			if (enable) {
-				inputArray[i].disabled ? inputArray[i].removeAttr("disabled")
-						: '';
+				inputArray[i].disabled ? inputArray[i].removeAttr("disabled") : '';
 			} else {
 				inputArray[i].disabled = "disabled";
 			}
@@ -228,8 +219,7 @@ var View = (function() {
 		} else {
 			// strip parameters
 			var verifyDTO = {};
-			$.each($('#eIdPlugin').find('form > input:hidden'), function(idx,
-					value) {
+			$.each($('#eIdPlugin').find('form > input:hidden'), function(idx, value) {
 				if (value.name) {
 					verifyDTO[value.name] = value.value;
 				}
@@ -240,25 +230,19 @@ var View = (function() {
 
 			// Store the email etc before reloading the formdraft
 			var confirmationEmail = FormModule.confirmationEmail();
-			var confirmationEmailConfirm = FormModule
-					.confirmationEmailConfirm();
+			var confirmationEmailConfirm = FormModule.confirmationEmailConfirm();
 
 			if (FormModule.formNeedsSecondSignature()) {
 				var secondSignatureName = FormModule.secondSignatureName();
-				var secondSignaturePhoneNumber = FormModule
-						.secondSignaturePhoneNumber();
-				var secondSignatureSocialSecurityNumber = FormModule
-						.secondSignatureSocialSecurityNumber();
+				var secondSignaturePhoneNumber = FormModule.secondSignaturePhoneNumber();
+				var secondSignatureSocialSecurityNumber = FormModule.secondSignatureSocialSecurityNumber();
 				var secondSignatureEmail = FormModule.secondSignatureEmail();
-				var secondSignatureEmailConfirm = FormModule
-						.secondSignatureEmailConfirm();
-				var secondSignatureSingleSignature = FormModule
-						.secondSignatureSingleSignature();
+				var secondSignatureEmailConfirm = FormModule.secondSignatureEmailConfirm();
+				var secondSignatureSingleSignature = FormModule.secondSignatureSingleSignature();
 				if (!FormModule.secondSignatureSingleSignature()) {
 					RequestModule.setSecondSignatureSingleSignature(false);
 					FormModule.setSecondSignatureSingleSignature(false);
-					secondSignatureSingleSignature = FormModule
-							.secondSignatureSingleSignature();
+					secondSignatureSingleSignature = FormModule.secondSignatureSingleSignature();
 				}
 			}
 
@@ -268,15 +252,11 @@ var View = (function() {
 
 			if (FormModule.formNeedsSecondSignature()) {
 				FormModule.setSecondSignatureName(secondSignatureName);
-				FormModule
-						.setSecondSignaturePhoneNumber(secondSignaturePhoneNumber);
-				FormModule
-						.setSecondSignatureSocialSecurityNumber(secondSignatureSocialSecurityNumber);
+				FormModule.setSecondSignaturePhoneNumber(secondSignaturePhoneNumber);
+				FormModule.setSecondSignatureSocialSecurityNumber(secondSignatureSocialSecurityNumber);
 				FormModule.setSecondSignatureEmail(secondSignatureEmail);
-				FormModule
-						.setSecondSignatureEmailConfirm(secondSignatureEmailConfirm);
-				FormModule
-						.setSecondSignatureSingleSignature(secondSignatureSingleSignature);
+				FormModule.setSecondSignatureEmailConfirm(secondSignatureEmailConfirm);
+				FormModule.setSecondSignatureSingleSignature(secondSignatureSingleSignature);
 			}
 			// signing success redirect to summary
 			throw {
@@ -303,8 +283,7 @@ var View = (function() {
 			else if (e.error)
 				messages.error = e.error;
 			else if (e.message)
-				messages.error = e.message + ', ' + e.fileName + '('
-						+ e.lineNumber + ')';
+				messages.error = e.message + ', ' + e.fileName + '(' + e.lineNumber + ')';
 
 			if (e.redirect) {
 				redirect(e.redirect);
@@ -339,30 +318,28 @@ var View = (function() {
 
 	inner.addHeader = function(node) {
 		var header = inner.clone('form_header');
-		header.find('#form_description').text(FormModule.title());
+		header.find('h1').text(FormModule.title());
 		node.prepend(header);
 	};
 
 	function addButtons(node, page) {
-		var buttons = inner.clone('buttons');
-		var previousBtn = new inner.Button(buttons, "button_previous").name(
-				texts.previous).href(inner.getPrevious(page));
-		var nextBtn = new inner.Button(buttons, "button_next").name(texts.next)
-				.href(inner.getNext(page)).enable(page != getSummary());
+		var buttons = inner.clone("buttons");
+		var previousBtn = new inner.Button(buttons, "button_previous").name(texts.previous).href(
+				inner.getPrevious(page));
+		var nextBtn = new inner.Button(buttons, "button_next").name(texts.next).href(inner.getNext(page)).enable(
+				page != getSummary());
 
 		if (!FormModule.isSecondSigningFlow()) {
 			previousBtn.enable(page != 0);
 			var dialogElement = createDiscardDialog(node);
-			new inner.Button(buttons).name(texts.discard).confirm(
-					'#' + dialogElement.attr('id')).addClass("btn-danger");
+			new inner.Button(buttons).name(texts.discard).confirm('#' + dialogElement.attr('id'))
+					.addClass("btn-danger");
 		} else {
 			previousBtn.enable(page != getIncoming());
 		}
 
 		if (page == getSummary()) {
-			var button = new inner.Button(buttons).name(texts.submit).href(
-					getSubmit());
-			button.attr('id', 'inserted_button_submit');
+			var button = new inner.Button(buttons, "button_submit").name(texts.submit).href(getSubmit());
 			if (FormModule.canSubmit()) {
 				button.addClass("btn-primary");
 			} else {
@@ -379,12 +356,10 @@ var View = (function() {
 		dialog.find('.modal-header').prepend(texts.discard);
 		dialog.find('.modal-body').append(texts.confirmDiscard);
 		dialog.find('.modal-footer').append();
-		var button = new inner.Button(dialog.find('.modal-footer')).name(
-				texts.no).attr({
+		var button = new inner.Button(dialog.find('.modal-footer')).name(texts.no).attr({
 			'data-dismiss' : 'modal'
 		});
-		var button = new inner.Button(dialog.find('.modal-footer')).name(
-				texts.yes).attr({
+		var button = new inner.Button(dialog.find('.modal-footer')).name(texts.yes).attr({
 			'data-dismiss' : 'modal'
 		}).href(getDiscard()).click(function() {
 			inner.discard();
@@ -405,8 +380,7 @@ var View = (function() {
 		if (current === 0) {
 			return getIncoming();
 		}
-		for ( var previous = isNaN(current) ? FormModule.pageCount() - 1
-				: current - 1; previous > 0; previous--) {
+		for ( var previous = isNaN(current) ? FormModule.pageCount() - 1 : current - 1; previous > 0; previous--) {
 			if (FormModule.pages()[previous].visible !== false) {
 				return getPage(previous);
 			}
@@ -461,21 +435,18 @@ var View = (function() {
 	function addMailNotification(node) {
 		var message = FormModule.getMailSelectionMessage();
 		if (message) {
-			var notification = inner.clone('mailNotification',
-					"insertedMailNotification");
+			var notification = inner.clone('mailNotification', "insertedMailNotification");
 			var controls = notification.find('#mailControls');
 			var inputs = notification.find('#mailInputs');
 
 			var checkbox = inner.clone('checkbox', 'mailCheckbox');
-			checkbox.find('input').prop('checked',
-					FormModule.mailNotificationEnabled());
+			checkbox.find('input').prop('checked', FormModule.mailNotificationEnabled());
 
 			checkbox.append(message);
 			controls.append(checkbox);
 
 			inputs.find('#confirmation-email-label').text(texts.email);
-			inputs.find('#confirmation-email-confirm-label').text(
-					texts.confirmEmail);
+			inputs.find('#confirmation-email-confirm-label').text(texts.confirmEmail);
 			var emailField = inputs.find('#confirmation-email');
 			var emailConfirmField = inputs.find('#confirmation-email-confirm');
 
@@ -491,19 +462,15 @@ var View = (function() {
 			// running.
 			// Not persisted on the server
 			emailConfirmField.val(FormModule.confirmationEmailConfirm());
-			emailConfirmField
-					.blur(function() {
-						FormModule
-								.setConfirmationEmailConfirm(emailConfirmField
-										.val());
-					});
+			emailConfirmField.blur(function() {
+				FormModule.setConfirmationEmailConfirm(emailConfirmField.val());
+			});
 
 			var emailFunction = function() {
 				// if not match show error and disable submit-button
 				if (emailConfirmField.val() != emailField.val()) {
 					inputs.addClass('error');
-					inputs.find('#confirmation-help').append(
-							texts.emailMismatch);
+					inputs.find('#confirmation-help').append(texts.emailMismatch);
 					toggleSubmitButton(false);
 
 					emailConfirmField.focus(function() {
@@ -548,11 +515,11 @@ var View = (function() {
 
 	function toggleSubmitButton(enabled) {
 		if (enabled && FormModule.canSubmit()) {
-			inner.enable($('#inserted_button_submit'), true);
-			$('#inserted_button_submit').addClass("btn-primary");
+			inner.enable($('#button_submit'), true);
+			$('#button_submit').addClass("btn-primary");
 		} else {
-			inner.enable($('#inserted_button_submit'), false);
-			$('#inserted_button_submit').removeClass("btn-primary");
+			inner.enable($('#button_submit'), false);
+			$('#button_submit').removeClass("btn-primary");
 		}
 	}
 
@@ -562,7 +529,7 @@ var View = (function() {
 
 			var signaturesNode = inner.clone('form_signatures');
 			signaturesNode.addClass('well');
-			signaturesNode.find("h3").append(texts.signature);
+			signaturesNode.find("h2").append(texts.signature);
 
 			var table = signaturesNode.find('table');
 			var idx = 0;
@@ -570,17 +537,14 @@ var View = (function() {
 			table.append(row);
 			row.addClass("signature-row");
 			row.append($('<td/>').append(reqSign.name + ":"));
-			var signature = getSignature(reqSign.name, FormModule
-					.getSignatures());
+			var signature = getSignature(reqSign.name, FormModule.getSignatures());
 			if (signature) {
-				row.append($('<td/>').append(signature.signerName).addClass(
-						'signer-name'));
+				row.append($('<td/>').append(signature.signerName).addClass('signer-name'));
 			} else {
 				row.append($('<td/>').append(eidProviders(idx)));
 				var buttonCell = $('<td/>');
-				new inner.Button(buttonCell).name(texts.sign)
-						.href(getSign(idx)).attr('id', "link_" + idx).image(
-								'icon-pencil').enable(false);
+				new inner.Button(buttonCell).name(texts.sign).href(getSign(idx)).attr('id', "link_" + idx).image(
+						'icon-pencil').enable(false);
 				row.append(buttonCell);
 			}
 			node.append(signaturesNode);
@@ -591,75 +555,54 @@ var View = (function() {
 		if (FormModule.formNeedsSecondSignature()) {
 			var reqSign = FormModule.getRequiredSignatures()[1];
 			var secondSignature = inner.clone('second_signature');
-			var signatureFields = secondSignature
-					.find('#secondsignature_fields');
+			var signatureFields = secondSignature.find('#secondsignature_fields');
 
 			secondSignature.find('#secondsignature-label').text(reqSign.name);
-			secondSignature.find('#secondsignaturetext').text(
-					texts.secondSignatureComment);
+			secondSignature.find('#secondsignaturetext').text(texts.secondSignatureComment);
 
 			secondSignature.find('#name-label').text(texts.name);
-			secondSignature.find('#socialsecuritynumber-label').text(
-					texts.socialSecurityNumber);
+			secondSignature.find('#socialsecuritynumber-label').text(texts.socialSecurityNumber);
 			secondSignature.find('#phonenumber-label').text(texts.phonenumber);
 
 			secondSignature.find('#email-label').text(texts.email);
-			secondSignature.find('#emailconfirm-label')
-					.text(texts.confirmEmail);
+			secondSignature.find('#emailconfirm-label').text(texts.confirmEmail);
 
 			if (!reqSign.mandatory) {
-				var singleSignatureCheckboxLabel = secondSignature
-						.find('#singlesignaturecheckbox-label');
+				var singleSignatureCheckboxLabel = secondSignature.find('#singlesignaturecheckbox-label');
 				var isChecked = FormModule.secondSignatureSingleSignature();
 				singleSignatureCheckboxLabel.append(reqSign.question);
-				secondSignature.find('#singlesignaturecheckbox').prop(
-						'checked', isChecked);
+				secondSignature.find('#singlesignaturecheckbox').prop('checked', isChecked);
 
 				isChecked ? signatureFields.hide() : '';
 
-				secondSignature
-						.find('#singlesignaturecheckbox')
-						.click(
-								function() {
-									var checked = secondSignature.find(
-											'#singlesignaturecheckbox').prop(
-											'checked');
-									RequestModule
-											.setSecondSignatureSingleSignature(checked);
-									FormModule
-											.setSecondSignatureSingleSignature(checked);
-									if (checked) {
-										signatureFields.hide('slow');
-									} else {
-										signatureFields.show('slow');
-									}
-									toggleSignButton(false);
-								});
+				secondSignature.find('#singlesignaturecheckbox').click(function() {
+					var checked = secondSignature.find('#singlesignaturecheckbox').prop('checked');
+					RequestModule.setSecondSignatureSingleSignature(checked);
+					FormModule.setSecondSignatureSingleSignature(checked);
+					if (checked) {
+						signatureFields.hide('slow');
+					} else {
+						signatureFields.show('slow');
+					}
+					toggleSignButton(false);
+				});
 			} else {
 				secondSignature.find('#singlesignaturecheckbox-label').hide();
 			}
 
 			updateSecondSignatureName(secondSignature.find('#name'));
-			setMandatory(secondSignature.find('#name-label'), secondSignature
-					.find('#name'));
-			updateSecondSignaturePhoneNumber(secondSignature
-					.find('#phonenumber'));
-			setMandatory(secondSignature.find('#phonenumber-label'),
-					secondSignature.find('#phonenumber'));
-			updateSecondSignatureSocialSecurityNumber(secondSignature
+			setMandatory(secondSignature.find('#name-label'), secondSignature.find('#name'));
+			updateSecondSignaturePhoneNumber(secondSignature.find('#phonenumber'));
+			setMandatory(secondSignature.find('#phonenumber-label'), secondSignature.find('#phonenumber'));
+			updateSecondSignatureSocialSecurityNumber(secondSignature.find('#socialsecuritynumber'));
+			setMandatory(secondSignature.find('#socialsecuritynumber-label'), secondSignature
 					.find('#socialsecuritynumber'));
-			setMandatory(secondSignature.find('#socialsecuritynumber-label'),
-					secondSignature.find('#socialsecuritynumber'));
-			setHint(secondSignature.find('#socialsecuritynumber-label'),
-					secondSignature.find('#socialsecuritynumber'),
+			setHint(secondSignature.find('#socialsecuritynumber-label'), secondSignature.find('#socialsecuritynumber'),
 					texts.socialSecurityNumberHint);
 			updateSecondSignatureEmail(secondSignature.find('#emailfields'));
-			setMandatory(secondSignature.find('#email-label'), secondSignature
-					.find('#email'));
-			updateSecondSignatureEmailConfirm(secondSignature
-					.find('#emailfields'));
-			setMandatory(secondSignature.find('#emailconfirm-label'),
-					secondSignature.find('#emailconfirm'));
+			setMandatory(secondSignature.find('#email-label'), secondSignature.find('#email'));
+			updateSecondSignatureEmailConfirm(secondSignature.find('#emailfields'));
+			setMandatory(secondSignature.find('#emailconfirm-label'), secondSignature.find('#emailconfirm'));
 
 			enableSecondSignatureFields(secondSignature);
 
@@ -687,25 +630,23 @@ var View = (function() {
 
 	function updateSecondSignatureName(nameField) {
 		nameField.val(FormModule.secondSignatureName());
-		nameField
-				.blur(function() {
-					var disableSignButton = false;
-					var stringDTO = {};
-					stringDTO.string = nameField.val();
-					try {
-						RequestModule.setSecondSignatureName(stringDTO);
-						nameField.parent().removeClass('error');
-						nameField.parent().find('#name-help').text("");
-						FormModule.setSecondSignatureName(stringDTO.string);
-					} catch (errorMessage) {
-						FormModule.setSecondSignatureName("");
-						nameField.parent().addClass('error');
-						nameField.parent().find('#name-help').text(
-								texts.invalidformat);
-						disableSignButton = true;
-					}
-					toggleSignButton(disableSignButton);
-				});
+		nameField.blur(function() {
+			var disableSignButton = false;
+			var stringDTO = {};
+			stringDTO.string = nameField.val();
+			try {
+				RequestModule.setSecondSignatureName(stringDTO);
+				nameField.parent().removeClass('error');
+				nameField.parent().find('#name-help').text("");
+				FormModule.setSecondSignatureName(stringDTO.string);
+			} catch (errorMessage) {
+				FormModule.setSecondSignatureName("");
+				nameField.parent().addClass('error');
+				nameField.parent().find('#name-help').text(texts.invalidformat);
+				disableSignButton = true;
+			}
+			toggleSignButton(disableSignButton);
+		});
 	}
 
 	function updateSecondSignaturePhoneNumber(phoneNumberField) {
@@ -722,8 +663,7 @@ var View = (function() {
 			} catch (errorMessage) {
 				FormModule.setSecondSignaturePhoneNumber("");
 				phoneNumberField.parent().addClass('error');
-				phoneNumberField.parent().find('#phonenumber-help').text(
-						texts.invalidformat);
+				phoneNumberField.parent().find('#phonenumber-help').text(texts.invalidformat);
 				disableSignButton = true;
 			}
 			toggleSignButton(disableSignButton);
@@ -731,31 +671,24 @@ var View = (function() {
 	}
 
 	function updateSecondSignatureSocialSecurityNumber(socialSecurityField) {
-		socialSecurityField.val(FormModule
-				.secondSignatureSocialSecurityNumber());
-		socialSecurityField
-				.blur(function() {
-					var disableSignButton = false;
-					var stringDTO = {};
-					stringDTO.string = socialSecurityField.val();
-					try {
-						RequestModule
-								.setSecondSignatureSocialSecurityNumber(stringDTO);
-						socialSecurityField.parent().removeClass('error');
-						socialSecurityField.parent().find(
-								'#socialsecuritynumber-help').text("");
-						FormModule
-								.setSecondSignatureSocialSecurityNumber(stringDTO.string);
-					} catch (errorMessage) {
-						FormModule.setSecondSignatureSocialSecurityNumber("");
-						socialSecurityField.parent().addClass('error');
-						socialSecurityField.parent().find(
-								'#socialsecuritynumber-help').text(
-								texts.invalidformat);
-						disableSignButton = true;
-					}
-					toggleSignButton(disableSignButton);
-				});
+		socialSecurityField.val(FormModule.secondSignatureSocialSecurityNumber());
+		socialSecurityField.blur(function() {
+			var disableSignButton = false;
+			var stringDTO = {};
+			stringDTO.string = socialSecurityField.val();
+			try {
+				RequestModule.setSecondSignatureSocialSecurityNumber(stringDTO);
+				socialSecurityField.parent().removeClass('error');
+				socialSecurityField.parent().find('#socialsecuritynumber-help').text("");
+				FormModule.setSecondSignatureSocialSecurityNumber(stringDTO.string);
+			} catch (errorMessage) {
+				FormModule.setSecondSignatureSocialSecurityNumber("");
+				socialSecurityField.parent().addClass('error');
+				socialSecurityField.parent().find('#socialsecuritynumber-help').text(texts.invalidformat);
+				disableSignButton = true;
+			}
+			toggleSignButton(disableSignButton);
+		});
 	}
 
 	function updateSecondSignatureEmail(emailField) {
@@ -795,23 +728,19 @@ var View = (function() {
 	}
 
 	function setMandatory(node, field) {
-		inner.clone('mandatory', 'mandatory_' + field.attr('id'))
-				.appendTo(node);
+		inner.clone('mandatory').appendTo(node);
 	}
 
 	function setHint(node, field, hintText) {
-		inner.clone('hint', 'hint_' + field.attr('id')).text(
-				' (' + hintText + ')').appendTo(node);
+		inner.clone('hint', 'hint_' + field.attr('id')).text(' (' + hintText + ')').appendTo(node);
 	}
 
 	function toggleSignButton(disable) {
 		var selectedEid = FormModule.selectedEid();
-		if (typeof selectedEid !== 'undefined' && selectedEid
-				&& selectedEid.value !== texts.provider) {
+		if (typeof selectedEid !== 'undefined' && selectedEid && selectedEid.value !== texts.provider) {
 			var button = $('#link_' + selectedEid.name);
-			(disable || selectedEid.selectedIndex === 0 || !FormModule
-					.isSecondSignatureReady()) ? inner.enable(button, false)
-					: inner.enable(button, true);
+			(disable || selectedEid.selectedIndex === 0 || !FormModule.isSecondSignatureReady()) ? inner.enable(button,
+					false) : inner.enable(button, true);
 		}
 	}
 
@@ -820,35 +749,31 @@ var View = (function() {
 			name : signatureId,
 			id : "eIdProvider_" + signatureId
 		});
-		comboBox
-				.change(function() {
-					FormModule.setSelectedEid(this);
-					var button = $('#link_' + this.name);
-					if (this.selectedIndex == 0
-							|| !FormModule.isSecondSignatureReady()) {
-						inner.enable(button, false);
-					}
+		comboBox.change(function() {
+			FormModule.setSelectedEid(this);
+			var button = $('#link_' + this.name);
+			if (this.selectedIndex == 0 || !FormModule.isSecondSignatureReady()) {
+				inner.enable(button, false);
+			}
 
-					var value = this.value;
-					button.attr('href', function() {
-						return this.href.split('?provider=')[0] + "?provider="
-								+ value;
-					});
-					if (this.selectedIndex !== 0
-							&& FormModule.isSecondSignatureReady()) {
-						inner.enable(button, true);
-					}
-					var signDTO = {
-						transactionId : FormModule.getFormId(),
-						tbs : FormModule.getFormTBS(),
-						provider : value,
-						successUrl : "verify",
-						errorUrl : "error"
-					};
+			var value = this.value;
+			button.attr('href', function() {
+				return this.href.split('?provider=')[0] + "?provider=" + value;
+			});
+			if (this.selectedIndex !== 0 && FormModule.isSecondSignatureReady()) {
+				inner.enable(button, true);
+			}
+			var signDTO = {
+				transactionId : FormModule.getFormId(),
+				tbs : FormModule.getFormTBS(),
+				provider : value,
+				successUrl : "verify",
+				errorUrl : "error"
+			};
 
-					var htmlSnippet = RequestModule.sign(signDTO);
-					$('#eIdPlugin').html(htmlSnippet).hide();
-				});
+			var htmlSnippet = RequestModule.sign(signDTO);
+			$('#eIdPlugin').html(htmlSnippet).hide();
+		});
 		comboBox.append($('<option>/').append(texts.provider));
 		$.each(FormModule.providerLinks(), function(idx, link) {
 			comboBox.append($('<option />').attr({
@@ -898,17 +823,15 @@ var View = (function() {
 	function addProgressbar(current, pages, contentNode) {
 		var progress = inner.clone('progress');
 		if (FormModule.isSecondSigningFlow()) {
-			progress.append(createProgressItem(current == getIncoming(),
-					getIncoming(), texts.incomingform));
+			progress
+					.append(createProgressItem(current == getIncoming(), getIncoming(), texts.incomingform, "Incoming"));
 		}
 		$.each(pages, function(idx, page) {
-			progress.append(createProgressItem(idx == current, getPage(idx),
-					page.title, idx));
+			progress.append(createProgressItem(idx == current, getPage(idx), page.title, idx));
 		});
 
-		progress.append(createProgressItem(current == getSummary(),
-				getSummary(), texts.summary));
-		progress.find('li').last().find('#divider').remove();
+		progress.append(createProgressItem(current == getSummary(), getSummary(), texts.summary, "Summary"));
+		progress.find('li').last().find('.divider').remove();
 		contentNode.append(progress);
 	}
 
@@ -920,9 +843,8 @@ var View = (function() {
 
 			return pageElm;
 		} else {
-			var pageElm = inner.clone('progressItem', 'progressItem'
-					+ (typeof idx === 'number' ? idx : ''));
-			pageElm.find('#link').append(title).attr({
+			var pageElm = inner.clone('progressItem', 'progressItem' + idx);
+			pageElm.find('a').append(title).attr({
 				'href' : href
 			});
 
@@ -1008,9 +930,13 @@ var View = (function() {
 
 	inner.clone = function(id, newId) {
 		if (!newId)
-			return $('#' + id).clone().attr('id', 'inserted_' + id);
+			return templates.find('#' + id).clone().removeAttr('id');
 
-		return $('#' + id).clone().attr('id', newId);
+		return templates.find('#' + id).clone().attr('id', newId);
+	};
+
+	inner.setTemplates = function(_templates) {
+		templates = _templates;
 	};
 
 	return inner;

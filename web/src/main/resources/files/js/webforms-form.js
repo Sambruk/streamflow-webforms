@@ -164,16 +164,14 @@ var FormModule = (function() {
 			this.uIFormatter = formatUTCStringToIsoString;
 		} else if (this.fieldType == "AttachmentFieldValue") {
 			this.uIFormatter = formatJSONAttachment;
-		} else if (this.fieldType == "CheckboxesFieldValue"
-				|| this.fieldType == "ListBoxFieldValue") {
+		} else if (this.fieldType == "CheckboxesFieldValue" || this.fieldType == "ListBoxFieldValue") {
 			this.uIFormatter = formatSelectionValues;
 		}
 	};
 
 	Field.prototype.setValue = function(value) {
 		this.value = value;
-		this.formattedValue = this.uIFormatter == null ? value : this
-				.uIFormatter(value);
+		this.formattedValue = this.uIFormatter == null ? value : this.uIFormatter(value);
 
 		return this;
 	};
@@ -192,10 +190,9 @@ var FormModule = (function() {
 				.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2}):(\d{2}(?:\.\d+)?)(Z|(([+-])(\d{2}):(\d{2})))$/i);
 		if (!d)
 			return "Invalid date format";
-		var dateValue = new Date(Date.UTC(d[1], d[2] - 1, d[3], d[4], d[5],
-				d[6] | 0, (d[6] * 1000 - ((d[6] | 0) * 1000)) | 0, d[7])
-				+ (d[7].toUpperCase() === "Z" ? 0 : (d[10] * 3600 + d[11] * 60)
-						* (d[9] === "-" ? 1000 : -1000)));
+		var dateValue = new Date(Date.UTC(d[1], d[2] - 1, d[3], d[4], d[5], d[6] | 0,
+				(d[6] * 1000 - ((d[6] | 0) * 1000)) | 0, d[7])
+				+ (d[7].toUpperCase() === "Z" ? 0 : (d[10] * 3600 + d[11] * 60) * (d[9] === "-" ? 1000 : -1000)));
 
 		return dateFormat(dateValue, "isoDate");
 	}
@@ -321,8 +318,7 @@ var FormModule = (function() {
 		if (inner.formNeedsSecondSignature()) {
 			var singleSignature = inner.secondSignatureSingleSignature();
 			if (typeof singleSignature === 'undefined' || !singleSignature) {
-				return (hasFieldAValue(formDraft.secondSignatureName)
-						&& hasFieldAValue(formDraft.secondSignatureEmail)
+				return (hasFieldAValue(formDraft.secondSignatureName) && hasFieldAValue(formDraft.secondSignatureEmail)
 						&& hasFieldAValue(formDraft.secondSignatureEmailConfirm)
 						&& hasFieldAValue(formDraft.secondSignaturePhoneNumber) && hasFieldAValue(formDraft.secondSignatureSocialSecurityNumber));
 			}
@@ -399,8 +395,7 @@ var FormModule = (function() {
 	};
 
 	inner.incomingSignerName = function() {
-		return incomingSummary === undefined ? undefined
-				: incomingSummary.signatures[0].signerName;
+		return incomingSummary === undefined ? undefined : incomingSummary.signatures[0].signerName;
 	};
 
 	function fieldIterator(iterate, form) {

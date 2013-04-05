@@ -69,8 +69,7 @@ var TaskUrlModule = (function() {
 	};
 
 	inner.getMailSelectionMessage = function() {
-		return urls.proxy + urls.proxydraft
-				+ 'summary/mailselectionmessage.json';
+		return urls.proxy + urls.proxydraft + 'summary/mailselectionmessage.json';
 	};
 
 	inner.createCaseWithForm = function() {
@@ -90,8 +89,7 @@ var TaskUrlModule = (function() {
 	};
 
 	inner.setConfirmationEmail = function() {
-		return urls.proxy + urls.proxydraft
-				+ 'summary/changeemailstobenotified.json';
+		return urls.proxy + urls.proxydraft + 'summary/changeemailstobenotified.json';
 	};
 
 	inner.submitAndSend = function() {
@@ -135,8 +133,7 @@ var TaskUrlModule = (function() {
 	};
 
 	inner.deleteAttachment = function(attachmentId) {
-		return urls.proxy + urls.proxydraft + 'attachments/' + attachmentId
-				+ '/delete';
+		return urls.proxy + urls.proxydraft + 'attachments/' + attachmentId + '/delete';
 	};
 
 	inner.refreshField = function() {
@@ -144,8 +141,7 @@ var TaskUrlModule = (function() {
 	};
 
 	inner.getPrintUrl = function(formId) {
-		return urls.proxy + urls.draft + 'submittedforms/' + formId
-				+ '/generateformaspdf';
+		return urls.proxy + urls.draft + 'submittedforms/' + formId + '/generateformaspdf';
 	};
 
 	return inner;

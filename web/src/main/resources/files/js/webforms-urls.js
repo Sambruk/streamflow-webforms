@@ -72,8 +72,7 @@ var UrlModule = (function() {
 	};
 
 	inner.getMailSelectionMessage = function() {
-		return urls.proxy + urls.proxydraft
-				+ 'summary/mailselectionmessage.json';
+		return urls.proxy + urls.proxydraft + 'summary/mailselectionmessage.json';
 	};
 
 	inner.createCaseWithForm = function() {
@@ -93,8 +92,7 @@ var UrlModule = (function() {
 	};
 
 	inner.setConfirmationEmail = function() {
-		return urls.proxy + urls.proxydraft
-				+ 'summary/changeemailstobenotified.json';
+		return urls.proxy + urls.proxydraft + 'summary/changeemailstobenotified.json';
 	};
 
 	inner.submitAndSend = function() {
@@ -138,8 +136,7 @@ var UrlModule = (function() {
 	};
 
 	inner.deleteAttachment = function(attachmentId) {
-		return urls.proxy + urls.proxydraft + 'attachments/' + attachmentId
-				+ '/delete';
+		return urls.proxy + urls.proxydraft + 'attachments/' + attachmentId + '/delete';
 	};
 
 	inner.refreshField = function() {
@@ -147,8 +144,7 @@ var UrlModule = (function() {
 	};
 
 	inner.getPrintUrl = function(formId) {
-		return inner.getCaseUrl() + 'submittedforms/' + formId
-				+ '/generateformaspdf';
+		return inner.getCaseUrl() + 'submittedforms/' + formId + '/generateformaspdf';
 	};
 
 	inner.setSecondSignatureName = function() {

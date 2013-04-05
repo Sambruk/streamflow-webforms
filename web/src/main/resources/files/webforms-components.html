@@ -18,149 +18,156 @@
 -->
 <!-- Components goes here-->
 <div id="form_header" class="header">
-	<h2 id="form_description"></h2>
+	<h1></h1>
 </div>
 
 <div id="row" class="row"></div>
 <div id="content" class="span12"></div>
 
 <ul id="progress" class="breadcrumb"></ul>
-<li id="progressItem"><a id="link" href="#"></a><span id="divider" class="divider">/</span></li>
-<li id="progressItemActive"><span id="divider" class="divider">/</span></li>
-<li id="progressItemLast"><a id="link" href="#"></a></li>
+<li id="progressItem"><a href="#"></a><span class="divider">/</span></li>
+<li id="progressItemActive"><span class="divider">/</span></li>
+<li id="progressItemLast"><a href="#"></a></li>
 
 <footer id="footer" class="footer">
-	<a href="http://jayway.com/streamsource"><p>Powered by Streamflow&#153;</p></a>
+	<a href="http://jayway.com/streamsource"><p>Powered by
+			Streamflow&#153;</p></a>
 </footer>
 
 <form id="form" class="form-vertical">
 	<fieldset>
+		<legend style="display: none"></legend>
 	</fieldset>
 </form>
 <div id="formfield" class="control-group">
 	<label class="control-label"></label>
-    <div class="controls"></div>        
+	<div class="controls"></div>
 </div>
+<span id="control-label" class="control-label"></span>
 
 <div id="previous_form_summary" class="well">
-    <h3></h3>
-	<table id="fields_table" class="fields_table">
-		<tr id="field_summary"></tr>
-	</table>
+	<h2></h2>
+	<table class="fields_table"></table>
 </div>
 
 <div id="form_page_summary" class="well">
-    <h3></h3>
-	<table id="fields_table" class="fields_table">
-		<tr id="field_summary"></tr>
-	</table>
+	<h2></h2>
+	<table class="fields_table"></table>
 </div>
 
+<table>
+	<tr id="field_summary"></tr>
+</table>
+
+<a id="link" href="#"></a>
+
 <div id="form_signatures">
-	<h3></h3>
+	<h2></h2>
 	<table id="signatures"></table>
 	<div id="eIdPlugin"></div>
 </div>
 
 <div id="second_signature" class="well">
-    <label id="singlesignaturecheckbox-label" class="checkbox">
-        <input id="singlesignaturecheckbox" type="checkbox"/>
-    </label>
-    <div id="secondsignature_fields" class="control-group">
-        <h3 id="secondsignature-label" class="control-label"></h3>  
-        <div id="secondsignaturetext" class='commentfield alert alert-info'></div>
+	<label id="singlesignaturecheckbox-label" class="checkbox"> <input
+		id="singlesignaturecheckbox" type="checkbox" />
+	</label>
+	<div id="secondsignature_fields" class="control-group">
+		<h2 id="secondsignature-label" class="control-label"></h2>
+		<div id="secondsignaturetext" class='commentfield alert alert-info'></div>
 		<div class="row-fluid">
 			<div class="control-group span4">
-		        <label id="name-label" class="control-label"></label>
-		        <input id="name" type="text"/>
-            	<span id="name-help" class="help-inline"></span>
+				<label id="name-label" class="control-label"></label> <input
+					id="name" type="text" /> <span id="name-help" class="help-inline"></span>
 			</div>
 			<div class="control-group span4">
-		        <label id="socialsecuritynumber-label" class="control-label"></label>
-		        <input id="socialsecuritynumber" type="text" />
-            	<span id="socialsecuritynumber-help" class="help-inline"></span>
+				<label id="socialsecuritynumber-label" class="control-label"></label>
+				<input id="socialsecuritynumber" type="text" /> <span
+					id="socialsecuritynumber-help" class="help-inline"></span>
 			</div>
 			<div class="control-group span4">
-		        <label id="phonenumber-label" class="control-label"></label>
-		        <input id="phonenumber" type="text" />
-            	<span id="phonenumber-help" class="help-inline"></span>
-			</div> 
+				<label id="phonenumber-label" class="control-label"></label> <input
+					id="phonenumber" type="text" /> <span id="phonenumber-help"
+					class="help-inline"></span>
+			</div>
 		</div>
-        <div id="emailfields" class="control-group">        
-            <label id="email-label" class="control-label"></label>
-            <input id="email" type="text" />
-            <label id="emailconfirm-label" class="control-label"></label>
-            <input id="emailconfirm" type="text" />
-            <span id="confirmation-help" class="help-inline"></span>
-        </div>
-    </div>
+		<div id="emailfields" class="control-group">
+			<label id="email-label" class="control-label"></label> <input
+				id="email" type="text" /> <label id="emailconfirm-label"
+				class="control-label"></label> <input id="emailconfirm" type="text" />
+			<span id="confirmation-help" class="help-inline"></span>
+		</div>
+	</div>
 </div>
 
 <div id="thank_you_div" class="well">
 	<div id="thank-you-message"></div>
-    <div id="caseid_message"></div>
-    <div id="caseid"></div>
+	<div id="caseid_message"></div>
+	<div id="caseid"></div>
 </div>
 
 <div id="CommentFieldValue" class="commentfield alert alert-info"></div>
-<select id="ComboBoxFieldValue" ></select>
-<textarea id="TextAreaFieldValue" cols="" rows=""></textarea>
+<select id="ComboBoxFieldValue"></select>
+<textarea id="TextAreaFieldValue"></textarea>
 <input id="textfield" type="text" />
 <label id="checkbox" class="checkbox"><input type="checkbox" /></label>
-<label id="radio" class="radio"><input type="radio" /></label>
+<!-- label id="radio" class="radio"><input type="radio" /></label -->
+<div id="radio" class="radio">
+	<input type="radio" /><label></label>
+</div>
 <label id="label"></label>
+<fieldset id="fieldset">
+	<legend style="display: none"></legend>
+</fieldset>
 <p id="help-block" class="help-block"></p>
 <span id="help-inline" class="help-inline"></span>
 <input id="datefield" type="text">
 <div id="datefieldcontainer" class="input-append">
-	<button class="btn" type="button"><i class="icon-calendar"></i></button>
+	<button class="btn" type="button">
+		<i class="icon-calendar"></i>
+	</button>
 </div>
 <span id="label_missing" class="label label-warning">Saknas</span>
 <span id="label_error" class="label label-important">Felaktigt</span>
-<font id="mandatory" color="red">&nbsp;*</font>
-<font id="hint" class="hint"></font>
+<span id="mandatory" class="mandatory">&nbsp;*</span>
+<span id="hint" class="hint"></span>
 
-<div id="AttachmentFieldValue">
-</div>
+<div id="AttachmentFieldValue"></div>
 
 <div id="AttachedFile">
-   <a href="#" id="delete_link"><i class="icon-trash"></i></a>
-   <span class="filename"></span>
-   <br/>
+	<a href="#" id="delete_link"><i class="icon-trash"></i></a> <span
+		class="filename"></span> <br />
 </div>
-   
-<form id="AttachmentFieldValueForm">
-	<span class="btn btn-success fileinput-button">
-	    <i class="icon-plus icon-white"></i>
-	    <span id="button-text"></span>
-	    <input type="file" id="Attachment"/>
+
+<div id="AttachmentFieldValueForm">
+	<span class="btn btn-success fileinput-button"> <i
+		class="icon-plus icon-white"></i> <span id="button-text"></span> <input
+		type="file" id="Attachment" />
 	</span>
 	<div class="span5 fileupload-progress fade">
-	    <div class="progress progress-success progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
-	        <div class="bar" style="width:0%;"></div>
-	    </div>
-   </div>
-</form>
-    
+		<div class="progress progress-success progress-striped active"
+			role="progressbar" aria-valuemin="0" aria-valuemax="100">
+			<div class="bar" style="width: 0%;"></div>
+		</div>
+	</div>
+</div>
+
 <div id="ListBoxFieldValue" class="listbox_container">
 	<select id="possiblevalues" class="listbox" multiple="multiple"></select>
 	<div id="listboxbuttons" class="listboxbuttons"></div>
-	<select id="selectedvalues" class="listbox" multiple="multiple" ></select>
+	<select id="selectedvalues" class="listbox" multiple="multiple"></select>
 </div>
 
-<div id="FieldGroupFieldValue" class="well">
-</div>
+<div id="FieldGroupFieldValue" class="well"></div>
 
 <div id="mailNotification" class="well">
-    <div id="mailControls">
-    </div>
-    <div id="mailInputs" class="control-group">
-         <label id="confirmation-email-label" class="control-label"></label>
-         <input id="confirmation-email" type="text" />
-         <label id="confirmation-email-confirm-label" class="control-label"></label>
-         <input id="confirmation-email-confirm" type="text" />
-         <span id="confirmation-help" class="help-inline"></span>
-    </div>
+	<div id="mailControls"></div>
+	<div id="mailInputs" class="control-group">
+		<label id="confirmation-email-label" class="control-label"></label> <input
+			id="confirmation-email" type="text" /> <label
+			id="confirmation-email-confirm-label" class="control-label"></label>
+		<input id="confirmation-email-confirm" type="text" /> <span
+			id="confirmation-help" class="help-inline"></span>
+	</div>
 </div>
 
 <div id="buttons" class="form-actions"></div>
@@ -171,11 +178,13 @@
 </div>
 
 <div id="modal" class="modal hide fade" style="display: none;">
-	<div class="modal-header"><a class="close" data-dismiss="modal">&times;</a></div>
+	<div class="modal-header">
+		<a class="close" data-dismiss="modal">&times;</a>
+	</div>
 	<div class="modal-body"></div>
 	<div class="modal-footer"></div>
 </div>
 
-<form id="uploadform" action="POST" enctype="multipart/form-data" ></form>
+<form id="uploadform" action="POST" enctype="multipart/form-data"></form>
 
 <select id="eidProviders" class="eidproviders"></select>

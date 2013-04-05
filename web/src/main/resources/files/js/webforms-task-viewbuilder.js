@@ -33,8 +33,7 @@ var TaskView = (function() {
 			node.find('#caseid_message').text(texts.caseidmessage);
 			node.find('#caseid').text(caseName);
 		}
-		new View.Button(node).image('print').name(texts.print).href(printUrl)
-				.attr('target', '_new');
+		new View.Button(node).image('print').name(texts.print).href(printUrl).attr('target', '_new');
 		container.append(node);
 	};
 
@@ -58,8 +57,7 @@ var TaskView = (function() {
 				return foldIncomingPage(node, page);
 			});
 		});
-		messages.info = texts.doublesignaturepreviousmessage.replace('{0}',
-				FormModule.incomingSignerName());
+		messages.info = texts.doublesignaturepreviousmessage.replace('{0}', FormModule.incomingSignerName());
 	};
 
 	function createPageContent(page, contentFunction) {
@@ -68,7 +66,7 @@ var TaskView = (function() {
 		View.addHeader(container);
 		var node = View.clone('row');
 		container.append(node);
-		var content = View.clone('content');
+		var content = View.clone('content', 'inserted_content');
 		node.append(content);
 		addProgressbar(page, FormModule.pages(), content);
 
@@ -84,18 +82,18 @@ var TaskView = (function() {
 
 	function foldIncomingPage(node, page) {
 		var pageDiv = View.clone('previous_form_summary').appendTo(node);
-		pageDiv.find('h3').append(page.name);
+		pageDiv.children('h2').append(page.name);
+		pageDiv.children('table').attr("title", page.name);
 
 		return function(field) {
-			foldPreviousSummaryField(pageDiv.find('#fields_table'), field);
+			foldPreviousSummaryField(pageDiv.children('table'), field);
 		};
 	}
 
 	function foldPreviousSummaryField(node, field) {
 		var row = View.clone('field_summary', field.field).appendTo(node);
-		var tr = $('<td class="field_label"/>').append(field.field);
-		row.append(tr);
-		$('<td class="field_value"/>').append(field.value).appendTo(row);
+		$('<td class="field_label" />').append(field.field).appendTo(row);
+		$('<td class="field_value" />').append(field.value).appendTo(row);
 	}
 
 	inner.sign = function(args) {
@@ -109,8 +107,7 @@ var TaskView = (function() {
 		} else {
 			// strip parameters
 			var verifyDTO = {};
-			$.each($('#eIdPlugin').find('form > input:hidden'), function(idx,
-					value) {
+			$.each($('#eIdPlugin').find('form > input:hidden'), function(idx, value) {
 				if (value.name) {
 					verifyDTO[value.name] = value.value;
 				}
@@ -121,8 +118,7 @@ var TaskView = (function() {
 
 			// Store the email etc before reloading the formdraft
 			var confirmationEmail = FormModule.confirmationEmail();
-			var confirmationEmailConfirm = FormModule
-					.confirmationEmailConfirm();
+			var confirmationEmailConfirm = FormModule.confirmationEmailConfirm();
 
 			FormModule.init(TaskRequestModule.getFormDraft());
 			FormModule.setConfirmationEmail(confirmationEmail);
@@ -153,8 +149,7 @@ var TaskView = (function() {
 			else if (e.error)
 				messages.error = e.error;
 			else if (e.message)
-				messages.error = e.message + ', ' + e.fileName + '('
-						+ e.lineNumber + ')';
+				messages.error = e.message + ', ' + e.fileName + '(' + e.lineNumber + ')';
 
 			if (e.redirect) {
 				redirect(e.redirect);
@@ -165,16 +160,13 @@ var TaskView = (function() {
 	};
 
 	function addButtons(node, page) {
-		var buttons = View.clone('buttons');
-		new View.Button(buttons, "button_previous").name(texts.previous).href(
-				inner.getPrevious(page)).enable(page != getIncoming());
-		new View.Button(buttons, "button_next").name(texts.next).href(
-				inner.getNext(page)).enable(page != getSummary());
+		var buttons = View.clone("buttons");
+		new View.Button(buttons, "button_previous").name(texts.previous).href(inner.getPrevious(page)).enable(
+				page != getIncoming());
+		new View.Button(buttons, "button_next").name(texts.next).href(inner.getNext(page)).enable(page != getSummary());
 
 		if (page == getSummary()) {
-			var button = new View.Button(buttons).name(texts.submit).href(
-					getSubmit());
-			button.attr('id', 'inserted_button_submit');
+			var button = new View.Button(buttons, "button_submit").name(texts.submit).href(getSubmit());
 			if (FormModule.canSubmit()) {
 				button.addClass("btn-primary");
 			} else {
@@ -191,8 +183,7 @@ var TaskView = (function() {
 		if (current === 0 || segment == getIncoming()) {
 			return getIncoming();
 		}
-		for ( var previous = isNaN(current) ? FormModule.pageCount() - 1
-				: current - 1; previous > 0; previous--) {
+		for ( var previous = isNaN(current) ? FormModule.pageCount() - 1 : current - 1; previous > 0; previous--) {
 			if (FormModule.pages()[previous].visible !== false) {
 				return getPage(previous);
 			}
@@ -242,21 +233,18 @@ var TaskView = (function() {
 	function addMailNotification(node) {
 		var message = FormModule.getMailSelectionMessage();
 		if (message) {
-			var notification = View.clone('mailNotification',
-					"insertedMailNotification");
+			var notification = View.clone('mailNotification', "insertedMailNotification");
 			var controls = notification.find('#mailControls');
 			var inputs = notification.find('#mailInputs');
 
 			var checkbox = View.clone('checkbox', 'mailCheckbox');
-			checkbox.find('input').prop('checked',
-					FormModule.mailNotificationEnabled());
+			checkbox.find('input').prop('checked', FormModule.mailNotificationEnabled());
 
 			checkbox.append(message);
 			controls.append(checkbox);
 
 			inputs.find('#confirmation-email-label').text(texts.email);
-			inputs.find('#confirmation-email-confirm-label').text(
-					texts.confirmEmail);
+			inputs.find('#confirmation-email-confirm-label').text(texts.confirmEmail);
 			var emailField = inputs.find('#confirmation-email');
 			var emailConfirmField = inputs.find('#confirmation-email-confirm');
 
@@ -272,19 +260,15 @@ var TaskView = (function() {
 			// running.
 			// Not persisted on the server
 			emailConfirmField.val(FormModule.confirmationEmailConfirm());
-			emailConfirmField
-					.blur(function() {
-						FormModule
-								.setConfirmationEmailConfirm(emailConfirmField
-										.val());
-					});
+			emailConfirmField.blur(function() {
+				FormModule.setConfirmationEmailConfirm(emailConfirmField.val());
+			});
 
 			var emailFunction = function() {
 				// if not match show error and disable submit-button
 				if (emailConfirmField.val() != emailField.val()) {
 					inputs.addClass('error');
-					inputs.find('#confirmation-help').append(
-							texts.emailMismatch);
+					inputs.find('#confirmation-help').append(texts.emailMismatch);
 					toggleSubmitButton(false);
 
 					emailConfirmField.focus(function() {
@@ -329,11 +313,11 @@ var TaskView = (function() {
 
 	function toggleSubmitButton(enabled) {
 		if (enabled && FormModule.canSubmit()) {
-			View.enable($('#inserted_button_submit'), true);
-			$('#inserted_button_submit').addClass("btn-primary");
+			View.enable($('#button_submit'), true);
+			$('#button_submit').addClass("btn-primary");
 		} else {
-			View.enable($('#inserted_button_submit'), false);
-			$('#inserted_button_submit').removeClass("btn-primary");
+			View.enable($('#button_submit'), false);
+			$('#button_submit').removeClass("btn-primary");
 		}
 	}
 
@@ -343,7 +327,7 @@ var TaskView = (function() {
 
 			var signaturesNode = View.clone('form_signatures');
 			signaturesNode.addClass('well');
-			signaturesNode.find("h3").append(texts.signature);
+			signaturesNode.find("h2").append(texts.signature);
 
 			var table = signaturesNode.find('table');
 			var idx = 0;
@@ -351,17 +335,14 @@ var TaskView = (function() {
 			table.append(row);
 			row.addClass("signature-row");
 			row.append($('<td/>').append(reqSign.name + ":"));
-			var signature = getSignature(reqSign.name, FormModule
-					.getSignatures());
+			var signature = getSignature(reqSign.name, FormModule.getSignatures());
 			if (signature) {
-				row.append($('<td/>').append(signature.signerName).addClass(
-						'signer-name'));
+				row.append($('<td/>').append(signature.signerName).addClass('signer-name'));
 			} else {
 				row.append($('<td/>').append(eidProviders(idx)));
 				var buttonCell = $('<td/>');
-				new View.Button(buttonCell).name(texts.sign).href(getSign(idx))
-						.attr('id', "link_" + idx).image('icon-pencil').enable(
-								false);
+				new View.Button(buttonCell).name(texts.sign).href(getSign(idx)).attr('id', "link_" + idx).image(
+						'icon-pencil').enable(false);
 				row.append(buttonCell);
 			}
 			node.append(signaturesNode);
@@ -373,8 +354,7 @@ var TaskView = (function() {
 		var value = selectedEid.value;
 		if (typeof selectedEid !== 'undefined' && value !== texts.provider) {
 			var button = $('#link_' + selectedEid.name);
-			(selectedEid.selectedIndex == 0 || !FormModule
-					.isSecondSignatureReady()) ? View.enable(button, false)
+			(selectedEid.selectedIndex == 0 || !FormModule.isSecondSignatureReady()) ? View.enable(button, false)
 					: View.enable(button, true);
 		}
 	}
@@ -384,36 +364,31 @@ var TaskView = (function() {
 			name : signatureId,
 			id : "eIdProvider_" + signatureId
 		});
-		comboBox
-				.change(function() {
-					FormModule.setSelectedEid(this);
-					var button = $('#link_' + this.name);
-					if (this.selectedIndex == 0
-							|| !FormModule.isSecondSignatureReady()) {
-						View.enable(button, false);
-					}
+		comboBox.change(function() {
+			FormModule.setSelectedEid(this);
+			var button = $('#link_' + this.name);
+			if (this.selectedIndex == 0 || !FormModule.isSecondSignatureReady()) {
+				View.enable(button, false);
+			}
 
-					var value = this.value;
-					button.attr('href', function() {
-						return this.href.split('?provider=')[0] + "?provider="
-								+ value;
-					});
-					if (this.selectedIndex !== 0
-							&& FormModule.isSecondSignatureReady()) {
-						View.enable(button, true);
-					}
-					var signDTO = {
-						transactionId : FormModule.getFormId(),
-						tbs : FormModule.getIncomingFormTBS()
-								+ FormModule.getFormTBS(),
-						provider : value,
-						successUrl : "verify",
-						errorUrl : "error"
-					};
+			var value = this.value;
+			button.attr('href', function() {
+				return this.href.split('?provider=')[0] + "?provider=" + value;
+			});
+			if (this.selectedIndex !== 0 && FormModule.isSecondSignatureReady()) {
+				View.enable(button, true);
+			}
+			var signDTO = {
+				transactionId : FormModule.getFormId(),
+				tbs : FormModule.getIncomingFormTBS() + FormModule.getFormTBS(),
+				provider : value,
+				successUrl : "verify",
+				errorUrl : "error"
+			};
 
-					var htmlSnippet = TaskRequestModule.sign(signDTO);
-					$('#eIdPlugin').html(htmlSnippet).hide();
-				});
+			var htmlSnippet = TaskRequestModule.sign(signDTO);
+			$('#eIdPlugin').html(htmlSnippet).hide();
+		});
 		comboBox.append($('<option>/').append(texts.provider));
 		$.each(FormModule.providerLinks(), function(idx, link) {
 			comboBox.append($('<option />').attr({
@@ -440,7 +415,7 @@ var TaskView = (function() {
 
 	function showMessages() {
 		if (messages.info || messages.warning || messages.error) {
-			var node = View.clone('alert');
+			var node = View.clone('alert', "inserted_alert");
 			var content = $('#inserted_content');
 			var breadcrumb = content.find('ul.breadcrumb');
 			node.insertAfter(breadcrumb);
@@ -462,16 +437,13 @@ var TaskView = (function() {
 
 	function addProgressbar(current, pages, contentNode) {
 		var progress = View.clone('progress');
-		progress.append(createProgressItem(current == getIncoming(),
-				getIncoming(), texts.incomingform));
+		progress.append(createProgressItem(current == getIncoming(), getIncoming(), texts.incomingform, "Incoming"));
 		$.each(pages, function(idx, page) {
-			progress.append(createProgressItem(idx == current, getPage(idx),
-					page.title, idx));
+			progress.append(createProgressItem(idx == current, getPage(idx), page.title, idx));
 		});
 
-		progress.append(createProgressItem(current == getSummary(),
-				getSummary(), texts.summary));
-		progress.find('li').last().find('#divider').remove();
+		progress.append(createProgressItem(current == getSummary(), getSummary(), texts.summary, "Summary"));
+		progress.find('li').last().find('.divider').remove();
 		contentNode.append(progress);
 	}
 
@@ -483,11 +455,8 @@ var TaskView = (function() {
 
 			return pageElm;
 		} else {
-			var pageElm = View.clone('progressItem', 'progressItem'
-					+ (typeof idx === 'number' ? idx : ''));
-			pageElm.find('#link').append(title).attr({
-				'href' : href
-			});
+			var pageElm = View.clone('progressItem', 'progressItem' + idx);
+			pageElm.find('a').append(title).attr('href', href);
 
 			return pageElm;
 		}

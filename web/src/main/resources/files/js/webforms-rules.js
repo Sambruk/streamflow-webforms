@@ -88,23 +88,19 @@ var RulesModule = (function() {
 			if (rule.condition === "anyof") {
 				var common = intersection(values, rule.values);
 
-				return (common.length && rule.visibleWhen)
-						|| (!common.length && !rule.visibleWhen);
+				return (common.length && rule.visibleWhen) || (!common.length && !rule.visibleWhen);
 			} else if (rule.condition === "noneof") {
 				var common = intersection(values, rule.values);
 
-				return (!common.length && rule.visibleWhen)
-						|| (common.length && !rule.visibleWhen);
+				return (!common.length && rule.visibleWhen) || (common.length && !rule.visibleWhen);
 			} else if (rule.condition === "morethan") {
-				var convert = allNumeric(values.concat(rule.values[0])) ? toNumber
-						: toLowerCase;
+				var convert = allNumeric(values.concat(rule.values[0])) ? toNumber : toLowerCase;
 				var minValue = min(values, convert);
 
 				return (minValue > convert(rule.values[0]) && rule.visibleWhen)
 						|| (minValue <= convert(rule.values[0]) && !rule.visibleWhen);
 			} else if (rule.condition === "lessthan") {
-				var convert = allNumeric(values.concat(rule.values[0])) ? toNumber
-						: toLowerCase;
+				var convert = allNumeric(values.concat(rule.values[0])) ? toNumber : toLowerCase;
 				var maxValue = max(values, convert);
 
 				return (maxValue < convert(rule.values[0]) && rule.visibleWhen)
@@ -130,7 +126,7 @@ var RulesModule = (function() {
 				f.visible = false;
 			}
 		});
-		
+
 		return changes;
 	}
 
@@ -156,7 +152,7 @@ var RulesModule = (function() {
 			});
 		}
 		evaluatePageRules(currentPage);
-		
+
 		return fieldChanges;
 	};
 
@@ -207,10 +203,8 @@ var RulesModule = (function() {
 		});
 
 		if (currentPage) {
-			$("#button_previous").attr("href",
-					viewModule.getPrevious(currentPage.index));
-			$("#button_next").attr("href",
-					viewModule.getNext(currentPage.index));
+			$("#button_previous").attr("href", viewModule.getPrevious(currentPage.index));
+			$("#button_next").attr("href", viewModule.getNext(currentPage.index));
 		}
 	}
 
@@ -228,7 +222,7 @@ var RulesModule = (function() {
 	inner.applyRules = function(currentPage, animate) {
 		var fieldChanges = inner.evaluateRules(currentPage);
 		inner.applyVisibility(currentPage, animate);
-		
+
 		return fieldChanges;
 	};
 

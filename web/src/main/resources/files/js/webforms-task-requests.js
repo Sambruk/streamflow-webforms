@@ -53,8 +53,7 @@ var TaskRequestModule = (function() {
 				};
 		} else {
 			throw {
-				error : texts.erroroccurred + "<br/>Status: " + textStatus
-						+ "<br/>Error: " + errorThrown
+				error : texts.erroroccurred + "<br/>Status: " + textStatus + "<br/>Error: " + errorThrown
 			};
 		}
 	}
@@ -94,8 +93,7 @@ var TaskRequestModule = (function() {
 	}
 
 	inner.getTaskSubmittedFormSummary = function() {
-		var parameters = request('GET', TaskUrlModule
-				.getTaskSubmittedFormSummary());
+		var parameters = request('GET', TaskUrlModule.getTaskSubmittedFormSummary());
 		parameters.error = null;
 
 		return getData(parameters);
@@ -134,8 +132,7 @@ var TaskRequestModule = (function() {
 	};
 
 	inner.deleteAttachment = function(attachmentId) {
-		var parameters = request('POST', TaskUrlModule
-				.deleteAttachment(attachmentId));
+		var parameters = request('POST', TaskUrlModule.deleteAttachment(attachmentId));
 		$.ajax(parameters);
 	};
 
@@ -179,8 +176,7 @@ var TaskRequestModule = (function() {
 		if (value) {
 			parameters = request('POST', TaskUrlModule.enableMailNotification());
 		} else {
-			parameters = request('POST', TaskUrlModule
-					.disableMailNotification());
+			parameters = request('POST', TaskUrlModule.disableMailNotification());
 		}
 		$.ajax(parameters);
 	};

@@ -14,141 +14,186 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-jQuery(document).ready(function()
-{
+jQuery(document).ready(function() {
 	RulesModule.setViewModule(TaskView);
-	
-    function login( contextRoot, task) {
-    	TaskRequestModule.init( contextRoot, task );
-        Contexts.init( contexts );
-        
-        setupView();
-        loadEidPlugins();
-    }
 
-    function loadEidPlugins() {
-    	if ( FormModule.requiredSignaturesCount() > 0 ) {
-	        $("#signerDiv").append( TaskRequestModule.getHeader() );
-	        addSigners($("#signerDiv"));
-    	}
-    }
-    
-    update = function( id, value ) {
-    	handleEvents( View.updateField( id, value ) );
-    };
+	function login(contextRoot, task) {
+		TaskRequestModule.init(contextRoot, task);
+		Contexts.init(contexts);
 
-    /** Setup functions **/
+		setupView();
+		loadEidPlugins();
+	}
 
-    function setupForm() {
-    	if ( FormModule.initialized() ) return;
-        FormModule.init( TaskRequestModule.getTaskFormDraft(), TaskRequestModule.getMailSelectionMessage() );
-    }
+	function loadEidPlugins() {
+		if (FormModule.requiredSignaturesCount() > 0) {
+			$("#signerDiv").append(TaskRequestModule.getHeader());
+			addSigners($("#signerDiv"));
+		}
+	}
 
-    function setupRequiredSignatures() {
-        FormModule.setRequiredSignatures( TaskRequestModule.getFormSignatures() );
-    }
+	update = function(id, value) {
+		handleEvents(View.updateField(id, value));
+	};
 
-    function setupRequiredSignature( args ) {
-    	FormModule.setRequiredSignature( args.segment );
-    }
+	/** Setup functions * */
 
-    function setupProviders() {
-        if ( !FormModule.providersInitialized() && FormModule.requiredSignaturesCount() > 0) {
-    	    FormModule.setProviders( TaskRequestModule.getProviders() );
-        }
-    }
+	function setupForm() {
+		if (FormModule.initialized())
+			return;
+		FormModule.init(TaskRequestModule.getTaskFormDraft(), TaskRequestModule.getMailSelectionMessage());
+	}
 
-    function setupIncomgingFormSummary() {
-    	FormModule.setupIncomingFormSummaryPage( TaskRequestModule.getTaskSubmittedFormSummary() );
-    }
-    
-    /** Verify functions **/
+	function setupRequiredSignatures() {
+		FormModule.setRequiredSignatures(TaskRequestModule.getFormSignatures());
+	}
 
-    function verifySubmit() {
-        formIsFilled( {error: texts.missingMandatoryFields});
+	function setupRequiredSignature(args) {
+		FormModule.setRequiredSignature(args.segment);
+	}
 
-        if ( FormModule.formNeedsSigning() && !FormModule.isFormSigned() ) {
-            throw {error:texts.signBeforeSubmit};
-        }
-    }
+	function setupProviders() {
+		if (!FormModule.providersInitialized() && FormModule.requiredSignaturesCount() > 0) {
+			FormModule.setProviders(TaskRequestModule.getProviders());
+		}
+	}
 
-    function formIsFilled( ifError ) {
-    	if ( FormModule.hasErrors() ) throw ifError;
-    }
+	function setupIncomgingFormSummary() {
+		FormModule.setupIncomingFormSummaryPage(TaskRequestModule.getTaskSubmittedFormSummary());
+	}
 
-    function verifyPage( args ) {
-        validateNumber( args.segment, FormModule.pageCount(),
-            {error: texts.invalidpage+args.segment});
-    }
+	/** Verify functions * */
 
-    function verifyFormEditing() {
-        if ( FormModule.hasSignatures() )
-            throw {error: texts.signedFormNotEditable };
-    }
+	function verifySubmit() {
+		formIsFilled({
+			error : texts.missingMandatoryFields
+		});
 
-    function verifySigner(args ) {
-        if ( FormModule.requiredSignaturesCount() == 0)
-            throw {error:texts.noRequiredSignatures};
+		if (FormModule.formNeedsSigning() && !FormModule.isFormSigned()) {
+			throw {
+				error : texts.signBeforeSubmit
+			};
+		}
+	}
 
-        formIsFilled( {error:texts.fillBeforeSign } );
+	function formIsFilled(ifError) {
+		if (FormModule.hasErrors())
+			throw ifError;
+	}
 
-        validateNumber( args.segment, FormModule.requiredSignaturesCount(),
-            {error:texts.requiredSignatureNotValid + args.segment });
-    }
+	function verifyPage(args) {
+		validateNumber(args.segment, FormModule.pageCount(), {
+			error : texts.invalidpage + args.segment
+		});
+	}
 
-    function validateNumber( number, max, ifError ) {
-        var nr = parseInt( number );
-        if ( isNaN(nr) || nr < 0 || nr >= max ) {
-            throw ifError;
-        }
-    }
+	function verifyFormEditing() {
+		if (FormModule.hasSignatures())
+			throw {
+				error : texts.signedFormNotEditable
+			};
+	}
 
-    function verifyProvider( args ) {
-        var match = $.grep( FormModule.providerLinks(), function(link, idx) {
-            return (link.provider == args.provider);
-        });
-        if ( match.length == 0) {
-         	throw {error: texts.unknownEidProvider};
-        }
-    }
+	function verifySigner(args) {
+		if (FormModule.requiredSignaturesCount() == 0)
+			throw {
+				error : texts.noRequiredSignatures
+			};
 
-    function handleEvents( eventMap ) {
-        if ( !eventMap.events ) return;
-        $.each( eventMap.events, function( idx, event){
-            var params = $.parseJSON(event.parameters);
-            if ( event.name == "createdCase") {
-                TaskUrlModule.createCaseUrl( params['param1'] );
-            } else if ( event.name == "changedFormDraft" ) {
-                TaskUrlModule.createFormDraftUrl( event.entity );
-                FormModule.init( $.parseJSON(params['param1']) );
-            } else if ( event.name == "changedFieldValue" ) {
-                FormModule.getField( params['param1'] ).setUIValue( params['param2'] );
-            }
-        });
-    }
+		formIsFilled({
+			error : texts.fillBeforeSign
+		});
 
-    function setupView() {
-        TaskView.runView( Contexts.findView( location.hash ));
-    }
+		validateNumber(args.segment, FormModule.requiredSignaturesCount(), {
+			error : texts.requiredSignatureNotValid + args.segment
+		});
+	}
 
-    function rootView() {
-        // since we have no root view redirect to first page of form
-        throw { redirect: Contexts.findUrl( TaskView.incoming ) }
-    }
+	function validateNumber(number, max, ifError) {
+		var nr = parseInt(number);
+		if (isNaN(nr) || nr < 0 || nr >= max) {
+			throw ifError;
+		}
+	}
 
-    var contexts = {view:rootView,          init: [ setupForm, setupIncomgingFormSummary, setupRequiredSignatures ], subContexts: {
-        'incoming'   : {view:TaskView.incoming, init : [  ]},
-        'idContext' : {view:View.formPage,   init: [ verifyPage, verifyFormEditing ]},
-        'summary'   : {view:TaskView.summary,    init: [ setupProviders ], subContexts: {
-           'submit'    : {view:TaskView.submit,   init: [ verifySubmit ]},
-           'idContext' : {view:TaskView.sign,     init: [ verifySigner, verifyProvider, setupRequiredSignature ]}}}}};
+	function verifyProvider(args) {
+		var match = $.grep(FormModule.providerLinks(), function(link, idx) {
+			return (link.provider == args.provider);
+		});
+		if (match.length == 0) {
+			throw {
+				error : texts.unknownEidProvider
+			};
+		}
+	}
 
-	$('#components').hide().load(contextRoot + '/static/webforms-components.html', function() {
-        try {
-            login( contextRoot, task );
-            $(window).hashchange( setupView );
-        } catch ( e ) {
-            View.error( e );
-        }
+	function handleEvents(eventMap) {
+		if (!eventMap.events)
+			return;
+		$.each(eventMap.events, function(idx, event) {
+			var params = $.parseJSON(event.parameters);
+			if (event.name == "createdCase") {
+				TaskUrlModule.createCaseUrl(params['param1']);
+			} else if (event.name == "changedFormDraft") {
+				TaskUrlModule.createFormDraftUrl(event.entity);
+				FormModule.init($.parseJSON(params['param1']));
+			} else if (event.name == "changedFieldValue") {
+				FormModule.getField(params['param1']).setUIValue(params['param2']);
+			}
+		});
+	}
+
+	function setupView() {
+		TaskView.runView(Contexts.findView(location.hash));
+	}
+
+	function rootView() {
+		// since we have no root view redirect to first page of
+		// form
+		throw {
+			redirect : Contexts.findUrl(TaskView.incoming)
+		}
+	}
+
+	var contexts = {
+		view : rootView,
+		init : [ setupForm, setupIncomgingFormSummary, setupRequiredSignatures ],
+		subContexts : {
+			'incoming' : {
+				view : TaskView.incoming,
+				init : []
+			},
+			'idContext' : {
+				view : View.formPage,
+				init : [ verifyPage, verifyFormEditing ]
+			},
+			'summary' : {
+				view : TaskView.summary,
+				init : [ setupProviders ],
+				subContexts : {
+					'submit' : {
+						view : TaskView.submit,
+						init : [ verifySubmit ]
+					},
+					'idContext' : {
+						view : TaskView.sign,
+						init : [ verifySigner, verifyProvider, setupRequiredSignature ]
+					}
+				}
+			}
+		}
+	};
+
+	var components = $('#components').hide();
+	FieldTypeModule.setTemplates(components);
+	View.setTemplates(components);
+	components.load(contextRoot + '/static/webforms-components.html', function() {
+		try {
+			components.detach();
+			login(contextRoot, task);
+			$(window).hashchange(setupView);
+		} catch (e) {
+			View.error(e);
+		}
 	});
 });

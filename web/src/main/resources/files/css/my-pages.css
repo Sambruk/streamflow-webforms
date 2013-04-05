@@ -14,26 +14,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /*body .bp { font-family: Lucida Grande,Lucida Sans,Arial,sans-serif; font-size: 0.8em; }*/
-body .bp { font-family: Lucida Grande,Lucida Sans,Arial,sans-serif; font-size: 10pt; }
-
-.bp { padding-bottom: 10px; }
-
-.bp span.copy { float: right; font-size: 8pt; }
-
-.bp h1.page-header { float: left; font-size: 1.5em; }
-.bp h2#user-info { float: right; font-size: 1em; padding: 8px; }
- 
-.bp .mypages_profile_form .ui-widget-content input { 
-	border: 1px solid #A6C9E2; width: 200px;
-	background: url("images/ui-bg_inset-hard_100_f5f8f9_1x100.png") repeat-x scroll 50% 50% #F5F8F9;
-	color: #000; 
+body .bp {
+	font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+	font-size: 10pt;
 }
 
-.bp .profile_label { color: #aaa; margin-top: 5px; }
+.bp {
+	padding-bottom: 10px;
+}
 
-.bp fieldset { margin: 10px 0; }
+.bp span.copy {
+	float: right;
+	font-size: 8pt;
+}
 
+.bp h1.page-header {
+	float: left;
+	font-size: 1.5em;
+}
+
+.bp h2#user-info {
+	float: right;
+	font-size: 1em;
+	padding: 8px;
+}
+
+.bp .mypages_profile_form .ui-widget-content input {
+	border: 1px solid #A6C9E2;
+	width: 200px;
+	background: url("images/ui-bg_inset-hard_100_f5f8f9_1x100.png") repeat-x
+		scroll 50% 50% #F5F8F9;
+	color: #000;
+}
+
+.bp .profile_label {
+	color: #aaa;
+	margin-top: 5px;
+}
+
+.bp fieldset {
+	margin: 10px 0;
+}
+
+/*
 #inserted_ErrorMessage {
   display: block;
   padding: 14px 5px 12px 35px;
@@ -89,4 +114,4 @@ body .bp { font-family: Lucida Grande,Lucida Sans,Arial,sans-serif; font-size: 1
   border-color: #347235;
   background-image: url("../images/check.png");
 }
-
+*/

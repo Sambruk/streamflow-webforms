@@ -58,9 +58,13 @@ label {
 	margin-right: 4px;
 }
 
-label.radio {
+.radio {
 	font-weight: normal;
 	font-size: 13px;
+}
+
+.radio label {
+	float: left;
 }
 
 .help-block {
@@ -97,7 +101,7 @@ select.listbox {
 	margin-bottom: 10px;
 }
 
-input.openselection-radio {
+input.openselection-radio,label.openselection-radio {
 	margin-top: 11px;
 }
 
@@ -112,6 +116,10 @@ input.openselection-text {
 
 input.hasDatepicker {
 	width: 75px;
+}
+
+.mandatory {
+	color: red;
 }
 
 .hint {
@@ -135,6 +143,14 @@ input.hasDatepicker {
 
 .breadcrumb li {
 	white-space: nowrap;
+}
+
+form {
+	margin: 0;
+}
+
+legend+.control-group {
+	margin-top: 0;
 }
 
 /* Summary 

@@ -53,8 +53,7 @@ var RequestModule = (function() {
 				};
 		} else {
 			throw {
-				error : texts.erroroccurred + "<br/>Status: " + textStatus
-						+ "<br/>Error: " + errorThrown
+				error : texts.erroroccurred + "<br/>Status: " + textStatus + "<br/>Error: " + errorThrown
 			};
 		}
 	}
@@ -128,8 +127,7 @@ var RequestModule = (function() {
 	};
 
 	inner.deleteAttachment = function(attachmentId) {
-		var parameters = request('POST', UrlModule
-				.deleteAttachment(attachmentId));
+		var parameters = request('POST', UrlModule.deleteAttachment(attachmentId));
 		$.ajax(parameters);
 	};
 
@@ -217,15 +215,13 @@ var RequestModule = (function() {
 	};
 
 	inner.setSecondSignaturePhoneNumber = function(stringDTO) {
-		var parameters = request('POST', UrlModule
-				.setSecondSignaturePhoneNumber());
+		var parameters = request('POST', UrlModule.setSecondSignaturePhoneNumber());
 		parameters.data = stringDTO;
 		invoke($.ajax, parameters, texts.secondSignatureError);
 	};
 
 	inner.setSecondSignatureSocialSecurityNumber = function(stringDTO) {
-		var parameters = request('POST', UrlModule
-				.setSecondSignatureSocialSecurityNumber());
+		var parameters = request('POST', UrlModule.setSecondSignatureSocialSecurityNumber());
 		parameters.data = stringDTO;
 		invoke($.ajax, parameters, texts.secondSignatureError);
 	};
@@ -237,8 +233,7 @@ var RequestModule = (function() {
 	};
 
 	inner.setSecondSignatureSingleSignature = function(enabled) {
-		var parameters = request('POST', UrlModule
-				.setSecondSignatureSingleSignature());
+		var parameters = request('POST', UrlModule.setSecondSignatureSingleSignature());
 		var stringDTO = {};
 		enabled ? stringDTO.string = 'true' : stringDTO.string = 'false';
 		parameters.data = stringDTO;
