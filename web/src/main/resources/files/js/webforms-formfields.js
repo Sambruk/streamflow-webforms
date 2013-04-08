@@ -57,14 +57,14 @@ var FieldTypeModule = (function() {
 	/** All field type functions * */
 	function AttachmentFieldValue(field, controlsNode) {
 		field.node = clone(field.fieldType, field.id);
-		controlsNode.prev("label").remove();
-		controlsNode.parent().prepend(clone("control-label"));
 		controlsNode.append(field.node);
 
 		field.refreshUI = function() {
 			var fieldId = this.id;
 			if (this.formattedValue) {
 				$("#AttachmentFieldValueForm" + fieldId).remove();
+				controlsNode.prev(".control-label").remove();
+				controlsNode.parent().prepend(clone("span-control-label").append(field.name));
 
 				var valueNode = clone("AttachedFile", "AttachedFile" + fieldId);
 				field.node.append(valueNode);
@@ -83,6 +83,9 @@ var FieldTypeModule = (function() {
 				this.node.find('.filename').text(this.formattedValue);
 			} else {
 				$("#AttachedFile" + fieldId).remove();
+				controlsNode.prev(".control-label").remove();
+				controlsNode.parent().prepend(
+						clone("control-label").append(field.name).attr("for", 'Attachment' + fieldId));
 
 				var formNode = clone("AttachmentFieldValueForm", "AttachmentFieldValueForm" + fieldId);
 				field.node.append(formNode);
@@ -91,7 +94,7 @@ var FieldTypeModule = (function() {
 					id : 'Attachment' + fieldId,
 					name : fieldId
 				});
-				formNode.find('#button-text').text(texts.add_file);
+				formNode.find('span.button-text').text(texts.add_file);
 
 				// Initialize the jQuery File Upload widget
 				formNode.fileupload({
@@ -132,7 +135,7 @@ var FieldTypeModule = (function() {
 		field.node = controlsNode;
 		field.node.addClass('well');
 		field.node.prev("label").remove();
-		field.node.parent().prepend(clone("control-label"));
+		field.node.parent().prepend(clone("span-control-label"));
 		field.node.append(clone("fieldset"));
 		field.node.find("legend").text(field.name);
 
@@ -241,7 +244,7 @@ var FieldTypeModule = (function() {
 	function ListBoxFieldValue(field, controlsNode) {
 		field.node = clone(field.fieldType, field.id);
 		controlsNode.prev("label").remove();
-		controlsNode.parent().prepend(clone("control-label"));
+		controlsNode.parent().prepend(clone("span-control-label"));
 
 		var possible = field.node.find('#possiblevalues').attr({
 			id : 'Possible' + field.id,
@@ -328,7 +331,7 @@ var FieldTypeModule = (function() {
 		field.node = controlsNode;
 		field.node.addClass('well');
 		field.node.prev("label").remove();
-		field.node.parent().prepend(clone("control-label"));
+		field.node.parent().prepend(clone("span-control-label"));
 		field.node.append(clone("fieldset"));
 		field.node.find("legend").text(field.name);
 
@@ -362,7 +365,7 @@ var FieldTypeModule = (function() {
 		field.node = controlsNode;
 		field.node.addClass('well');
 		field.node.prev("label").remove();
-		field.node.parent().prepend(clone("control-label"));
+		field.node.parent().prepend(clone("span-control-label"));
 		field.node.append(clone("fieldset"));
 		field.node.find("legend").text(field.name);
 

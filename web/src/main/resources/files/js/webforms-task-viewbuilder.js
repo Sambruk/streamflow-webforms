@@ -174,8 +174,6 @@ var TaskView = (function() {
 			}
 		}
 		node.append(buttons);
-
-		return buttons;
 	}
 
 	inner.getPrevious = function(segment) {
@@ -329,13 +327,13 @@ var TaskView = (function() {
 			signaturesNode.addClass('well');
 			signaturesNode.find("h2").append(texts.signature);
 
-			var table = signaturesNode.find('table');
+			var table = signaturesNode.find('table').attr("title", texts.signatures);
 			var idx = 0;
 			var row = $('<tr/>');
 			table.append(row);
 			row.addClass("signature-row");
 			row.append($('<td/>').append(reqSign.name + ":"));
-			var signature = getSignature(reqSign.name, FormModule.getSignatures());
+			var signature = View.getSignature(reqSign.name, FormModule.getSignatures());
 			if (signature) {
 				row.append($('<td/>').append(signature.signerName).addClass('signer-name'));
 			} else {
@@ -362,7 +360,8 @@ var TaskView = (function() {
 	function eidProviders(signatureId) {
 		var comboBox = View.clone('eidProviders').attr({
 			name : signatureId,
-			id : "eIdProvider_" + signatureId
+			id : "eIdProvider_" + signatureId,
+			title : texts.eidProviders
 		});
 		comboBox.change(function() {
 			FormModule.setSelectedEid(this);
@@ -397,16 +396,6 @@ var TaskView = (function() {
 		});
 
 		return comboBox;
-	}
-
-	function getSignature(name, signatures) {
-		var match;
-		$.each(signatures, function(idxSign, signature) {
-			if (name == signature.name)
-				match = signature;
-		});
-
-		return match;
 	}
 
 	function redirect(view) {

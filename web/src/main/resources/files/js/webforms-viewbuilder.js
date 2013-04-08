@@ -195,7 +195,7 @@ var View = (function() {
 
 	function enableSecondSignatureFields(secondSignature) {
 		var enable = false;
-		var signature = getSignature(FormModule.getRequiredSignatures()[0].name, FormModule.getSignatures());
+		var signature = inner.getSignature(FormModule.getRequiredSignatures()[0].name, FormModule.getSignatures());
 		signature ? enable = false : enable = true;
 		var inputArray = secondSignature.find('input');
 		for ( var i = 0; i < inputArray.length; i++) {
@@ -326,8 +326,8 @@ var View = (function() {
 		var buttons = inner.clone("buttons");
 		var previousBtn = new inner.Button(buttons, "button_previous").name(texts.previous).href(
 				inner.getPrevious(page));
-		var nextBtn = new inner.Button(buttons, "button_next").name(texts.next).href(inner.getNext(page)).enable(
-				page != getSummary());
+		new inner.Button(buttons, "button_next").name(texts.next).href(inner.getNext(page))
+				.enable(page != getSummary());
 
 		if (!FormModule.isSecondSigningFlow()) {
 			previousBtn.enable(page != 0);
@@ -347,8 +347,6 @@ var View = (function() {
 			}
 		}
 		node.append(buttons);
-
-		return buttons;
 	}
 
 	function createDiscardDialog(node) {
@@ -531,13 +529,13 @@ var View = (function() {
 			signaturesNode.addClass('well');
 			signaturesNode.find("h2").append(texts.signature);
 
-			var table = signaturesNode.find('table');
+			var table = signaturesNode.find('table').attr("title", texts.signatures);
 			var idx = 0;
 			var row = $('<tr/>');
 			table.append(row);
 			row.addClass("signature-row");
 			row.append($('<td/>').append(reqSign.name + ":"));
-			var signature = getSignature(reqSign.name, FormModule.getSignatures());
+			var signature = inner.getSignature(reqSign.name, FormModule.getSignatures());
 			if (signature) {
 				row.append($('<td/>').append(signature.signerName).addClass('signer-name'));
 			} else {
@@ -747,7 +745,8 @@ var View = (function() {
 	function eidProviders(signatureId) {
 		var comboBox = inner.clone('eidProviders').attr({
 			name : signatureId,
-			id : "eIdProvider_" + signatureId
+			id : "eIdProvider_" + signatureId,
+			title : texts.eidProviders
 		});
 		comboBox.change(function() {
 			FormModule.setSelectedEid(this);
@@ -784,7 +783,7 @@ var View = (function() {
 		return comboBox;
 	}
 
-	function getSignature(name, signatures) {
+	inner.getSignature = function(name, signatures) {
 		var match;
 		$.each(signatures, function(idxSign, signature) {
 			if (name == signature.name)
