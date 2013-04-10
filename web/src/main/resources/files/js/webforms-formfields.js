@@ -567,7 +567,9 @@ var FieldTypeModule = (function() {
 					continue;
 
 				if (changes.indexOf(field.page.fields[i]) !== -1) {
-					field.textFieldNode.focus();
+					setTimeout(function() {
+						field.textFieldNode.focus();
+					}, 0);
 					break;
 				} else if (field.page.fields[i].visible !== false)
 					break;
