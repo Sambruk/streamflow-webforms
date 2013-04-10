@@ -33,7 +33,7 @@ var TaskView = (function() {
 			node.find('#caseid_message').text(texts.caseidmessage);
 			node.find('#caseid').text(caseName);
 		}
-		new View.Button(node).image('print').name(texts.print).href(printUrl).attr('target', '_new');
+		new View.Button(node).image('print').name(texts.print).href(printUrl).attr('target', '_blank');
 		container.append(node);
 	};
 
@@ -45,7 +45,7 @@ var TaskView = (function() {
 			FormModule.fold(function(page) {
 				return View.foldPage(node, page);
 			});
-			addMailNotification(node);
+			View.addMailNotification(node, TaskRequestModule);
 			addSignaturesDiv(node);
 		});
 	};
@@ -91,7 +91,7 @@ var TaskView = (function() {
 	}
 
 	function foldPreviousSummaryField(node, field) {
-		var row = View.clone('field_summary', field.field).appendTo(node);
+		var row = View.clone('field_summary').appendTo(node);
 		$('<td class="field_label" />').append(field.field).appendTo(row);
 		$('<td class="field_value" />').append(field.value).appendTo(row);
 	}
@@ -226,97 +226,6 @@ var TaskView = (function() {
 
 	function getSign(idx) {
 		return '#' + Contexts.findUrl(inner.sign, [ idx ]);
-	}
-
-	function addMailNotification(node) {
-		var message = FormModule.getMailSelectionMessage();
-		if (message) {
-			var notification = View.clone('mailNotification', "insertedMailNotification");
-			var controls = notification.find('#mailControls');
-			var inputs = notification.find('#mailInputs');
-
-			var checkbox = View.clone('checkbox', 'mailCheckbox');
-			checkbox.find('input').prop('checked', FormModule.mailNotificationEnabled());
-
-			checkbox.append(message);
-			controls.append(checkbox);
-
-			inputs.find('#confirmation-email-label').text(texts.email);
-			inputs.find('#confirmation-email-confirm-label').text(texts.confirmEmail);
-			var emailField = inputs.find('#confirmation-email');
-			var emailConfirmField = inputs.find('#confirmation-email-confirm');
-
-			emailField.val(FormModule.confirmationEmail());
-			emailField.blur(function() {
-				// update server
-				var stringDTO = {};
-				stringDTO.string = emailField.val();
-				TaskRequestModule.setConfirmationEmail(stringDTO);
-				FormModule.setConfirmationEmail(stringDTO.string);
-			});
-			// Fill with value that is temporary stored in the application while
-			// running.
-			// Not persisted on the server
-			emailConfirmField.val(FormModule.confirmationEmailConfirm());
-			emailConfirmField.blur(function() {
-				FormModule.setConfirmationEmailConfirm(emailConfirmField.val());
-			});
-
-			var emailFunction = function() {
-				// if not match show error and disable submit-button
-				if (emailConfirmField.val() != emailField.val()) {
-					inputs.addClass('error');
-					inputs.find('#confirmation-help').append(texts.emailMismatch);
-					toggleSubmitButton(false);
-
-					emailConfirmField.focus(function() {
-						// Remove old error messages and enable submit button
-						inputs.removeClass("error");
-						inputs.find('#confirmation-help').text("");
-						emailConfirmField.focus(function() {
-						});
-					});
-				} else if (emailField.val()) {
-					toggleSubmitButton(true);
-				}
-			};
-
-			if (FormModule.mailNotificationEnabled()) {
-				toggleSubmitButton(false);
-				emailFunction.call();
-			} else {
-				inputs.hide();
-			}
-
-			checkbox.find('input').click(function() {
-				var checked = checkbox.find('input').prop('checked');
-				TaskRequestModule.setMailNotificationEnablement(checked);
-				FormModule.setMailNotificationEnabled(checked);
-
-				if (checked) {
-					inputs.show('slow');
-					toggleSubmitButton(false);
-					emailFunction.call();
-				} else {
-					inputs.hide('slow');
-					toggleSubmitButton(true);
-				}
-
-			});
-			emailConfirmField.blur(emailFunction);
-
-			node.append(notification);
-		}
-	}
-
-	function toggleSubmitButton(enabled) {
-		if (enabled && FormModule.canSubmit()) {
-			View.enable($('#button_submit'), true);
-			$('#button_submit').addClass("btn-primary");
-		} else {
-			View.enable($('#button_submit'), false);
-			$('#button_submit').removeClass("btn-primary");
-		}
 	}
 
 	function addSignaturesDiv(node) {

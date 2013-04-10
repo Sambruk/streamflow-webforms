@@ -192,8 +192,8 @@ jQuery(document).ready(function() {
 	components.load(contextRoot + '/static/webforms-components.html', function() {
 		try {
 			components.detach();
-			login(contextRoot, accesspoint);
 			$(window).hashchange(setupView);
+			login(contextRoot, accesspoint);
 		} catch (e) {
 			View.error(e);
 		}

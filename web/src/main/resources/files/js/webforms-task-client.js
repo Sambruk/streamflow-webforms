@@ -190,8 +190,8 @@ jQuery(document).ready(function() {
 	components.load(contextRoot + '/static/webforms-components.html', function() {
 		try {
 			components.detach();
-			login(contextRoot, task);
 			$(window).hashchange(setupView);
+			login(contextRoot, task);
 		} catch (e) {
 			View.error(e);
 		}

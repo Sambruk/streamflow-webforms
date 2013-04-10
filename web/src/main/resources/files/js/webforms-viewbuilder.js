@@ -57,7 +57,7 @@ var View = (function() {
 			node.find('#caseid_message').text(texts.caseidmessage);
 			node.find('#caseid').text(caseName);
 		}
-		new inner.Button(node).image('print').name(texts.print).href(printUrl).attr('target', '_new');
+		new inner.Button(node).image('print').name(texts.print).href(printUrl).attr('target', '_blank');
 		container.append(node);
 	};
 
@@ -86,7 +86,7 @@ var View = (function() {
 			FormModule.fold(function(page) {
 				return foldPage(node, page)
 			});
-			addMailNotification(node);
+			inner.addMailNotification(node, RequestModule);
 			addSecondSignatureDiv(node);
 			addSignaturesDiv(node);
 		});
@@ -430,15 +430,16 @@ var View = (function() {
 		return '#' + Contexts.findUrl(inner.sign, [ idx ]);
 	}
 
-	function addMailNotification(node) {
+	inner.addMailNotification = function(node, requestModule) {
 		var message = FormModule.getMailSelectionMessage();
 		if (message) {
 			var notification = inner.clone('mailNotification', "insertedMailNotification");
 			var controls = notification.find('#mailControls');
 			var inputs = notification.find('#mailInputs');
 
-			var checkbox = inner.clone('checkbox', 'mailCheckbox');
-			checkbox.find('input').prop('checked', FormModule.mailNotificationEnabled());
+			var checkbox = inner.clone('checkbox', 'mailCheckbox').attr("for", "mailCheckboxInput");
+			checkbox.find('input').attr("id", "mailCheckboxInput")
+					.prop('checked', FormModule.mailNotificationEnabled());
 
 			checkbox.append(message);
 			controls.append(checkbox);
@@ -453,7 +454,7 @@ var View = (function() {
 				// update server
 				var stringDTO = {};
 				stringDTO.string = emailField.val();
-				RequestModule.setConfirmationEmail(stringDTO);
+				requestModule.setConfirmationEmail(stringDTO);
 				FormModule.setConfirmationEmail(stringDTO.string);
 			});
 			// Fill with value that is temporary stored in the application while
@@ -492,7 +493,7 @@ var View = (function() {
 
 			checkbox.find('input').click(function() {
 				var checked = checkbox.find('input').prop('checked');
-				RequestModule.setMailNotificationEnablement(checked);
+				requestModule.setMailNotificationEnablement(checked);
 				FormModule.setMailNotificationEnabled(checked);
 
 				if (checked) {
