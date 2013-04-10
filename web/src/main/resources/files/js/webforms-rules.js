@@ -79,7 +79,7 @@ var RulesModule = (function() {
 	}
 
 	function evaluate(rule) {
-		if (rule) {
+		if (rule && rule.field) {
 			var field = FormModule.getField(rule.field);
 			if (field.visible === false || field.page.visible === false) {
 				return false;
