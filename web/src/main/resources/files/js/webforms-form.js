@@ -63,43 +63,6 @@ var FormModule = (function() {
 		$.each(page.fields, function(idx, field) {
 			fields[idx] = new Field(field, parent, idx);
 		});
-
-		// TEST
-
-		if (page.page === "516b08f6-9bde-4390-9d5a-a41327b7b599-44") {
-			this.rule = {};
-			this.rule.field = "516b08f6-9bde-4390-9d5a-a41327b7b599-2b";
-			this.rule.condition = "anyof";
-			this.rule.values = [ "Andra", "asdf" ];
-			this.rule.visibleWhen = true;
-		} else if (page.page === "16e7c6df-1697-4ded-b07f-5210338bde23-63") {
-			this.rule = {};
-			this.rule.field = "16e7c6df-1697-4ded-b07f-5210338bde23-66";
-			this.rule.condition = "morethan";
-			this.rule.values = [ "asdf" ];
-			this.rule.visibleWhen = false;
-		} else if (page.page === "0a20a6fa-3332-49f3-81fe-f532f17a1fe5-1") {
-			// Vårdnadshavare
-			this.rule = {};
-			this.rule.field = "2191ea18-5b09-422a-b064-e0f25301d601-6e";
-			this.rule.condition = "lessthan";
-			this.rule.values = [ "20000" ];
-			this.rule.visibleWhen = false;
-		} else if (page.page === "dec46658-f1e8-4994-bd0b-249503444a2e-ee") {
-			// Formulär med alla fält
-			this.rule = {};
-			this.rule.field = "dec46658-f1e8-4994-bd0b-249503444a2e-cd";
-			this.rule.condition = "anyof";
-			this.rule.values = [ "Alternativ 1" ];
-			this.rule.visibleWhen = false;
-		} else if (page.page === "80699c1e-6e99-4f57-b986-3f544a16ae31-20b") {
-			// Formulär med alla fält
-			this.rule = {};
-			this.rule.field = "dec46658-f1e8-4994-bd0b-249503444a2e-f4";
-			this.rule.condition = "morethan";
-			this.rule.values = [ "99" ];
-			this.rule.visibleWhen = true;
-		}
 	}
 
 	function Field(field, page, index) {
@@ -125,56 +88,6 @@ var FormModule = (function() {
 		} else if (fieldGroup && fieldGroup.count) {
 			this.fieldGroup = fieldGroup.id;
 			fieldGroup.count--;
-		}
-
-		// TEST
-
-		if (this.id === "16e7c6df-1697-4ded-b07f-5210338bde23-66") {
-			field.field.rule = {};
-			field.field.rule.field = "516b08f6-9bde-4390-9d5a-a41327b7b599-2b";
-			field.field.rule.condition = "noneof";
-			field.field.rule.values = [ "Andra" ];
-			field.field.rule.visibleWhen = false;
-		} else if (this.id === "16e7c6df-1697-4ded-b07f-5210338bde23-69") {
-			field.field.rule = {};
-			field.field.rule.field = "16e7c6df-1697-4ded-b07f-5210338bde23-66";
-			field.field.rule.condition = "lessthan";
-			field.field.rule.values = [ "asdf" ];
-			field.field.rule.visibleWhen = true;
-		} else if (this.id === "16e7c6df-1697-4ded-b07f-5210338bde23-6f") {
-			field.field.rule = {};
-			field.field.rule.field = "16e7c6df-1697-4ded-b07f-5210338bde23-6c";
-			field.field.rule.condition = "morethan";
-			field.field.rule.values = [ "100" ];
-			field.field.rule.visibleWhen = true;
-		} else if (this.id === "2191ea18-5b09-422a-b064-e0f25301d601-5d") {
-			// Vårdnadshavare
-			field.field.rule = {};
-			field.field.rule.field = "2191ea18-5b09-422a-b064-e0f25301d601-58";
-			field.field.rule.condition = "anyof";
-			field.field.rule.values = [ "Henrik" ];
-			field.field.rule.visibleWhen = false;
-		} else if (this.id === "dec46658-f1e8-4994-bd0b-249503444a2e-c8") {
-			// Formulär med alla fält
-			field.field.rule = {};
-			field.field.rule.field = "dec46658-f1e8-4994-bd0b-249503444a2e-c0";
-			field.field.rule.condition = "anyof";
-			field.field.rule.values = [ "asdf" ];
-			field.field.rule.visibleWhen = false;
-		} else if (this.id === "80699c1e-6e99-4f57-b986-3f544a16ae31-77") {
-			// Formulär med alla fält
-			field.field.rule = {};
-			field.field.rule.field = "001547bd-e8ac-48cb-8843-adf09371dab4-10d";
-			field.field.rule.condition = "anyof";
-			field.field.rule.values = [ "asdf" ];
-			field.field.rule.visibleWhen = true;
-		} else if (this.id === "b4f267cc-9f21-4d83-97a1-43d3e601d644-131") {
-			// Skolplats ansökningsformulär
-			field.field.rule = {};
-			field.field.rule.field = "d6ba5335-f1e1-4926-a956-399b8dd3ca6f-20d";
-			field.field.rule.condition = "anyof";
-			field.field.rule.values = [ "Apa" ];
-			field.field.rule.visibleWhen = false;
 		}
 	}
 
