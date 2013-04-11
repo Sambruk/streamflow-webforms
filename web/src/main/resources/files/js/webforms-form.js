@@ -24,6 +24,7 @@ var FormModule = (function() {
 	var requiredSignatures;
 	var selectedRequiredSignature;
 	var incomingSummary;
+	var fieldGroup;
 
 	function Form(formDraft) {
 		this.title = formDraft.description;
@@ -113,7 +114,18 @@ var FormModule = (function() {
 		this.setUIFormatter();
 		this.invalidformat = false;
 		this.setValue(this.field.value == null ? "" : this.field.value);
+		this.visible = true;
 		fieldMap[this.id] = this;
+
+		if (this.fieldType == "FieldGroupFieldValue") {
+			fieldGroup = {
+				id : this.id,
+				count : this.field.field.fieldValue.fieldCount
+			};
+		} else if (fieldGroup && fieldGroup.count) {
+			this.fieldGroup = fieldGroup.id;
+			fieldGroup.count--;
+		}
 
 		// TEST
 
@@ -156,6 +168,13 @@ var FormModule = (function() {
 			field.field.rule.condition = "anyof";
 			field.field.rule.values = [ "asdf" ];
 			field.field.rule.visibleWhen = true;
+		} else if (this.id === "b4f267cc-9f21-4d83-97a1-43d3e601d644-131") {
+			// Skolplats ansökningsformulär
+			field.field.rule = {};
+			field.field.rule.field = "d6ba5335-f1e1-4926-a956-399b8dd3ca6f-20d";
+			field.field.rule.condition = "anyof";
+			field.field.rule.values = [ "Apa" ];
+			field.field.rule.visibleWhen = false;
 		}
 	}
 

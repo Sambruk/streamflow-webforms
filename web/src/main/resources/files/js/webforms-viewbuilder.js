@@ -17,7 +17,6 @@
 var View = (function() {
 	var inner = {};
 	var messages = {};
-	var fieldGroups = {};
 	var templates;
 
 	inner.error = function(message) {
@@ -63,19 +62,18 @@ var View = (function() {
 
 	inner.formPage = function(args) {
 		createPageContent(args.segment, function(node) {
-			var form = inner.clone('form');
+			var form = inner.clone("form");
 			var page = parseInt(args.segment);
-			var fieldset = form.children('fieldset');
+			var fieldset = form.children("fieldset");
 			fieldset.children("legend").text(FormModule.pages()[page].title);
 			FormModule.foldEditPage(page, function(field) {
 				foldEditField(fieldset, field);
 			});
-			$.each(fieldGroups, function(key, value) {
-				var group = form.find('#' + key);
-				$.each(value.embedded, function(i, val) {
-					// find element and move into group
-					group.append(form.find('#Field' + val));
-				});
+			$.each(FormModule.pages()[page].fields, function(i, field) {
+				if (field.fieldGroup) {
+					var group = form.find("#" + field.fieldGroup);
+					group.append(form.find("#Field" + field.id));
+				}
 			});
 			node.append(form);
 		});
@@ -84,16 +82,12 @@ var View = (function() {
 	inner.summary = function(args) {
 		createPageContent(getSummary(), function(node) {
 			FormModule.fold(function(page) {
-				return foldPage(node, page)
+				return inner.foldPage(node, page);
 			});
 			inner.addMailNotification(node, RequestModule);
 			addSecondSignatureDiv(node);
 			addSignaturesDiv(node);
 		});
-	};
-
-	inner.foldPage = function(node, page) {
-		return foldPage(node, page);
 	};
 
 	function createPageContent(page, contentFunction) {
@@ -121,26 +115,12 @@ var View = (function() {
 		var controlsNode = fieldNode.find('div.controls');
 		FieldTypeModule.createFieldUI(field, controlsNode);
 
-		if (field.fieldType == "FieldGroupFieldValue") {
-			// setup a collector that collect the next field id's
-			var fieldGroup = {};
-			fieldGroup.count = field.fieldValue.fieldCount;
-			fieldGroup.embedded = [];
-			fieldGroups[field.id] = fieldGroup;
+		if (field.fieldType === "CommentFieldValue")
+			fieldNode.find('.control-label').remove();
+		else {
 			var fieldHeader = fieldNode.find('.control-label');
 			fieldHeader.append(field.name);
-		} else {
-			$.each(fieldGroups, function(key, value) {
-				if (value.count > 0) {
-					value.embedded.push(field.id);
-					value.count--;
-				}
-			});
-			if (field.fieldType == "CommentFieldValue") {
-				fieldNode.find('.control-label').remove();
-			} else {
-				var fieldHeader = fieldNode.find('.control-label');
-				fieldHeader.append(field.name);
+			if (field.fieldType !== "FieldGroupFieldValue") {
 				mandatory(fieldHeader, field);
 				hint(fieldHeader, field);
 				help(fieldHeader, field);
@@ -161,7 +141,7 @@ var View = (function() {
 		}
 	}
 
-	function foldPage(node, page) {
+	inner.foldPage = function(node, page) {
 		var pageDiv = inner.clone('form_page_summary', "form_page_summary" + page.index).appendTo(node);
 		pageDiv.children('h2').append(inner.clone("link").attr('href', getPage(page.index)).text(page.title));
 		pageDiv.children('table').attr("title", page.title);
@@ -169,15 +149,22 @@ var View = (function() {
 		return function(field) {
 			foldField(pageDiv.children('table'), field);
 		};
-	}
+	};
 
 	function foldField(node, field) {
 		if (field.fieldType == "CommentFieldValue")
 			return;
 
 		var row = inner.clone('field_summary', "Field" + field.id).appendTo(node);
-		$('<td class="field_label" />').append(field.name).appendTo(row);
-		$('<td class="field_value" />').append(field.formattedValue).appendTo(row);
+		var label = $('<td class="field_label" />').append(field.name).appendTo(row);
+		if (field.fieldType == "FieldGroupFieldValue") {
+			label.attr("colspan", "2").addClass("field_group");
+		} else {
+			$('<td class="field_value" />').append(field.formattedValue).appendTo(row);
+		}
+		if (field.fieldGroup) {
+			label.addClass("field_group_field");
+		}
 		if (field.field.field.mandatory && !field.formattedValue) {
 			row.addClass('validation-missing');
 			row.append($('<td class="field_message pull-right" />').append(inner.clone('label_missing')));
@@ -188,9 +175,8 @@ var View = (function() {
 	}
 
 	function help(node, field) {
-		if (field.field.field.note != "" && field.fieldType != "CommentFieldValue") {
+		if (field.field.field.note != "" && field.fieldType != "CommentFieldValue")
 			inner.clone('help-block').append(field.field.field.note).insertAfter(node);
-		}
 	}
 
 	function enableSecondSignatureFields(secondSignature) {

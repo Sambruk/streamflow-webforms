@@ -172,7 +172,16 @@ tr.validation-missing {
 
 td.field_label {
 	padding: 2px 0px 2px 10px;
-	width: 150px;
+	width: 200px;
+}
+
+td.field_label.field_group {
+	color: gray;
+	font-style: italic;
+}
+
+td.field_label.field_group_field {
+	padding-left: 25px;
 }
 
 td.field_value {

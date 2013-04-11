@@ -116,14 +116,15 @@ var RulesModule = (function() {
 		$.each(currentPage.fields, function(idx, f) {
 			var result = evaluate(f.field.field.rule);
 
-			if (result === true) {
-				if (f.visible === false)
+			if (result !== undefined) {
+				if (f.visible !== result)
 					changes.push(f);
-				f.visible = true;
-			} else if (result === false) {
-				if (f.visible === true)
+				f.visible = result;
+			} else if (f.fieldGroup) {
+				var group = FormModule.getField(f.fieldGroup);
+				if (f.visible !== group.visible)
 					changes.push(f);
-				f.visible = false;
+				f.visible = group.visible;
 			}
 		});
 
@@ -160,21 +161,17 @@ var RulesModule = (function() {
 		$.each(currentPage.fields, function(idx, f) {
 			var node = $("#Field" + f.id);
 
-			if (f.visible === true) {
-				if (animate)
-					setTimeout(function() {
-						node.slideDown();
-					}, 0);
-				else
-					node.show();
-			} else if (f.visible === false) {
-				if (animate)
-					setTimeout(function() {
-						node.slideUp();
-					}, 0);
-				else
-					node.hide();
+			if (f.fieldGroup && !node.is("tr")) {
+				// Gets ugly if hiding both field group and individual fields.
+				return;
 			}
+
+			if (animate)
+				setTimeout(function() {
+					f.visible ? node.slideDown() : node.slideUp();
+				}, 0);
+			else
+				f.visible ? node.show() : node.hide();
 		});
 	}
 
