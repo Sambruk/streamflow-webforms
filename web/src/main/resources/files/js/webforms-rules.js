@@ -78,37 +78,47 @@ var RulesModule = (function() {
 		return result;
 	}
 
+	function xor(condition1, condition2) {
+		return (condition1 && !condition2) || (!condition1 && condition2);
+	}
+
 	function evaluate(rule) {
 		if (rule && rule.field) {
 			var field = FormModule.getField(rule.field);
-			if (field.visible === false || field.page.visible === false) {
+			if (field.visible === false || field.page.visible === false)
 				return false;
-			}
 			var values = FormModule.selectedValues(field);
 			if (rule.condition === "anyof") {
 				var common = intersection(values, rule.values);
 
-				return (common.length && rule.visibleWhen) || (!common.length && !rule.visibleWhen);
+				return xor(common.length, !rule.visibleWhen);
 			} else if (rule.condition === "noneof") {
 				var common = intersection(values, rule.values);
 
-				return (!common.length && rule.visibleWhen) || (common.length && !rule.visibleWhen);
+				return xor(common.length, rule.visibleWhen);
 			} else if (rule.condition === "morethan") {
 				var convert = allNumeric(values.concat(rule.values[0])) ? toNumber : toLowerCase;
 				var minValue = min(values, convert);
 
-				return (minValue > convert(rule.values[0]) && rule.visibleWhen)
-						|| (minValue <= convert(rule.values[0]) && !rule.visibleWhen);
+				return xor(minValue > convert(rule.values[0]), !rule.visibleWhen);
 			} else if (rule.condition === "lessthan") {
 				var convert = allNumeric(values.concat(rule.values[0])) ? toNumber : toLowerCase;
 				var maxValue = max(values, convert);
 
-				return (maxValue < convert(rule.values[0]) && rule.visibleWhen)
-						|| (maxValue >= convert(rule.values[0]) && !rule.visibleWhen);
+				return xor(maxValue < convert(rule.values[0]), !rule.visibleWhen);
 			}
 		}
 
 		return;
+	}
+
+	function evaluatePageRule(page) {
+		var result = evaluate(page.rule);
+
+		if (result === true)
+			page.visible = true;
+		else if (result === false)
+			page.visible = false;
 	}
 
 	function evaluateFieldRules(currentPage) {
@@ -131,28 +141,12 @@ var RulesModule = (function() {
 		return changes;
 	}
 
-	function evaluatePageRules(currentPage) {
-		$.each(FormModule.pages(), function(idx, p) {
-			var result = evaluate(p.rule);
-
-			if (result === true) {
-				p.visible = true;
-			} else if (result === false) {
-				p.visible = false;
-			}
+	inner.evaluateRules = function() {
+		var fieldChanges = [];
+		$.each(FormModule.pages(), function(idx, page) {
+			evaluatePageRule(page);
+			fieldChanges = fieldChanges.concat(evaluateFieldRules(page));
 		});
-	}
-
-	inner.evaluateRules = function(currentPage) {
-		var fieldChanges;
-		if (currentPage) {
-			fieldChanges = evaluateFieldRules(currentPage);
-		} else {
-			$.each(FormModule.pages(), function(idx, page) {
-				evaluateFieldRules(page);
-			});
-		}
-		evaluatePageRules(currentPage);
 
 		return fieldChanges;
 	};
@@ -217,7 +211,7 @@ var RulesModule = (function() {
 	};
 
 	inner.applyRules = function(currentPage, animate) {
-		var fieldChanges = inner.evaluateRules(currentPage);
+		var fieldChanges = inner.evaluateRules();
 		inner.applyVisibility(currentPage, animate);
 
 		return fieldChanges;

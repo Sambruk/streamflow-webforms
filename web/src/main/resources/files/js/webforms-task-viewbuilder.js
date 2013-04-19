@@ -72,7 +72,7 @@ var TaskView = (function() {
 
 		contentFunction(content);
 
-		RulesModule.evaluateRules(FormModule.pages()[page]);
+		RulesModule.evaluateRules();
 
 		addButtons(content, page);
 		View.addFooter(container);

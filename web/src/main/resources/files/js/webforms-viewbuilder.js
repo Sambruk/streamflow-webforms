@@ -102,7 +102,7 @@ var View = (function() {
 
 		contentFunction(content);
 
-		RulesModule.evaluateRules(FormModule.pages()[page]);
+		RulesModule.evaluateRules();
 
 		addButtons(content, page);
 		inner.addFooter(container);
