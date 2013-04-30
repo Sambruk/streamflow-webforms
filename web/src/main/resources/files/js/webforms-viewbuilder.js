@@ -76,6 +76,12 @@ var View = (function() {
         	});
         	node.append(form);
         });
+        // Init each GeoLocationField
+        $.each( FormModule.pages()[ page ].fields, function(index, field ) {
+        	if (field.fieldType == 'GeoLocationFieldValue') {
+				field.initMap();
+        	}
+        });
     }
 
     inner.summary = function( args ) {
@@ -104,7 +110,7 @@ var View = (function() {
          contentFunction(content);
 
          addButtons( content, page);
-         addFooter( container);
+         addFooter( container);      
     }
     
     function foldEditField( node, field ) {

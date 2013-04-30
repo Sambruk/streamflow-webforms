@@ -24,6 +24,7 @@ var FormModule = (function() {
 	var requiredSignatures;
 	var selectedRequiredSignature;
 	var incomingSummary;
+	var visibleMaps = new Array();
 	
 	function Form( formDraft ) {
 		this.title = formDraft.description;
@@ -200,7 +201,7 @@ var FormModule = (function() {
 	inner.isFormSigned = function() {
 	    return inner.requiredSignedSignaturesCount() == formDraft.signatures.length;
 	}
-	 
+
 	inner.isSecondSignatureReady = function() {
 	  if( inner.formNeedsSecondSignature() ) {
 	    var singleSignature = inner.secondSignatureSingleSignature();

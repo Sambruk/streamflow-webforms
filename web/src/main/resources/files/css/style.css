@@ -133,6 +133,16 @@ input.hasDatepicker {
 	color: #333;
 }
 
+.map { 
+	height: 500px; 
+	width: 800px;
+	border: 1px solid #CCCCCC;
+}
+
+.map img { 
+	max-width: none;
+}
+
 /* Summary 
 -------------------------------------------------- */
 table.fields_table {
