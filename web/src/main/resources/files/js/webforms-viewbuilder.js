@@ -62,7 +62,7 @@ var View = (function() {
 
 	inner.formPage = function(args) {
 		createPageContent(args.segment, function(node) {
-			var form = inner.clone("form", "fileupload");
+			var form = inner.clone("form");
 			var page = parseInt(args.segment);
 			var fieldset = form.children("fieldset");
 			fieldset.children("legend").text(FormModule.pages()[page].title);

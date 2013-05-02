@@ -48,7 +48,7 @@ pre {
 	border: 0px;
 }
 
-label {
+label, span.control-label {
 	font-size: 15px;
 	font-weight: 500;
 	margin-bottom: 0px;

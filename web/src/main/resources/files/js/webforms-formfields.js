@@ -59,19 +59,63 @@ var FieldTypeModule = (function() {
 		field.node = clone(field.fieldType, field.id);
 		controlsNode.append(field.node);
 
+		var valueNode = clone("AttachedFile", "AttachedFile" + field.id);
+		field.node.append(valueNode);
+
+		var formNode = clone("AttachmentFieldValueForm", "AttachmentFieldValueForm" + field.id);
+		
+		field.node.append(formNode);
+
+		var fieldNode = formNode.find('#Attachment').attr({
+			id : 'Attachment' + field.id,
+			name : field.id
+		});
+		
+		formNode.find('span.button-text').text(texts.add_file);
+
+		// Initialize the jQuery File Upload widget
+		formNode.fileupload({
+			dropZone : null,
+		});
+
+		// Disable default dropzone
+		$(document).bind('drop dragover', function(e) {
+			e.preventDefault();
+		});
+
+		// Settings
+		var url = UrlModule.attach();
+		formNode.fileupload('option', {
+			acceptFileTypes : /(\.|\/)(jpe?g|png|pdf)$/i,
+			autoUpload : true,
+			url : url
+		});
+
+		formNode.bind('fileuploaddone', function(e, data) {
+			FormModule.setValue(field.id, requestModule().refreshField(field.id));
+			field.refreshUI();
+			removeErrorFromField(controlsNode.parent(), field);
+		});
+
+		formNode.bind('fileuploadadded', function(e, data) {
+			if (!data.isValidated) {
+				$.each(data.files, function(index, file) {
+					addErrorToField(field, texts[file.error]);
+				});
+			}
+		});
+		
 		field.refreshUI = function() {
-			var fieldId = this.id;
 			if (this.formattedValue) {
-				$("#AttachmentFieldValueForm" + fieldId).remove();
+				formNode.hide();
+				valueNode.show();
+				
 				controlsNode.prev(".control-label").remove();
 				controlsNode.parent().prepend(clone("span-control-label").append(field.name));
-
-				var valueNode = clone("AttachedFile", "AttachedFile" + fieldId);
-				field.node.append(valueNode);
-
+			
 				this.node.find('#delete_link').append("<span style='display: none'>" + texts.removeFile + "</span>")
 						.attr({
-							id : 'delete_link' + fieldId,
+							id : 'delete_link' + this.id,
 							title : texts.removeFile
 						}).click(function() {
 							requestModule().deleteAttachment(JSON.parse(field.value).attachment);
@@ -81,56 +125,15 @@ var FieldTypeModule = (function() {
 							return false;
 						});
 				this.node.find('.filename').text(this.formattedValue);
+
 			} else {
-				$("#AttachedFile" + fieldId).remove();
+				formNode.show();
+				valueNode.hide();
+				
 				controlsNode.prev(".control-label").remove();
 				controlsNode.parent().prepend(
-						clone("control-label").append(field.name).attr("for", 'Attachment' + fieldId));
+						clone("control-label").append(field.name).attr("for", 'Attachment' + this.id));
 
-				var formNode = clone("AttachmentFieldValueForm", "AttachmentFieldValueForm" + fieldId);
-				
-				field.node.append(formNode);
-
-				var fieldNode = formNode.find('#Attachment').attr({
-					id : 'Attachment' + fieldId,
-					name : fieldId
-				});
-				
-				formNode.find('span.button-text').text(texts.add_file);
-
-				// Initialize the jQuery File Upload widget
-				fieldNode.fileupload({
-					dropZone : null,
-				});
-
-				// Disable default dropzone
-				$(document).bind('drop dragover', function(e) {
-					e.preventDefault();
-				});
-
-				// Settings
-				var url = UrlModule.attach();
-				fieldNode.fileupload('option', {
-					acceptFileTypes : /(\.|\/)(jpe?g|png|pdf)$/i,
-					autoUpload : true,
-					url : url,
-					done: null,
-					stop: null
-				});
-
-				fieldNode.bind('fileuploaddone', function(e, data) {
-					FormModule.setValue(field.id, requestModule().refreshField(fieldId));
-					field.refreshUI();
-					removeErrorFromField(controlsNode.parent(), field);
-				});
-
-				fieldNode.bind('fileuploadadded', function(e, data) {
-					if (!data.isValidated) {
-						$.each(data.files, function(index, file) {
-							addErrorToField(field, texts[file.error]);
-						});
-					}
-				});
 			}
 		}
 	}
