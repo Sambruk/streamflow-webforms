@@ -88,17 +88,19 @@ var FieldTypeModule = (function() {
 						clone("control-label").append(field.name).attr("for", 'Attachment' + fieldId));
 
 				var formNode = clone("AttachmentFieldValueForm", "AttachmentFieldValueForm" + fieldId);
+				
 				field.node.append(formNode);
 
-				formNode.find('#Attachment').attr({
+				var fieldNode = formNode.find('#Attachment').attr({
 					id : 'Attachment' + fieldId,
 					name : fieldId
 				});
+				
 				formNode.find('span.button-text').text(texts.add_file);
 
 				// Initialize the jQuery File Upload widget
-				formNode.fileupload({
-					dropZone : null
+				fieldNode.fileupload({
+					dropZone : null,
 				});
 
 				// Disable default dropzone
@@ -108,19 +110,21 @@ var FieldTypeModule = (function() {
 
 				// Settings
 				var url = UrlModule.attach();
-				formNode.fileupload('option', {
+				fieldNode.fileupload('option', {
 					acceptFileTypes : /(\.|\/)(jpe?g|png|pdf)$/i,
 					autoUpload : true,
-					url : url
+					url : url,
+					done: null,
+					stop: null
 				});
 
-				formNode.bind('fileuploaddone', function(e, data) {
+				fieldNode.bind('fileuploaddone', function(e, data) {
 					FormModule.setValue(field.id, requestModule().refreshField(fieldId));
 					field.refreshUI();
 					removeErrorFromField(controlsNode.parent(), field);
 				});
 
-				formNode.bind('fileuploadadded', function(e, data) {
+				fieldNode.bind('fileuploadadded', function(e, data) {
 					if (!data.isValidated) {
 						$.each(data.files, function(index, file) {
 							addErrorToField(field, texts[file.error]);
