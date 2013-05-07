@@ -168,6 +168,10 @@ td.field_message {
 	width: 62px;	
 }
 
+img.map_icon {
+	margin-right: 7px;
+}
+
 #thank-you-message {
 	font-size: 20px;
 	font-weight: 600;

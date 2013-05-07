@@ -117,6 +117,9 @@ var FormModule = (function() {
     Field.prototype.setValue = function( value ) {
     	this.value = value;
     	this.formattedValue = this.uIFormatter==null ? value : this.uIFormatter( value );
+    	if (this.fieldType == "GeoLocationFieldValue") {
+    		this.mapValue = MapModule.createMapValue( value );
+    	}
     	return this;
     }
 

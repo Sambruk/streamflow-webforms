@@ -491,10 +491,21 @@ var FieldTypeModule = (function() {
 			
 			var selectedDrawingModes = new Array();
 			var initDrawingMode = null;
+			if (field.mapValue) {
+				if (field.mapValue.isPoint) {
+					initDrawingMode = google.maps.drawing.OverlayType.MARKER;
+				} else if (field.mapValue.isPolyline) {
+					initDrawingMode = google.maps.drawing.OverlayType.POLYLINE;
+				} else if (field.mapValue.isPolygon) {
+					initDrawingMode = google.maps.drawing.OverlayType.POLYGON;
+				}
+			}
 						   
 			if (field.fieldValue.point) {
 				selectedDrawingModes.push(google.maps.drawing.OverlayType.MARKER);
-				initDrawingMode = google.maps.drawing.OverlayType.MARKER
+				if (!initDrawingMode) {
+					initDrawingMode = google.maps.drawing.OverlayType.MARKER;
+				}
 			}
 			if (field.fieldValue.polyline) {
 				selectedDrawingModes.push(google.maps.drawing.OverlayType.POLYLINE);
@@ -542,6 +553,7 @@ var FieldTypeModule = (function() {
 				field.marker = newMarker;
 				var position = newMarker.position.lat() + ", " + newMarker.position.lng();
 				update( field.id, position);
+				field.mapValue = MapModule.createMapValue(position);
 			});
 			
 			google.maps.event.addListener(drawingManager, 'polylinecomplete', function(newLine) {
@@ -549,40 +561,56 @@ var FieldTypeModule = (function() {
 				
 				field.marker = newLine;
 				var position = newLine.getPath().getArray().toString();
-				alert(position);
 				update( field.id, position);
+				field.mapValue = MapModule.createMapValue(position);
 			});
-			google.maps.event.addListener(drawingManager, 'drawingmode_changed', function(event){
-				alert("Changed tool");
+			
+			google.maps.event.addListener(drawingManager, 'polygoncomplete', function(newSurface) {
+				clearCurrentMarkersAndLines();
+
+				// Add the first position as the last so that we know that it's a surface
+				newSurface.getPath().getArray().push(newSurface.getPath().getArray()[0]);
+				field.marker = newSurface;
+				var position = newSurface.getPath().getArray().toString();
+				update( field.id, position);
+				field.mapValue = MapModule.createMapValue(position);
+			});
+
+			google.maps.event.addListener(drawingManager, 'drawingmode_changed', function(){
+				if (drawingManager.drawingMode != null) {
+					clearCurrentMarkersAndLines();
+				}
 			}); 
 		}
 		
 		field.refreshUI = function() {
-			if (field.value) {
+			if (field.mapValue) {
 				// Detect if it's a single point or a line/surface
-				if (field.value.indexOf("(") == -1) {
-					
-					var latLong = field.value.split(',');
+				if (field.mapValue.isPoint) {
 					if (field.marker) {
 						field.marker.setMap(null);
 					}
 					field.marker = new google.maps.Marker({
-					    position: new google.maps.LatLng(latLong[0], latLong[1]),
+					    position: new google.maps.LatLng(field.mapValue.path[0].latitude, field.mapValue.path[0].longitude),
 					    map: field.map
 					});
 					
 				} else {
-					//var positions = field.value.split('),');
-					
-					var path[];
-					$.each( field.value, function(position) {
-						var latLong = position.split(',');
-						path.push(new google.maps.LatLng(latLong[0], latLong[1]));
+					var path = new Array();
+					$.each( field.mapValue.path, function(index, position) {
+						path.push(new google.maps.LatLng(position.latitude, position.longitude));
 					});
-					field.polyline = new google.maps.Polyline();
-					field.polyline.setPath(path);
-					field.polyline.setMap( field.map );
-					
+				
+					if (field.mapValue.isPolyline) {
+						field.polyline = new google.maps.Polyline();
+						field.polyline.setPath(path);
+						field.polyline.setMap( field.map );
+
+					} else if (field.mapValue.isPolygon) {
+						field.polygon = new google.maps.Polygon();
+						field.polygon.setPath(path);
+						field.polygon.setMap( field.map );
+					}
 				}
 			}
 		}

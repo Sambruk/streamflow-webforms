@@ -173,7 +173,17 @@ var View = (function() {
         var row = clone( 'field_summary', field.id ).appendTo( node );
         var tr = $('<td class="field_label"/>').append( field.name );
         row.append( tr );
-        $('<td class="field_value"/>').append( field.formattedValue ).appendTo( row );
+        if (field.fieldType == "GeoLocationFieldValue") {
+        	if (field.mapValue.isPoint) {
+        		$('<td class="field_value"/>').append( clone( 'map_point') ).append(texts.map_point).appendTo( row );
+        	} else if (field.mapValue.isPolyline){
+        		$('<td class="field_value"/>').append( clone( 'map_polyline') ).append(texts.map_polyline).appendTo( row );
+        	} else if (field.mapValue.isPolygon) {
+        			$('<td class="field_value"/>').append( clone( 'map_polygon') ).append(texts.map_polygon).appendTo( row );
+        	}
+        } else {
+        	$('<td class="field_value"/>').append( field.formattedValue ).appendTo( row );
+        }
         if (field.field.field.mandatory && !field.formattedValue) {
     		row.addClass('validation-missing');
     		row.append($('<td class="field_message pull-right"/>').append(clone('label_missing', 'missing')));
@@ -183,6 +193,15 @@ var View = (function() {
         }
     }
 
+    function cleanUpPosition( position) {
+		if (position.indexOf("(") == 0) {
+			position = position.substring(1);
+		}
+		if (position.indexOf(")") != -1) {
+			position = position.substring(0, position.indexOf(")"));
+		}
+		return $.trim(position);
+	}
     function help( node, field ) {
         if ( field.field.field.note != "" && field.fieldType != "CommentFieldValue") {
             clone('help-block').append(field.field.field.note).insertAfter(node);
