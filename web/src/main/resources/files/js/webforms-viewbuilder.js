@@ -61,9 +61,9 @@ var View = (function() {
 	};
 
 	inner.formPage = function(args) {
+		var page = parseInt(args.segment);
 		createPageContent(args.segment, function(node) {
 			var form = inner.clone("form");
-			var page = parseInt(args.segment);
 			var fieldset = form.children("fieldset");
 			fieldset.children("legend").text(FormModule.pages()[page].title);
 			FormModule.foldEditPage(page, function(field) {
@@ -77,6 +77,12 @@ var View = (function() {
 			});
 			node.append(form);
 		});
+        // Init each GeoLocationField
+        $.each( FormModule.pages()[ page ].fields, function(index, field ) {
+        	if (field.fieldType == 'GeoLocationFieldValue') {
+				field.initMap();
+        	}
+        });
 	};
 
 	inner.summary = function(args) {

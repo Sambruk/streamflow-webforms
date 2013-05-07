@@ -25,8 +25,9 @@ var FormModule = (function() {
 	var selectedRequiredSignature;
 	var incomingSummary;
 	var fieldGroup;
+	var visibleMaps = new Array();
 
-	function Form(formDraft) {
+	function Form(formDraft) {	
 		this.title = formDraft.description;
 		this.id = formDraft.form;
 		this.signatures = formDraft.signatures;
@@ -107,46 +108,59 @@ var FormModule = (function() {
 
 		return this;
 	};
+	
+    function getFieldType( qualifiedField ) {
+        var list = qualifiedField.split('.');
+        return list[ list.length - 1 ];
+    }
+	
+    Field.prototype.setUIFormatter = function( ) {
+    	if ( this.fieldType == "DateFieldValue" ) {
+    		this.uIFormatter = formatUTCStringToIsoString;
+    	} else if ( this.fieldType == "AttachmentFieldValue" ) {
+    		this.uIFormatter = formatJSONAttachment;
+    	} else if ( this.fieldType == "CheckboxesFieldValue" || this.fieldType == "ListBoxFieldValue" ) {
+    	    this.uIFormatter = formatSelectionValues;
+    	}
+    }
 
-	function getFieldType(qualifiedField) {
-		var list = qualifiedField.split('.');
+    function formatUTCStringToIsoString( value ) {
+        if (value == '') return value;
 
-		return list[list.length - 1];
-	}
+        var d = value.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2}):(\d{2}(?:\.\d+)?)(Z|(([+-])(\d{2}):(\d{2})))$/i);
+        if (!d) return "Invalid date format";
+        var dateValue = new Date(
+        Date.UTC(d[1],d[2]-1,d[3],d[4],d[5],d[6]|0,(d[6]*1000-((d[6]|0)*1000))|0,d[7]) +
+        (d[7].toUpperCase() ==="Z" ? 0 : (d[10]*3600 + d[11]*60) * (d[9]==="-" ? 1000 : -1000)));
+        return dateFormat(dateValue,"isoDate");
+    }
 
-	function formatUTCStringToIsoString(value) {
-		if (value == '')
-			return value;
+    function formatJSONAttachment( value ) {
+        if ( value ) return $.parseJSON( value ).name;
+        return "";
+    }
 
-		var d = value
-				.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2}):(\d{2}(?:\.\d+)?)(Z|(([+-])(\d{2}):(\d{2})))$/i);
-		if (!d)
-			return "Invalid date format";
-		var dateValue = new Date(Date.UTC(d[1], d[2] - 1, d[3], d[4], d[5], d[6] | 0,
-				(d[6] * 1000 - ((d[6] | 0) * 1000)) | 0, d[7])
-				+ (d[7].toUpperCase() === "Z" ? 0 : (d[10] * 3600 + d[11] * 60) * (d[9] === "-" ? 1000 : -1000)));
+    function formatSelectionValues( value ) {
+        return value.replace(/(\[|\])/g, "'" );
+    }
+    
+    function hasFieldAValue( field ) {
+      return !((typeof field === 'undefined') || (field.length < 1) );
+    }
 
-		return dateFormat(dateValue, "isoDate");
-	}
+    Field.prototype.setValue = function( value ) {
+    	this.value = value;
+    	this.formattedValue = this.uIFormatter==null ? value : this.uIFormatter( value );
+    	if (this.fieldType == "GeoLocationFieldValue") {
+    		this.mapValue = MapModule.createMapValue( value );
+    	}
+    	return this;
+    }
 
-	function formatJSONAttachment(value) {
-		if (value)
-			return $.parseJSON(value).name;
-
-		return "";
-	}
-
-	function formatSelectionValues(value) {
-		return value.replace(/(\[|\])/g, "'");
-	}
-
-	function hasFieldAValue(field) {
-		return !((typeof field === 'undefined') || (field.length < 1));
-	}
-
-	inner.setupIncomingFormSummaryPage = function(incomingFormSummary) {
+	inner.setupIncomingFormSummaryPage = function ( incomingFormSummary ) {
 		incomingSummary = incomingFormSummary;
-	};
+	}
+
 
 	inner.getField = function(id) {
 		return fieldMap[id];
