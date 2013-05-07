@@ -166,7 +166,17 @@ var View = (function() {
 		if (field.fieldType == "FieldGroupFieldValue") {
 			label.attr("colspan", "2").addClass("field_group");
 		} else {
-			$('<td class="field_value" />').append(field.formattedValue).appendTo(row);
+		    if (field.fieldType == "GeoLocationFieldValue") {
+	        	if (field.mapValue.isPoint) {
+	        		$('<td class="field_value"/>').append( inner.clone( 'map_point') ).append(texts.map_point).appendTo( row );
+	        	} else if (field.mapValue.isPolyline){
+	        		$('<td class="field_value"/>').append( inner.clone( 'map_polyline') ).append(texts.map_polyline).appendTo( row );
+	        	} else if (field.mapValue.isPolygon) {
+	        			$('<td class="field_value"/>').append( inner.clone( 'map_polygon') ).append(texts.map_polygon).appendTo( row );
+	        	}
+	        } else {
+	        	$('<td class="field_value"/>').append( field.formattedValue ).appendTo( row );
+	        }
 		}
 		if (field.fieldGroup) {
 			label.addClass("field_group_field");
@@ -179,7 +189,7 @@ var View = (function() {
 			row.append($('<td class="field_message pull-right" />').append(inner.clone('label_error')));
 		}
 	}
-
+	
 	function help(node, field) {
 		if (field.field.field.note != "" && field.fieldType != "CommentFieldValue")
 			inner.clone('help-block').append(field.field.field.note).insertAfter(node);
