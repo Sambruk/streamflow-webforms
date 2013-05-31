@@ -22,6 +22,8 @@
 var MapModule = (function() {
 	var inner = {};
 	
+	var geocoder = null;
+	
 	function MapValue( fieldValue ) {
 		this.path = new Array();
 		this.isPoint = false;
@@ -51,6 +53,16 @@ var MapModule = (function() {
 		return this;
 	}
 	
+	function SearchResultItem( result ) {
+		var address = "";
+		var location = null;
+		
+		this.address = result.formatted_address;
+		this.location = result.geometry.location;
+		
+		return this;
+	}
+	
 	function LatLong( fieldValueString ) {
 		var latLong = fieldValueString.split(',');
 		this.latitude = cleanUpPosition(latLong[0]);
@@ -71,6 +83,42 @@ var MapModule = (function() {
 		return $.trim(position);
 	}
 	
+	function getGeocoder() {
+		if (!geocoder)
+			geocoder = new google.maps.Geocoder();
+		return geocoder;
+	}
+	
+	
+	inner.reverseGeocode = function( position, resultNode, field) {
+		getGeocoder().geocode({'latLng': position}, function(results, status) {
+			
+		    if (status == google.maps.GeocoderStatus.OK) {
+		      if (results[1]) {
+		    	  field.mapAddress = results[0].formatted_address;
+		    	  resultNode.text(field.mapAddress);
+		      } else {
+		    	  addressField.text(texts.mapAddressLocationNotFound);
+		      }
+		    }
+		});
+	}
+	
+	inner.geocode = function(searchTerm, map, itemFunction ){
+		var request = { 
+				'address': searchTerm,
+				'bounds' : map.getBounds()
+				};
+		
+		getGeocoder().geocode( request, function(results, status)  {
+			if (status == google.maps.GeocoderStatus.OK) {
+				$.each( results, function(index, result) {
+					itemFunction( new SearchResultItem(result));
+				});
+			}
+		})
+	}
+
 	inner.createMapValue = function( fieldValue){
 		return new MapValue(fieldValue);
 	}

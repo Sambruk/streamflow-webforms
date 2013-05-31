@@ -168,11 +168,11 @@ var View = (function() {
 		} else {
 		    if (field.fieldType == "GeoLocationFieldValue") {
 	        	if (field.mapValue.isPoint) {
-	        		$('<td class="field_value"/>').append( inner.clone( 'map_point') ).append(texts.map_point).appendTo( row );
+	        		$('<td class="field_value"/>').append( inner.clone( 'map_point') ).append(texts.mapPoint).appendTo( row );
 	        	} else if (field.mapValue.isPolyline){
-	        		$('<td class="field_value"/>').append( inner.clone( 'map_polyline') ).append(texts.map_polyline).appendTo( row );
+	        		$('<td class="field_value"/>').append( inner.clone( 'map_polyline') ).append(texts.mapPolyline).appendTo( row );
 	        	} else if (field.mapValue.isPolygon) {
-	        			$('<td class="field_value"/>').append( inner.clone( 'map_polygon') ).append(texts.map_polygon).appendTo( row );
+	        			$('<td class="field_value"/>').append( inner.clone( 'map_polygon') ).append(texts.mapPolygon).appendTo( row );
 	        	}
 	        } else {
 	        	$('<td class="field_value"/>').append( field.formattedValue ).appendTo( row );
