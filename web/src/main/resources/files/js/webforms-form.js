@@ -26,6 +26,7 @@ var FormModule = (function() {
 	var incomingSummary;
 	var fieldGroup;
 	var visibleMaps = new Array();
+	var settings;
 
 	function Form(formDraft) {	
 		this.title = formDraft.description;
@@ -214,7 +215,8 @@ var FormModule = (function() {
 		});
 	};
 
-	inner.init = function(formDraftValue, mailSelectionMessageTextIn) {
+	inner.init = function(formDraftValue, mailSelectionMessageTextIn, settings) {
+		this.settings = settings;
 		formDraft = new Form(formDraftValue);
 		mailSelectionMessageText = mailSelectionMessageTextIn;
 		initDone = true;
@@ -260,6 +262,10 @@ var FormModule = (function() {
 		return inner.requiredSignedSignaturesCount() == formDraft.signatures.length;
 	};
 
+	inner.settings = function() {
+		return this.settings;
+	}
+	
 	inner.isSecondSignatureReady = function() {
 		if (inner.formNeedsSecondSignature()) {
 			var singleSignature = inner.secondSignatureSingleSignature();

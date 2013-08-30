@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 jQuery(document).ready(function() {
+	var settings;
 	RulesModule.setViewModule(View);
 
 	function login(contextRoot, accesspoint) {
@@ -45,7 +46,8 @@ jQuery(document).ready(function() {
 		if (data.caze && data.form) {
 			UrlModule.createCaseUrl(data.caze);
 			UrlModule.createFormDraftUrl(data.form);
-			FormModule.init(RequestModule.getFormDraft(), RequestModule.getMailSelectionMessage());
+			settings = RequestModule.settings();
+			FormModule.init(RequestModule.getFormDraft(), RequestModule.getMailSelectionMessage(), settings);
 		} else {
 			handleEvents(RequestModule.createCaseWithForm());
 		}

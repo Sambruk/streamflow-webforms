@@ -172,6 +172,10 @@ legend+.control-group {
 .geocoding {
 	margin-bottom: 30px;
 }
+
+.btn-find-me {
+	margin-bottom: 20px;
+}
 /* Summary 
 -------------------------------------------------- */
 table.fields_table {

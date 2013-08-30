@@ -533,6 +533,11 @@ var FieldTypeModule = (function() {
 		var mapAddress = field.node.find('#map-address-container').attr({
 			id : 'map-address-container' + field.id
 		});
+		
+		var mapFindMe = field.node.find('#map-find-me').attr({
+			id : 'map-find-me' + field.id
+		});
+		
 		mapAddress.find('.geocoding > label:first-child').text(texts.mapAddressSearch);
 		mapAddress.find('.geocoding button:first-of-type').text(texts.mapAddressSearchButton);
 		mapAddress.find('.reversegeocoding > label:first-child').text(texts.mapAddressLocation);
@@ -545,9 +550,11 @@ var FieldTypeModule = (function() {
 			field.polyline = null;
 			field.polygon = null;
 			
+			var coords = FormModule.settings.location.split(",");
+			var startPosition = new google.maps.LatLng(parseFloat(coords[0]), parseFloat(coords[1]));
 			var mapOptions = {
-				center : new google.maps.LatLng(56.660920, 12.879581),
-				zoom : 11,
+				center : startPosition,
+				zoom : FormModule.settings.zoomLevel,
 				mapTypeId : google.maps.MapTypeId.ROADMAP
 			};
 
@@ -641,10 +648,9 @@ var FieldTypeModule = (function() {
 			});
 			drawingManager.setMap(map);
 			
-			
-			if (typeof field.mapValue.value === 'undefined' || field.mapValue.value.length == 0) {
-				// No location set. Try to use the browsers location if possible
-				if (navigator.geolocation) {
+			if (navigator.geolocation) {
+				var btnFindMe = clone('btn-find-me', 'btn-find-me' + field.id);
+				btnFindMe.click(function() {
 					navigator.geolocation.getCurrentPosition(function(position) {
 						
 						field.marker = new google.maps.Marker({
@@ -655,11 +661,14 @@ var FieldTypeModule = (function() {
 						update( field.id, position);
 						field.mapValue = MapModule.createMapValue(position);
 						map.setCenter(field.marker.position);
+						map.setZoom( 14 );
 							
 						MapModule.reverseGeocode(field.marker.position, adressResultNode, field );
 					});
-				}
-			}
+				});
+				
+				mapFindMe.append(btnFindMe.append(texts.findme));
+			} 
 			
 			field.refreshUI();
 			
