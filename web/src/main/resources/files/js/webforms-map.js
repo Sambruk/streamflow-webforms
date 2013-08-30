@@ -104,7 +104,7 @@ var MapModule = (function() {
 		});
 	}
 	
-	inner.geocode = function(searchTerm, map, itemFunction ){
+	inner.geocode = function(searchTerm, map, successFunction, errorFunction ){
 		var request = { 
 				'address': searchTerm,
 				'bounds' : map.getBounds()
@@ -113,8 +113,10 @@ var MapModule = (function() {
 		getGeocoder().geocode( request, function(results, status)  {
 			if (status == google.maps.GeocoderStatus.OK) {
 				$.each( results, function(index, result) {
-					itemFunction( new SearchResultItem(result));
+					successFunction( new SearchResultItem(result));
 				});
+			} else {
+				errorFunction();
 			}
 		})
 	}

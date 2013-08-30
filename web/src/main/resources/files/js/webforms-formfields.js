@@ -554,11 +554,47 @@ var FieldTypeModule = (function() {
 			var map = new google.maps.Map(mapCanvas[0], mapOptions);
 			field.map = map;
 			
+			var clearCurrentMarkersAndLines = function() {
+				if (field.marker) {
+					field.marker.setMap(null);
+				}
+				if (field.polyline) {
+					field.polyline.setMap(null);
+				}
+				if (field.polygon) {
+					field.polygon.setMap(null);
+				}
+			}
+			
 			mapAddress.find('.geocoding button:first-of-type')
 			.click(function() {
+				geocodingResultList.empty();
 				var searchResult = MapModule.geocode(adressSearchField.val(), map, function( item ) {
-					geocodingResultList.append("<li>" + item.address + "</li>");
+					var link = $('<li><a href="">' + item.address + '</a></li>').on('click', function() {
+						clearCurrentMarkersAndLines();
+						field.marker = new google.maps.Marker({
+						    position: item.location,
+						    map: field.map
+						});
+						var position = field.marker.position.lat() + ", " + field.marker.position.lng();
+						update( field.id, position);
+						field.mapValue = MapModule.createMapValue(position);
+						map.setCenter(field.marker.position);
+						
+						MapModule.reverseGeocode(field.marker.position, adressResultNode, field );
+						return false;
+					});
+					geocodingResultList.append(link);
+				}, function() {
+					geocodingResultList.append('<li>' + texts.mapAddressAddressNotFound + '</li>');
 				});
+			});
+			
+			// Click the button if the user hits 'enter' in the searchfield
+			adressSearchField.keyup(function(event){
+			    if(event.keyCode == 13){
+			    	mapAddress.find('.geocoding button:first-of-type').click();
+			    }
 			});
 			
 			var selectedDrawingModes = new Array();
@@ -572,7 +608,7 @@ var FieldTypeModule = (function() {
 					initDrawingMode = google.maps.drawing.OverlayType.POLYGON;
 				}
 			}
-						   
+			
 			if (field.fieldValue.point) {
 				selectedDrawingModes.push(google.maps.drawing.OverlayType.MARKER);
 				if (!initDrawingMode) {
@@ -605,15 +641,23 @@ var FieldTypeModule = (function() {
 			});
 			drawingManager.setMap(map);
 			
-			var clearCurrentMarkersAndLines = function() {
-				if (field.marker) {
-					field.marker.setMap(null);
-				}
-				if (field.polyline) {
-					field.polyline.setMap(null);
-				}
-				if (field.polygon) {
-					field.polygon.setMap(null);
+			
+			if (typeof field.mapValue.value === 'undefined' || field.mapValue.value.length == 0) {
+				// No location set. Try to use the browsers location if possible
+				if (navigator.geolocation) {
+					navigator.geolocation.getCurrentPosition(function(position) {
+						
+						field.marker = new google.maps.Marker({
+							position: new google.maps.LatLng(position.coords.latitude, position.coords.longitude),
+							map: field.map
+						});
+						var position = position.coords.latitude + ", " + position.coords.longitude;
+						update( field.id, position);
+						field.mapValue = MapModule.createMapValue(position);
+						map.setCenter(field.marker.position);
+							
+						MapModule.reverseGeocode(field.marker.position, adressResultNode, field );
+					});
 				}
 			}
 			
