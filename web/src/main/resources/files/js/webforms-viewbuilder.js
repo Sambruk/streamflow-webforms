@@ -61,9 +61,9 @@ var View = (function() {
 	};
 
 	inner.formPage = function(args) {
+		var page = parseInt(args.segment);
 		createPageContent(args.segment, function(node) {
 			var form = inner.clone("form");
-			var page = parseInt(args.segment);
 			var fieldset = form.children("fieldset");
 			fieldset.children("legend").text(FormModule.pages()[page].title);
 			FormModule.foldEditPage(page, function(field) {
@@ -77,6 +77,12 @@ var View = (function() {
 			});
 			node.append(form);
 		});
+        // Init each GeoLocationField
+        $.each( FormModule.pages()[ page ].fields, function(index, field ) {
+        	if (field.fieldType == 'GeoLocationFieldValue') {
+				field.initMap();
+        	}
+        });
 	};
 
 	inner.summary = function(args) {
@@ -160,7 +166,17 @@ var View = (function() {
 		if (field.fieldType == "FieldGroupFieldValue") {
 			label.attr("colspan", "2").addClass("field_group");
 		} else {
-			$('<td class="field_value" />').append(field.formattedValue).appendTo(row);
+		    if (field.fieldType == "GeoLocationFieldValue") {
+	        	if (field.mapValue.isPoint) {
+	        		$('<td class="field_value"/>').append( inner.clone( 'map_point') ).append(texts.mapPoint).appendTo( row );
+	        	} else if (field.mapValue.isPolyline){
+	        		$('<td class="field_value"/>').append( inner.clone( 'map_polyline') ).append(texts.mapPolyline).appendTo( row );
+	        	} else if (field.mapValue.isPolygon) {
+	        			$('<td class="field_value"/>').append( inner.clone( 'map_polygon') ).append(texts.mapPolygon).appendTo( row );
+	        	}
+	        } else {
+	        	$('<td class="field_value"/>').append( field.formattedValue ).appendTo( row );
+	        }
 		}
 		if (field.fieldGroup) {
 			label.addClass("field_group_field");
@@ -173,7 +189,7 @@ var View = (function() {
 			row.append($('<td class="field_message pull-right" />').append(inner.clone('label_error')));
 		}
 	}
-
+	
 	function help(node, field) {
 		if (field.field.field.note != "" && field.fieldType != "CommentFieldValue")
 			inner.clone('help-block').append(field.field.field.note).insertAfter(node);

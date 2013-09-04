@@ -523,6 +523,190 @@ var FieldTypeModule = (function() {
 		});
 	}
 
+	function GeoLocationFieldValue(field, controlsNode) {
+		field.node = clone(field.fieldType, field.id);
+		
+		var mapCanvas = field.node.find('#map-canvas').attr({
+			id : 'map-canvas' + field.id
+		});
+		
+		var mapAddress = field.node.find('#map-address-container').attr({
+			id : 'map-address-container' + field.id
+		});
+		mapAddress.find('.geocoding > label:first-child').text(texts.mapAddressSearch);
+		mapAddress.find('.geocoding button:first-of-type').text(texts.mapAddressSearchButton);
+		mapAddress.find('.reversegeocoding > label:first-child').text(texts.mapAddressLocation);
+		var adressSearchField = mapAddress.find('.geocoding input:first-of-type');
+		var adressResultNode = mapAddress.find('.reversegeocoding p:first-of-type');
+		var geocodingResultList = mapAddress.find('.geocodingResultList');
+		
+		field.initMap = function() {
+			field.marker = null;
+			field.polyline = null;
+			field.polygon = null;
+			
+			var mapOptions = {
+				center : new google.maps.LatLng(56.660920, 12.879581),
+				zoom : 11,
+				mapTypeId : google.maps.MapTypeId.ROADMAP
+			};
+
+			var map = new google.maps.Map(mapCanvas[0], mapOptions);
+			field.map = map;
+			
+			mapAddress.find('.geocoding button:first-of-type')
+			.click(function() {
+				var searchResult = MapModule.geocode(adressSearchField.val(), map, function( item ) {
+					geocodingResultList.append("<li>" + item.address + "</li>");
+				});
+			});
+			
+			var selectedDrawingModes = new Array();
+			var initDrawingMode = null;
+			if (field.mapValue) {
+				if (field.mapValue.isPoint) {
+					initDrawingMode = google.maps.drawing.OverlayType.MARKER;
+				} else if (field.mapValue.isPolyline) {
+					initDrawingMode = google.maps.drawing.OverlayType.POLYLINE;
+				} else if (field.mapValue.isPolygon) {
+					initDrawingMode = google.maps.drawing.OverlayType.POLYGON;
+				}
+			}
+						   
+			if (field.fieldValue.point) {
+				selectedDrawingModes.push(google.maps.drawing.OverlayType.MARKER);
+				if (!initDrawingMode) {
+					initDrawingMode = google.maps.drawing.OverlayType.MARKER;
+				}
+			}
+			if (field.fieldValue.polyline) {
+				selectedDrawingModes.push(google.maps.drawing.OverlayType.POLYLINE);
+				if (!initDrawingMode) {
+					initDrawingMode = google.maps.drawing.OverlayType.POLYLINE;
+				}
+			}
+			if (field.fieldValue.polygon) {
+				selectedDrawingModes.push(google.maps.drawing.OverlayType.POLYGON);
+				if (!initDrawingMode) {
+					initDrawingMode = google.maps.drawing.OverlayType.POLYGON;
+				}
+			}
+			var drawingManager = new google.maps.drawing.DrawingManager({
+				drawingMode: initDrawingMode,
+				drawingControlOptions: {
+				    position: google.maps.ControlPosition.TOP_CENTER,
+				    drawingModes: selectedDrawingModes
+				},
+				drawingControl: true,
+				markerOptions: {
+					draggable: true
+				},
+				
+			});
+			drawingManager.setMap(map);
+			
+			var clearCurrentMarkersAndLines = function() {
+				if (field.marker) {
+					field.marker.setMap(null);
+				}
+				if (field.polyline) {
+					field.polyline.setMap(null);
+				}
+				if (field.polygon) {
+					field.polygon.setMap(null);
+				}
+			}
+			
+			field.refreshUI();
+			
+			google.maps.event.addListener(drawingManager, 'markercomplete', function(newMarker) {
+				clearCurrentMarkersAndLines();
+				
+				field.marker = newMarker;
+				var position = newMarker.position.lat() + ", " + newMarker.position.lng();
+				update( field.id, position);
+				field.mapValue = MapModule.createMapValue(position);
+				
+				MapModule.reverseGeocode(newMarker.position, adressResultNode, field );
+			});
+			
+			google.maps.event.addListener(drawingManager, 'polylinecomplete', function(newLine) {
+				clearCurrentMarkersAndLines();
+				
+				field.marker = newLine;
+				var position = newLine.getPath().getArray().toString();
+				update( field.id, position);
+				field.mapValue = MapModule.createMapValue(position);
+
+				MapModule.reverseGeocode(newLine.getPath().getArray()[0], adressResultNode, field );
+			});
+			
+			google.maps.event.addListener(drawingManager, 'polygoncomplete', function(newSurface) {
+				clearCurrentMarkersAndLines();
+
+				// Add the first position as the last so that we know that it's a surface
+				newSurface.getPath().getArray().push(newSurface.getPath().getArray()[0]);
+				field.marker = newSurface;
+				var position = newSurface.getPath().getArray().toString();
+				update( field.id, position);
+				field.mapValue = MapModule.createMapValue(position);
+
+				MapModule.reverseGeocode(newSurface.getPath().getArray()[0], adressResultNode, field );
+			});
+
+			google.maps.event.addListener(drawingManager, 'drawingmode_changed', function(){
+				if (drawingManager.drawingMode != null) {
+					clearCurrentMarkersAndLines();
+				}
+			}); 
+		}
+		
+		field.refreshUI = function() {
+			if (field.mapValue) {
+				// Detect if it's a single point or a line/surface
+				if (field.mapValue.isPoint) {
+					if (field.marker) {
+						field.marker.setMap(null);
+					}
+					field.marker = new google.maps.Marker({
+					    position: new google.maps.LatLng(field.mapValue.path[0].latitude, field.mapValue.path[0].longitude),
+					    map: field.map
+					});
+					if (!field.mapAddress) {
+						MapModule.reverseGeocode(field.marker.position, adressResultNode, field );
+					} else {
+						adressResultNode.text(field.mapAddress);
+					}
+					
+				} else {
+					var path = new Array();
+					$.each( field.mapValue.path, function(index, position) {
+						path.push(new google.maps.LatLng(position.latitude, position.longitude));
+					});
+				
+					if (field.mapValue.isPolyline) {
+						field.polyline = new google.maps.Polyline();
+						field.polyline.setPath(path);
+						field.polyline.setMap( field.map );
+
+					} else if (field.mapValue.isPolygon) {
+						field.polygon = new google.maps.Polygon();
+						field.polygon.setPath(path);
+						field.polygon.setMap( field.map );
+					}
+					if (!field.mapAddress) {
+						MapModule.reverseGeocode(path[0], adressResultNode, field );
+					} else {
+						adressResultNode.text(field.mapAddress);
+					}
+				}
+			}
+		}
+		
+		controlsNode.append(field.node);
+
+	}
+
 	function removeErrorFromField(node, field) {
 		node.removeClass("error");
 		$('#help' + field.id).remove();

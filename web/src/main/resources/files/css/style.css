@@ -153,6 +153,25 @@ legend+.control-group {
 	margin-top: 0;
 }
 
+.map { 
+	height: 500px; 
+	width: 70%;
+	border: 1px solid #CCCCCC;
+	float: left;
+	margin-right: 20px;
+}
+
+.map img { 
+	max-width: none;
+}
+
+#map-adress-container {
+	margin-left: 10px;
+}
+
+.geocoding {
+	margin-bottom: 30px;
+}
 /* Summary 
 -------------------------------------------------- */
 table.fields_table {
@@ -190,6 +209,10 @@ td.field_value {
 
 td.field_message {
 	width: 62px;
+}
+
+img.map_icon {
+	margin-right: 7px;
 }
 
 #thank-you-message {
