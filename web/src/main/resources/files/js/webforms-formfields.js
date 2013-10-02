@@ -489,6 +489,7 @@ var FieldTypeModule = (function() {
 			field.changed();
 		});
 		addTabListener(field.node, field);
+		
 		field.node.blur(function() {
 			if (!field.dirty)
 				return;
@@ -541,7 +542,7 @@ var FieldTypeModule = (function() {
 		mapAddress.find('.geocoding > label:first-child').text(texts.mapAddressSearch);
 		mapAddress.find('.geocoding button:first-of-type').text(texts.mapAddressSearchButton);
 		mapAddress.find('.reversegeocoding > label:first-child').text(texts.mapAddressLocation);
-		var adressSearchField = mapAddress.find('.geocoding input:first-of-type');
+		var addressSearchField = mapAddress.find('.geocoding input:first-of-type');
 		var adressResultNode = mapAddress.find('.reversegeocoding p:first-of-type');
 		var geocodingResultList = mapAddress.find('.geocodingResultList');
 		
@@ -549,9 +550,11 @@ var FieldTypeModule = (function() {
 			field.marker = null;
 			field.polyline = null;
 			field.polygon = null;
+			field.init = true;
 			
 			var coords = FormModule.settings.location.split(",");
 			var startPosition = new google.maps.LatLng(parseFloat(coords[0]), parseFloat(coords[1]));
+			
 			var mapOptions = {
 				center : startPosition,
 				zoom : FormModule.settings.zoomLevel,
@@ -576,19 +579,23 @@ var FieldTypeModule = (function() {
 			mapAddress.find('.geocoding button:first-of-type')
 			.click(function() {
 				geocodingResultList.empty();
-				var searchResult = MapModule.geocode(adressSearchField.val(), map, function( item ) {
+				var searchResult = MapModule.geocode(addressSearchField.val(), map, function( item ) {
 					var link = $('<li><a href="">' + item.address + '</a></li>').on('click', function() {
 						clearCurrentMarkersAndLines();
+						geocodingResultList.empty();
+						addressSearchField.val("");
 						field.marker = new google.maps.Marker({
 						    position: item.location,
 						    map: field.map
 						});
 						var position = field.marker.position.lat() + ", " + field.marker.position.lng();
-						update( field.id, position);
-						field.mapValue = MapModule.createMapValue(position);
+						field.mapValue.updateLocation(position);
 						map.setCenter(field.marker.position);
-						
-						MapModule.reverseGeocode(field.marker.position, adressResultNode, field );
+						map.setZoom( 14 );
+							
+						MapModule.reverseGeocode(field.marker.position, adressResultNode, field, function() {
+							update( field.id, JSON.stringify(field.mapValue.value));
+						});
 						return false;
 					});
 					geocodingResultList.append(link);
@@ -598,7 +605,7 @@ var FieldTypeModule = (function() {
 			});
 			
 			// Click the button if the user hits 'enter' in the searchfield
-			adressSearchField.keyup(function(event){
+			addressSearchField.keyup(function(event){
 			    if(event.keyCode == 13){
 			    	mapAddress.find('.geocoding button:first-of-type').click();
 			    }
@@ -652,18 +659,20 @@ var FieldTypeModule = (function() {
 				var btnFindMe = clone('btn-find-me', 'btn-find-me' + field.id);
 				btnFindMe.click(function() {
 					navigator.geolocation.getCurrentPosition(function(position) {
-						
+						geocodingResultList.empty();
+						addressSearchField.val("");
 						field.marker = new google.maps.Marker({
 							position: new google.maps.LatLng(position.coords.latitude, position.coords.longitude),
 							map: field.map
 						});
 						var position = position.coords.latitude + ", " + position.coords.longitude;
-						update( field.id, position);
-						field.mapValue = MapModule.createMapValue(position);
+						field.mapValue.updateLocation(position);
 						map.setCenter(field.marker.position);
 						map.setZoom( 14 );
 							
-						MapModule.reverseGeocode(field.marker.position, adressResultNode, field );
+						MapModule.reverseGeocode(field.marker.position, adressResultNode, field, function() {
+							update( field.id, JSON.stringify(field.mapValue.value));
+						});
 					});
 				});
 				
@@ -677,10 +686,11 @@ var FieldTypeModule = (function() {
 				
 				field.marker = newMarker;
 				var position = newMarker.position.lat() + ", " + newMarker.position.lng();
-				update( field.id, position);
-				field.mapValue = MapModule.createMapValue(position);
+				field.mapValue.updateLocation(position);
+				MapModule.reverseGeocode(newMarker.position, adressResultNode, field, function() {
+					update( field.id, JSON.stringify(field.mapValue.value));
+				});
 				
-				MapModule.reverseGeocode(newMarker.position, adressResultNode, field );
 			});
 			
 			google.maps.event.addListener(drawingManager, 'polylinecomplete', function(newLine) {
@@ -688,10 +698,11 @@ var FieldTypeModule = (function() {
 				
 				field.marker = newLine;
 				var position = newLine.getPath().getArray().toString();
-				update( field.id, position);
-				field.mapValue = MapModule.createMapValue(position);
+				field.mapValue.updateLocation(position);
 
-				MapModule.reverseGeocode(newLine.getPath().getArray()[0], adressResultNode, field );
+				MapModule.reverseGeocode(newLine.getPath().getArray()[0], adressResultNode, field, function() {
+					update( field.id, JSON.stringify(field.mapValue.value));
+				});
 			});
 			
 			google.maps.event.addListener(drawingManager, 'polygoncomplete', function(newSurface) {
@@ -701,10 +712,12 @@ var FieldTypeModule = (function() {
 				newSurface.getPath().getArray().push(newSurface.getPath().getArray()[0]);
 				field.marker = newSurface;
 				var position = newSurface.getPath().getArray().toString();
-				update( field.id, position);
-				field.mapValue = MapModule.createMapValue(position);
+				field.mapValue.updateLocation(position);
 
-				MapModule.reverseGeocode(newSurface.getPath().getArray()[0], adressResultNode, field );
+				MapModule.reverseGeocode(newSurface.getPath().getArray()[0], adressResultNode, field, function() {
+					update( field.id, JSON.stringify(field.mapValue.value));
+				});
+				
 			});
 
 			google.maps.event.addListener(drawingManager, 'drawingmode_changed', function(){
@@ -730,7 +743,11 @@ var FieldTypeModule = (function() {
 					} else {
 						adressResultNode.text(field.mapAddress);
 					}
-					
+					if (field.init) {
+						field.init = false;
+						field.map.setCenter(field.marker.position);
+						field.map.setZoom( 14 );
+					}
 				} else {
 					var path = new Array();
 					$.each( field.mapValue.path, function(index, position) {
@@ -752,7 +769,13 @@ var FieldTypeModule = (function() {
 					} else {
 						adressResultNode.text(field.mapAddress);
 					}
+					if (field.init) {
+						field.init = false;
+						field.map.setCenter(path[0]);
+						field.map.setZoom( 14 );
+					}
 				}
+				
 			}
 		}
 		

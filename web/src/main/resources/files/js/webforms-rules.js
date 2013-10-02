@@ -28,7 +28,7 @@ var RulesModule = (function() {
 	function intersection(array1, array2) {
 		var result = [];
 		$.each(array1, function(idx, el) {
-			if (!$.inArray(el, array2))
+			if ($.inArray(el, array2))
 				result.push(el);
 		});
 

@@ -102,13 +102,6 @@ var FormModule = (function() {
 			this.uIFormatter = formatSelectionValues;
 		}
 	};
-
-	Field.prototype.setValue = function(value) {
-		this.value = value;
-		this.formattedValue = this.uIFormatter == null ? value : this.uIFormatter(value);
-
-		return this;
-	};
 	
     function getFieldType( qualifiedField ) {
         var list = qualifiedField.split('.');
@@ -153,7 +146,12 @@ var FormModule = (function() {
     	this.value = value;
     	this.formattedValue = this.uIFormatter==null ? value : this.uIFormatter( value );
     	if (this.fieldType == "GeoLocationFieldValue") {
-    		this.mapValue = MapModule.createMapValue( value );
+    		if (value && !value.location) {
+    			this.value = JSON.parse(value);
+    		} else {
+    			this.value = {location : "", street: "", zipcode: "", city : "", country : "" }; 
+    		}
+    		this.mapValue = MapModule.createMapValue( this.value );
     	}
     	return this;
     }
