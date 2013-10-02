@@ -771,8 +771,10 @@ var FieldTypeModule = (function() {
 					}
 					if (field.init) {
 						field.init = false;
-						field.map.setCenter(path[0]);
-						field.map.setZoom( 14 );
+						if (path.length > 0) {
+							field.map.setCenter(path[0]);
+							field.map.setZoom( 14 );
+						}
 					}
 				}
 				

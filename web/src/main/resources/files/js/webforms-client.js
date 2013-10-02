@@ -141,6 +141,7 @@ jQuery(document).ready(function() {
 				UrlModule.createCaseUrl(params['param1']);
 			} else if (event.name == "changedFormDraft") {
 				UrlModule.createFormDraftUrl(event.entity);
+				settings = RequestModule.settings();
 				FormModule.init($.parseJSON(params['param1']), RequestModule.getMailSelectionMessage(), settings);
 			} else if (event.name == "changedFieldValue") {
 				FormModule.getField(params['param1']).setUIValue(params['param2']);
