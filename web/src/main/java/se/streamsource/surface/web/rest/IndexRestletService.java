@@ -75,6 +75,11 @@ public interface IndexRestletService extends ServiceComposite, Configuration<Ext
                String externalCssReplaceString = externalCssReplaceString( cssConfig.configuration().cssUrl().get() );
                template = template.replace( "$externalcss", externalCssReplaceString );
 
+               String externalMapModuleString = externalMapModuleString( cssConfig.configuration().jsMapModuleUrl().get());
+               template = template.replace( "$externalMapModule", externalMapModuleString );
+               if (!Strings.empty( externalMapModuleString )) {
+                  template = template.replace( "<script type=\"text/javascript\" src=\"/" + request.getResourceRef().getBaseRef().getSegments().get( 0 ) + "/static/js/webforms-map.js\"></script>", "" );
+               }
                response.setEntity( template, MediaType.TEXT_HTML );
          } else if (taskId != null)
          {
@@ -86,7 +91,7 @@ public interface IndexRestletService extends ServiceComposite, Configuration<Ext
             template = template.replace( "$hostname", request.getResourceRef().getHostIdentifier() );
             String externalCssReplaceString = externalCssReplaceString( cssConfig.configuration().cssUrl().get() );
             template = template.replace( "$externalcss", externalCssReplaceString );
-
+            
             response.setEntity( template, MediaType.TEXT_HTML );
          } else
          {
@@ -96,13 +101,24 @@ public interface IndexRestletService extends ServiceComposite, Configuration<Ext
          }
       }
 
-      private String externalCssReplaceString(String property)
+      private String externalMapModuleString(String mapUrl)
+      {
+         String externalMapModuleString = "";
+         if (!Strings.empty( mapUrl ))
+         {
+            externalMapModuleString = "<script type=\"text/javascript\" src=\""
+                  + mapUrl + "\"></script>";
+         }
+         return externalMapModuleString;
+      }
+
+      private String externalCssReplaceString(String cssUrl)
       {
          String externalCssReplaceString = "";
-         if (!Strings.empty( property ))
+         if (!Strings.empty( cssUrl ))
          {
             externalCssReplaceString = "<link rel=\"stylesheet\" type=\"text/css\" href=\""
-                  + cssConfig.configuration().cssUrl().get() + "\" />";
+                  + cssUrl + "\" />";
          }
          return externalCssReplaceString;
       }

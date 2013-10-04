@@ -27,4 +27,6 @@ public interface ExternalCssConfiguration
    extends ConfigurationComposite, Enabled
 {
    Property<String> cssUrl();
+   
+   Property<String> jsMapModuleUrl();
 }
