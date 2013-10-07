@@ -141,6 +141,11 @@ var RequestModule = (function() {
 		$.ajax(parameters);
 	};
 
+	inner.settings = function() {
+		var parameters = request('GET', UrlModule.settings());
+		return getData(parameters);
+	}
+
 	inner.getFormSignatures = function() {
 		var parameters = request('GET', UrlModule.getFormSignatures());
 

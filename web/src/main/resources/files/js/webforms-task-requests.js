@@ -146,6 +146,11 @@ var TaskRequestModule = (function() {
 		$.ajax(parameters);
 	}
 
+	inner.settings = function() {
+		var parameters = request('GET', TaskUrlModule.settings());
+		return getData(parameters);
+	}
+
 	inner.getFormSignatures = function() {
 		var parameters = request('GET', TaskUrlModule.getFormSignatures());
 
