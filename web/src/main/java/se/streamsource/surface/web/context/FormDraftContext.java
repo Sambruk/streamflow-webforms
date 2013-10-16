@@ -102,12 +102,21 @@ public class FormDraftContext
          upload.setHeaderEncoding( "UTF-8" );
          try
          {
-            List items = upload.parseRequest( request );
-            if ( items.size() != 1 ) 
+            List<FileItem> items = upload.parseRequest( request );
+            int numberOfFiles = 0;
+            FileItem fi = null;
+            for (FileItem fileItem : items)
+            {
+               if (!fileItem.isFormField()) {
+                  numberOfFiles++;
+                  fi = fileItem;
+               }
+            }
+            if ( numberOfFiles != 1 ) 
             {
                throw new ResourceException( Status.CLIENT_ERROR_METHOD_NOT_ALLOWED, "Could not handle multiple files" );
             }
-            final FileItem fi = (FileItem) items.get( 0 );
+            
             if ( !acceptedTypes.contains( MediaType.valueOf( fi.getContentType() ) ) )
             {
                throw new ResourceException( Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE, "Could not upload file" );
