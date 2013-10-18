@@ -153,9 +153,11 @@ var MapModule = (function() {
 		});
 		
 		// Click the button if the user hits 'enter' in the searchfield
-		addressSearchField.keyup(function(event){
+		addressSearchField.keypress(function(event){
 		    if(event.keyCode == 13){
 		    	mapAddress.find('.geocoding button:first-of-type').click();
+		        event.preventDefault();
+		    	return false;
 		    }
 		});
 		
@@ -207,6 +209,7 @@ var MapModule = (function() {
 			var btnFindMe = node.find('#btn-find-me').attr({id : 'btn-find-me' + field.id });
 			btnFindMe.click(function() {
 				navigator.geolocation.getCurrentPosition(function(position) {
+					clearCurrentMarkersAndLines();
 					geocodingResultList.empty();
 					addressSearchField.val("");
 					field.marker = new google.maps.Marker({
