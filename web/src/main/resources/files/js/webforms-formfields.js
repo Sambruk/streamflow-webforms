@@ -159,9 +159,9 @@ var FieldTypeModule = (function() {
 			field.node.find("fieldset").append(element);
 		});
 
-		field.node.change(function() {
-			field.formattedValue = "TST"
-		});
+//		field.node.change(function() {
+//			field.formattedValue = "TST"
+//		});
 
 		field.refreshUI = function() {
 			var values = FormModule.selectedValues(field);
