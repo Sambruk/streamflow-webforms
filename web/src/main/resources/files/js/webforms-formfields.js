@@ -159,9 +159,6 @@ var FieldTypeModule = (function() {
 			field.node.find("fieldset").append(element);
 		});
 
-//		field.node.change(function() {
-//			field.formattedValue = "TST"
-//		});
 
 		field.refreshUI = function() {
 			var values = FormModule.selectedValues(field);
@@ -535,6 +532,9 @@ var FieldTypeModule = (function() {
 			MapModule.refreshUI(field);
 		};
 		
+		field.repaintWhenVisible = function() {
+			MapModule.repaintWhenVisible(field);
+		}
 		controlsNode.append(field.node);
 
 	}

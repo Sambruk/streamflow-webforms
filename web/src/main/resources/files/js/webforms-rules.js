@@ -162,10 +162,24 @@ var RulesModule = (function() {
 
 			if (animate)
 				setTimeout(function() {
-					f.visible ? node.slideDown() : node.slideUp();
+					if (f.visible) {
+						node.slideDown(); 
+						if (f.fieldType == "GeoLocationFieldValue") {
+							f.repaintWhenVisible();
+						}
+					} else {
+						node.slideUp();
+					}
 				}, 0);
 			else
-				f.visible ? node.show() : node.hide();
+				if (f.visible) {
+					node.show();
+					if (f.fieldType == "GeoLocationFieldValue") {
+						f.repaintWhenVisible();
+					}
+				} else {
+					node.hide();
+				}
 		});
 	}
 

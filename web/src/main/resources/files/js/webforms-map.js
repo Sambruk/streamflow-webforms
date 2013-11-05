@@ -278,7 +278,14 @@ var MapModule = (function() {
 				clearCurrentMarkersAndLines();
 			}
 		}); 
-	}
+	};
+	
+	inner.repaintWhenVisible = function(field) {
+		if (field.map) {
+			google.maps.event.trigger(field.map, 'resize');
+			inner.refreshUI(field);
+		}
+	};
 	
 	inner.refreshUI = function(field) {
 		if (field.mapValue) {
@@ -317,6 +324,13 @@ var MapModule = (function() {
 					field.polygon = new google.maps.Polygon();
 					field.polygon.setPath(path);
 					field.polygon.setMap( field.map );
+				} else {
+					if (field.map) {
+						var coords = FormModule.settings.location.split(",");
+						var startPosition = new google.maps.LatLng(parseFloat(coords[0]), parseFloat(coords[1]));
+						field.map.setCenter(startPosition);
+						field.map.setZoom( FormModule.settings.zoomLevel );
+					}
 				}
 				if (!field.mapAddress) {
 					reverseGeocode(path[0], adressResultNode, field );
