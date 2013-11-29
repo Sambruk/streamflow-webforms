@@ -50,6 +50,19 @@
         </snapshotRepository>
     </distributionManagement>
      -->
+    <distributionManagement>
+        <repository>
+            <id>releases</id>
+            <name>Cloudbees Release Repo</name>
+            <url>dav:https://repository-streamflow.forge.cloudbees.com/release/</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>Cloudbees Snapshot Repo</name>
+            <url>dav:https://repository-streamflow.forge.cloudbees.com/snapshot/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <issueManagement>
         <system>JIRA</system>
         <url>https://jira.waygroup.se/browse/STREAMFLOWSURFACE</url>
