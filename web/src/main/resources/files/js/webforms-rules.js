@@ -28,7 +28,7 @@ var RulesModule = (function() {
 	function intersection(array1, array2) {
 		var result = [];
 		$.each(array1, function(idx, el) {
-			if (!$.inArray(el, array2))
+			if (0 <= $.inArray(el, array2))
 				result.push(el);
 		});
 
@@ -162,10 +162,24 @@ var RulesModule = (function() {
 
 			if (animate)
 				setTimeout(function() {
-					f.visible ? node.slideDown() : node.slideUp();
+					if (f.visible) {
+						node.slideDown(); 
+						if (f.fieldType == "GeoLocationFieldValue") {
+							f.repaintWhenVisible();
+						}
+					} else {
+						node.slideUp();
+					}
 				}, 0);
 			else
-				f.visible ? node.show() : node.hide();
+				if (f.visible) {
+					node.show();
+					if (f.fieldType == "GeoLocationFieldValue") {
+						f.repaintWhenVisible();
+					}
+				} else {
+					node.hide();
+				}
 		});
 	}
 

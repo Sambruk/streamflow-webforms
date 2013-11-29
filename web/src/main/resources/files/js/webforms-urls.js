@@ -103,6 +103,10 @@ var UrlModule = (function() {
 		return urls.proxy + urls.proxydraft + 'discard.json';
 	};
 
+	inner.settings = function() {
+		return urls.proxy + urls.proxydraft + 'settings.json';
+	};
+	
 	inner.getFormSignatures = function() {
 		return urls.proxy + urls.proxydraft + 'summary/signatures.json';
 	};
