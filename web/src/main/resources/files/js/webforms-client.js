@@ -185,6 +185,9 @@ jQuery(document).ready(function() {
 						init : [ verifySigner, verifyProvider, setupRequiredSignature ]
 					}
 				}
+			},
+			'missing' : {
+				view : View.missing
 			}
 		}
 	};

@@ -96,6 +96,18 @@ var View = (function() {
 		});
 	};
 
+
+	inner.missing = function(args) {
+		var container = $('#container').empty();
+		var node = inner.clone('thank_you_div');
+		var alert = inner.clone('alert');
+		alert.addClass("alert-info")
+		alert.append(texts.missingEid);
+		node.prepend(alert);
+		
+		container.append(node);
+	};
+
 	function createPageContent(page, contentFunction) {
 		var errors = $('#inserted_alert');
 		var container = $('#container').empty();
