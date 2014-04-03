@@ -14,19 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.streamsource.surface.web.proxy;
-
-import org.qi4j.api.configuration.ConfigurationComposite;
-import org.qi4j.api.configuration.Enabled;
-import org.qi4j.api.property.Property;
-
-/**
- * Configuration for proxy service
+/*
+ * Upplands-Bro specific css for Streamflow Surface WebForms
  */
-public interface ProxyConfiguration
-   extends ConfigurationComposite, Enabled
-{
-   Property<String> url();
-   Property<String> username();
-   Property<String> password();
+
+/* Set @media all to be on the safe side */
+@media all {
+    
+    /* Layout resets */
+    body {
+    }
+    .container {
+    	background-image:url('http://upplands-bro.se/images/18.31ee484e137749734a380001320/top-logga.png');
+		background-repeat:no-repeat;        
+        padding: 0;
+	    padding-top: 60px;
+    }
+    
+    /* end @media all */
 }

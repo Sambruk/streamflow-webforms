@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2009-2012 Jayway Products AB
+ * Copyright 2009-2014 Jayway Products AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,9 @@ var UrlModule = (function() {
 		urls.proxy = contextRoot + urls.proxy;
 		urls.surface = contextRoot + urls.surface;
 		urls.eid = contextRoot + urls.eid;
-		urls.accesspoint = 'accesspoints/' + accesspoint + '/endusers/';
+		urls.accesspoint = 'accesspoints/' + accesspoint + "/";
+		urls.endusers = urls.accesspoint  + 'endusers/';
+		
 	};
 
 	inner.verifyAccessPoint = function() {
@@ -35,16 +37,16 @@ var UrlModule = (function() {
 	};
 
 	inner.selectEndUser = function() {
-		return urls.surface + urls.accesspoint + 'selectenduser.json';
+		return urls.surface + urls.endusers + 'selectenduser.json';
 	};
 
 	inner.getUser = function() {
-		return urls.surface + urls.accesspoint + 'userreference.json';
+		return urls.surface + urls.endusers + 'userreference.json';
 	};
 
 	inner.setUserUrl = function(user) {
-		urls.user = urls.accesspoint + user + '/';
-		urls.proxyuser = urls.accesspoint + user + '/drafts/';
+		urls.user = urls.endusers + user + '/';
+		urls.proxyuser = urls.endusers + user + '/drafts/';
 	};
 
 	inner.createCaseUrl = function(caze) {

@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2009-2012 Jayway Products AB
+ * Copyright 2009-2014 Jayway Products AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,6 +94,18 @@ var View = (function() {
 			addSecondSignatureDiv(node);
 			addSignaturesDiv(node);
 		});
+	};
+
+
+	inner.missing = function(args) {
+		var container = $('#container').empty();
+		var node = inner.clone('thank_you_div');
+		var alert = inner.clone('alert');
+		alert.addClass("alert-info")
+		alert.append(texts.missingEid);
+		node.prepend(alert);
+		
+		container.append(node);
 	};
 
 	function createPageContent(page, contentFunction) {

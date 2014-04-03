@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2009-2012 Jayway Products AB
+ * Copyright 2009-2014 Jayway Products AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,15 +62,16 @@ var FieldTypeModule = (function() {
 		var valueNode = clone("AttachedFile", "AttachedFile" + field.id);
 		field.node.append(valueNode);
 
-		var formNode = clone("AttachmentFieldValueForm", "AttachmentFieldValueForm" + field.id);
-		
+		var formNode = clone("AttachmentFieldValueForm",
+				"AttachmentFieldValueForm" + field.id);
+
 		field.node.append(formNode);
 
 		var fieldNode = formNode.find('#Attachment').attr({
 			id : 'Attachment' + field.id,
 			name : field.id
 		});
-		
+
 		formNode.find('span.button-text').text(texts.add_file);
 
 		// Initialize the jQuery File Upload widget
@@ -92,7 +93,8 @@ var FieldTypeModule = (function() {
 		});
 
 		formNode.bind('fileuploaddone', function(e, data) {
-			FormModule.setValue(field.id, requestModule().refreshField(field.id));
+			FormModule.setValue(field.id, requestModule()
+					.refreshField(field.id));
 			field.refreshUI();
 			removeErrorFromField(controlsNode.parent(), field);
 		});
@@ -104,21 +106,25 @@ var FieldTypeModule = (function() {
 				});
 			}
 		});
-		
+
 		field.refreshUI = function() {
 			if (this.formattedValue) {
 				formNode.hide();
 				valueNode.show();
-				
+
 				controlsNode.prev(".control-label").remove();
-				controlsNode.parent().prepend(clone("span-control-label").append(field.name));
-			
-				this.node.find('#delete_link').append("<span style='display: none'>" + texts.removeFile + "</span>")
-						.attr({
-							id : 'delete_link' + this.id,
-							title : texts.removeFile
-						}).click(function() {
-							requestModule().deleteAttachment(JSON.parse(field.value).attachment);
+				controlsNode.parent().prepend(
+						clone("span-control-label").append(field.name));
+
+				this.node.find('#delete_link').append(
+						"<span style='display: none'>" + texts.removeFile
+								+ "</span>").attr({
+					id : 'delete_link' + this.id,
+					title : texts.removeFile
+				}).click(
+						function() {
+							requestModule().deleteAttachment(
+									JSON.parse(field.value).attachment);
 							field.value = "";
 							update(field.id, field.value);
 
@@ -129,10 +135,11 @@ var FieldTypeModule = (function() {
 			} else {
 				formNode.show();
 				valueNode.hide();
-				
+
 				controlsNode.prev(".control-label").remove();
 				controlsNode.parent().prepend(
-						clone("control-label").append(field.name).attr("for", 'Attachment' + this.id));
+						clone("control-label").append(field.name).attr("for",
+								'Attachment' + this.id));
 
 			}
 		}
@@ -148,7 +155,8 @@ var FieldTypeModule = (function() {
 
 		$.each(field.fieldValue.values, function(idx, value) {
 			var selectionId = field.id + safeIdString(value);
-			var element = clone('checkbox', 'label' + selectionId).attr("for", selectionId);
+			var element = clone('checkbox', 'label' + selectionId).attr("for",
+					selectionId);
 			element.find('input').attr({
 				'id' : selectionId,
 				'name' : field.id
@@ -159,22 +167,23 @@ var FieldTypeModule = (function() {
 			field.node.find("fieldset").append(element);
 		});
 
-
 		field.refreshUI = function() {
 			var values = FormModule.selectedValues(field);
 			$.each(values, function(idx, selectionValue) {
-				field.node.find('#' + field.id + safeIdString(selectionValue)).attr('checked', 'checked');
+				field.node.find('#' + field.id + safeIdString(selectionValue))
+						.attr('checked', 'checked');
 			});
 		}
 		field.getUIValue = function() {
-			return $.map($('#Field' + field.id + ' input:checked'), function(elm) {
-				var value = $('#label' + elm.id).text();
-				if (value.indexOf(",") != -1) {
-					return "[" + value + "]";
-				} else {
-					return value;
-				}
-			}).join(', ');
+			return $.map($('#Field' + field.id + ' input:checked'),
+					function(elm) {
+						var value = $('#label' + elm.id).text();
+						if (value.indexOf(",") != -1) {
+							return "[" + value + "]";
+						} else {
+							return value;
+						}
+					}).join(', ');
 		}
 	}
 
@@ -196,7 +205,8 @@ var FieldTypeModule = (function() {
 		controlsNode.append(field.node);
 
 		field.refreshUI = function() {
-			field.node.find('#' + field.id + safeIdString(this.value)).attr('selected', 'selected');
+			field.node.find('#' + field.id + safeIdString(this.value)).attr(
+					'selected', 'selected');
 		}
 
 		field.getUIValue = function() {
@@ -213,7 +223,8 @@ var FieldTypeModule = (function() {
 	}
 
 	function DateFieldValue(field, controlsNode) {
-		var containerNode = clone('datefieldcontainer', "datecontainer-" + field.id);
+		var containerNode = clone('datefieldcontainer', "datecontainer-"
+				+ field.id);
 		field.node = clone('datefield', field.id);
 		controlsNode.prev("label").attr("for", field.id);
 
@@ -223,7 +234,8 @@ var FieldTypeModule = (function() {
 			field.formattedValue = field.getUIValue();
 			if (field.formattedValue != '') {
 				try {
-					field.value = $.datepicker.parseDate('yy-mm-dd', field.formattedValue).format(
+					field.value = $.datepicker.parseDate('yy-mm-dd',
+							field.formattedValue).format(
 							"UTC:yyyy-mm-dd'T'HH:MM:ss.0000'Z'");
 				} catch (e) {
 					field.invalidformat = texts.invaliddate;
@@ -259,16 +271,21 @@ var FieldTypeModule = (function() {
 			title : texts.selectedValues
 		});
 		var buttons = field.node.find('#listboxbuttons');
-		new View.Button(buttons).name("<span style='display: none'>" + texts.selectValues + "</span>").attr("title",
-				texts.selectValues).image('icon-arrow-right').click(function() {
-			listBoxArrow(field.id, 'Selected');
-			field.changed().update();
+		new View.Button(buttons)
+				.name(
+						"<span style='display: none'>" + texts.selectValues
+								+ "</span>").attr("title", texts.selectValues)
+				.image('icon-arrow-right').click(function() {
+					listBoxArrow(field.id, 'Selected');
+					field.changed().update();
 
-			return false;
-		});
+					return false;
+				});
 		buttons.append('<br/>');
-		new View.Button(buttons).name("<span style='display: none'>" + texts.deselectValues + "</span>").attr("title",
-				texts.deselectValues).image('icon-arrow-left').click(function() {
+		new View.Button(buttons).name(
+				"<span style='display: none'>" + texts.deselectValues
+						+ "</span>").attr("title", texts.deselectValues).image(
+				'icon-arrow-left').click(function() {
 			listBoxArrow(field.id, 'Possible');
 			field.changed().update();
 
@@ -276,7 +293,8 @@ var FieldTypeModule = (function() {
 		});
 
 		$.each(field.fieldValue.values, function(idx, value) {
-			var optionNode = $('<option />').attr('id', field.id + safeIdString(value)).text(value);
+			var optionNode = $('<option />').attr('id',
+					field.id + safeIdString(value)).text(value);
 			possible.append(optionNode);
 		});
 		controlsNode.append(field.node);
@@ -284,18 +302,21 @@ var FieldTypeModule = (function() {
 		var values = FormModule.selectedValues(field);
 		field.refreshUI = function() {
 			$.each(values, function(idx, selectionValue) {
-				selected.append(field.node.find('#' + field.id + safeIdString(selectionValue)));
+				selected.append(field.node.find('#' + field.id
+						+ safeIdString(selectionValue)));
 			});
 		};
 
 		field.getUIValue = function() {
-			var val = $.map(field.node.find('#Selected' + field.id + ' > option'), function(elm) {
-				if (elm.text.indexOf(",") != -1) {
-					return "[" + elm.text + "]";
-				} else {
-					return elm.text;
-				}
-			}).join(', ');
+			var val = $.map(
+					field.node.find('#Selected' + field.id + ' > option'),
+					function(elm) {
+						if (elm.text.indexOf(",") != -1) {
+							return "[" + elm.text + "]";
+						} else {
+							return elm.text;
+						}
+					}).join(', ');
 
 			return val;
 		};
@@ -356,12 +377,14 @@ var FieldTypeModule = (function() {
 		});
 
 		field.refreshUI = function() {
-			field.node.find('#' + field.id + safeIdString(this.value)).attr('checked', 'checked');
+			field.node.find('#' + field.id + safeIdString(this.value)).attr(
+					'checked', 'checked');
 		};
 		field.getUIValue = function() {
-			return $.map($('#Field' + field.id + ' input:checked'), function(elm) {
-				return $('#label' + elm.id).text();
-			}).join(', ');
+			return $.map($('#Field' + field.id + ' input:checked'),
+					function(elm) {
+						return $('#label' + elm.id).text();
+					}).join(', ');
 		};
 	}
 
@@ -415,8 +438,11 @@ var FieldTypeModule = (function() {
 		}
 
 		var textfield = clone('textfield', 'TextField' + field.id);
-		textfield.attr("title", field.fieldValue.openSelectionName ? field.fieldValue.openSelectionName
-				: texts.noOpenSelectionName);
+		textfield
+				.attr(
+						"title",
+						field.fieldValue.openSelectionName ? field.fieldValue.openSelectionName
+								: texts.noOpenSelectionName);
 		textfield.addClass('openselection-text');
 		textfield.change(function() {
 			field.changed();
@@ -431,10 +457,14 @@ var FieldTypeModule = (function() {
 		field.node.find("fieldset").append(option);
 
 		field.refreshUI = function() {
-			var selected = field.node.find('#' + field.id + safeIdString(this.value)).attr('checked', 'checked');
+			var selected = field.node.find(
+					'#' + field.id + safeIdString(this.value)).attr('checked',
+					'checked');
 			if (selected.size() == 0 && this.value) {
-				field.node.find('#openSelectionOption' + field.id).attr('checked', 'checked');
-				field.node.find('#TextField' + field.id).attr("value", this.value);
+				field.node.find('#openSelectionOption' + field.id).attr(
+						'checked', 'checked');
+				field.node.find('#TextField' + field.id).attr("value",
+						this.value);
 			} else {
 				field.node.find('#TextField' + field.id).attr({
 					disabled : true,
@@ -443,9 +473,10 @@ var FieldTypeModule = (function() {
 			}
 		};
 		field.getUIValue = function() {
-			var fieldValue = $.map($('#Field' + field.id + ' input:checked'), function(elm) {
-				return $('#label' + elm.id).text()
-			}).join(', ');
+			var fieldValue = $.map($('#Field' + field.id + ' input:checked'),
+					function(elm) {
+						return $('#label' + elm.id).text()
+					}).join(', ');
 			if (fieldValue == field.fieldValue.openSelectionName) {
 				fieldValue = $('#TextField' + field.id).attr('value');
 			}
@@ -486,7 +517,7 @@ var FieldTypeModule = (function() {
 			field.changed();
 		});
 		addTabListener(field.node, field);
-		
+
 		field.node.blur(function() {
 			if (!field.dirty)
 				return;
@@ -513,7 +544,8 @@ var FieldTypeModule = (function() {
 	function addTabListener(node, field) {
 		field.textFieldNode = node;
 		node.keydown(function(e) {
-			if (e.which === 9 && !e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+			if (e.which === 9 && !e.altKey && !e.ctrlKey && !e.metaKey
+					&& !e.shiftKey) {
 				field.tabPressed = true;
 			} else {
 				field.tabPressed = false;
@@ -522,16 +554,17 @@ var FieldTypeModule = (function() {
 	}
 
 	function GeoLocationFieldValue(field, controlsNode) {
-		field.node = MapModule.createUI(field, clone(field.fieldType, field.id));
-		
+		field.node = MapModule
+				.createUI(field, clone(field.fieldType, field.id));
+
 		field.initMap = function() {
 			MapModule.initMap(field, field.node, update);
 		};
-		
+
 		field.refreshUI = function() {
 			MapModule.refreshUI(field);
 		};
-		
+
 		field.repaintWhenVisible = function() {
 			MapModule.repaintWhenVisible(field);
 		}
