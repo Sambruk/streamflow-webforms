@@ -31,7 +31,7 @@ var MapModule = (function() {
 	}
 	
 	MapValue.prototype.clearAddress = function() {
-		self = this;
+		var self = this;
 		self.value.street = "";
 		self.value.zipcode = "";
 		self.value.city = "";
@@ -39,7 +39,7 @@ var MapModule = (function() {
 	}
 	
 	MapValue.prototype.updateLocation = function(newLocation){
-		self = this;
+		 var self = this;
 		self.path = new Array();
 		self.value.location = newLocation;
 		self.isPoint = false;
