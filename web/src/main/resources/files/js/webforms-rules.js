@@ -175,7 +175,11 @@ var RulesModule = (function() {
 				if (f.visible) {
 					node.show();
 					if (f.fieldType == "GeoLocationFieldValue") {
-						f.repaintWhenVisible();
+						try {				
+							f.repaintWhenVisible();
+						} catch(exception) {
+							//Occurs when in summary page
+						}
 					}
 				} else {
 					node.hide();
