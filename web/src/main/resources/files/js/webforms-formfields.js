@@ -136,7 +136,7 @@ var FieldTypeModule = (function() {
 				formNode.show();
 				valueNode.hide();
 
-				controlsNode.prev(".control-label").remove();
+				controlsNode.parent().find("label").remove();
 				controlsNode.parent().prepend(
 						clone("control-label").append(field.name).attr("for",
 								'Attachment' + this.id));
