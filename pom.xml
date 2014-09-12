@@ -4,7 +4,7 @@
     <groupId>se.streamsource.streamflow</groupId>
     <artifactId>surface</artifactId>
     <name>StreamFlow Surface (Build POM)</name>
-    <version>1.14-SNAPSHOT</version>
+    <version>1.14</version>
     <packaging>pom</packaging>
 
     <!-- This POM is ONLY to initiate the modules to be built. -->
@@ -34,7 +34,7 @@
     <scm>
         <connection>scm:git:ssh://gerrit.jayway.com/projects/streamflow-surface.git</connection>
         <developerConnection>scm:git:ssh://gerrit.jayway.com/projects/streamflow-surface.git</developerConnection>
-      <tag>HEAD</tag>
+      <tag>surface-1.14</tag>
   </scm>
     <!--
     <distributionManagement>
