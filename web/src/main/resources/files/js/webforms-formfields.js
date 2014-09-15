@@ -112,7 +112,7 @@ var FieldTypeModule = (function() {
 				formNode.hide();
 				valueNode.show();
 
-				controlsNode.prev(".control-label").remove();
+				controlsNode.parent().find(".control-label").remove();
 				controlsNode.parent().prepend(
 						clone("span-control-label").append(field.name));
 
@@ -136,7 +136,7 @@ var FieldTypeModule = (function() {
 				formNode.show();
 				valueNode.hide();
 
-				controlsNode.parent().find("label").remove();
+				controlsNode.parent().find(".control-label").remove();
 				controlsNode.parent().prepend(
 						clone("control-label").append(field.name).attr("for",
 								'Attachment' + this.id));
