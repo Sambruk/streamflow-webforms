@@ -53,8 +53,8 @@ jQuery(document).ready(function() {
 	}
 
 	function setupProviders() {
-		if (!FormModule.providersInitialized() && FormModule.requiredSignaturesCount() > 0) {
-			FormModule.setProviders(TaskRequestModule.getProviders());
+		if (!FormModule.osifProvidersInitialized() && FormModule.requiredSignaturesCount() > 0) {
+			FormModule.setOsifProviders(TaskRequestModule.getProviders());
 		}
 	}
 
@@ -117,7 +117,7 @@ jQuery(document).ready(function() {
 	}
 
 	function verifyProvider(args) {
-		var match = $.grep(FormModule.providerLinks(), function(link, idx) {
+		var match = $.grep(FormModule.osifProviderLinks(), function(link, idx) {
 			return (link.provider == args.provider);
 		});
 		if (match.length == 0) {

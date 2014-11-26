@@ -18,11 +18,13 @@ var FormModule = (function() {
 	var inner = {};
 	var formDraft;
 	var mailSelectionMessageText;
-	var eIdProviders;
+	var grpEIdProviders;
+	var osifEIdProviders;
 	var fieldMap = {};
 	var initDone = false;
 	var requiredSignatures;
 	var selectedRequiredSignature;
+    var signingService;
 	var incomingSummary;
 	var fieldGroup;
 	var visibleMaps = new Array();
@@ -298,6 +300,24 @@ var FormModule = (function() {
 		return selectedRequiredSignature;
 	};
 
+    inner.setSigningService = function(services) {
+        if(services.resources && services.resources.length > 0){
+            signingService = services.resources[0].id;
+        }
+    };
+
+    inner.getSigningService = function() {
+        return signingService;
+    };
+
+    inner.signWithGrp = function() {
+        return signingService === 'grp';
+    };
+
+    inner.signWithAuthify = function() {
+        return signingService === 'authify';
+    };
+
 	inner.formNeedsSecondSignature = function() {
 		var needsSigning = false;
 		if (requiredSignatures.length > 1) {
@@ -396,13 +416,15 @@ var FormModule = (function() {
 		return formDraft.pages;
 	};
 
-	inner.providersInitialized = function() {
-		return (typeof (eIdProviders) != "undefined");
+    //TODO: Remove (along with property) when changing from OSIF to GRP in webforms-task (second signature)
+	inner.osifProvidersInitialized = function() {
+		return (typeof (osifEIdProviders) != "undefined");
 	};
 
-	inner.setProviders = function(providers) {
-		eIdProviders = providers;
-		$.each(eIdProviders.links, function(idx, provider) {
+    //TODO: Remove (along with property) when changing from OSIF to GRP in webforms-task (second signature)
+	inner.setOsifProviders = function(providers) {
+		osifEIdProviders = providers;
+		$.each(osifEIdProviders.links, function(idx, provider) {
 			var list = provider.href.split('=');
 			if (list.length != 2) {
 				throw {
@@ -415,9 +437,22 @@ var FormModule = (function() {
 		});
 	};
 
-	inner.providerLinks = function() {
-		return eIdProviders.links;
+    //TODO: Remove (along with property) when changing from OSIF to GRP in webforms-task (second signature)
+	inner.osifProviderLinks = function() {
+		return osifEIdProviders.links;
 	};
+
+    inner.grpEIdProvidersInitialized = function() {
+        return (typeof (grpEIdProviders) != "undefined");
+    };
+
+    inner.setGrpEIdProviders = function(providers) {
+        grpEIdProviders = providers.providers;
+    };
+
+    inner.getGrpEIdProviders = function() {
+        return grpEIdProviders;
+    };
 
 	inner.canSubmit = function() {
 		var formFilled = !inner.hasErrors();
@@ -504,6 +539,7 @@ var FormModule = (function() {
 		return formDraft.selectedEid;
 	};
 
+    //TODO: Remove (along with property) when changing from OSIF to GRP in webforms-task (second signature)
 	inner.setSelectedEid = function(eid) {
 		formDraft.selectedEid = eid;
 	};

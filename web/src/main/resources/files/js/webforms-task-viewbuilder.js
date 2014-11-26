@@ -298,7 +298,7 @@ var TaskView = (function() {
 			$('#eIdPlugin').html(htmlSnippet).hide();
 		});
 		comboBox.append($('<option>/').append(texts.provider));
-		$.each(FormModule.providerLinks(), function(idx, link) {
+		$.each(FormModule.osifProviderLinks(), function(idx, link) {
 			comboBox.append($('<option />').attr({
 				value : link.provider
 			}).text(link.text));

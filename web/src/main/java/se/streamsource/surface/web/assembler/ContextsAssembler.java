@@ -41,6 +41,7 @@ import se.streamsource.surface.web.ClientEventSourceService;
 import se.streamsource.surface.web.context.AccessPointsContext;
 import se.streamsource.surface.web.context.EndUsersContext;
 import se.streamsource.surface.web.context.FormDraftContext;
+import se.streamsource.surface.web.dto.SaveSignatureDTO;
 import se.streamsource.surface.web.dto.VerifyDTO;
 import se.streamsource.surface.web.resource.*;
 import se.streamsource.surface.web.rest.AttachmentResponseHandler;
@@ -77,7 +78,8 @@ public class ContextsAssembler
               TitledLinksValue.class,
               ValueComposite.class,
               VerifyDTO.class,
-              VerifySignatureResponseValue.class
+              VerifySignatureResponseValue.class,
+              SaveSignatureDTO.class
       ).visibleIn( Visibility.application );
 
       // Resources
