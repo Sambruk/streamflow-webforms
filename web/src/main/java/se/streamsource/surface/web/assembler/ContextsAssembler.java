@@ -36,14 +36,23 @@ import se.streamsource.dci.value.link.LinksValue;
 import se.streamsource.dci.value.link.TitledLinksValue;
 import se.streamsource.streamflow.infrastructure.event.domain.DomainEvent;
 import se.streamsource.streamflow.infrastructure.event.domain.TransactionDomainEvents;
-import se.streamsource.streamflow.plugin.eid.api.VerifySignatureResponseValue;
 import se.streamsource.surface.web.ClientEventSourceService;
 import se.streamsource.surface.web.context.AccessPointsContext;
 import se.streamsource.surface.web.context.EndUsersContext;
 import se.streamsource.surface.web.context.FormDraftContext;
 import se.streamsource.surface.web.dto.SaveSignatureDTO;
 import se.streamsource.surface.web.dto.VerifyDTO;
-import se.streamsource.surface.web.resource.*;
+import se.streamsource.surface.web.resource.AccessPointResource;
+import se.streamsource.surface.web.resource.AccessPointsResource;
+import se.streamsource.surface.web.resource.CaseResource;
+import se.streamsource.surface.web.resource.DoubleSignatureTaskResource;
+import se.streamsource.surface.web.resource.DoubleSignatureTasksResource;
+import se.streamsource.surface.web.resource.EndUserResource;
+import se.streamsource.surface.web.resource.EndUsersResource;
+import se.streamsource.surface.web.resource.FormDraftResource;
+import se.streamsource.surface.web.resource.FormDraftsResource;
+import se.streamsource.surface.web.resource.RootResource;
+import se.streamsource.surface.web.resource.SurfaceRestlet;
 import se.streamsource.surface.web.rest.AttachmentResponseHandler;
 import se.streamsource.surface.web.rest.CookieResponseHandler;
 
@@ -78,7 +87,6 @@ public class ContextsAssembler
               TitledLinksValue.class,
               ValueComposite.class,
               VerifyDTO.class,
-              VerifySignatureResponseValue.class,
               SaveSignatureDTO.class
       ).visibleIn( Visibility.application );
 
