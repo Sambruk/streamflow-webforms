@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2009-2014 Jayway Products AB
+ * Copyright 2009-2015 Jayway Products AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -298,7 +298,7 @@ var TaskView = (function() {
 			$('#eIdPlugin').html(htmlSnippet).hide();
 		});
 		comboBox.append($('<option>/').append(texts.provider));
-		$.each(FormModule.providerLinks(), function(idx, link) {
+		$.each(FormModule.osifProviderLinks(), function(idx, link) {
 			comboBox.append($('<option />').attr({
 				value : link.provider
 			}).text(link.text));

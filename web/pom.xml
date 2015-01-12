@@ -3,7 +3,7 @@
     <parent>
         <groupId>se.streamsource.streamflow</groupId>
         <artifactId>surface</artifactId>
-        <version>1.15-SNAPSHOT</version>
+        <version>1.16-SNAPSHOT</version>
     </parent>
     <artifactId>surface-web</artifactId>
     <packaging>war</packaging>
@@ -118,11 +118,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>se.streamsource.streamflow.plugins</groupId>
-            <artifactId>streamflow-plugin-eid-api</artifactId>
-        </dependency>
-
         
         <dependency>
             <groupId>se.streamsource.streamflow</groupId>

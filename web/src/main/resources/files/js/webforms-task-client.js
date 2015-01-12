@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2009-2014 Jayway Products AB
+ * Copyright 2009-2015 Jayway Products AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,8 +53,8 @@ jQuery(document).ready(function() {
 	}
 
 	function setupProviders() {
-		if (!FormModule.providersInitialized() && FormModule.requiredSignaturesCount() > 0) {
-			FormModule.setProviders(TaskRequestModule.getProviders());
+		if (!FormModule.osifProvidersInitialized() && FormModule.requiredSignaturesCount() > 0) {
+			FormModule.setOsifProviders(TaskRequestModule.getProviders());
 		}
 	}
 
@@ -117,7 +117,7 @@ jQuery(document).ready(function() {
 	}
 
 	function verifyProvider(args) {
-		var match = $.grep(FormModule.providerLinks(), function(link, idx) {
+		var match = $.grep(FormModule.osifProviderLinks(), function(link, idx) {
 			return (link.provider == args.provider);
 		});
 		if (match.length == 0) {

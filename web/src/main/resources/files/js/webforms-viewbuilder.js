@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2009-2014 Jayway Products AB
+ * Copyright 2009-2015 Jayway Products AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,7 +104,7 @@ var View = (function() {
 		alert.addClass("alert-info")
 		alert.append(texts.missingEid);
 		node.prepend(alert);
-		
+
 		container.append(node);
 	};
 
@@ -201,7 +201,7 @@ var View = (function() {
 			row.append($('<td class="field_message pull-right" />').append(inner.clone('label_error')));
 		}
 	}
-	
+
 	function help(node, field) {
 		if (field.field.field.note != "" && field.fieldType != "CommentFieldValue")
 			inner.clone('help-block').append(field.field.field.note).insertAfter(node);
@@ -221,64 +221,13 @@ var View = (function() {
 		}
 	}
 
-	inner.sign = function(args) {
-		var retVal = doSign();
-		if (retVal != 0) {
-			var errorKey = "eid-" + retVal;
-			FormModule.setSelectedEid(null);
-			throw {
-				warning : texts.eiderrormessage + ": " + texts[errorKey],
-				redirect : getSummary()
-			};
-		} else {
-			// strip parameters
-			var verifyDTO = {};
-			$.each($('#eIdPlugin').find('form > input:hidden'), function(idx, value) {
-				if (value.name) {
-					verifyDTO[value.name] = value.value;
-				}
-			});
-			verifyDTO.name = FormModule.getRequiredSignature();
-			verifyDTO.form = FormModule.getFormTBS();
-			RequestModule.verify(verifyDTO);
-
-			// Store the email etc before reloading the formdraft
-			var confirmationEmail = FormModule.confirmationEmail();
-			var confirmationEmailConfirm = FormModule.confirmationEmailConfirm();
-
-			if (FormModule.formNeedsSecondSignature()) {
-				var secondSignatureName = FormModule.secondSignatureName();
-				var secondSignaturePhoneNumber = FormModule.secondSignaturePhoneNumber();
-				var secondSignatureSocialSecurityNumber = FormModule.secondSignatureSocialSecurityNumber();
-				var secondSignatureEmail = FormModule.secondSignatureEmail();
-				var secondSignatureEmailConfirm = FormModule.secondSignatureEmailConfirm();
-				var secondSignatureSingleSignature = FormModule.secondSignatureSingleSignature();
-				if (!FormModule.secondSignatureSingleSignature()) {
-					RequestModule.setSecondSignatureSingleSignature(false);
-					FormModule.setSecondSignatureSingleSignature(false);
-					secondSignatureSingleSignature = FormModule.secondSignatureSingleSignature();
-				}
-			}
-
-			FormModule.init(RequestModule.getFormDraft());
-			FormModule.setConfirmationEmail(confirmationEmail);
-			FormModule.setConfirmationEmailConfirm(confirmationEmailConfirm);
-
-			if (FormModule.formNeedsSecondSignature()) {
-				FormModule.setSecondSignatureName(secondSignatureName);
-				FormModule.setSecondSignaturePhoneNumber(secondSignaturePhoneNumber);
-				FormModule.setSecondSignatureSocialSecurityNumber(secondSignatureSocialSecurityNumber);
-				FormModule.setSecondSignatureEmail(secondSignatureEmail);
-				FormModule.setSecondSignatureEmailConfirm(secondSignatureEmailConfirm);
-				FormModule.setSecondSignatureSingleSignature(secondSignatureSingleSignature);
-			}
-			// signing success redirect to summary
-			throw {
-				info : texts.formSigned,
-				redirect : getSummary()
-			};
-		}
-	};
+    inner.finishSigning = function(args) {
+        $('#grpSigningModal').modal('hide');
+        throw {
+            info : texts.formSigned,
+            redirect : getSummary()
+        };
+    };
 
 	inner.runView = function(view) {
 		try {
@@ -440,9 +389,9 @@ var View = (function() {
 		return '#' + Contexts.findUrl(inner.discard);
 	}
 
-	function getSign(idx) {
-		return '#' + Contexts.findUrl(inner.sign, [ idx ]);
-	}
+    function getFinishSigning() {
+        return '#' + Contexts.findUrl(inner.finishSigning);
+    }
 
 	inner.addMailNotification = function(node, requestModule) {
 		var message = FormModule.getMailSelectionMessage();
@@ -554,15 +503,291 @@ var View = (function() {
 			if (signature) {
 				row.append($('<td/>').append(signature.signerName).addClass('signer-name'));
 			} else {
-				row.append($('<td/>').append(eidProviders(idx)));
-				var buttonCell = $('<td/>');
-				new inner.Button(buttonCell).name(texts.sign).href(getSign(idx)).attr('id', "link_" + idx).image(
-						'icon-pencil').enable(false);
+				var buttonCell = $('<td/>').addClass('sign-button');
+                if(FormModule.signWithGrp()){
+                    var signingModal = createGrpSigningDialog(node);
+                    new inner.Button(buttonCell).attr('id', 'signButton').name(texts.sign).modal('#' + signingModal.attr('id'))
+                        .image('icon-pencil').enable(true);
+                } else if(FormModule.signWithAuthify()){
+                    //TODO Authify: Add button for starting Authify signing flow
+                }
 				row.append(buttonCell);
 			}
 			node.append(signaturesNode);
 		}
 	}
+
+    function createGrpSigningDialog(node) {
+        if(!FormModule.grpEIdProvidersInitialized()){
+            FormModule.setGrpEIdProviders(RequestModule.getGrpEIdProviders());
+        }
+        var dialog = inner.clone('modal', 'grpSigningModal');
+        dialog.find('.modal-header').prepend(texts.signature);
+
+        renderGrpSigningDialogFirstStep(dialog);
+
+        dialog.on('show.bs.modal', function(event) {
+            try {
+                verifySigning();
+            } catch(e) {
+                event.preventDefault();
+                messages.error = e.error;
+                showMessages();
+                $(window).scrollTop(0);
+            }
+        });
+
+        dialog.on('hidden.bs.modal', function(event) {
+            restartGrpSigningDialog(dialog);
+        });
+
+        node.append(dialog);
+
+        return dialog;
+    }
+
+    function renderGrpSigningDialogFirstStep(dialog, signingMessages){
+        //Dialog body
+        dialog.find('.modal-body').empty().append(grpEIdProvidersCombo()).addClass('grp-signing-modal-body');
+        if(signingMessages && (signingMessages.info || signingMessages.warning || signingMessages.error)){
+            var alert = inner.clone('alert');
+            alert.insertBefore(dialog.find('#grpEIdProvidersCombo'));
+
+            if (signingMessages.info) {
+                alert.append(signingMessages.info);
+                alert.addClass("alert-info");
+            }
+            if (signingMessages.warning) {
+                alert.append(signingMessages.warning);
+            }
+            if (signingMessages.error) {
+                alert.append(signingMessages.error);
+                alert.addClass("alert-error");
+            }
+        }
+
+        //Dialog footer
+        var dialogFooter = dialog.find('.modal-footer').empty();
+        var cancelButton = new inner.Button(dialogFooter, 'grpCancelButton')
+            .name(texts.cancel)
+            .click(function() {
+                dialog.modal('hide');
+                return false;
+            });
+        var signButton = new inner.Button(dialogFooter, 'grpSignButton')
+            .name(texts.sign)
+            .image('icon-pencil')
+            .click(function() {
+                if(inner.isEnabled($(this))){
+                    grpSigningPerform(dialog);
+                }
+                return false;
+            })
+            .enable(false);
+    }
+
+    function restartGrpSigningDialog(dialog, signingMessages) {
+        if(dialog.collectTimer){
+            clearTimeout(dialog.collectTimer);
+            dialog.collectTimer = null;
+        }
+        renderGrpSigningDialogFirstStep(dialog, signingMessages);
+    }
+
+    function verifySigning() {
+        if (!FormModule.formNeedsSigning())
+            throw {
+                error : texts.noRequiredSignatures
+            };
+
+        if (FormModule.hasErrors()){
+            throw {
+                error : texts.fillBeforeSign
+            };
+        }
+    }
+
+    function grpEIdProvidersCombo() {
+        var comboBox = inner.clone('eidProviders').attr({
+            name : 'grpEIdProvidersCombo',
+            id : 'grpEIdProvidersCombo',
+            title : texts.eidProviders
+        });
+        comboBox.append($('<option>/').append(texts.provider));
+        $.each(FormModule.getGrpEIdProviders(), function(idx, provider) {
+            comboBox.append($('<option />').attr({
+                value : provider.id
+            }).text(provider.name));
+        });
+        comboBox.change(function() {
+            var button = $('#grpSignButton');
+            if (this.selectedIndex == 0) {
+                inner.enable(button, false);
+            } else if(this.selectedIndex !== 0) {
+                inner.enable(button, true);
+            }
+        });
+
+        return comboBox;
+    }
+
+    function grpSigningPerform(dialog) {
+        var selectedEIdProvider = dialog.find('#grpEIdProvidersCombo').val();
+        FormModule.setRequiredSignature(0);
+
+        try {
+            verifyProvider(selectedEIdProvider);
+
+            var dialogBody = dialog.find('.modal-body').empty();
+            var dialogFooter = dialog.find('.modal-footer');
+
+            //Dialog footer
+            inner.enable(dialogFooter.find('#grpSignButton'), false);
+
+            //Dialog body
+            var waiting = inner.clone('waiting', 'grpSigningWaiting');
+            var bodyContent = inner.clone('grpSigningModalPerformBody');
+            bodyContent.find('#signingStatus').prepend(waiting);
+            var openBankIDManually = bodyContent.find("#openBankIDManually").hide();
+            openBankIDManually.find('#openBankIDMessage').append(texts.eidOpenBankIDHelp);
+
+            var openBankIDButton = new inner.Button(openBankIDManually, 'grpBankIdButton')
+                .name(texts.eidOpenBankIDApp)
+                .enable(false)
+                .click(function () {
+                    var thisButton = $(this);
+                    if (inner.isEnabled(thisButton)) {
+                        inner.enable(thisButton, false);
+                    } else {
+                        return false;
+                    }
+                });
+            dialogBody.append(bodyContent);
+
+            //Call sign@API
+            //TODO (?): Add client IP to sign request (recommended even if not used yet) - how to obtain?
+            var signDTO = {
+                transactionId:FormModule.getFormId() + (new Date()).getTime(),
+                text:FormModule.getFormTBS(),
+                provider:selectedEIdProvider
+            };
+            var signResponse = RequestModule.grpSign(signDTO);
+
+            //Add iframe opening BankID application
+            var bankIDAppUrl = "bankid:///?autostarttoken=" + signResponse.autoStartToken + "&redirect=null";
+            var bankIDIFrame = inner.clone('iframe', 'bankIDIframe')
+                .attr('src', bankIDAppUrl)
+                .attr('width', 0 + 'px')
+                .attr('height', 0 + 'px')
+                .hide();
+            dialogBody.append(bankIDIFrame);
+
+            //Show button opening BankID manually
+            setTimeout(function () {
+                openBankIDButton.href(bankIDAppUrl).enable(true);
+                openBankIDManually.show();
+            }, 5000);
+
+            //Call collect@API (getting signing status)
+            var collectDTO = {
+                transactionId:signResponse.transactionId,
+                orderRef:signResponse.orderRef,
+                provider:signResponse.provider
+            };
+
+            var collectResponse;
+            dialog.collectTimer = setTimeout(function () {
+                try {
+                    collectResponse = RequestModule.grpCollect(collectDTO);
+                    if (collectResponse.progressStatus === 'COMPLETE') {
+                        grpSigningDone(dialog, signResponse.provider, collectResponse);
+                    } else if (collectResponse.progressStatus === 'STARTED') {
+                        var messageKey = "grpstatus-" + collectResponse.progressStatus;
+                        restartGrpSigningDialog(dialog, {error:texts[messageKey]});
+                    } else {
+                        var messageKey = "grpstatus-" + collectResponse.progressStatus;
+                        bodyContent.find('#signingStatusMessage').text(texts[messageKey]);
+                        dialog.collectTimer = setTimeout(arguments.callee, signResponse.collectIntervalMs);
+                    }
+                } catch (e) {
+                    restartGrpSigningDialog(dialog, e);
+                }
+            }, signResponse.collectIntervalMs);
+
+        } catch (e) {
+            restartGrpSigningDialog(dialog, e);
+        }
+    }
+
+    function verifyProvider(chosenProvider) {
+        var match = $.grep(FormModule.getGrpEIdProviders(), function(provider, idx) {
+            return (provider.id === chosenProvider);
+        });
+        if (match.length == 0) {
+            throw {
+                error : texts.unknownEidProvider
+            };
+        }
+    }
+
+    function grpSigningDone(dialog, provider, signingData) {
+        var saveSignatureDTO = {};
+        saveSignatureDTO.name = FormModule.getRequiredSignature();
+        saveSignatureDTO.form = FormModule.getFormTBS();
+        saveSignatureDTO.encodedTbs = signingData.encodedText;
+        saveSignatureDTO.signature = signingData.signature;
+        saveSignatureDTO.provider = provider;
+        saveSignatureDTO.signerId = signingData.signerId;
+        saveSignatureDTO.signerName = signingData.signerName;
+
+        RequestModule.saveSignature(saveSignatureDTO);
+
+        //Store the email etc before reloading the formdraft
+        var confirmationEmail = FormModule.confirmationEmail();
+        var confirmationEmailConfirm = FormModule.confirmationEmailConfirm();
+
+        if (FormModule.formNeedsSecondSignature()) {
+            var secondSignatureName = FormModule.secondSignatureName();
+            var secondSignaturePhoneNumber = FormModule.secondSignaturePhoneNumber();
+            var secondSignatureSocialSecurityNumber = FormModule.secondSignatureSocialSecurityNumber();
+            var secondSignatureEmail = FormModule.secondSignatureEmail();
+            var secondSignatureEmailConfirm = FormModule.secondSignatureEmailConfirm();
+            var secondSignatureSingleSignature = FormModule.secondSignatureSingleSignature();
+            if (!FormModule.secondSignatureSingleSignature()) {
+                RequestModule.setSecondSignatureSingleSignature(false);
+                FormModule.setSecondSignatureSingleSignature(false);
+                secondSignatureSingleSignature = FormModule.secondSignatureSingleSignature();
+            }
+        }
+
+        //Reload form draft
+        FormModule.init(RequestModule.getFormDraft());
+        FormModule.setConfirmationEmail(confirmationEmail);
+        FormModule.setConfirmationEmailConfirm(confirmationEmailConfirm);
+
+        if (FormModule.formNeedsSecondSignature()) {
+            FormModule.setSecondSignatureName(secondSignatureName);
+            FormModule.setSecondSignaturePhoneNumber(secondSignaturePhoneNumber);
+            FormModule.setSecondSignatureSocialSecurityNumber(secondSignatureSocialSecurityNumber);
+            FormModule.setSecondSignatureEmail(secondSignatureEmail);
+            FormModule.setSecondSignatureEmailConfirm(secondSignatureEmailConfirm);
+            FormModule.setSecondSignatureSingleSignature(secondSignatureSingleSignature);
+        }
+
+        var dialogBody = dialog.find('.modal-body').empty();
+        var dialogFooter = dialog.find('.modal-footer').empty();
+
+        //Dialog body
+        dialogBody.append(texts.signOk);
+
+        //Dialog footer
+        var closeButton = new inner.Button(dialogFooter, 'grpCloseButton')
+            .name(texts.close)
+            .href(getFinishSigning());
+
+        //X button in dialog header (should do the same as closeButton above in this step)
+        dialog.find('.modal-header a.close').removeAttr('data-dismiss').attr('href', getFinishSigning());
+    }
 
 	function addSecondSignatureDiv(node) {
 		if (FormModule.formNeedsSecondSignature()) {
@@ -749,53 +974,9 @@ var View = (function() {
 	}
 
 	function toggleSignButton(disable) {
-		var selectedEid = FormModule.selectedEid();
-		if (typeof selectedEid !== 'undefined' && selectedEid && selectedEid.value !== texts.provider) {
-			var button = $('#link_' + selectedEid.name);
-			(disable || selectedEid.selectedIndex === 0 || !FormModule.isSecondSignatureReady()) ? inner.enable(button,
-					false) : inner.enable(button, true);
-		}
-	}
-
-	function eidProviders(signatureId) {
-		var comboBox = inner.clone('eidProviders').attr({
-			name : signatureId,
-			id : "eIdProvider_" + signatureId,
-			title : texts.eidProviders
-		});
-		comboBox.change(function() {
-			FormModule.setSelectedEid(this);
-			var button = $('#link_' + this.name);
-			if (this.selectedIndex == 0 || !FormModule.isSecondSignatureReady()) {
-				inner.enable(button, false);
-			}
-
-			var value = this.value;
-			button.attr('href', function() {
-				return this.href.split('?provider=')[0] + "?provider=" + value;
-			});
-			if (this.selectedIndex !== 0 && FormModule.isSecondSignatureReady()) {
-				inner.enable(button, true);
-			}
-			var signDTO = {
-				transactionId : FormModule.getFormId(),
-				tbs : FormModule.getFormTBS(),
-				provider : value,
-				successUrl : "verify",
-				errorUrl : "error"
-			};
-
-			var htmlSnippet = RequestModule.sign(signDTO);
-			$('#eIdPlugin').html(htmlSnippet).hide();
-		});
-		comboBox.append($('<option>/').append(texts.provider));
-		$.each(FormModule.providerLinks(), function(idx, link) {
-			comboBox.append($('<option />').attr({
-				value : link.provider
-			}).text(link.text));
-		});
-
-		return comboBox;
+        var button = $('#signButton');
+        (disable || !FormModule.isSecondSignatureReady()) ? inner.enable(button,
+                false) : inner.enable(button, true);
 	}
 
 	inner.getSignature = function(name, signatures) {
@@ -806,7 +987,7 @@ var View = (function() {
 		});
 
 		return match;
-	}
+	};
 
 	function redirect(view) {
 		location.hash = view;
@@ -884,6 +1065,17 @@ var View = (function() {
 		return this;
 	};
 
+    inner.Button.prototype.modal = function(modalElement) {
+        var button = this.elm;
+        button.attr({
+            'href' : modalElement,
+            'data-toggle' : 'modal',
+            'data-backdrop' : 'static'
+        });
+
+        return this;
+    };
+
 	inner.Button.prototype.small = function() {
 		this.elm.addClass('btn-small');
 
@@ -932,6 +1124,18 @@ var View = (function() {
 		return this;
 	};
 
+    inner.Button.prototype.show = function() {
+        this.elm.show();
+
+        return this;
+    };
+
+    inner.Button.prototype.hide = function() {
+        this.elm.hide();
+
+        return this;
+    };
+
 	inner.enable = function(button, _enable) {
 		if (_enable) {
 			button.removeClass('disabled');
@@ -941,6 +1145,10 @@ var View = (function() {
 			button.attr("onClick", "return false;");
 		}
 	};
+
+    inner.isEnabled = function(button){
+        return !button.hasClass('disabled');
+    };
 
 	inner.clone = function(id, newId) {
 		if (!newId)

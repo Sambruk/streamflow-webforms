@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2009-2014 Jayway Products AB
+ * Copyright 2009-2015 Jayway Products AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ var RequestModule = (function() {
 			url : url,
 			async : false,
 			cache : false,
-			error : errorPopup,
+			error : handleError,
 			dataType : 'json'
 		};
 	}
@@ -41,7 +41,7 @@ var RequestModule = (function() {
 		return data;
 	}
 
-	function errorPopup(jqXHR, textStatus, errorThrown) {
+	function handleError(jqXHR, textStatus, errorThrown) {
 		if (jqXHR.responseText) {
 			if (texts[jqXHR.responseText])
 				throw {
@@ -49,7 +49,7 @@ var RequestModule = (function() {
 				};
 			else
 				throw {
-					error : texts[jqXHR.responseText]
+                    error : texts.erroroccurred
 				};
 		} else {
 			throw {
@@ -152,18 +152,39 @@ var RequestModule = (function() {
 		return getData(parameters).signatures;
 	};
 
-	inner.getProviders = function() {
-		var parameters = request('GET', UrlModule.getProviders());
+    //Error handling is not working correctly (if error - no message is shown and view is not rendered correctly)
+    inner.getSigningServiceApi = function() {
+        var parameters = request('GET', UrlModule.getSigningServiceApi());
+        return invoke(getData, parameters, { error : texts.eidServiceUnavailable});
+    };
 
-		return getData(parameters);
-	};
+    //Error handling is not working correctly (if error - no message is shown and view is not rendered correctly)
+    inner.getGrpEIdProviders = function() {
+        var parameters = request('GET', UrlModule.getGrpEIdProviders());
+        return invoke(getData, parameters, texts.eidServiceUnavailable);
+    };
 
-	inner.getHeader = function() {
-		var parameters = request('GET', UrlModule.getHeader());
-		parameters.dataType = null;
+    inner.grpSign = function(signDTO) {
+        var parameters = request('POST', UrlModule.grpSign());
+        parameters.data = signDTO;
 
-		return invoke(getData, parameters, texts.eidServiceUnavailable);
-	};
+        return getData(parameters);
+    };
+
+    inner.grpCollect = function(collectDTO) {
+        var parameters = request('GET', UrlModule.grpCollect());
+        parameters.data = collectDTO;
+
+        return getData(parameters);
+    };
+
+    inner.saveSignature = function(saveSignatureDTO){
+        var parameters = request('POST', UrlModule.saveSignature());
+        parameters.data = saveSignatureDTO;
+        invoke($.ajax, parameters, {
+            error : texts.savesignaturefailed
+        });
+    };
 
 	inner.getCaseName = function() {
 		var parameters = request('GET', UrlModule.getCaseName());
@@ -185,23 +206,6 @@ var RequestModule = (function() {
 		var parameters = request('POST', UrlModule.setConfirmationEmail());
 		parameters.data = stringDTO;
 		$.ajax(parameters);
-	};
-
-	inner.sign = function(signDTO) {
-		var parameters = request('GET', UrlModule.sign());
-		parameters.dataType = null;
-		parameters.data = signDTO;
-
-		return getData(parameters);
-	};
-
-	inner.verify = function(verifyDTO) {
-		var parameters = request('POST', UrlModule.verify());
-		parameters.data = verifyDTO;
-		invoke($.ajax, parameters, {
-			error : texts.verifyfailed,
-			redirect : 'summary'
-		});
 	};
 
 	inner.refreshField = function(fieldId) {

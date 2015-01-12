@@ -1,6 +1,6 @@
 /**
  *
- * Copyright 2009-2014 Jayway Products AB
+ * Copyright 2009-2015 Jayway Products AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,6 @@
  */
 package se.streamsource.surface.web.rest;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
 import org.qi4j.api.configuration.Configuration;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.This;
@@ -33,9 +28,13 @@ import org.restlet.Uniform;
 import org.restlet.data.MediaType;
 import org.restlet.data.Reference;
 import org.restlet.data.Status;
-
 import se.streamsource.streamflow.util.Strings;
 import se.streamsource.surface.web.config.ExternalCssConfiguration;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  */

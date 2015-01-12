@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2009-2014 Jayway Products AB
+ * Copyright 2009-2015 Jayway Products AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -113,13 +113,28 @@ var UrlModule = (function() {
 		return urls.proxy + urls.proxydraft + 'summary/signatures.json';
 	};
 
-	inner.getProviders = function() {
-		return urls.eid + 'sign/providers.json';
-	};
+    inner.getSigningServiceApi = function() {
+        return urls.eid + 'services/.json';
+    };
 
-	inner.getHeader = function() {
-		return urls.eid + 'sign/header.htm';
-	};
+    //TODO: Create url from API response instead?
+    inner.getGrpEIdProviders = function() {
+        return urls.eid + 'services/grp/providers.json';
+    };
+
+    //TODO: Create url from API response instead?
+    inner.grpSign = function() {
+        return urls.eid + 'services/grp/sign.json';
+    };
+
+    //TODO: Create url from API response instead?
+    inner.grpCollect = function(){
+        return urls.eid + 'services/grp/collect.json';
+    };
+
+    inner.saveSignature = function() {
+        return urls.surface + urls.draft + 'savesignature.json';
+    };
 
 	inner.getCaseName = function() {
 		return urls.proxy + urls.proxycaze + 'index.json';
@@ -127,14 +142,6 @@ var UrlModule = (function() {
 
 	inner.getCaseUrl = function() {
 		return urls.proxy + urls.proxycaze;
-	};
-
-	inner.sign = function() {
-		return urls.eid + 'sign/surface.htm';
-	};
-
-	inner.verify = function() {
-		return urls.surface + urls.draft + 'verify.json';
 	};
 
 	inner.attach = function() {

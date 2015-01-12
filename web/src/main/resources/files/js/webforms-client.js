@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2009-2014 Jayway Products AB
+ * Copyright 2009-2015 Jayway Products AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,14 +23,6 @@ jQuery(document).ready(function() {
 		Contexts.init(contexts);
 
 		setupView();
-		loadEidPlugins();
-	}
-
-	function loadEidPlugins() {
-		if (FormModule.formNeedsSigning()) {
-			$("#signerDiv").append(RequestModule.getHeader());
-			addSigners($("#signerDiv"));
-		}
 	}
 
 	update = function(id, value) {
@@ -53,18 +45,14 @@ jQuery(document).ready(function() {
 		}
 	}
 
-	function setupRequiredSignatures() {
-		FormModule.setRequiredSignatures(RequestModule.getFormSignatures());
-	}
+    function setupRequiredSignatures() {
+        FormModule.setRequiredSignatures(RequestModule.getFormSignatures());
+    }
 
-	function setupRequiredSignature(args) {
-		FormModule.setRequiredSignature(args.segment);
-	}
-
-	function setupProviders() {
-		if (!FormModule.providersInitialized() && FormModule.formNeedsSigning()) {
-			FormModule.setProviders(RequestModule.getProviders());
-		}
+	function setupSigningService() {
+        if (FormModule.formNeedsSigning()) {
+		    FormModule.setSigningService(RequestModule.getSigningServiceApi());
+        }
 	}
 
 	/** Verify functions * */
@@ -99,36 +87,10 @@ jQuery(document).ready(function() {
 			};
 	}
 
-	function verifySigner(args) {
-		if (!FormModule.formNeedsSigning())
-			throw {
-				error : texts.noRequiredSignatures
-			};
-
-		formIsFilled({
-			error : texts.fillBeforeSign
-		});
-
-		validateNumber(args.segment, FormModule.requiredSignedSignaturesCount(), {
-			error : texts.requiredSignatureNotValid + args.segment
-		});
-	}
-
 	function validateNumber(number, max, ifError) {
 		var nr = parseInt(number);
 		if (isNaN(nr) || nr < 0 || nr >= max) {
 			throw ifError;
-		}
-	}
-
-	function verifyProvider(args) {
-		var match = $.grep(FormModule.providerLinks(), function(link, idx) {
-			return (link.provider == args.provider);
-		});
-		if (match.length == 0) {
-			throw {
-				error : texts.unknownEidProvider
-			};
 		}
 	}
 
@@ -174,16 +136,15 @@ jQuery(document).ready(function() {
 			},
 			'summary' : {
 				view : View.summary,
-				init : [ setupProviders ],
+				init : [ setupSigningService ],
 				subContexts : {
 					'submit' : {
 						view : View.submit,
 						init : [ verifySubmit ]
 					},
-					'idContext' : {
-						view : View.sign,
-						init : [ verifySigner, verifyProvider, setupRequiredSignature ]
-					}
+                    "finishSigning" : {
+                        view : View.finishSigning
+                    }
 				}
 			},
 			'missing' : {

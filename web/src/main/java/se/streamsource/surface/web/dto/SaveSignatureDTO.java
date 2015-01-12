@@ -14,20 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package se.streamsource.surface.web.resource;
+package se.streamsource.surface.web.dto;
 
-import se.streamsource.dci.restlet.server.CommandQueryResource;
-import se.streamsource.surface.web.context.FormDraftContext;
+import org.qi4j.api.property.Property;
+import org.qi4j.api.value.ValueComposite;
 
-/**
- * JAVADOC
- */
-public class FormDraftResource
-   extends CommandQueryResource
-{
-   public FormDraftResource( )
-   {
-      super( FormDraftContext.class );
-   }
+public interface SaveSignatureDTO extends ValueComposite {
 
+    Property<String> name();
+    Property<String> form();
+
+    Property<String> encodedTbs();
+    Property<String> signature();
+    Property<String> provider();
+
+    Property<String> signerId();
+    Property<String> signerName();
 }

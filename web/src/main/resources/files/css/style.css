@@ -1,6 +1,6 @@
 /**
  *
- * Copyright 2009-2014 Jayway Products AB
+ * Copyright 2009-2015 Jayway Products AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -176,6 +176,7 @@ legend+.control-group {
 .btn-find-me {
 	margin-bottom: 20px;
 }
+
 /* Summary 
 -------------------------------------------------- */
 table.fields_table {
@@ -245,6 +246,7 @@ img.map_icon {
 	font-size: 15px;
 }
 
+
 /* Mail comfirmation
 -------------------------------------------------- */
 #mailInputs {
@@ -263,8 +265,28 @@ td.signer-name {
 	font-weight: 600;
 }
 
+td.sign-button {
+    padding-left: 7px;
+}
+
 select.eidproviders {
 	margin: 4px;
+}
+
+.grp-signing-modal-body {
+    height: 140px;
+    text-align: center;
+}
+
+#openBankIDManually {
+    margin-top: 30px;
+}
+
+#openBankIDMessage {
+    font-weight: normal;
+    font-style: italic;
+    font-size: 13px;
+    color: #999;
 }
 
 /* Second signature

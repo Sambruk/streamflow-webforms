@@ -4,7 +4,7 @@
     <groupId>se.streamsource.streamflow</groupId>
     <artifactId>surface</artifactId>
     <name>StreamFlow Surface (Build POM)</name>
-    <version>1.15-SNAPSHOT</version>
+    <version>1.16-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <!-- This POM is ONLY to initiate the modules to be built. -->
@@ -13,10 +13,9 @@
         <version.qi4j-lib>1.3</version.qi4j-lib>
         <version.qi4j-ext>1.3</version.qi4j-ext>
 
-        <version.eid.plugin>1.5.0</version.eid.plugin>
         <version.qi4j-tools>1.3</version.qi4j-tools>
         <version.restlet>2.0.3</version.restlet>
-        <version.streamflow>1.18</version.streamflow>
+        <version.streamflow>1.22</version.streamflow>
     </properties>
 
     <repositories>
@@ -168,7 +167,7 @@
         </contributor>
     </contributors>
 
-    <inceptionYear>2009-2014</inceptionYear>
+    <inceptionYear>2009-2015</inceptionYear>
     <url>http://www.jayway.com/streamflow/</url>
 
     <organization>
@@ -353,11 +352,11 @@
                             </properties>
                             <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
                             <resourceBundles>
-                                <resourceBundle>se.streamsource.streamflow:streamflow-jar-resource-bundle:1.3
+                                <resourceBundle>se.streamsource.streamflow:streamflow-jar-resource-bundle:1.4
                                 </resourceBundle>
                             </resourceBundles>
                             <supplementalModelArtifacts>
-                                <supplementalModelArtifact>se.streamsource.streamflow:dependency-resource-supplement:1.7
+                                <supplementalModelArtifact>se.streamsource.streamflow:dependency-resource-supplement:1.9
                                 </supplementalModelArtifact>
                             </supplementalModelArtifacts>
                             <supplementalModels>
@@ -423,12 +422,6 @@
                 <artifactId>streamflow-infrastructure</artifactId>
                 <version>${version.streamflow}</version>
             </dependency>
-            <dependency>
-                <groupId>se.streamsource.streamflow.plugins</groupId>
-                <artifactId>streamflow-plugin-eid-api</artifactId>
-                <version>${version.eid.plugin}</version>
-            </dependency>
-            
 
             <!-- Qi4j -->
             <dependency>
