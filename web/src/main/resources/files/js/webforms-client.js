@@ -142,7 +142,7 @@ jQuery(document).ready(function() {
 						view : View.submit,
 						init : [ verifySubmit ]
 					},
-                    "finishSigning" : {
+                    'finishSigning' : {
                         view : View.finishSigning
                     }
 				}

@@ -178,6 +178,11 @@ var RequestModule = (function() {
         return getData(parameters);
     };
 
+    inner.getAuthifySigningInfo = function() {
+        var parameters = request('GET', UrlModule.getAuthifySigningInfo());
+        return invoke(getData, parameters, texts.eidServiceUnavailable);
+    };
+
     inner.saveSignature = function(saveSignatureDTO){
         var parameters = request('POST', UrlModule.saveSignature());
         parameters.data = saveSignatureDTO;

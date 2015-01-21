@@ -25,6 +25,7 @@ import org.qi4j.api.service.qualifier.Tagged;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Uniform;
+import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Reference;
 import org.restlet.data.Status;
@@ -62,6 +63,7 @@ public interface IndexRestletService extends ServiceComposite, Configuration<Ext
 
          String accessPointId = request.getResourceRef().getQueryAsForm().getFirstValue( "ap" );
          String taskId = request.getResourceRef().getQueryAsForm().getFirstValue( "tid" );
+         String authifyCallback = request.getResourceRef().getQueryAsForm().getFirstValue( "authify_callback" );
 
          if (accessPointId != null)
          {
@@ -92,6 +94,22 @@ public interface IndexRestletService extends ServiceComposite, Configuration<Ext
             template = template.replace( "$externalcss", externalCssReplaceString );
             
             response.setEntity( template, MediaType.TEXT_HTML );
+         } else if (authifyCallback != null)
+         {
+             String template = getTemplate( "authify-callback.html", getClass() );
+             Form form = new Form(request.getEntity());
+             String provider = form.getFirstValue( "provider" );
+             String encodedText = form.getFirstValue( "encodedText" );
+             String signature = form.getFirstValue( "signature" );
+             String signerId = form.getFirstValue( "signerId" );
+             String signerName = form.getFirstValue( "signerName" );
+             template = template.replace( "$hostname", request.getResourceRef().getHostIdentifier() );
+             template = template.replace("$provider", provider);
+             template = template.replace("$encodedText", encodedText);
+             template = template.replace("$signature", signature);
+             template = template.replace("$signerId", signerId);
+             template = template.replace("$signerName", signerName);
+             response.setEntity( template, MediaType.TEXT_HTML );
          } else
          {
             response.setLocationRef( new Reference( request.getResourceRef(), "/"
