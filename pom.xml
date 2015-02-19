@@ -4,7 +4,7 @@
     <groupId>se.streamsource.streamflow</groupId>
     <artifactId>surface</artifactId>
     <name>StreamFlow Surface (Build POM)</name>
-    <version>1.16-SNAPSHOT</version>
+    <version>1.17-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <!-- This POM is ONLY to initiate the modules to be built. -->
@@ -439,6 +439,13 @@
                 <groupId>se.streamsource.streamflow</groupId>
                 <artifactId>streamflow-infrastructure</artifactId>
                 <version>${version.streamflow}</version>
+                <!-- exclude elasticsearch since it is not needed, to keep artifact size down -->
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.elasticsearch</groupId>
+                        <artifactId>elasticsearch</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- Qi4j -->

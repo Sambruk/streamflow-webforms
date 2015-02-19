@@ -27,6 +27,7 @@ var UrlModule = (function() {
 		urls.proxy = contextRoot + urls.proxy;
 		urls.surface = contextRoot + urls.surface;
 		urls.eid = contextRoot + urls.eid;
+        urls.eidapi = urls.eid + "api/";
 		urls.accesspoint = 'accesspoints/' + accesspoint + "/";
 		urls.endusers = urls.accesspoint  + 'endusers/';
 		
@@ -114,22 +115,27 @@ var UrlModule = (function() {
 	};
 
     inner.getSigningServiceApi = function() {
-        return urls.eid + 'services/.json';
+        return urls.eidapi + 'services/.json';
     };
 
     //TODO: Create url from API response instead?
     inner.getGrpEIdProviders = function() {
-        return urls.eid + 'services/grp/providers.json';
+        return urls.eidapi + 'services/grp/providers.json';
     };
 
     //TODO: Create url from API response instead?
     inner.grpSign = function() {
-        return urls.eid + 'services/grp/sign.json';
+        return urls.eidapi + 'services/grp/sign.json';
     };
 
     //TODO: Create url from API response instead?
     inner.grpCollect = function(){
-        return urls.eid + 'services/grp/collect.json';
+        return urls.eidapi + 'services/grp/collect.json';
+    };
+
+    //TODO: Create url from API response instead?
+    inner.getAuthifySigningInfo = function() {
+        return urls.eidapi + "services/authify/signing.json";
     };
 
     inner.saveSignature = function() {

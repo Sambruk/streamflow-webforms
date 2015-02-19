@@ -264,7 +264,7 @@ var FormModule = (function() {
 
 	inner.settings = function() {
 		return this.settings;
-	}
+	};
 	
 	inner.isSecondSignatureReady = function() {
 		if (inner.formNeedsSecondSignature()) {
