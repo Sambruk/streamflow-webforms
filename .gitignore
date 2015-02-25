@@ -10,3 +10,4 @@
 target
 /web/target/
 .sass-cache
+.DS_Store
