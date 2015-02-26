@@ -21,7 +21,7 @@ var View = (function() {
 
 	inner.error = function(message) {
 		var node = inner.clone('alert', "inserted_alert");
-		node.addClass("alert-error")
+		node.addClass("alert-error");
 		node.append(message);
 		var breadcrumbNode = $('#inserted_content').find('ul.breadcrumb');
 		node.insertAfter(breadcrumbNode);
@@ -34,7 +34,7 @@ var View = (function() {
 		var container = $('#container').empty();
 		var node = inner.clone('thank_you_div');
 		var alert = inner.clone('alert');
-		alert.addClass("alert-info")
+		alert.addClass("alert-info");
 		alert.append(texts.formdiscarded);
 		node.prepend(alert);
 
@@ -100,7 +100,7 @@ var View = (function() {
 		var container = $('#container').empty();
 		var node = inner.clone('thank_you_div');
 		var alert = inner.clone('alert');
-		alert.addClass("alert-info")
+		alert.addClass("alert-info");
 		alert.append(texts.missingEid);
 		node.prepend(alert);
 
@@ -347,7 +347,7 @@ var View = (function() {
 		}
 
 		return getPage(0);
-	}
+	};
 
 	inner.getNext = function(segment) {
 		var current = parseInt(segment);
@@ -362,7 +362,7 @@ var View = (function() {
 
 			return getSummary();
 		}
-	}
+	};
 
 	function getPage(page) {
 		return '#' + Contexts.findUrl(inner.formPage, [ page ]);
@@ -510,13 +510,18 @@ var View = (function() {
                 } else if(FormModule.signWithAuthify()){
                     new inner.Button(buttonCell).attr('id', 'signButton').name(texts.sign).image('icon-pencil').enable(true)
                         .click(function(event) {
-                            openAuthifySigningDialog(event);
-                            return false;
+                            if(isSignButtonEnabled()){ //Button could be disabled due to incorrect data in second signature form
+                                openAuthifySigningDialog(event);
+                                return false;
+                            } else {
+                                event.preventDefault();
+                            }
                         });
                 }
 				row.append(buttonCell);
 			}
 			node.append(signaturesNode);
+            toggleSignButton(false);
 		}
 	}
 
@@ -530,13 +535,17 @@ var View = (function() {
         renderGrpSigningDialogFirstStep(dialog);
 
         dialog.on('show.bs.modal', function(event) {
-            try {
-                verifySigning();
-            } catch(e) {
+            if(isSignButtonEnabled()){ //Button could be disabled due to incorrect data in second signature form
+                try {
+                    verifySigning();
+                } catch(e) {
+                    event.preventDefault();
+                    messages.error = e.error;
+                    showMessages();
+                    $(window).scrollTop(0);
+                }
+            } else {
                 event.preventDefault();
-                messages.error = e.error;
-                showMessages();
-                $(window).scrollTop(0);
             }
         });
 
@@ -999,7 +1008,7 @@ var View = (function() {
 	}
 
 	function updateSecondSignatureEmail(emailField) {
-		var email = emailField.find('#email')
+		var email = emailField.find('#email');
 		email.val(FormModule.secondSignatureEmail());
 		email.blur(function() {
 			var stringDTO = {};
@@ -1047,6 +1056,11 @@ var View = (function() {
         (disable || !FormModule.isSecondSignatureReady()) ? inner.enable(button,
                 false) : inner.enable(button, true);
 	}
+
+    function isSignButtonEnabled() {
+        var signButton = $('#signButton');
+        return inner.isEnabled(signButton);
+    }
 
 	inner.getSignature = function(name, signatures) {
 		var match;

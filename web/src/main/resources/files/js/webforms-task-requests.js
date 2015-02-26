@@ -26,7 +26,7 @@ var TaskRequestModule = (function() {
 			url : url,
 			async : false,
 			cache : false,
-			error : errorPopup,
+			error : handleError,
 			dataType : 'json'
 		};
 	}
@@ -41,7 +41,7 @@ var TaskRequestModule = (function() {
 		return data;
 	}
 
-	function errorPopup(jqXHR, textStatus, errorThrown) {
+	function handleError(jqXHR, textStatus, errorThrown) {
 		if (jqXHR.responseText) {
 			if (texts[jqXHR.responseText])
 				throw {
@@ -49,7 +49,7 @@ var TaskRequestModule = (function() {
 				};
 			else
 				throw {
-					error : texts[jqXHR.responseText]
+                    error : texts.erroroccurred
 				};
 		} else {
 			throw {
@@ -157,18 +157,44 @@ var TaskRequestModule = (function() {
 		return getData(parameters).signatures;
 	};
 
-	inner.getProviders = function() {
-		var parameters = request('GET', TaskUrlModule.getProviders());
+    //Error handling is not working correctly (if error - no message is shown and view is not rendered correctly)
+    inner.getSigningServiceApi = function() {
+        var parameters = request('GET', TaskUrlModule.getSigningServiceApi());
+        return invoke(getData, parameters, { error : texts.eidServiceUnavailable});
+    };
 
-		return getData(parameters);
-	};
+    //Error handling is not working correctly (if error - no message is shown and view is not rendered correctly)
+    inner.getGrpEIdProviders = function() {
+        var parameters = request('GET', TaskUrlModule.getGrpEIdProviders());
+        return invoke(getData, parameters, texts.eidServiceUnavailable);
+    };
 
-	inner.getHeader = function() {
-		var parameters = request('GET', TaskUrlModule.getHeader());
-		parameters.dataType = null;
+    inner.grpSign = function(signDTO) {
+        var parameters = request('POST', TaskUrlModule.grpSign());
+        parameters.data = signDTO;
 
-		return invoke(getData, parameters, texts.eidServiceUnavailable);
-	};
+        return getData(parameters);
+    };
+
+    inner.grpCollect = function(collectDTO) {
+        var parameters = request('GET', TaskUrlModule.grpCollect());
+        parameters.data = collectDTO;
+
+        return getData(parameters);
+    };
+
+    inner.getAuthifySigningInfo = function() {
+        var parameters = request('GET', TaskUrlModule.getAuthifySigningInfo());
+        return invoke(getData, parameters, texts.eidServiceUnavailable);
+    };
+
+    inner.saveSignature = function(saveSignatureDTO){
+        var parameters = request('POST', TaskUrlModule.saveSignature());
+        parameters.data = saveSignatureDTO;
+        invoke($.ajax, parameters, {
+            error : texts.savesignaturefailed
+        });
+    };
 
 	inner.getCaseName = function() {
 		var parameters = request('GET', TaskUrlModule.getCaseName());
@@ -190,23 +216,6 @@ var TaskRequestModule = (function() {
 		var parameters = request('POST', TaskUrlModule.setConfirmationEmail());
 		parameters.data = stringDTO;
 		$.ajax(parameters);
-	};
-
-	inner.sign = function(signDTO) {
-		var parameters = request('GET', TaskUrlModule.sign());
-		parameters.dataType = null;
-		parameters.data = signDTO;
-
-		return getData(parameters);
-	};
-
-	inner.verify = function(verifyDTO) {
-		var parameters = request('POST', TaskUrlModule.verify());
-		parameters.data = verifyDTO;
-		invoke($.ajax, parameters, {
-			error : texts.verifyfailed,
-			redirect : 'summary'
-		});
 	};
 
 	inner.refreshField = function(fieldId) {

@@ -27,6 +27,7 @@ var TaskUrlModule = (function() {
 		urls.proxy = contextRoot + urls.proxy;
 		urls.surface = contextRoot + urls.surface;
 		urls.eid = contextRoot + urls.eid;
+        urls.eidapi = urls.eid + "api/";
 		urls.task = 'tasks/' + task + '/';
 	};
 
@@ -108,13 +109,33 @@ var TaskUrlModule = (function() {
 		return urls.proxy + urls.proxydraft + 'summary/signatures.json';
 	};
 
-	inner.getProviders = function() {
-		return urls.eid + 'sign/providers.json';
-	};
+    inner.getSigningServiceApi = function() {
+        return urls.eidapi + 'services/.json';
+    };
 
-	inner.getHeader = function() {
-		return urls.eid + 'sign/header.htm';
-	};
+    //TODO: Create url from API response instead?
+    inner.getGrpEIdProviders = function() {
+        return urls.eidapi + 'services/grp/providers.json';
+    };
+
+    //TODO: Create url from API response instead?
+    inner.grpSign = function() {
+        return urls.eidapi + 'services/grp/sign.json';
+    };
+
+    //TODO: Create url from API response instead?
+    inner.grpCollect = function(){
+        return urls.eidapi + 'services/grp/collect.json';
+    };
+
+    //TODO: Create url from API response instead?
+    inner.getAuthifySigningInfo = function() {
+        return urls.eidapi + "services/authify/signing.json";
+    };
+
+    inner.saveSignature = function() {
+        return urls.surface + urls.draft + 'savesignature.json';
+    };
 
 	inner.getCaseName = function() {
 		return urls.proxy + urls.task + 'caseid.json';
@@ -122,14 +143,6 @@ var TaskUrlModule = (function() {
 
 	inner.getCaseUrl = function() {
 		return urls.proxy + urls.proxycaze;
-	};
-
-	inner.sign = function() {
-		return urls.eid + 'sign/surface.htm';
-	};
-
-	inner.verify = function() {
-		return urls.surface + urls.draft + 'verify.json';
 	};
 
 	inner.attach = function() {

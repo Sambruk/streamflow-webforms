@@ -19,7 +19,6 @@ var FormModule = (function() {
 	var formDraft;
 	var mailSelectionMessageText;
 	var grpEIdProviders;
-	var osifEIdProviders;
 	var fieldMap = {};
 	var initDone = false;
 	var requiredSignatures;
@@ -48,7 +47,6 @@ var FormModule = (function() {
 			// this.secondSignatureEmailConfirm =
 			// formDraft.secondSignatureEmailConfirm;
 		}
-		this.selectedEid = formDraft.selectedEid;
 
 		var pages = this.pages;
 		$.each(formDraft.pages, function(idx, page) {
@@ -416,32 +414,6 @@ var FormModule = (function() {
 		return formDraft.pages;
 	};
 
-    //TODO: Remove (along with property) when changing from OSIF to GRP in webforms-task (second signature)
-	inner.osifProvidersInitialized = function() {
-		return (typeof (osifEIdProviders) != "undefined");
-	};
-
-    //TODO: Remove (along with property) when changing from OSIF to GRP in webforms-task (second signature)
-	inner.setOsifProviders = function(providers) {
-		osifEIdProviders = providers;
-		$.each(osifEIdProviders.links, function(idx, provider) {
-			var list = provider.href.split('=');
-			if (list.length != 2) {
-				throw {
-					error : texts.invalidProviderList,
-					redirect : 'summary'
-				};
-			} else {
-				provider.provider = list[1];
-			}
-		});
-	};
-
-    //TODO: Remove (along with property) when changing from OSIF to GRP in webforms-task (second signature)
-	inner.osifProviderLinks = function() {
-		return osifEIdProviders.links;
-	};
-
     inner.grpEIdProvidersInitialized = function() {
         return (typeof (grpEIdProviders) != "undefined");
     };
@@ -533,15 +505,6 @@ var FormModule = (function() {
 			return formDraft.secondSignatureEmail;
 		} else
 			return formDraft.secondSignatureEmailConfirm;
-	};
-
-	inner.selectedEid = function() {
-		return formDraft.selectedEid;
-	};
-
-    //TODO: Remove (along with property) when changing from OSIF to GRP in webforms-task (second signature)
-	inner.setSelectedEid = function(eid) {
-		formDraft.selectedEid = eid;
 	};
 
 	return inner;
