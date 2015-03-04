@@ -4,7 +4,7 @@
     <groupId>se.streamsource.streamflow</groupId>
     <artifactId>surface</artifactId>
     <name>StreamFlow Surface (Build POM)</name>
-    <version>1.17-SNAPSHOT</version>
+    <version>1.18-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <!-- This POM is ONLY to initiate the modules to be built. -->
@@ -332,6 +332,7 @@
                                 <exclude>**/resources/files/js/external/**</exclude>
                                 <exclude>**/webapp/css/external/**</exclude><!-- Is this really correct? Should be **/resources/files/css/external/**? And make sure correct licenses are in the affected files? -->
                                 <exclude>**/*.html</exclude> <!--  IE will screw up if anything is added before the doctype, add license manually instead -->
+                                <exclude>**/*.htm</exclude> <!--  IE will screw up if anything is added before the doctype, add license manually instead -->
                                 <exclude>**/jquery-ui-1.8.2.css</exclude>
                             </excludes>
                             <encoding>UTF-8</encoding>

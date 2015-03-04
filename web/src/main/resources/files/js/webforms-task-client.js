@@ -22,14 +22,6 @@ jQuery(document).ready(function() {
 		Contexts.init(contexts);
 
 		setupView();
-		loadEidPlugins();
-	}
-
-	function loadEidPlugins() {
-		if (FormModule.requiredSignaturesCount() > 0) {
-			$("#signerDiv").append(TaskRequestModule.getHeader());
-			addSigners($("#signerDiv"));
-		}
 	}
 
 	update = function(id, value) {
@@ -48,17 +40,13 @@ jQuery(document).ready(function() {
 		FormModule.setRequiredSignatures(TaskRequestModule.getFormSignatures());
 	}
 
-	function setupRequiredSignature(args) {
-		FormModule.setRequiredSignature(args.segment);
-	}
+    function setupSigningService() {
+        if (FormModule.formNeedsSigning()) {
+            FormModule.setSigningService(TaskRequestModule.getSigningServiceApi());
+        }
+    }
 
-	function setupProviders() {
-		if (!FormModule.osifProvidersInitialized() && FormModule.requiredSignaturesCount() > 0) {
-			FormModule.setOsifProviders(TaskRequestModule.getProviders());
-		}
-	}
-
-	function setupIncomgingFormSummary() {
+	function setupIncomingFormSummary() {
 		FormModule.setupIncomingFormSummaryPage(TaskRequestModule.getTaskSubmittedFormSummary());
 	}
 
@@ -94,36 +82,10 @@ jQuery(document).ready(function() {
 			};
 	}
 
-	function verifySigner(args) {
-		if (FormModule.requiredSignaturesCount() == 0)
-			throw {
-				error : texts.noRequiredSignatures
-			};
-
-		formIsFilled({
-			error : texts.fillBeforeSign
-		});
-
-		validateNumber(args.segment, FormModule.requiredSignaturesCount(), {
-			error : texts.requiredSignatureNotValid + args.segment
-		});
-	}
-
 	function validateNumber(number, max, ifError) {
 		var nr = parseInt(number);
 		if (isNaN(nr) || nr < 0 || nr >= max) {
 			throw ifError;
-		}
-	}
-
-	function verifyProvider(args) {
-		var match = $.grep(FormModule.osifProviderLinks(), function(link, idx) {
-			return (link.provider == args.provider);
-		});
-		if (match.length == 0) {
-			throw {
-				error : texts.unknownEidProvider
-			};
 		}
 	}
 
@@ -157,7 +119,7 @@ jQuery(document).ready(function() {
 
 	var contexts = {
 		view : rootView,
-		init : [ setupForm, setupIncomgingFormSummary, setupRequiredSignatures ],
+		init : [ setupForm, setupIncomingFormSummary, setupRequiredSignatures ],
 		subContexts : {
 			'incoming' : {
 				view : TaskView.incoming,
@@ -169,16 +131,15 @@ jQuery(document).ready(function() {
 			},
 			'summary' : {
 				view : TaskView.summary,
-				init : [ setupProviders ],
+				init : [ setupSigningService ],
 				subContexts : {
 					'submit' : {
 						view : TaskView.submit,
 						init : [ verifySubmit ]
 					},
-					'idContext' : {
-						view : TaskView.sign,
-						init : [ verifySigner, verifyProvider, setupRequiredSignature ]
-					}
+                    'finishSigning' : {
+                        view : TaskView.finishSigning
+                    }
 				}
 			}
 		}

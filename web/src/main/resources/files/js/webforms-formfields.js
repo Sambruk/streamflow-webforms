@@ -622,7 +622,7 @@ var FieldTypeModule = (function() {
 				if (field.page.fields[i].fieldType === "CommentFieldValue")
 					continue;
 
-				if (changes.indexOf(field.page.fields[i]) !== -1) {
+                if ($.inArray(field.page.fields[i], changes) !== -1) {
 					setTimeout(function() {
 						field.textFieldNode.focus();
 					}, 0);

@@ -46,7 +46,11 @@
         signerId : signerId,
         signerName : signerName
     };
-    window.opener.View.handleAuthifyCallback(callbackMessage);
+    if(window.opener.TaskView) {
+        window.opener.TaskView.handleAuthifyCallback(callbackMessage);
+    } else {
+        window.opener.View.handleAuthifyCallback(callbackMessage);
+    }
     this.close();
 </script>
 </body>
