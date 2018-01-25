@@ -137,6 +137,11 @@ input.hasDatepicker {
 	margin-left: 15px;
 }
 
+.fileinput-button + .fileupload-progress {
+  float: left;
+  width: 380px;
+}
+
 .alert-info {
 	color: #333;
 }
