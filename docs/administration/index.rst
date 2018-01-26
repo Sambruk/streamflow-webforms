@@ -5,3 +5,4 @@ Administration
     :titlesonly:
 
     configuration
+    restyle
