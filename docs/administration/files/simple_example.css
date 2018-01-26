@@ -1,0 +1,23 @@
+/****************************/
+/* Size and container style */
+/****************************/
+
+.span12, .container {
+   width: 650px;
+}
+
+.span8 {
+   width: 650px;
+}
+
+/***************/
+/* Text Styles */
+/***************/
+body {
+	font-family: "Cambria", Georgia, serif,sans-serif;
+}
+
+label {
+	font-family: "Cambria", Georgia, serif,sans-serif;
+	font-size: 13px;
+}

@@ -46,3 +46,23 @@ Alternative 2: Using Bootstrap
     #. Download the files using the large button "Customize and download" at the end of the page
     #. Unzip the files and locate the file "../css/boostrap.min.css"
     #. Publish that file to a webserver and configure surface WebForms as described above.
+
+Examples
+********
+
+CSS files
+---------
+    :download:`Simple CSS <files/simple_example.css>`.
+
+    :download:`Kalmar CSS file <files/simple_example.css>`.
+
+Usage
+-----
+    :download:`Kalmar iframe pop-up .pdf <files/simple_example.css>`.
+
+    :download:`Kalmar iframe pop-up .pptx <files/simple_example.css>`.
+
+    :download:`Jonkoping iframe integrated .pdf<files/simple_example.css>`.
+
+    :download:`Jonkoping iframe integrated .pptx<files/simple_example.css>`.
+
