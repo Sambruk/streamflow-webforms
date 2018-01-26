@@ -2,4 +2,6 @@
 ===========
 
 .. toctree::
-   :titlesonly:
+    :titlesonly:
+
+    build_release
