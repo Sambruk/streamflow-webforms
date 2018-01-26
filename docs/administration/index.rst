@@ -3,3 +3,5 @@ Administration
 
 .. toctree::
     :titlesonly:
+
+    configuration
