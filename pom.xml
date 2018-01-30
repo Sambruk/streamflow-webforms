@@ -149,12 +149,12 @@
         </contributor>
     </contributors>
 
-    <inceptionYear>2009-2015</inceptionYear>
+    <inceptionYear>2016-2018</inceptionYear>
     <url>http://www.jayway.com/streamflow/</url>
 
     <organization>
-        <name>Jayway Products AB</name>
-        <url>http://www.jayway.com/streamflow/</url>
+        <name>Föreningen Sambruk</name>
+        <url>http://www.sambruk.se/streamflow/</url>
     </organization>
 
     <build>

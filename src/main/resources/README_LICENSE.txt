@@ -1,11 +1,12 @@
 
 Streamflow (tm) Surface
 
-Copyright 2009-2010 Jayway Products AB
+Copyright 2009-2015 Jayway Products AB
+Copyright 2016-2018 Föreningen Sambruk
 
-Streamflow (tm) Surface is licensed under the Apache License, Version 2.0 (the "License"). 
+Streamflow (tm) Surface is licensed under the under AGPL, Version 3.0 (the "License").
 You may not use Streamflow (tm) Surface except in compliance with the License. A copy of 
-the License may be obtained at http://www.apache.org/licenses/LICENSE-2.0 . 
+the License may be obtained at http://www.gnu.org/licenses/agpl.txt .
 
 Streamflow (tm) Surface contains software that is licensed by third parties to 
 Jayway Products AB and protected by copyright.
