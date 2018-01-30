@@ -9,8 +9,7 @@
     <packaging>war</packaging>
     <name>Streamsource Surface web</name>
     <description>Streamsource Surface web application</description>
-    <properties>
-    </properties>
+
     <build>
         <plugins>
             <!-- Resources -->
