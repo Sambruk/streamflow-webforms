@@ -71,7 +71,7 @@ Setup Surface in VisualVM
 
     To make it possible for Surface to talk to Streamflow we have to configure the Streamflow proxy user and the Streamflow address to use for the connection to Streamflow.
 
-    Proxy users, access points and functions connected to the access points are set up in the Streamflow administrative UI.
+    Proxy users, access points and functions connected to the access points are set up in the Streamflow administrative UI. For more detailed configuration go to :doc:`../administration/configuration_streamflow_core`
 
 enabled - ``boolean``
 """""""""""""""""""""
